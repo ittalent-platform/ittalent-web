@@ -1,0 +1,45 @@
+{
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "retry": "Retry",
+    "search": "Search",
+    "clear": "Clear filters",
+    "back": "Back",
+    "close": "Close",
+    "confirm": "Confirm",
+    "logout": "Log out"
+  },
+  "state": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "empty": "No data yet",
+    "error": "Something went wrong. Please try again.",
+    "noResults": "No matching results found"
+  },
+  "pagination": {
+    "showing": "Showing {{start}}–{{end}} of {{total}}",
+    "rows": "Rows:",
+    "page": "Page",
+    "previous": "Previous page",
+    "next": "Next page"
+  },
+  "errorState": {
+    "defaultTitle": "Something went wrong",
+    "retry": "Try again"
+  },
+  "search": {
+    "placeholder": "Search…",
+    "clearSearch": "Clear search"
+  },
+  "timeline": {
+    "viewAll": "View all {{count}}"
+  },
+  "loadingScreen": {
+    "message": "Loading your session and app state."
+  }
+}

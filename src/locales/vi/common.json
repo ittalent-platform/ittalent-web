@@ -1,0 +1,45 @@
+{
+  "actions": {
+    "save": "Lưu",
+    "cancel": "Huỷ",
+    "delete": "Xoá",
+    "edit": "Sửa",
+    "create": "Tạo mới",
+    "update": "Cập nhật",
+    "retry": "Thử lại",
+    "search": "Tìm kiếm",
+    "clear": "Xoá bộ lọc",
+    "back": "Quay lại",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "logout": "Đăng xuất"
+  },
+  "state": {
+    "loading": "Đang tải...",
+    "saving": "Đang lưu...",
+    "empty": "Chưa có dữ liệu",
+    "error": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+    "noResults": "Không tìm thấy kết quả phù hợp"
+  },
+  "pagination": {
+    "showing": "Hiển thị {{start}}–{{end}} trên {{total}}",
+    "rows": "Số dòng:",
+    "page": "Trang",
+    "previous": "Trang trước",
+    "next": "Trang sau"
+  },
+  "errorState": {
+    "defaultTitle": "Đã có lỗi xảy ra",
+    "retry": "Thử lại"
+  },
+  "search": {
+    "placeholder": "Tìm kiếm…",
+    "clearSearch": "Xoá tìm kiếm"
+  },
+  "timeline": {
+    "viewAll": "Xem tất cả {{count}}"
+  },
+  "loadingScreen": {
+    "message": "Đang tải phiên đăng nhập và dữ liệu ứng dụng."
+  }
+}
