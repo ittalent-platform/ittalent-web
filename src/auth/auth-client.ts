@@ -1,0 +1,38 @@
+import { getApiV1AuthMe } from "@/api/generated";
+import type { UserDto } from "@/api/generated/types.gen";
+import { getStoredTokens, setStoredTokens, type AuthTokens } from "@/api/client";
+
+export async function getCurrentUser(): Promise<UserDto | null> {
+  const tokens = getStoredTokens();
+  if (!tokens?.accessToken) {
+    return null;
+  }
+
+  const result = await getApiV1AuthMe();
+  if (result.error || !result.data) {
+    setStoredTokens(null);
+    return null;
+  }
+
+  return result.data;
+}
+
+export function handleLoginSuccess(tokens: AuthTokens, user?: UserDto): void {
+  setStoredTokens(tokens);
+  if (user) {
+    sessionStorage.setItem("ittalent_user", JSON.stringify(user));
+  }
+}
+
+export function handleLogout(): void {
+  setStoredTokens(null);
+  sessionStorage.removeItem("ittalent_user");
+}
+
+export const authClient = {
+  getStoredTokens,
+  setStoredTokens,
+  getCurrentUser,
+  login: handleLoginSuccess,
+  logout: handleLogout,
+};
