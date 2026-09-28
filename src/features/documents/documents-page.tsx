@@ -96,7 +96,7 @@ export function DocumentsPage() {
   };
   const items = query.data?.items ?? [];
   return (
-    <main className="mx-auto min-h-[60vh] max-w-6xl px-5 py-10">
+    <main className="mx-auto min-h-[60vh] max-w-6xl px-5 pb-10 pt-28">
       <h1 className="text-3xl font-bold">My documents</h1>
       <p className="mt-2 text-muted-foreground">
         Upload CVs and cover letters. Files are stored securely by the platform.

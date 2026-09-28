@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { LogOut, Users } from "lucide-react";
+import { FileText, LogOut, Users } from "lucide-react";
 
 import { useSession } from "@/auth/use-session";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/toast/toast-provider";
 import { getLogoutSuccessToast } from "@/features/auth/logout-toast";
 import { cn } from "@/lib/utils";
@@ -58,11 +63,21 @@ export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-[260px] rounded-[18px] py-1" side="bottom" sideOffset={8}>
+      <DropdownMenuContent
+        align="end"
+        className="w-[260px] rounded-[18px] py-1"
+        side="bottom"
+        sideOffset={8}
+      >
         <div className="px-4 py-3 border-b border-border">
-          <p className="truncate text-sm font-bold text-foreground">{displayName}</p>
+          <p className="truncate text-sm font-bold text-foreground">
+            {displayName}
+          </p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            {user?.email} · <span className="capitalize font-medium">{user?.role ?? "user"}</span>
+            {user?.email} ·{" "}
+            <span className="capitalize font-medium">
+              {user?.role ?? "user"}
+            </span>
           </p>
         </div>
 
@@ -73,6 +88,16 @@ export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
           >
             <Users className="size-4" />
             User Management
+          </DropdownMenuItem>
+        ) : null}
+
+        {user?.role === "user" ? (
+          <DropdownMenuItem
+            className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer"
+            onSelect={() => navigate("/documents")}
+          >
+            <FileText className="size-4" />
+            My Documents
           </DropdownMenuItem>
         ) : null}
 

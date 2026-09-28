@@ -57,6 +57,11 @@ export const appRoutes = [
     children: [
       { path: "/", element: <LandingPage /> },
       { path: "/jobs", element: <JobsPage /> },
+      {
+        path: "/documents",
+        element: <ProtectedRoute requiredRole="user" />,
+        children: [{ index: true, element: <DocumentsPage /> }],
+      },
     ],
   },
   { path: "/login", element: <LoginPage /> },
@@ -80,11 +85,6 @@ export const appRoutes = [
         ],
       },
     ],
-  },
-  {
-    path: "/documents",
-    element: <ProtectedRoute requiredRole="user" />,
-    children: [{ index: true, element: <DocumentsPage /> }],
   },
   {
     path: "*",
