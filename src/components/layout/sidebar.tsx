@@ -1,8 +1,4 @@
-import {
-  PanelLeftClose,
-  Users,
-  X,
-} from "lucide-react";
+import { PanelLeftClose, Users, BriefcaseBusiness, X } from "lucide-react";
 import { Link } from "react-router";
 
 import { UserMenu } from "./user-menu";
@@ -11,6 +7,12 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { end: false, icon: Users, label: "Users", to: "/admin/users" },
+  {
+    end: false,
+    icon: BriefcaseBusiness,
+    label: "Job postings",
+    to: "/admin/job-postings",
+  },
 ] as const;
 
 type SidebarProps = {
@@ -20,7 +22,12 @@ type SidebarProps = {
   onToggleCollapsed: () => void;
 };
 
-export function Sidebar({ collapsed, mobileOpen, onCloseMobile, onToggleCollapsed }: SidebarProps) {
+export function Sidebar({
+  collapsed,
+  mobileOpen,
+  onCloseMobile,
+  onToggleCollapsed,
+}: SidebarProps) {
   return (
     <aside
       className={cn(
@@ -30,14 +37,29 @@ export function Sidebar({ collapsed, mobileOpen, onCloseMobile, onToggleCollapse
         collapsed && "lg:items-center",
       )}
     >
-      <div className={cn("flex items-center gap-2 px-2 pb-4 pt-1", collapsed && "lg:px-0")}>
-        <Link className="flex min-w-0 items-center gap-2 no-underline text-white" to="/">
+      <div
+        className={cn(
+          "flex items-center gap-2 px-2 pb-4 pt-1",
+          collapsed && "lg:px-0",
+        )}
+      >
+        <Link
+          className="flex min-w-0 items-center gap-2 no-underline text-white"
+          to="/"
+        >
           <div className="relative h-7 w-7 overflow-hidden rounded-[7px] border-2 border-[var(--primary)]">
             <div className="absolute inset-[4px] border border-[var(--primary)] opacity-50" />
             <div className="absolute left-[-20%] top-1/2 h-[2px] w-[140%] -translate-y-1/2 rotate-45 bg-[var(--primary)]" />
             <div className="absolute left-[-20%] top-1/2 h-[2px] w-[140%] -translate-y-1/2 -rotate-45 bg-[var(--primary)]" />
           </div>
-          <span className={cn("itt-display text-[13px] font-bold tracking-[0.05em]", collapsed && "lg:hidden")}>ITTALENT</span>
+          <span
+            className={cn(
+              "itt-display text-[13px] font-bold tracking-[0.05em]",
+              collapsed && "lg:hidden",
+            )}
+          >
+            ITTALENT
+          </span>
         </Link>
         {!collapsed ? (
           <button
@@ -61,9 +83,18 @@ export function Sidebar({ collapsed, mobileOpen, onCloseMobile, onToggleCollapse
         </button>
       </div>
 
-      <SidebarNavList collapsed={collapsed} items={navItems} onItemClick={onCloseMobile} />
+      <SidebarNavList
+        collapsed={collapsed}
+        items={navItems}
+        onItemClick={onCloseMobile}
+      />
 
-      <div className={cn("mt-auto border-t border-[var(--sidebar-border)] pt-3 lg:shrink-0", collapsed && "lg:w-full")}>
+      <div
+        className={cn(
+          "mt-auto border-t border-[var(--sidebar-border)] pt-3 lg:shrink-0",
+          collapsed && "lg:w-full",
+        )}
+      >
         <UserMenu collapsed={collapsed} />
       </div>
     </aside>
