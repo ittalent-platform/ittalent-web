@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { loginSchema, type LoginFormValues } from "./login.schema";
+import { forgotPasswordPath } from "./password-reset";
 import { getAuthErrorMessage } from "./auth-utils";
 import { PasswordField } from "./password-field";
 import { AuthBrand } from "./auth-brand";
@@ -120,6 +121,14 @@ export function LoginPage() {
               <PasswordField
                 id="login-password"
                 label="Password"
+                labelExtra={
+                  <Link
+                    className="text-[12.5px] font-medium text-(--primary-600) no-underline hover:underline"
+                    to={forgotPasswordPath}
+                  >
+                    Forgot password?
+                  </Link>
+                }
                 registration={form.register("password")}
               />
 
