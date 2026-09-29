@@ -52,13 +52,77 @@
           },
           "password": {
             "type": "string",
-            "minLength": 8
+            "minLength": 8,
+            "maxLength": 64,
+            "pattern": "[A-Z]"
           }
         },
         "required": [
           "email",
           "username",
           "password"
+        ]
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "username": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "email",
+              "username",
+              "role",
+              "status"
+            ]
+          },
+          "tokens": {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string"
+              },
+              "refreshToken": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "accessToken",
+              "refreshToken"
+            ]
+          },
+          "verificationEmailSent": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "user",
+          "tokens",
+          "verificationEmailSent"
         ]
       },
       "LoginRequest": {
@@ -197,6 +261,327 @@
           "status"
         ]
       },
+      "VerifyEmailQuery": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "ResendVerificationEmailRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResendVerificationEmailResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "verificationEmailSent": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "verificationEmailSent"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "message",
+          "data"
+        ]
+      },
+      "ForgotPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ForgotPasswordResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {},
+            "default": {}
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "ResetPasswordTokenQuery": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "ResetPasswordTokenResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "valid": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "valid"
+            ]
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 64,
+            "pattern": "[A-Z]"
+          }
+        },
+        "required": [
+          "token",
+          "newPassword"
+        ]
+      },
+      "ResetPasswordResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {},
+            "default": {}
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 64,
+            "pattern": "[A-Z]"
+          },
+          "revokeOtherSessions": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "ChangePasswordResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {},
+            "default": {}
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ]
+      },
+      "EnterpriseListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "logoUrl": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "industry": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "location": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "shortDescription": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "logoUrl",
+                "industry",
+                "location",
+                "shortDescription"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "EnterpriseDetailDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "industry": {
+            "type": "string",
+            "nullable": true
+          },
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "shortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "logoUrl",
+          "industry",
+          "location",
+          "shortDescription",
+          "description",
+          "website"
+        ]
+      },
       "UserListResponse": {
         "type": "object",
         "properties": {
@@ -272,13 +657,69 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthResponse"
+                  "$ref": "#/components/schemas/RegisterResponse"
                 }
               }
             }
           },
           "409": {
             "description": "Email or username already exists"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify-email": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Verify user email address using token",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirects to frontend verification result page"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/resend-verification-email": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Resend email verification link",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerificationEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification email sent if account is unverified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendVerificationEmailResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests"
           }
         }
       }
@@ -375,6 +816,154 @@
         }
       }
     },
+    "/api/v1/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Request a password reset link",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset link sent if account exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many password reset requests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/reset-password": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Validate password reset token",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password reset token is valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetPasswordTokenResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid password reset link"
+          },
+          "410": {
+            "description": "Password reset link has expired or has already been used"
+          },
+          "429": {
+            "description": "Too many token verification attempts"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Reset password using token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResetPasswordResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid password reset link"
+          },
+          "410": {
+            "description": "Password reset link has expired or has already been used"
+          },
+          "429": {
+            "description": "Too many password reset attempts"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Change account password while authenticated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangePasswordResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid current password or account has no local password"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      }
+    },
     "/api/v1/users/{id}": {
       "get": {
         "tags": [
@@ -413,6 +1002,121 @@
           },
           "404": {
             "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprises": {
+      "get": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "View enterprise list / search enterprises",
+        "description": "Public. Returns only Active enterprises. Optional keyword (matches name, industry, location), industry and location narrow the list.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "keyword",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "industry",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "location",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of active enterprises (empty items when nothing matches)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or unsupported query parameters"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprises/{enterpriseId}": {
+      "get": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "View enterprise detail",
+        "description": "Public. Returns 404 when the enterprise does not exist or is not Active.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "enterpriseId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public enterprise details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid enterprise ID"
+          },
+          "404": {
+            "description": "Enterprise not found"
           }
         }
       }

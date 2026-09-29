@@ -15,6 +15,23 @@ export type RegisterRequest = {
     password: string;
 };
 
+export type RegisterResponse = {
+    user: {
+        id: string;
+        email: string;
+        username: string;
+        role: string;
+        status: string;
+        createdAt?: string;
+        updatedAt?: string;
+    };
+    tokens: {
+        accessToken: string;
+        refreshToken: string;
+    };
+    verificationEmailSent: boolean;
+};
+
 export type LoginRequest = {
     identifier: string;
     password: string;
@@ -53,6 +70,99 @@ export type UserDto = {
     status: string;
     createdAt?: string;
     updatedAt?: string;
+};
+
+export type VerifyEmailQuery = {
+    token: string;
+};
+
+export type ResendVerificationEmailRequest = {
+    email: string;
+};
+
+export type ResendVerificationEmailResponse = {
+    success: true;
+    message: string;
+    data: {
+        verificationEmailSent: boolean;
+    };
+};
+
+export type ForgotPasswordRequest = {
+    email: string;
+};
+
+export type ForgotPasswordResponse = {
+    success: true;
+    message: string;
+    data?: {
+        [key: string]: unknown;
+    };
+};
+
+export type ResetPasswordTokenQuery = {
+    token: string;
+};
+
+export type ResetPasswordTokenResponse = {
+    success: boolean;
+    message?: string;
+    data: {
+        valid: boolean;
+    };
+};
+
+export type ResetPasswordRequest = {
+    token: string;
+    newPassword: string;
+};
+
+export type ResetPasswordResponse = {
+    success: true;
+    message: string;
+    data?: {
+        [key: string]: unknown;
+    };
+};
+
+export type ChangePasswordRequest = {
+    currentPassword: string;
+    newPassword: string;
+    revokeOtherSessions?: boolean;
+};
+
+export type ChangePasswordResponse = {
+    success: true;
+    message: string;
+    data?: {
+        [key: string]: unknown;
+    };
+};
+
+export type EnterpriseListResponse = {
+    items: Array<{
+        id: string;
+        name: string;
+        logoUrl: string | null;
+        industry: string | null;
+        location: string | null;
+        shortDescription: string | null;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type EnterpriseDetailDto = {
+    id: string;
+    name: string;
+    logoUrl: string | null;
+    industry: string | null;
+    location: string | null;
+    shortDescription: string | null;
+    description: string | null;
+    website: string | null;
 };
 
 export type UserListResponse = {
@@ -97,10 +207,42 @@ export type PostApiV1AuthRegisterResponses = {
     /**
      * User registered successfully
      */
-    201: AuthResponse;
+    201: RegisterResponse;
 };
 
 export type PostApiV1AuthRegisterResponse = PostApiV1AuthRegisterResponses[keyof PostApiV1AuthRegisterResponses];
+
+export type GetApiV1AuthVerifyEmailData = {
+    body?: never;
+    path?: never;
+    query: {
+        token: string;
+    };
+    url: '/api/v1/auth/verify-email';
+};
+
+export type PostApiV1AuthResendVerificationEmailData = {
+    body?: ResendVerificationEmailRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/resend-verification-email';
+};
+
+export type PostApiV1AuthResendVerificationEmailErrors = {
+    /**
+     * Too many requests
+     */
+    429: unknown;
+};
+
+export type PostApiV1AuthResendVerificationEmailResponses = {
+    /**
+     * Verification email sent if account is unverified
+     */
+    200: ResendVerificationEmailResponse;
+};
+
+export type PostApiV1AuthResendVerificationEmailResponse = PostApiV1AuthResendVerificationEmailResponses[keyof PostApiV1AuthResendVerificationEmailResponses];
 
 export type PostApiV1AuthLoginData = {
     body?: LoginRequest;
@@ -171,6 +313,120 @@ export type GetApiV1AuthMeResponses = {
 
 export type GetApiV1AuthMeResponse = GetApiV1AuthMeResponses[keyof GetApiV1AuthMeResponses];
 
+export type PostApiV1AuthForgotPasswordData = {
+    body?: ForgotPasswordRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/forgot-password';
+};
+
+export type PostApiV1AuthForgotPasswordErrors = {
+    /**
+     * Too many password reset requests
+     */
+    429: unknown;
+};
+
+export type PostApiV1AuthForgotPasswordResponses = {
+    /**
+     * Password reset link sent if account exists
+     */
+    200: ForgotPasswordResponse;
+};
+
+export type PostApiV1AuthForgotPasswordResponse = PostApiV1AuthForgotPasswordResponses[keyof PostApiV1AuthForgotPasswordResponses];
+
+export type GetApiV1AuthResetPasswordData = {
+    body?: never;
+    path?: never;
+    query: {
+        token: string;
+    };
+    url: '/api/v1/auth/reset-password';
+};
+
+export type GetApiV1AuthResetPasswordErrors = {
+    /**
+     * Invalid password reset link
+     */
+    404: unknown;
+    /**
+     * Password reset link has expired or has already been used
+     */
+    410: unknown;
+    /**
+     * Too many token verification attempts
+     */
+    429: unknown;
+};
+
+export type GetApiV1AuthResetPasswordResponses = {
+    /**
+     * Password reset token is valid
+     */
+    200: ResetPasswordTokenResponse;
+};
+
+export type GetApiV1AuthResetPasswordResponse = GetApiV1AuthResetPasswordResponses[keyof GetApiV1AuthResetPasswordResponses];
+
+export type PostApiV1AuthResetPasswordData = {
+    body?: ResetPasswordRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/reset-password';
+};
+
+export type PostApiV1AuthResetPasswordErrors = {
+    /**
+     * Invalid password reset link
+     */
+    404: unknown;
+    /**
+     * Password reset link has expired or has already been used
+     */
+    410: unknown;
+    /**
+     * Too many password reset attempts
+     */
+    429: unknown;
+};
+
+export type PostApiV1AuthResetPasswordResponses = {
+    /**
+     * Password reset successful
+     */
+    200: ResetPasswordResponse;
+};
+
+export type PostApiV1AuthResetPasswordResponse = PostApiV1AuthResetPasswordResponses[keyof PostApiV1AuthResetPasswordResponses];
+
+export type PostApiV1AuthChangePasswordData = {
+    body?: ChangePasswordRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/change-password';
+};
+
+export type PostApiV1AuthChangePasswordErrors = {
+    /**
+     * Invalid current password or account has no local password
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+};
+
+export type PostApiV1AuthChangePasswordResponses = {
+    /**
+     * Password changed successfully
+     */
+    200: ChangePasswordResponse;
+};
+
+export type PostApiV1AuthChangePasswordResponse = PostApiV1AuthChangePasswordResponses[keyof PostApiV1AuthChangePasswordResponses];
+
 export type GetApiV1UsersByIdData = {
     body?: never;
     path: {
@@ -199,6 +455,64 @@ export type GetApiV1UsersByIdResponses = {
 };
 
 export type GetApiV1UsersByIdResponse = GetApiV1UsersByIdResponses[keyof GetApiV1UsersByIdResponses];
+
+export type GetApiV1EnterprisesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        keyword?: string;
+        industry?: string;
+        location?: string;
+    };
+    url: '/api/v1/enterprises';
+};
+
+export type GetApiV1EnterprisesErrors = {
+    /**
+     * Invalid or unsupported query parameters
+     */
+    400: unknown;
+};
+
+export type GetApiV1EnterprisesResponses = {
+    /**
+     * Paginated list of active enterprises (empty items when nothing matches)
+     */
+    200: EnterpriseListResponse;
+};
+
+export type GetApiV1EnterprisesResponse = GetApiV1EnterprisesResponses[keyof GetApiV1EnterprisesResponses];
+
+export type GetApiV1EnterprisesByEnterpriseIdData = {
+    body?: never;
+    path: {
+        enterpriseId: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprises/{enterpriseId}';
+};
+
+export type GetApiV1EnterprisesByEnterpriseIdErrors = {
+    /**
+     * Invalid enterprise ID
+     */
+    400: unknown;
+    /**
+     * Enterprise not found
+     */
+    404: unknown;
+};
+
+export type GetApiV1EnterprisesByEnterpriseIdResponses = {
+    /**
+     * Public enterprise details
+     */
+    200: EnterpriseDetailDto;
+};
+
+export type GetApiV1EnterprisesByEnterpriseIdResponse = GetApiV1EnterprisesByEnterpriseIdResponses[keyof GetApiV1EnterprisesByEnterpriseIdResponses];
 
 export type GetApiV1UsersData = {
     body?: never;
