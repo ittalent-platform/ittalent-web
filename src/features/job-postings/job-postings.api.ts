@@ -5,8 +5,9 @@ export const jobPostingStatuses = ["draft", "published", "archived"] as const;
 export type JobPostingStatus = (typeof jobPostingStatuses)[number];
 
 export type JobPosting = {
+  enterpriseId?: string;
   id: string;
-  postedByUserId: string;
+  postedByUserId?: string;
   title: string;
   slug: string;
   location?: string;
@@ -106,6 +107,15 @@ export async function listAdminJobPostings(params: JobPostingListParams) {
   );
 }
 
+export async function listRecruiterJobPostings(params: JobPostingListParams) {
+  return unwrap(
+    await client.get<{ 200: PaginatedResponse<JobPosting> }, ApiErrorBody>({
+      url: "/api/v1/recruiter/job-postings",
+      query: params,
+    }),
+  );
+}
+
 export async function listPublicJobPostings(params: JobPostingListParams) {
   return unwrap(
     await client.get<{ 200: PaginatedResponse<JobPosting> }, ApiErrorBody>({
@@ -133,7 +143,10 @@ export async function createJobPosting(payload: JobPostingPayload) {
   );
 }
 
-export async function updateJobPosting(id: string, payload: JobPostingPayload) {
+export async function updateJobPosting(
+  id: string,
+  payload: Partial<JobPostingPayload>,
+) {
   return unwrap(
     await client.patch<{ 200: JobPosting }, ApiErrorBody>({
       url: "/api/v1/job-postings/{id}",

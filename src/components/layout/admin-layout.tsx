@@ -6,7 +6,7 @@ import { AdminLayoutProvider } from "./admin-layout-context";
 import { Sidebar } from "./sidebar";
 import { cn } from "@/lib/utils";
 
-export function AppLayout() {
+export function AppLayout({ actor = "admin" }: { actor?: "admin" | "recruiter" }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
@@ -20,6 +20,7 @@ export function AppLayout() {
       )}
     >
       <Sidebar
+        actor={actor}
         collapsed={isSidebarCollapsed}
         mobileOpen={isMobileNavOpen}
         onCloseMobile={() => setIsMobileNavOpen(false)}

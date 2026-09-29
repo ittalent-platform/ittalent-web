@@ -41,6 +41,8 @@ export function LoginPage() {
 
       if (result.data.user.role === "admin") {
         navigate("/admin/users", { replace: true });
+      } else if (result.data.user.role === "recruiter") {
+        navigate("/recruiter/job-postings", { replace: true });
       } else {
         navigate("/", { replace: true });
       }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { FileText, LogOut, Users } from "lucide-react";
+import { BriefcaseBusiness, FileText, LogOut, Users } from "lucide-react";
 
 import { useSession } from "@/auth/use-session";
 import {
@@ -57,7 +57,11 @@ export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
               {displayName}
             </p>
             <p className="truncate text-[0.8rem] text-muted-foreground">
-              {user?.role === "admin" ? "Admin" : "User"}
+              {user?.role === "admin"
+                ? "Admin"
+                : user?.role === "recruiter"
+                  ? "Recruiter"
+                  : "User"}
             </p>
           </div>
         </button>
@@ -98,6 +102,16 @@ export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
           >
             <FileText className="size-4" />
             My Documents
+          </DropdownMenuItem>
+        ) : null}
+
+        {user?.role === "recruiter" ? (
+          <DropdownMenuItem
+            className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer"
+            onSelect={() => navigate("/recruiter/job-postings")}
+          >
+            <BriefcaseBusiness className="size-4" />
+            Job postings
           </DropdownMenuItem>
         ) : null}
 

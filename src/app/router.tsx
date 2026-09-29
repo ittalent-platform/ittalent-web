@@ -7,19 +7,6 @@ import { PublicLayout } from "@/components/layout/public-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
 import { LandingPage } from "@/features/public-site/landing-page";
 
-const LoginPage = lazy(() =>
-  import("@/features/auth/login-page").then((m) => ({ default: m.LoginPage })),
-);
-const RegisterPage = lazy(() =>
-  import("@/features/auth/register-page").then((m) => ({
-    default: m.RegisterPage,
-  })),
-);
-const UsersPage = lazy(() =>
-  import("@/features/admin/users/users-page").then((m) => ({
-    default: m.UsersPage,
-  })),
-);
 const LoginPage = lazy(() => import("@/features/auth/login-page").then((m) => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import("@/features/auth/register-page").then((m) => ({ default: m.RegisterPage })));
 const EmailVerificationPage = lazy(() =>
@@ -51,6 +38,21 @@ const EditJobPostingPage = lazy(() =>
   import("@/features/admin/job-postings/job-postings-pages").then((m) => ({
     default: m.EditJobPostingPage,
   })),
+);
+const AdminJobPostingDetailPage = lazy(() =>
+  import("@/features/admin/job-postings/job-postings-pages").then((m) => ({ default: m.JobPostingDetailPage })),
+);
+const RecruiterJobPostingsPage = lazy(() =>
+  import("@/features/recruiter/job-postings/job-postings-pages").then((m) => ({ default: m.RecruiterJobPostingsPage })),
+);
+const RecruiterCreateJobPostingPage = lazy(() =>
+  import("@/features/recruiter/job-postings/job-postings-pages").then((m) => ({ default: m.RecruiterCreateJobPostingPage })),
+);
+const RecruiterJobPostingDetailPage = lazy(() =>
+  import("@/features/recruiter/job-postings/job-postings-pages").then((m) => ({ default: m.RecruiterJobPostingDetailPage })),
+);
+const RecruiterEditJobPostingPage = lazy(() =>
+  import("@/features/recruiter/job-postings/job-postings-pages").then((m) => ({ default: m.RecruiterEditJobPostingPage })),
 );
 const JobsPage = lazy(() =>
   import("@/features/public-site/jobs-page").then((m) => ({
@@ -93,10 +95,27 @@ export const appRoutes = [
           { path: "users/:userId", element: <AdminUserDetailPage /> },
           { path: "job-postings", element: <JobPostingsPage /> },
           { path: "job-postings/create", element: <CreateJobPostingPage /> },
+          { path: "job-postings/:jobPostingId", element: <AdminJobPostingDetailPage /> },
           {
             path: "job-postings/:jobPostingId/edit",
             element: <EditJobPostingPage />,
           },
+        ],
+      },
+    ],
+  },
+  {
+    path: "/recruiter",
+    element: <ProtectedRoute requiredRole="recruiter" />,
+    children: [
+      {
+        element: <AppLayout actor="recruiter" />,
+        children: [
+          { index: true, element: <Navigate replace to="/recruiter/job-postings" /> },
+          { path: "job-postings", element: <RecruiterJobPostingsPage /> },
+          { path: "job-postings/create", element: <RecruiterCreateJobPostingPage /> },
+          { path: "job-postings/:jobPostingId", element: <RecruiterJobPostingDetailPage /> },
+          { path: "job-postings/:jobPostingId/edit", element: <RecruiterEditJobPostingPage /> },
         ],
       },
     ],

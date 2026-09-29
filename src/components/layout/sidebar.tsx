@@ -5,7 +5,7 @@ import { UserMenu } from "./user-menu";
 import { SidebarNavList } from "./sidebar-nav-list";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+const adminNavItems = [
   { end: false, icon: Users, label: "Users", to: "/admin/users" },
   {
     end: false,
@@ -15,7 +15,17 @@ const navItems = [
   },
 ] as const;
 
+const recruiterNavItems = [
+  {
+    end: false,
+    icon: BriefcaseBusiness,
+    label: "Job postings",
+    to: "/recruiter/job-postings",
+  },
+] as const;
+
 type SidebarProps = {
+  actor: "admin" | "recruiter";
   collapsed: boolean;
   mobileOpen: boolean;
   onCloseMobile: () => void;
@@ -23,6 +33,7 @@ type SidebarProps = {
 };
 
 export function Sidebar({
+  actor,
   collapsed,
   mobileOpen,
   onCloseMobile,
@@ -85,7 +96,7 @@ export function Sidebar({
 
       <SidebarNavList
         collapsed={collapsed}
-        items={navItems}
+        items={actor === "admin" ? adminNavItems : recruiterNavItems}
         onItemClick={onCloseMobile}
       />
 

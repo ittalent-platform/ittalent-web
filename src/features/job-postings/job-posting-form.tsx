@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,10 @@ import {
   FormFieldLabel,
   FormFieldMessage,
 } from "@/components/common/form-field";
-import type { JobPosting, JobPostingPayload } from "./job-postings.api";
+import type {
+  JobPosting,
+  JobPostingPayload,
+} from "./job-postings.api";
 
 const optionalText = z.string().trim().max(200);
 const schema = z
@@ -148,6 +151,7 @@ export function JobPostingForm({
     defaultValues: valuesFrom(posting),
     resolver: zodResolver(schema),
   });
+  const selectedStatus = useWatch({ control: form.control, name: "status" });
   useEffect(() => form.reset(valuesFrom(posting)), [form, posting]);
   const field = (
     name: keyof Values,
@@ -202,14 +206,22 @@ export function JobPostingForm({
       {field("description", "Description", { multiline: true })}
       {field("requirements", "Requirements", { multiline: true })}
       {field("benefits", "Benefits", { multiline: true })}
-      <div className="flex justify-end">
-        <Button disabled={isSaving} type="submit">
-          {isSaving
-            ? "Saving…"
-            : posting
-              ? "Save changes"
-              : "Create job posting"}
-        </Button>
+      <div className="flex flex-wrap justify-end gap-2">
+        {posting ? (
+          <Button disabled={isSaving || !form.formState.isDirty} type="submit">
+            {isSaving ? "Saving…" : "Save changes"}
+          </Button>
+        ) : (
+          <Button disabled={isSaving} type="submit">
+            {isSaving
+              ? "Saving…"
+              : selectedStatus === "published"
+                ? "Publish"
+                : selectedStatus === "archived"
+                  ? "Archive job posting"
+                  : "Save as draft"}
+          </Button>
+        )}
       </div>
     </form>
   );
