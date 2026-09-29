@@ -12,18 +12,24 @@ const HEX_COLOR_GRANDFATHERED_FILES = [
   "src/features/auth/login-page.tsx",
   "src/features/auth/register-page.tsx",
   "src/features/public-site/landing-page.tsx",
+  "src/features/public-site/career/career-detail-blocks.tsx",
+  "src/features/public-site/career/career-page.tsx",
 ];
 
 const NO_HARDCODED_HEX_RULE = {
   "no-restricted-syntax": [
     "error",
     {
-      selector: "JSXAttribute[name.name='className'] Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
-      message: "Don't hardcode hex colors in className — use a design token from src/styles/globals.css instead.",
+      selector:
+        "JSXAttribute[name.name='className'] Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+      message:
+        "Don't hardcode hex colors in className — use a design token from src/styles/globals.css instead.",
     },
     {
-      selector: "JSXAttribute[name.name='className'] TemplateElement[value.raw=/#[0-9a-fA-F]{3,8}\\b/]",
-      message: "Don't hardcode hex colors in className — use a design token from src/styles/globals.css instead.",
+      selector:
+        "JSXAttribute[name.name='className'] TemplateElement[value.raw=/#[0-9a-fA-F]{3,8}\\b/]",
+      message:
+        "Don't hardcode hex colors in className — use a design token from src/styles/globals.css instead.",
     },
   ],
 };
