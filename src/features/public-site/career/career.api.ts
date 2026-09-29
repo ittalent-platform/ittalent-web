@@ -33,6 +33,7 @@ const BACKEND_MAX_LIMIT = 100;
 
 export type Job = {
   _id: string;
+  enterpriseId?: string;
   title: string;
   slug: string;
   location?: string;
@@ -90,6 +91,7 @@ function toJob(dto: JobPostingSummaryDto | JobPostingDetailDto): Job {
 
   return {
     _id: dto.id,
+    enterpriseId: dto.enterpriseId,
     slug: dto.id,
     title: dto.title,
     location: dto.location ?? undefined,
@@ -261,4 +263,22 @@ export async function fetchJob(id: string): Promise<Job> {
   }
 
   return toJob(result.data as JobPostingDetailDto);
+}
+
+export async function fetchJobsByEnterprise(enterpriseId: string): Promise<Job[]> {
+  const all = await getAllJobs();
+  return sortJobs(
+    all.filter((job) => job.enterpriseId === enterpriseId),
+    "newest",
+  );
+}
+
+/** Number of public open roles per enterprise id. */
+export async function fetchOpenRoleCounts(): Promise<Record<string, number>> {
+  const all = await getAllJobs();
+  const counts: Record<string, number> = {};
+  for (const job of all) {
+    if (job.enterpriseId) counts[job.enterpriseId] = (counts[job.enterpriseId] ?? 0) + 1;
+  }
+  return counts;
 }

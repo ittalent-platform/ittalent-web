@@ -36,6 +36,17 @@ const CareerJobPage = lazy(() =>
   })),
 );
 
+const EnterprisePage = lazy(() =>
+  import("@/features/public-site/enterprise/enterprise-page").then((m) => ({
+    default: m.EnterprisePage,
+  })),
+);
+const EnterpriseDetailPage = lazy(() =>
+  import("@/features/public-site/enterprise/enterprise-detail-page").then((m) => ({
+    default: m.EnterpriseDetailPage,
+  })),
+);
+
 export const appRoutes = [
   {
     element: <PublicLayout />,
@@ -43,6 +54,8 @@ export const appRoutes = [
       { path: "/", element: <LandingPage /> },
       { path: "/career", element: <CareerPage /> },
       { path: "/career/:slug", element: <CareerJobPage /> },
+      { path: "/enterprises", element: <EnterprisePage /> },
+      { path: "/enterprises/:id", element: <EnterpriseDetailPage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },

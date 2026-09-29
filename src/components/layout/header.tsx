@@ -103,6 +103,16 @@ export function Header({
           >
             Career
           </button>
+          <button
+            className="cursor-pointer text-[14.5px] font-medium text-inherit/80 hover:text-inherit transition-colors"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              navigate("/enterprises");
+            }}
+            type="button"
+          >
+            Enterprises
+          </button>
         </nav>
 
         {/* Right Actions */}
