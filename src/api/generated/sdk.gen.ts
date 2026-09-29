@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses } from './types.gen';
+import type { GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -28,6 +28,23 @@ export const getHealth = <ThrowOnError extends boolean = false>(options?: Option
  */
 export const postApiV1AuthRegister = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1AuthRegisterData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1AuthRegisterResponses, PostApiV1AuthRegisterErrors, ThrowOnError>({
     url: '/api/v1/auth/register',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers
+    }
+});
+
+/**
+ * Verify user email address using token
+ */
+export const getApiV1AuthVerifyEmail = <ThrowOnError extends boolean = false>(options: Options<GetApiV1AuthVerifyEmailData, ThrowOnError>) => (options.client ?? client).get<unknown, unknown, ThrowOnError>({ url: '/api/v1/auth/verify-email', ...options });
+
+/**
+ * Resend email verification link
+ */
+export const postApiV1AuthResendVerificationEmail = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1AuthResendVerificationEmailData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResendVerificationEmailErrors, ThrowOnError>({
+    url: '/api/v1/auth/resend-verification-email',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -69,6 +86,48 @@ export const getApiV1AuthMe = <ThrowOnError extends boolean = false>(options?: O
 });
 
 /**
+ * Request a password reset link
+ */
+export const postApiV1AuthForgotPassword = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1AuthForgotPasswordData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1AuthForgotPasswordResponses, PostApiV1AuthForgotPasswordErrors, ThrowOnError>({
+    url: '/api/v1/auth/forgot-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers
+    }
+});
+
+/**
+ * Validate password reset token
+ */
+export const getApiV1AuthResetPassword = <ThrowOnError extends boolean = false>(options: Options<GetApiV1AuthResetPasswordData, ThrowOnError>) => (options.client ?? client).get<GetApiV1AuthResetPasswordResponses, GetApiV1AuthResetPasswordErrors, ThrowOnError>({ url: '/api/v1/auth/reset-password', ...options });
+
+/**
+ * Reset password using token
+ */
+export const postApiV1AuthResetPassword = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1AuthResetPasswordData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1AuthResetPasswordResponses, PostApiV1AuthResetPasswordErrors, ThrowOnError>({
+    url: '/api/v1/auth/reset-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers
+    }
+});
+
+/**
+ * Change account password while authenticated
+ */
+export const postApiV1AuthChangePassword = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1AuthChangePasswordData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1AuthChangePasswordResponses, PostApiV1AuthChangePasswordErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/auth/change-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers
+    }
+});
+
+/**
  * Get user by ID
  */
 export const getApiV1UsersById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdResponses, GetApiV1UsersByIdErrors, ThrowOnError>({
@@ -76,6 +135,20 @@ export const getApiV1UsersById = <ThrowOnError extends boolean = false>(options:
     url: '/api/v1/users/{id}',
     ...options
 });
+
+/**
+ * View enterprise list / search enterprises
+ *
+ * Public. Returns only Active enterprises. Optional keyword (matches name, industry, location), industry and location narrow the list.
+ */
+export const getApiV1Enterprises = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1EnterprisesData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1EnterprisesResponses, GetApiV1EnterprisesErrors, ThrowOnError>({ url: '/api/v1/enterprises', ...options });
+
+/**
+ * View enterprise detail
+ *
+ * Public. Returns 404 when the enterprise does not exist or is not Active.
+ */
+export const getApiV1EnterprisesByEnterpriseId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1EnterprisesByEnterpriseIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesByEnterpriseIdErrors, ThrowOnError>({ url: '/api/v1/enterprises/{enterpriseId}', ...options });
 
 /**
  * List users (requires admin authorization)
