@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { registerSchema, type RegisterFormValues } from "./register.schema";
+import { emailVerificationPath } from "./email-verification";
 import { getAuthErrorMessage } from "./auth-utils";
 import { getPasswordRules } from "./password-rules";
 import { PasswordField } from "./password-field";
@@ -77,11 +78,16 @@ export function RegisterPage() {
 
       authClient.login(result.data.tokens, result.data.user);
 
-      if (result.data.user.role === "admin") {
-        navigate("/admin/users", { replace: true });
-      } else {
-        navigate("/", { replace: true });
+      const searchParams = new URLSearchParams({
+        email: values.email,
+        stage: "registration",
+      });
+
+      if (!result.data.verificationEmailSent) {
+        searchParams.set("delivery", "failed");
       }
+
+      navigate(`${emailVerificationPath}?${searchParams.toString()}`, { replace: true });
     } catch (error) {
       setSubmitError(getAuthErrorMessage(error, "Unable to create your account right now."));
     }
