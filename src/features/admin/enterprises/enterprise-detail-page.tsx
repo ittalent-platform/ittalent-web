@@ -12,7 +12,7 @@ import {
   CompanyTypeBadge,
   formatEnterpriseId,
 } from "./enterprise-badges";
-import { SOCIAL_LINK_LABELS } from "./enterprises.constants";
+import { getEnterpriseActions, SOCIAL_LINK_LABELS } from "./enterprises.constants";
 import { formatEnterpriseDateTime, formatTaxCode } from "./enterprises.formatters";
 import {
   useEnterpriseDetailQuery,
@@ -73,7 +73,7 @@ export function AdminEnterpriseDetailPage() {
     );
   }
 
-  const isActive = enterprise.status?.toLowerCase() === "active";
+  const actions = getEnterpriseActions(enterprise.status);
   const extraJobCounts = enterprise as {
     draftJobsCount?: number;
     closedJobsCount?: number;
@@ -188,25 +188,25 @@ export function AdminEnterpriseDetailPage() {
             </Link>
           </Button>
 
-          {isActive ? (
+          {actions.canSuspend ? (
             <Button
               type="button"
               onClick={() => setIsSuspendOpen(true)}
-              className="h-11 px-5 rounded-xl bg-destructive hover:bg-destructive/90 text-white font-semibold text-sm inline-flex items-center gap-2 transition cursor-pointer"
+              className="h-11 px-5 rounded-xl bg-(--status-warning-fg) hover:bg-(--status-warning-fg)/90 text-white font-semibold text-sm inline-flex items-center gap-2 transition cursor-pointer"
             >
               <Ban className="size-4" />
               <span>{t("adminEnterprises.detail.suspend", "Suspend")}</span>
             </Button>
-          ) : (
+          ) : actions.canActivate ? (
             <Button
               type="button"
               onClick={() => setIsActivateOpen(true)}
-              className="h-11 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm inline-flex items-center gap-2 transition cursor-pointer"
+              className="h-11 px-5 rounded-xl bg-(--status-success-fg) hover:bg-(--status-success-fg)/90 text-white font-semibold text-sm inline-flex items-center gap-2 transition cursor-pointer"
             >
               <Check className="size-4" />
               <span>{t("adminEnterprises.detail.activate", "Activate")}</span>
             </Button>
-          )}
+          ) : null}
         </div>
       </div>
 

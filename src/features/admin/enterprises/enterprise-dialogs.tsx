@@ -63,11 +63,11 @@ export function SuspendEnterpriseDialog({
       <DialogContent showCloseButton={false} className="max-w-[500px] p-6 rounded-2xl bg-card border border-border shadow-2xl">
 
         <form onSubmit={handleSubmit} className="flex gap-4">
-          <span className="size-10 shrink-0 rounded-xl bg-(--danger-bg) text-(--danger-fg) flex items-center justify-center">
+          <span className="size-10 shrink-0 rounded-xl bg-(--status-warning-bg) text-(--status-warning-fg) flex items-center justify-center">
             <Ban className="size-5" />
           </span>
           <div className="flex-1 flex flex-col gap-3 min-w-0">
-            <DialogHeader className="p-0 text-left">
+            <DialogHeader className="border-0 p-0 text-left">
               <DialogTitle className="itt-display text-xl font-semibold text-foreground">
                 {t("adminEnterprises.suspendDialog.title", "Suspend {{name}}?", { name: enterpriseName })}
               </DialogTitle>
@@ -95,13 +95,7 @@ export function SuspendEnterpriseDialog({
                 <span className="text-muted-foreground">
                   Required · shown in audit history
                 </span>
-                <span
-                  className={
-                    reason.trim().length >= 10
-                      ? "text-(--status-success-fg) font-medium"
-                      : "text-muted-foreground"
-                  }
-                >
+                <span className="text-muted-foreground">
                   {reason.trim().length}/10 min chars
                 </span>
               </div>
@@ -113,7 +107,7 @@ export function SuspendEnterpriseDialog({
               {error && <span className="text-xs text-destructive font-medium">{error}</span>}
             </div>
 
-            <DialogFooter className="mt-3 flex items-center justify-end gap-3 p-0">
+            <DialogFooter className="mt-3 flex items-center justify-end gap-3 border-0 p-0">
               <Button
                 type="button"
                 variant="outline"
@@ -126,8 +120,7 @@ export function SuspendEnterpriseDialog({
               <Button
                 type="submit"
                 disabled={!isValid || isSubmitting}
-                variant="destructive"
-                className="h-10 px-4 rounded-xl text-sm font-semibold shadow-sm"
+                className="h-10 px-4 rounded-xl bg-(--status-warning-fg) text-white text-sm font-semibold shadow-sm hover:bg-(--status-warning-fg)/90 disabled:opacity-45"
               >
                 {isSubmitting ? "Suspending..." : t("adminEnterprises.suspendDialog.confirm", "Suspend enterprise")}
               </Button>
@@ -183,7 +176,7 @@ export function ActivateEnterpriseDialog({
             <Check className="size-5" />
           </span>
           <div className="flex-1 flex flex-col gap-3 min-w-0">
-            <DialogHeader className="p-0 text-left">
+            <DialogHeader className="border-0 p-0 text-left">
               <DialogTitle className="itt-display text-xl font-semibold text-foreground">
                 {t("adminEnterprises.activateDialog.title", "Activate {{name}}?", { name: enterpriseName })}
               </DialogTitle>
@@ -216,7 +209,7 @@ export function ActivateEnterpriseDialog({
               {error && <span className="text-xs text-destructive font-medium">{error}</span>}
             </div>
 
-            <DialogFooter className="mt-3 flex items-center justify-end gap-3 p-0">
+            <DialogFooter className="mt-3 flex items-center justify-end gap-3 border-0 p-0">
               <Button
                 type="button"
                 variant="outline"
@@ -229,7 +222,7 @@ export function ActivateEnterpriseDialog({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-10 px-4 rounded-xl bg-(--status-success-fg) hover:bg-(--status-success-fg)/90 text-white text-sm font-semibold shadow-sm"
+                className="h-10 px-4 rounded-xl bg-(--status-success-fg) hover:bg-(--status-success-fg)/90 text-white text-sm font-semibold shadow-sm disabled:opacity-45"
               >
                 {isSubmitting ? "Activating..." : t("adminEnterprises.activateDialog.confirm", "Activate enterprise")}
               </Button>
@@ -281,7 +274,7 @@ export function DeleteEnterpriseDialog({
             <Trash2 className="size-5" />
           </span>
           <div className="flex-1 flex flex-col gap-3 min-w-0">
-            <DialogHeader className="p-0 text-left">
+            <DialogHeader className="border-0 p-0 text-left">
               <DialogTitle className="itt-display text-xl font-semibold text-foreground">
                 {t("adminEnterprises.deleteDialog.title", "Delete {{name}}?", { name: enterpriseName })}
               </DialogTitle>
@@ -295,7 +288,7 @@ export function DeleteEnterpriseDialog({
 
             {error && <span className="text-xs text-destructive font-medium">{error}</span>}
 
-            <DialogFooter className="mt-4 flex items-center justify-end gap-3 p-0">
+            <DialogFooter className="mt-4 flex items-center justify-end gap-3 border-0 p-0">
               <Button
                 type="button"
                 variant="outline"
@@ -308,8 +301,7 @@ export function DeleteEnterpriseDialog({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                variant="destructive"
-                className="h-10 px-4 rounded-xl text-sm font-semibold shadow-sm"
+                className="h-10 px-4 rounded-xl bg-(--danger-fg) text-white text-sm font-semibold shadow-sm hover:bg-(--danger-fg)/90 disabled:opacity-45"
               >
                 {isSubmitting ? "Deleting..." : t("adminEnterprises.deleteDialog.confirm", "Delete enterprise")}
               </Button>

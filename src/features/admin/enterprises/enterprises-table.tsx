@@ -31,7 +31,7 @@ import { SearchEmptyState } from "@/components/common/search-empty-state";
 import { EnterpriseAvatar, EnterpriseStatusBadge, formatEnterpriseId } from "./enterprise-badges";
 import { formatEnterpriseDateTime } from "./enterprises.formatters";
 import type { EnterpriseSummaryDto } from "./enterprises.queries";
-import type { EnterpriseSortField, EnterpriseSortOrder } from "./enterprises.constants";
+import { getEnterpriseActions, type EnterpriseSortField, type EnterpriseSortOrder } from "./enterprises.constants";
 
 type EnterprisesTableProps = {
   items: EnterpriseSummaryDto[];
@@ -196,7 +196,7 @@ export function EnterprisesTable({
       <TableBody>
         {items.map((ent) => {
           const detailPath = `/admin/enterprises/${ent.id}`;
-          const isActive = ent.status?.toLowerCase() === "active";
+          const actions = getEnterpriseActions(ent.status);
 
           return (
             <TableRow
@@ -294,34 +294,38 @@ export function EnterprisesTable({
                       <span>{t("adminEnterprises.table.edit", "Edit")}</span>
                     </DropdownMenuItem>
 
-                    {isActive ? (
+                    {actions.canSuspend ? (
                       <DropdownMenuItem
                         onClick={() => onSuspend(ent)}
-                        variant="destructive"
+                        variant="warning"
                         className="flex items-center gap-2 px-3 py-2 cursor-pointer"
                       >
                         <Ban className="size-4" />
                         <span>{t("adminEnterprises.table.suspend", "Suspend")}</span>
                       </DropdownMenuItem>
-                    ) : (
+                    ) : null}
+
+                    {actions.canActivate ? (
                       <DropdownMenuItem
                         onClick={() => onActivate(ent)}
-                        variant="default"
+                        variant="success"
                         className="flex items-center gap-2 px-3 py-2 cursor-pointer"
                       >
-                        <Check className="size-4 text-(--status-success-fg)" />
+                        <Check className="size-4" />
                         <span>{t("adminEnterprises.table.activate", "Activate")}</span>
                       </DropdownMenuItem>
-                    )}
+                    ) : null}
 
-                    <DropdownMenuItem
-                      onClick={() => onDelete(ent)}
-                      variant="destructive"
-                      className="flex items-center gap-2 px-3 py-2 cursor-pointer"
-                    >
-                      <Trash2 className="size-4" />
-                      <span>{t("adminEnterprises.table.delete", "Delete")}</span>
-                    </DropdownMenuItem>
+                    {actions.canDelete ? (
+                      <DropdownMenuItem
+                        onClick={() => onDelete(ent)}
+                        variant="destructive"
+                        className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+                      >
+                        <Trash2 className="size-4" />
+                        <span>{t("adminEnterprises.table.delete", "Delete")}</span>
+                      </DropdownMenuItem>
+                    ) : null}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
