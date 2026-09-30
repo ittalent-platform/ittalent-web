@@ -498,7 +498,43 @@
     "optional": "Không bắt buộc",
     "cancel": "Hủy",
     "create": "Tạo tin tuyển dụng",
-    "save": "Lưu thay đổi"
+    "save": "Lưu thay đổi",
+    "requiredMark": "bắt buộc",
+    "optionalMark": "tùy chọn",
+    "level_placeholder": "Chọn cấp bậc",
+    "employmentTypePlaceholder": "Chọn loại công việc",
+    "employmentTypes": {
+      "Full-time": "Toàn thời gian",
+      "Part-time": "Bán thời gian",
+      "Internship": "Thực tập",
+      "Contract": "Hợp đồng",
+      "Remote": "Làm từ xa"
+    },
+    "recruitmentStatus": {
+      "open": "Đang tuyển",
+      "closed": "Đã đóng"
+    },
+    "deadlineHint": "Tin ngừng nhận hồ sơ vào cuối ngày này (giờ Việt Nam).",
+    "contentHint": "{{min}}–{{max}} ký tự.",
+    "validation": {
+      "titleLength": "Tiêu đề phải từ {{min}}–{{max}} ký tự.",
+      "locationLength": "Địa điểm phải từ {{min}}–{{max}} ký tự.",
+      "employmentType": "Hãy chọn loại công việc.",
+      "deadlineRequired": "Hãy chọn hạn nộp.",
+      "deadlinePast": "Hạn nộp phải là hôm nay hoặc muộn hơn.",
+      "contentLength": "Phải từ {{min}}–{{max}} ký tự.",
+      "salary": "Nhập khoảng lương hợp lệ.",
+      "openings": "Số lượng tuyển phải là số nguyên dương.",
+      "currency": "Nhập mã tiền tệ."
+    },
+    "publicationStatus": {
+      "draft": "Bản nháp",
+      "published": "Đã đăng",
+      "archived": "Đã lưu trữ"
+    },
+    "applications": "Hồ sơ ứng tuyển",
+    "status": "Trạng thái",
+    "deadline": "Hạn nộp"
   },
   "adminLayout": {
     "openMenu": "Mở menu",

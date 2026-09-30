@@ -165,7 +165,9 @@ export const getApiV1AdminDocuments = <ThrowOnError extends boolean = false>(opt
 export const getApiV1JobPostings = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1JobPostingsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1JobPostingsResponses, GetApiV1JobPostingsErrors, ThrowOnError>({ url: '/api/v1/job-postings', ...options });
 
 /**
- * Create a job posting for the authenticated recruiter enterprise
+ * Create and publish a job posting for the authenticated recruiter enterprise
+ *
+ * Saving always publishes: the posting is Published and Open. There is no status field and sending one is rejected. The enterprise is derived from the session and must be Active. The deadline is a date (YYYY-MM-DD) meaning the end of that day in Asia/Ho_Chi_Minh and must be today or later.
  */
 export const postApiV1JobPostings = <ThrowOnError extends boolean = false>(options: Options<PostApiV1JobPostingsData, ThrowOnError>) => (options.client ?? client).post<PostApiV1JobPostingsResponses, PostApiV1JobPostingsErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -198,7 +200,7 @@ export const getApiV1AdminJobPostings = <ThrowOnError extends boolean = false>(o
 /**
  * Delete a job posting for management
  *
- * A job posting cannot be deleted while one or more applications reference it.
+ * Recruiters of the owning enterprise only. Hard-removes the posting in any state, and only while no application has ever been recorded for it.
  */
 export const deleteApiV1JobPostingsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1JobPostingsByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1JobPostingsByIdResponses, DeleteApiV1JobPostingsByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -207,7 +209,7 @@ export const deleteApiV1JobPostingsById = <ThrowOnError extends boolean = false>
 });
 
 /**
- * Get a job posting for management
+ * Get a job posting for management (recruiter of the owning enterprise, or admin read-only)
  */
 export const getApiV1JobPostingsById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1JobPostingsByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -218,7 +220,7 @@ export const getApiV1JobPostingsById = <ThrowOnError extends boolean = false>(op
 /**
  * Update a job posting for management
  *
- * Omit a field to leave it unchanged. Send null to clear a clearable optional field.
+ * Recruiters of the owning enterprise only. Omit a field to leave it unchanged; send null to clear salary_min, salary_max, level or openings. Publication status, enterprise ownership and application data cannot be changed and are rejected. Archived postings (legacy data) cannot be edited.
  */
 export const patchApiV1JobPostingsById = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1JobPostingsByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1JobPostingsByIdResponses, PatchApiV1JobPostingsByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

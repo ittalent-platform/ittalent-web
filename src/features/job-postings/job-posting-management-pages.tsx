@@ -22,8 +22,11 @@ import type {
   UpdateJobPostingRequest,
 } from "@/api/generated/types.gen";
 import { JobPostingForm } from "./job-posting-form";
+import { formatDeadline } from "./job-postings.format";
+import { JobPostingStatusBadge } from "./job-posting-status-badge";
 import { useListParams } from "@/hooks/use-list-params";
 import { formatDate } from "@/lib/format";
+import { useTranslation } from "react-i18next";
 
 import {
   createJobPosting,
@@ -44,7 +47,7 @@ type JobPostingSortBy = NonNullable<JobPostingListParams["sort_by"]>;
 const sortOptions: { label: string; value: JobPostingSortBy }[] = [
   { label: "Created date", value: "created_at" },
   { label: "Title", value: "title" },
-  { label: "Expiry date", value: "expires_at" },
+  { label: "Deadline", value: "expires_at" },
 ];
 
 function basePath(actor: Actor) {
@@ -173,6 +176,7 @@ function JobPostingError({
 }
 
 export function JobPostingDetailPage({ actor }: { actor: Actor }) {
+  const { t } = useTranslation();
   const { jobPostingId } = useParams<{ jobPostingId: string }>();
   const navigate = useNavigate();
   const client = useQueryClient();
@@ -222,12 +226,14 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
         </Button>
         {actor === "recruiter" ? (
           <div className="flex flex-wrap gap-2">
-            <Button asChild size="sm" variant="outline">
-              <Link to={`${basePath(actor)}/${posting.id}/edit`}>
-                <Pencil />
-                Edit
-              </Link>
-            </Button>
+            {posting.status !== "archived" ? (
+              <Button asChild size="sm" variant="outline">
+                <Link to={`${basePath(actor)}/${posting.id}/edit`}>
+                  <Pencil />
+                  Edit
+                </Link>
+              </Button>
+            ) : null}
             <Button
               onClick={() => setPendingAction("delete")}
               size="sm"
@@ -252,7 +258,9 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
               value={posting.employmentType ?? "—"}
             />
             <DetailRow label="Level" value={posting.level ?? "—"} />
-            <DetailRow label="Expiry" value={formatDate(posting.expiresAt)} />
+            <DetailRow label={t("jobPostings.status")} value={<JobPostingStatusBadge posting={posting} />} />
+            <DetailRow label={t("jobPostings.deadline")} value={formatDeadline(posting.expiresAt)} />
+            <DetailRow label={t("jobPostings.applications")} value={posting.applicationCount?.toString() ?? "—"} />
             <DetailRow label="Created" value={formatDate(posting.createdAt)} />
             <DetailRow
               label="Openings"
@@ -275,7 +283,7 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
       {pendingAction ? (
         <ActionConfirmDialog
           action={mutation.isPending ? "Deleting…" : actionLabel}
-          description="This permanently removes the job posting. This action cannot be undone."
+          description="This permanently removes the job posting. A job that has received any application cannot be deleted. This action cannot be undone."
           disabled={mutation.isPending}
           icon={Trash2}
           onConfirm={() => mutation.mutate()}
@@ -290,6 +298,7 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
 }
 
 export function JobPostingListPage({ actor }: { actor: Actor }) {
+  const { t } = useTranslation();
   const { page, limit, search, debouncedSearch, set } = useListParams({
     defaultLimit: 10,
   });
@@ -405,14 +414,19 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
                 cell: (row: JobPosting) => row.level ?? "—",
               },
               {
-                key: "created",
-                header: "Created",
-                cell: (row: JobPosting) => formatDate(row.createdAt),
+                key: "applications",
+                header: t("jobPostings.applications"),
+                cell: (row: JobPosting) => row.applicationCount ?? "—",
               },
               {
                 key: "expires",
-                header: "Expiry",
-                cell: (row: JobPosting) => formatDate(row.expiresAt),
+                header: t("jobPostings.deadline"),
+                cell: (row: JobPosting) => formatDeadline(row.expiresAt),
+              },
+              {
+                key: "status",
+                header: t("jobPostings.status"),
+                cell: (row: JobPosting) => <JobPostingStatusBadge posting={row} />,
               },
               {
                 key: "actions",
@@ -498,7 +512,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
       {actor === "recruiter" && pendingDelete ? (
         <ActionConfirmDialog
           action={deletion.isPending ? "Deleting…" : "Delete"}
-          description="This permanently removes the job posting. This action cannot be undone."
+          description="This permanently removes the job posting. A job that has received any application cannot be deleted. This action cannot be undone."
           disabled={deletion.isPending}
           icon={Trash2}
           onConfirm={() => deletion.mutate(pendingDelete.id)}
