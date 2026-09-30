@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import {
   getApiV1AuthResetPassword,
@@ -15,45 +15,9 @@ import {
 import { forgotPasswordPath } from "./password-reset";
 import { getAuthErrorMessage } from "./auth-utils";
 import { Button } from "@/components/ui/button";
-import { getPasswordRules } from "./password-rules";
 import { PasswordField } from "./password-field";
 import { AuthCenteredShell } from "./auth-centered-shell";
 import { AuthAlert } from "./auth-alert";
-
-function PasswordRuleChips({
-  confirmPassword,
-  password,
-}: {
-  confirmPassword: string;
-  password: string;
-}) {
-  const touched = password.length > 0 || confirmPassword.length > 0;
-
-  return (
-    <div className="flex flex-wrap gap-2" aria-live="polite">
-      {getPasswordRules(password, confirmPassword).map((rule) => {
-        const active = touched && rule.ok;
-        const invalid = touched && !rule.ok;
-
-        return (
-          <span
-            key={rule.label}
-            className={[
-              "rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-colors duration-200",
-              active
-                ? "bg-(--status-success-bg) text-(--status-success-fg)"
-                : invalid
-                  ? "bg-(--status-error-bg) text-(--status-error-fg)"
-                  : "bg-(--status-neutral-bg) text-(--status-neutral-fg)",
-            ].join(" ")}
-          >
-            {rule.label} {touched ? (rule.ok ? "✓" : "×") : ""}
-          </span>
-        );
-      })}
-    </div>
-  );
-}
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -77,9 +41,6 @@ export function ResetPasswordPage() {
     },
     resolver: zodResolver(resetPasswordSchema),
   });
-
-  const newPassword = useWatch({ control: form.control, name: "newPassword" }) ?? "";
-  const confirmPassword = useWatch({ control: form.control, name: "confirmPassword" }) ?? "";
 
   useEffect(() => {
     if (!token) {
@@ -376,18 +337,14 @@ export function ResetPasswordPage() {
               label="New password"
               registration={form.register("newPassword")}
             />
+            <p className="mt-1.5 text-[13.5px] text-muted-foreground">
+              8–64 characters with upper case, lower case, a number and a special character.
+            </p>
             {form.formState.errors.newPassword ? (
               <p className="mt-1.5 text-[12.5px] text-(--danger-fg)">
                 {form.formState.errors.newPassword.message}
               </p>
             ) : null}
-          </div>
-
-          <div className="rounded-[12px] bg-(--surface-2) p-3">
-            <PasswordRuleChips
-              confirmPassword={confirmPassword}
-              password={newPassword}
-            />
           </div>
 
           <div>
@@ -415,7 +372,7 @@ export function ResetPasswordPage() {
 
         <div className="text-center">
           <Link
-            className="text-[13px] font-semibold text-(--primary-600) no-underline hover:underline"
+            className="text-[13px] font-semibold text-fg-link no-underline hover:underline"
             to="/login"
           >
             Back to sign in

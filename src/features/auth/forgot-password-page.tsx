@@ -121,7 +121,7 @@ export function ForgotPasswordPage() {
             </Link>
 
             <Button
-              className="h-11 text-[13.5px] font-semibold text-(--primary-600) hover:text-(--primary-600)"
+              className="h-11 text-[13.5px] font-semibold text-fg-link hover:text-fg-link"
               onClick={() => {
                 setSubmittedEmail(null);
                 setAlert(null);
@@ -196,7 +196,7 @@ export function ForgotPasswordPage() {
 
         <div className="text-center">
           <Link
-            className="text-[13px] font-semibold text-(--primary-600) no-underline hover:underline"
+            className="text-[13px] font-semibold text-fg-link no-underline hover:underline"
             to="/login"
           >
             Back to sign in

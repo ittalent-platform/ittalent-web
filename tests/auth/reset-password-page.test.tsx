@@ -193,28 +193,14 @@ describe("ResetPasswordPage", () => {
     ).toHaveClass("-translate-y-1/2");
   });
 
-  it("shows unmet password rules as light red pills", async () => {
-    const user = userEvent.setup();
+  it("renders password requirements helper text", async () => {
     renderPage();
 
-    await user.type(
-      await screen.findByLabelText(/^new password$/i),
-      "Password123!",
-    );
-
-    expect(screen.getByText("Match ×")).toHaveClass(
-      "bg-(--status-error-bg)",
-      "text-(--status-error-fg)",
-    );
-  });
-
-  it("shows untouched password rules as gray pills", async () => {
-    renderPage();
-
-    expect(await screen.findByText("8–64 chars")).toHaveClass(
-      "bg-(--status-neutral-bg)",
-      "text-(--status-neutral-fg)",
-    );
+    expect(
+      await screen.findByText(
+        "8–64 characters with upper case, lower case, a number and a special character.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("shows a retry warning when the API rate limits the request", async () => {
