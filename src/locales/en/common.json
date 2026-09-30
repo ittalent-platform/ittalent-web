@@ -37,9 +37,210 @@
     "clearSearch": "Clear search"
   },
   "timeline": {
-    "viewAll": "View all {{count}}"
+    "viewAll": "View all {{count}}",
+    "by": "by {{name}}",
+    "viewMessage": "View message",
+    "viewMessageFor": "View message for {{label}}"
+  },
+  "applications": {
+    "title": "My applications",
+    "browse": "Browse jobs",
+    "subtitle_one": "{{count}} application",
+    "subtitle_other": "{{count}} applications",
+    "search": "Search by job title or company…",
+    "filter": {
+      "status": "Status:",
+      "submitted": "Submitted:",
+      "all": "All",
+      "any": "Any",
+      "selected_one": "{{count}} selected",
+      "selected_other": "{{count}} selected",
+      "stage": "Stage:",
+      "job": "Job",
+      "clearJob": "Clear job filter",
+      "from": "From",
+      "to": "To",
+      "statusCaption": "Status",
+      "appliesRightAway": "Applies right away",
+      "inProgress": "In progress",
+      "closed": "Closed",
+      "selectAll": "Select all"
+    },
+    "range": {
+      "any": "Any time",
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 90 days",
+      "custom": "Custom range"
+    },
+    "view": {
+      "table": "Table",
+      "board": "Board"
+    },
+    "columns": {
+      "reference": "ID",
+      "job": "Job",
+      "submitted": "Submitted",
+      "updated": "Updated",
+      "documents": "Documents",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "submitted": "Submitted",
+      "under_review": "Under Review",
+      "interviewing": "Interviewing",
+      "offered": "Offered",
+      "hired": "Hired",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn",
+      "position_filled": "Position filled"
+    },
+    "attachment": {
+      "cv": "CV",
+      "cover_letter": "Cover letter"
+    },
+    "attachmentShort": {
+      "cv": "CV",
+      "cover_letter": "CL"
+    },
+    "actor": {
+      "candidate": "You",
+      "company": "Company",
+      "system": "System"
+    },
+    "noDocuments": "No documents",
+    "viewDetail": "View detail",
+    "rowActions": "Row actions for {{id}}",
+    "noApplications": "No applications yet",
+    "noApplicationsDescription": "When you apply to a job, it'll show up here so you can track its status.",
+    "noMatches": "No matching applications",
+    "noMatchesDescription": "Check the spelling or try a different filter.",
+    "clearFilters": "Clear filters",
+    "loadErrorTitle": "Could not load your applications.",
+    "loadErrorHint": "Check your connection. Nothing was changed.",
+    "board": {
+      "columns": "Application status columns",
+      "selectionBar": "Selected applications",
+      "selected": "{{count}} selected",
+      "clear": "Clear",
+      "withdraw": "Withdraw",
+      "select": "Select {{id}}",
+      "dragHint": "Drag to Withdrawn to withdraw",
+      "dropToWithdraw": "Drop here to withdraw",
+      "companyOnly": "Company only",
+      "emptyColumn": "No applications",
+      "hint": "While an application is Submitted or Under Review you can withdraw it: drag its card to Withdrawn, or tick it and choose Withdraw. The company moves applications through every other stage, so those columns don't accept drops.",
+      "withdrawTarget": "Withdraw drop target"
+    },
+    "withdraw": "Withdraw application",
+    "withdrawMany_one": "Withdraw {{count}} application",
+    "withdrawMany_other": "Withdraw {{count}} applications",
+    "withdrawTitle": "Withdraw this application?",
+    "withdrawTitleMany_one": "Withdraw {{count}} application?",
+    "withdrawTitleMany_other": "Withdraw {{count}} applications?",
+    "withdrawDescriptionOne": "This closes your application. While the job is still open you can apply once more, as a new application.",
+    "withdrawDescriptionMany": "This closes these applications. While each job is still open you can apply once more, as a new application.",
+    "withdrawFinal": "After that you can’t apply to it again.",
+    "withdrawRule": "Possible while Submitted or Under Review. You can apply once more later, as a new application.",
+    "reasonOptional": "Reason (optional)",
+    "reasonPlaceholder": "Tell the company why, if you want to",
+    "reasonHint": "Up to {{max}} characters. The company can see it.",
+    "keepApplication": "Keep application",
+    "keepApplications": "Keep applications",
+    "withdrawFailed": "Withdrawal failed. Nothing was changed. Please try again.",
+    "withdrawConflict": "The company moved this application while it was open, so it can’t be withdrawn now. Nothing was changed.",
+    "toast": {
+      "withdrawnTitle": "Application withdrawn",
+      "withdrawnOne": "{{id}} has been withdrawn.",
+      "withdrawnMany": "{{count}} applications withdrawn."
+    },
+    "back": "Back to my applications",
+    "breadcrumb": "Breadcrumb",
+    "notFound": "Application not found",
+    "notFoundDescription": "It may not exist, or you may not have access to it.",
+    "progress": "Application progress",
+    "detailsTitle": "Application details",
+    "reference": "Reference",
+    "submitted": "Submitted",
+    "lastUpdate": "Last update",
+    "documents": "Documents",
+    "jobDetails": "Job details",
+    "jobSnapshotDescription": "Saved when you applied. The live posting may have changed.",
+    "withdrawnOn": "You withdrew this application on {{date}}",
+    "withdrawnReason": "Your reason: {{reason}}",
+    "nextStep": "Next step",
+    "next": {
+      "submitted": "Waiting for the company to review your application.",
+      "under_review": "The company is reviewing your application. Nothing to do for now.",
+      "interviewing": "The company is arranging your interview. Watch your email for details.",
+      "offered": "Offer received. The company will contact you by email with the details.",
+      "hired": "You are hired. Congratulations!",
+      "rejected": "Not selected this time. You can keep applying to other jobs.",
+      "withdrawn": "You withdrew this application.",
+      "position_filled": "The company filled this position. Your application is closed and can't be withdrawn."
+    },
+    "history": {
+      "title": "Status history",
+      "submitted": "Submitted",
+      "under_review": "Moved to Under Review",
+      "interviewing": "Moved to Interviewing",
+      "offered": "Moved to Offered",
+      "hired": "Moved to Hired",
+      "rejected": "Moved to Rejected",
+      "withdrawn": "Withdrawn",
+      "submittedAgain": "Submitted · applied again"
+    },
+    "historyError": "Could not load the status history.",
+    "noHistory": "No status events yet",
+    "stage": {
+      "screening": "Screening",
+      "interview": "Interview",
+      "offer": "Offer",
+      "hired": "Hired",
+      "rejected": "Rejected"
+    },
+    "stageLabel": "Review stage",
+    "errors": {
+      "keywordBlank": "Enter a keyword. Spaces alone don't count.",
+      "keywordTooLong": "Keep the keyword to {{max}} characters or fewer.",
+      "rangeContradictory": "The start date must not be after the end date.",
+      "filterUnsupported": "One of the filters in this link isn't supported.",
+      "invalidTitle": "These search criteria aren't valid.",
+      "invalidHint": "Fix the highlighted filter or clear the filters. Nothing was searched."
+    },
+    "reapply": {
+      "second": "2nd application",
+      "secondTitle": "Your second application to this job",
+      "earlierWithdrawn": "The earlier one was withdrawn on {{date}}.",
+      "openEarlier": "View {{id}}",
+      "appliedAgainTitle": "You applied again on {{date}}",
+      "openLater": "View {{id}}",
+      "reappliedAs": "Reapplied as {{id}}"
+    },
+    "applyAgain": "Apply again",
+    "applyAgainRule": "The job is still open. You can apply once more, as a new application; this one stays here as Withdrawn.",
+    "viewJob": "View job posting",
+    "invalidLink": "This link isn't valid",
+    "invalidLinkDescription": "The application address is malformed. Go back to your applications and open it from the list.",
+    "withdrawPartial": "{{done}} withdrawn, {{failed}} left unchanged.",
+    "withdrawDescriptionReapplied": "This closes your application. This was already your second application to this job, so you won't be able to apply to it again.",
+    "acrossCompanies_one": "across {{count}} company",
+    "acrossCompanies_other": "across {{count}} companies"
   },
   "loadingScreen": {
     "message": "Loading your session and app state."
+  },
+  "brand": {
+    "wordmark": "ITTALENT"
+  },
+  "nav": {
+    "home": "ITTalent home",
+    "main": "Main",
+    "jobs": "Jobs",
+    "notifications": "Notifications",
+    "notificationsUnread": "Notifications, {{count}} unread",
+    "accountMenu": "Account menu, {{name}}",
+    "signingOut": "Signing out..."
   }
 }

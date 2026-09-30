@@ -8,6 +8,7 @@ export function ListToolbar({
   onSearchChange,
   search,
   searchError,
+  searchMaxLength,
   searchPlaceholder,
 }: {
   children?: ReactNode;
@@ -15,6 +16,7 @@ export function ListToolbar({
   onSearchChange: (value: string) => void;
   search: string;
   searchError?: string;
+  searchMaxLength?: number;
   searchPlaceholder?: string;
 }) {
   return (
@@ -22,6 +24,7 @@ export function ListToolbar({
       <SearchInput
         className="min-w-[280px] flex-[1_0_0]"
         error={searchError}
+        maxLength={searchMaxLength}
         onChange={onSearchChange}
         placeholder={searchPlaceholder}
         value={search}

@@ -27,10 +27,12 @@ const iconStyles: Record<ActionVariant, string> = {
 export function ActionConfirmDialog({
   action,
   cancelLabel = "Cancel",
+  children,
   description,
   disabled,
   error,
   icon: Icon,
+  keepOpenOnConfirm = false,
   onConfirm,
   onOpenChange,
   open,
@@ -39,10 +41,14 @@ export function ActionConfirmDialog({
 }: {
   action: string;
   cancelLabel?: string;
+  /** Extra body between the description and the footer, e.g. a reason field. */
+  children?: ReactNode;
   description: ReactNode;
   disabled?: boolean;
   error?: ReactNode;
   icon: LucideIcon;
+  /** Radix closes the dialog on confirm by default; set this when the caller closes it after an async result. */
+  keepOpenOnConfirm?: boolean;
   onConfirm: () => void;
   onOpenChange: (open: boolean) => void;
   open: boolean;
@@ -61,10 +67,11 @@ export function ActionConfirmDialog({
               <AlertDialogTitle className="itt-display [overflow-wrap:anywhere] text-[19px] font-semibold leading-[1.2] text-foreground">{title}</AlertDialogTitle>
               <AlertDialogDescription className="text-[13.5px] leading-[1.55] text-muted-foreground">{description}</AlertDialogDescription>
             </AlertDialogHeader>
+            {children ? <div className="mt-4">{children}</div> : null}
             {error ? <div className="mt-4"><InlineErrorAlert>{error}</InlineErrorAlert></div> : null}
             <AlertDialogFooter className="mt-6 gap-3">
               <AlertDialogCancel className="h-10 px-4 text-[13.5px] font-semibold" disabled={disabled} shape="default">{cancelLabel}</AlertDialogCancel>
-              <AlertDialogAction className="h-10 px-4 text-[13.5px] font-semibold" disabled={disabled} onClick={onConfirm} shape="default" variant={variant}>{action}</AlertDialogAction>
+              <AlertDialogAction className="h-10 px-4 text-[13.5px] font-semibold" disabled={disabled} onClick={(event) => { if (keepOpenOnConfirm) event.preventDefault(); onConfirm(); }} shape="default" variant={variant}>{action}</AlertDialogAction>
             </AlertDialogFooter>
           </div>
         </div>

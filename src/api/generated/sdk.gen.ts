@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses } from './types.gen';
+import type { DeleteApiV1EnterprisesByEnterpriseIdData, DeleteApiV1EnterprisesByEnterpriseIdErrors, DeleteApiV1EnterprisesByEnterpriseIdResponses, GetApiV1AdminDocumentsData, GetApiV1AdminDocumentsResponses, GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1DocumentsData, GetApiV1DocumentsResponses, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesResponses, GetApiV1MeApplicationsByIdData, GetApiV1MeApplicationsByIdErrors, GetApiV1MeApplicationsByIdHistoryData, GetApiV1MeApplicationsByIdHistoryErrors, GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsData, GetApiV1MeApplicationsErrors, GetApiV1MeApplicationsResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdResponses, GetHealthData, GetHealthResponses, PatchApiV1EnterprisesByEnterpriseIdData, PatchApiV1EnterprisesByEnterpriseIdErrors, PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdStatusData, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1MeApplicationsByIdWithdrawData, PatchApiV1MeApplicationsByIdWithdrawErrors, PatchApiV1MeApplicationsByIdWithdrawResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses, PostApiV1DocumentsData, PostApiV1DocumentsResponses, PostApiV1EnterprisesData, PostApiV1EnterprisesErrors, PostApiV1EnterprisesResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -128,6 +128,33 @@ export const postApiV1AuthChangePassword = <ThrowOnError extends boolean = false
 });
 
 /**
+ * List current user documents
+ */
+export const getApiV1Documents = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1DocumentsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1DocumentsResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/documents',
+    ...options
+});
+
+/**
+ * Upload the current user CV or cover letter
+ */
+export const postApiV1Documents = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1DocumentsData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1DocumentsResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/documents',
+    ...options
+});
+
+/**
+ * List all CVs and cover letters for administrators
+ */
+export const getApiV1AdminDocuments = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AdminDocumentsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1AdminDocumentsResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/admin/documents',
+    ...options
+});
+
+/**
  * Get user by ID
  */
 export const getApiV1UsersById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdResponses, GetApiV1UsersByIdErrors, ThrowOnError>({
@@ -139,22 +166,117 @@ export const getApiV1UsersById = <ThrowOnError extends boolean = false>(options:
 /**
  * View enterprise list / search enterprises
  *
- * Public. Returns only Active enterprises. Optional keyword (matches name, industry, location), industry and location narrow the list.
+ * Public for Active enterprises. Administrators can filter by any status or query all enterprises.
  */
 export const getApiV1Enterprises = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1EnterprisesData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1EnterprisesResponses, GetApiV1EnterprisesErrors, ThrowOnError>({ url: '/api/v1/enterprises', ...options });
 
 /**
- * View enterprise detail
+ * Create an enterprise profile
  *
- * Public. Returns 404 when the enterprise does not exist or is not Active.
+ * Creates a new enterprise profile. Authenticated recruiter or admin required. Default status is pending for recruiters and active for admins.
+ */
+export const postApiV1Enterprises = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1EnterprisesData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1EnterprisesResponses, PostApiV1EnterprisesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/enterprises',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers
+    }
+});
+
+/**
+ * Delete enterprise profile (Soft delete)
+ *
+ * Soft-deletes an enterprise profile. Exclusive to System Administrator. Fails if the enterprise currently has published active jobs.
+ */
+export const deleteApiV1EnterprisesByEnterpriseId = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1EnterprisesByEnterpriseIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1EnterprisesByEnterpriseIdResponses, DeleteApiV1EnterprisesByEnterpriseIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/enterprises/{enterpriseId}',
+    ...options
+});
+
+/**
+ * View an enterprise profile detail
+ *
+ * Returns complete enterprise information. Non-active enterprises are accessible only to the owner or admins.
  */
 export const getApiV1EnterprisesByEnterpriseId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1EnterprisesByEnterpriseIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesByEnterpriseIdErrors, ThrowOnError>({ url: '/api/v1/enterprises/{enterpriseId}', ...options });
 
 /**
- * List users (requires admin authorization)
+ * Update an enterprise profile information
+ *
+ * Updates company details. Accessible only by the enterprise owner (Recruiter) or a System Administrator.
  */
-export const getApiV1Users = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UsersData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1UsersResponses, GetApiV1UsersErrors, ThrowOnError>({
+export const patchApiV1EnterprisesByEnterpriseId = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1EnterprisesByEnterpriseIdData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users',
+    url: '/api/v1/enterprises/{enterpriseId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update an enterprise's lifecycle status
+ *
+ * Transitions enterprise status (pending, active, suspended, rejected, inactive). Exclusive to System Administrator. Justification reason mandatory for suspended and rejected statuses.
+ */
+export const patchApiV1EnterprisesByEnterpriseIdStatus = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1EnterprisesByEnterpriseIdStatusData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/enterprises/{enterpriseId}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * View the authenticated candidate applications list with filtering and pagination
+ *
+ * Returns a bounded, newest-first list of the candidate’s own applications. Supports filtering by one or several statuses (comma-separated), job ID, review stage, date range, and keyword search on the job title or company name, sorted by submitted date, last update or ID. Also returns status counts for board-like views over the same filter set (UC-MYAPP-01.AC.3).
+ */
+export const getApiV1MeApplications = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1MeApplicationsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1MeApplicationsResponses, GetApiV1MeApplicationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/applications',
     ...options
+});
+
+/**
+ * View an owned application detail
+ *
+ * Returns the detail of a single application owned by the authenticated candidate. Public job snapshot and attachment metadata are included; no private HR data or document URLs are exposed.
+ */
+export const getApiV1MeApplicationsById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1MeApplicationsByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/applications/{id}',
+    ...options
+});
+
+/**
+ * View the history of an owned application
+ *
+ * Returns the append-only status history for an application owned by the authenticated candidate. Each entry contains public status, timestamp, stage, and actor role only. No private notes, interviewer identities, or company-internal fields are exposed.
+ */
+export const getApiV1MeApplicationsByIdHistory = <ThrowOnError extends boolean = false>(options: Options<GetApiV1MeApplicationsByIdHistoryData, ThrowOnError>) => (options.client ?? client).get<GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdHistoryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/applications/{id}/history',
+    ...options
+});
+
+/**
+ * Withdraw an owned application
+ *
+ * Withdraws an owned application if it is currently in Submitted or Under Review status. Uses optimistic concurrency via expectedVersion and records the withdrawal as an append-only history event. The Withdrawn status is terminal.
+ */
+export const patchApiV1MeApplicationsByIdWithdraw = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1MeApplicationsByIdWithdrawData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1MeApplicationsByIdWithdrawErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/applications/{id}/withdraw',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });

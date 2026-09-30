@@ -37,9 +37,205 @@
     "clearSearch": "Xoá tìm kiếm"
   },
   "timeline": {
-    "viewAll": "Xem tất cả {{count}}"
+    "viewAll": "Xem tất cả {{count}}",
+    "by": "bởi {{name}}",
+    "viewMessage": "Xem tin nhắn",
+    "viewMessageFor": "Xem tin nhắn của {{label}}"
+  },
+  "applications": {
+    "title": "Đơn ứng tuyển của tôi",
+    "browse": "Tìm việc làm",
+    "subtitle_other": "{{count}} đơn ứng tuyển",
+    "search": "Tìm theo tên vị trí hoặc công ty…",
+    "filter": {
+      "status": "Trạng thái:",
+      "submitted": "Ngày nộp:",
+      "all": "Tất cả",
+      "any": "Bất kỳ",
+      "selected_other": "Đã chọn {{count}}",
+      "stage": "Giai đoạn:",
+      "job": "Vị trí",
+      "clearJob": "Bỏ lọc vị trí",
+      "from": "Từ",
+      "to": "Đến",
+      "statusCaption": "Trạng thái",
+      "appliesRightAway": "Áp dụng ngay",
+      "inProgress": "Đang xử lý",
+      "closed": "Đã đóng",
+      "selectAll": "Chọn tất cả"
+    },
+    "range": {
+      "any": "Mọi lúc",
+      "7d": "7 ngày qua",
+      "30d": "30 ngày qua",
+      "90d": "90 ngày qua",
+      "custom": "Tùy chọn"
+    },
+    "view": {
+      "table": "Bảng",
+      "board": "Bảng Kanban"
+    },
+    "columns": {
+      "reference": "Mã",
+      "job": "Vị trí",
+      "submitted": "Ngày nộp",
+      "updated": "Cập nhật",
+      "documents": "Tài liệu",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "status": {
+      "submitted": "Đã nộp",
+      "under_review": "Đang xem xét",
+      "interviewing": "Phỏng vấn",
+      "offered": "Đã nhận offer",
+      "hired": "Đã trúng tuyển",
+      "rejected": "Bị từ chối",
+      "withdrawn": "Đã rút đơn",
+      "position_filled": "Đã đủ người"
+    },
+    "attachment": {
+      "cv": "CV",
+      "cover_letter": "Thư xin việc"
+    },
+    "attachmentShort": {
+      "cv": "CV",
+      "cover_letter": "TXV"
+    },
+    "actor": {
+      "candidate": "Bạn",
+      "company": "Công ty",
+      "system": "Hệ thống"
+    },
+    "noDocuments": "Chưa có tài liệu",
+    "viewDetail": "Xem chi tiết",
+    "rowActions": "Thao tác cho {{id}}",
+    "noApplications": "Chưa có đơn ứng tuyển",
+    "noApplicationsDescription": "Khi bạn ứng tuyển một vị trí, đơn sẽ hiển thị ở đây để bạn theo dõi trạng thái.",
+    "noMatches": "Không có đơn phù hợp",
+    "noMatchesDescription": "Kiểm tra lại từ khóa hoặc thử bộ lọc khác.",
+    "clearFilters": "Xóa bộ lọc",
+    "loadErrorTitle": "Không tải được đơn ứng tuyển.",
+    "loadErrorHint": "Kiểm tra kết nối mạng. Dữ liệu không bị thay đổi.",
+    "board": {
+      "columns": "Các cột trạng thái đơn ứng tuyển",
+      "selectionBar": "Các đơn đã chọn",
+      "selected": "Đã chọn {{count}}",
+      "clear": "Bỏ chọn",
+      "withdraw": "Rút đơn",
+      "select": "Chọn {{id}}",
+      "dragHint": "Kéo sang cột Đã rút đơn để rút đơn",
+      "dropToWithdraw": "Thả vào đây để rút đơn",
+      "companyOnly": "Chỉ công ty",
+      "emptyColumn": "Không có đơn",
+      "hint": "Khi đơn ở trạng thái Đã nộp hoặc Đang xem xét, bạn có thể rút đơn: kéo thẻ sang cột Đã rút đơn, hoặc tick chọn rồi bấm Rút đơn. Công ty chuyển đơn qua các giai đoạn còn lại nên các cột đó không nhận thả thẻ.",
+      "withdrawTarget": "Vùng thả để rút đơn"
+    },
+    "withdraw": "Rút đơn ứng tuyển",
+    "withdrawMany_other": "Rút {{count}} đơn ứng tuyển",
+    "withdrawTitle": "Rút đơn ứng tuyển này?",
+    "withdrawTitleMany_other": "Rút {{count}} đơn ứng tuyển?",
+    "withdrawDescriptionOne": "Thao tác này đóng đơn ứng tuyển của bạn. Khi vị trí vẫn còn mở, bạn có thể ứng tuyển lại một lần nữa bằng đơn mới.",
+    "withdrawDescriptionMany": "Thao tác này đóng các đơn ứng tuyển đã chọn. Khi vị trí vẫn còn mở, bạn có thể ứng tuyển lại một lần nữa bằng đơn mới.",
+    "withdrawFinal": "Sau đó bạn không thể ứng tuyển lại vị trí này.",
+    "withdrawRule": "Chỉ rút được khi đơn ở trạng thái Đã nộp hoặc Đang xem xét. Sau này bạn có thể ứng tuyển lại bằng đơn mới.",
+    "reasonOptional": "Lý do (không bắt buộc)",
+    "reasonPlaceholder": "Cho công ty biết lý do, nếu bạn muốn",
+    "reasonHint": "Tối đa {{max}} ký tự. Công ty có thể xem lý do này.",
+    "keepApplication": "Giữ đơn",
+    "keepApplications": "Giữ các đơn",
+    "withdrawFailed": "Rút đơn thất bại. Dữ liệu không bị thay đổi. Vui lòng thử lại.",
+    "withdrawConflict": "Công ty đã chuyển đơn sang giai đoạn khác khi bạn đang thao tác nên không thể rút đơn. Dữ liệu không bị thay đổi.",
+    "toast": {
+      "withdrawnTitle": "Đã rút đơn",
+      "withdrawnOne": "{{id}} đã được rút.",
+      "withdrawnMany": "Đã rút {{count}} đơn ứng tuyển."
+    },
+    "back": "Quay lại đơn ứng tuyển của tôi",
+    "breadcrumb": "Đường dẫn",
+    "notFound": "Không tìm thấy đơn ứng tuyển",
+    "notFoundDescription": "Đơn có thể không tồn tại hoặc bạn không có quyền truy cập.",
+    "progress": "Tiến trình ứng tuyển",
+    "detailsTitle": "Chi tiết đơn ứng tuyển",
+    "reference": "Mã đơn",
+    "submitted": "Ngày nộp",
+    "lastUpdate": "Cập nhật gần nhất",
+    "documents": "Tài liệu",
+    "jobDetails": "Thông tin vị trí",
+    "jobSnapshotDescription": "Được lưu lại tại thời điểm bạn ứng tuyển. Tin tuyển dụng hiện tại có thể đã thay đổi.",
+    "withdrawnOn": "Bạn đã rút đơn này vào {{date}}",
+    "withdrawnReason": "Lý do của bạn: {{reason}}",
+    "nextStep": "Bước tiếp theo",
+    "next": {
+      "submitted": "Đang chờ công ty xem xét đơn của bạn.",
+      "under_review": "Công ty đang xem xét đơn của bạn. Hiện chưa cần làm gì.",
+      "interviewing": "Công ty đang sắp xếp buổi phỏng vấn. Hãy theo dõi email để biết chi tiết.",
+      "offered": "Bạn đã nhận offer. Công ty sẽ liên hệ qua email với thông tin chi tiết.",
+      "hired": "Bạn đã trúng tuyển. Chúc mừng!",
+      "rejected": "Lần này bạn chưa được chọn. Bạn có thể tiếp tục ứng tuyển các vị trí khác.",
+      "withdrawn": "Bạn đã rút đơn ứng tuyển này.",
+      "position_filled": "Công ty đã tuyển đủ người cho vị trí này. Đơn của bạn đã đóng và không thể rút."
+    },
+    "history": {
+      "title": "Lịch sử trạng thái",
+      "submitted": "Đã nộp",
+      "under_review": "Chuyển sang Đang xem xét",
+      "interviewing": "Chuyển sang Phỏng vấn",
+      "offered": "Chuyển sang Đã nhận offer",
+      "hired": "Chuyển sang Đã trúng tuyển",
+      "rejected": "Chuyển sang Bị từ chối",
+      "withdrawn": "Đã rút đơn",
+      "submittedAgain": "Đã nộp · ứng tuyển lại"
+    },
+    "historyError": "Không tải được lịch sử trạng thái.",
+    "noHistory": "Chưa có sự kiện trạng thái",
+    "stage": {
+      "screening": "Sàng lọc",
+      "interview": "Phỏng vấn",
+      "offer": "Đề nghị",
+      "hired": "Trúng tuyển",
+      "rejected": "Từ chối"
+    },
+    "stageLabel": "Giai đoạn xét duyệt",
+    "errors": {
+      "keywordBlank": "Nhập từ khóa. Chỉ có khoảng trắng là không hợp lệ.",
+      "keywordTooLong": "Từ khóa tối đa {{max}} ký tự.",
+      "rangeContradictory": "Ngày bắt đầu không được sau ngày kết thúc.",
+      "filterUnsupported": "Một bộ lọc trong liên kết này không được hỗ trợ.",
+      "invalidTitle": "Tiêu chí tìm kiếm không hợp lệ.",
+      "invalidHint": "Sửa bộ lọc đang báo lỗi hoặc xóa bộ lọc. Chưa có tìm kiếm nào được thực hiện."
+    },
+    "reapply": {
+      "second": "Đơn thứ 2",
+      "secondTitle": "Đây là đơn thứ hai của bạn cho vị trí này",
+      "earlierWithdrawn": "Đơn trước đã được rút vào {{date}}.",
+      "openEarlier": "Xem {{id}}",
+      "appliedAgainTitle": "Bạn đã ứng tuyển lại vào {{date}}",
+      "openLater": "Xem {{id}}",
+      "reappliedAs": "Đã ứng tuyển lại: {{id}}"
+    },
+    "applyAgain": "Ứng tuyển lại",
+    "applyAgainRule": "Vị trí vẫn còn mở. Bạn có thể ứng tuyển lại một lần bằng đơn mới; đơn này vẫn ở trạng thái Đã rút đơn.",
+    "viewJob": "Xem tin tuyển dụng",
+    "invalidLink": "Liên kết không hợp lệ",
+    "invalidLinkDescription": "Địa chỉ đơn ứng tuyển bị sai. Hãy quay lại danh sách và mở đơn từ đó.",
+    "withdrawPartial": "Đã rút {{done}} đơn, {{failed}} đơn giữ nguyên.",
+    "withdrawDescriptionReapplied": "Thao tác này đóng đơn ứng tuyển của bạn. Đây đã là đơn thứ hai cho vị trí này nên bạn sẽ không thể ứng tuyển lại.",
+    "acrossCompanies_other": "tại {{count}} công ty"
   },
   "loadingScreen": {
     "message": "Đang tải phiên đăng nhập và dữ liệu ứng dụng."
+  },
+  "brand": {
+    "wordmark": "ITTALENT"
+  },
+  "nav": {
+    "home": "Trang chủ ITTalent",
+    "main": "Điều hướng chính",
+    "jobs": "Việc làm",
+    "notifications": "Thông báo",
+    "notificationsUnread": "Thông báo, {{count}} chưa đọc",
+    "accountMenu": "Menu tài khoản, {{name}}",
+    "signingOut": "Đang đăng xuất..."
   }
 }
