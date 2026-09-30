@@ -13,12 +13,11 @@ export function AuthPageShell({ aside, children }: { aside: ReactNode; children:
           <div aria-hidden="true" className="itt-hero-rings pointer-events-none absolute inset-x-0 bottom-0 select-none">
             {HERO_RINGS.map((ring) => (
               <span
-                className={`itt-ring absolute rounded-full border-solid ${ring.borderClass}`}
+                className={`itt-ring absolute rounded-full ${ring.fillClass}`}
                 key={ring.id}
                 style={
                   {
                     animationDelay: `${ring.pulseDelaySeconds}s`,
-                    borderWidth: ring.borderWidth,
                     bottom: ring.bottom,
                     height: ring.size,
                     left: ring.left,
