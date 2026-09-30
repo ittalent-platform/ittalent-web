@@ -32,7 +32,7 @@ export function PaginationControls({
     <div className="flex items-center gap-2">
       <button
         aria-label={t("pagination.previous")}
-        className="flex h-9 w-9 items-center justify-center rounded-md border border-(--border-strong) bg-card text-muted-foreground disabled:cursor-not-allowed disabled:text-muted-foreground/60"
+        className="flex h-9 w-9 items-center justify-center rounded-lg border border-(--border-strong) bg-card text-muted-foreground disabled:cursor-not-allowed disabled:text-muted-foreground/60"
         disabled={page <= 1}
         onClick={() => onPageChange(page - 1)}
         type="button"
@@ -43,7 +43,7 @@ export function PaginationControls({
       <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
         <input
           aria-label={t("pagination.pageNumber")}
-          className="h-9 w-12 rounded-md border border-(--border-strong) bg-card px-2 text-center font-semibold text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
+          className="h-9 w-12 rounded-lg border border-(--border-strong) bg-card px-2 text-center font-semibold text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
           inputMode="numeric"
           max={totalPages}
           min={1}
@@ -63,7 +63,7 @@ export function PaginationControls({
 
       <button
         aria-label={t("pagination.next")}
-        className="flex h-9 w-9 items-center justify-center rounded-md border border-(--border-strong) bg-card text-muted-foreground disabled:cursor-not-allowed disabled:text-muted-foreground/60"
+        className="flex h-9 w-9 items-center justify-center rounded-lg border border-(--border-strong) bg-card text-muted-foreground disabled:cursor-not-allowed disabled:text-muted-foreground/60"
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
         type="button"

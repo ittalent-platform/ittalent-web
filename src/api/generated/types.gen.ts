@@ -20,8 +20,11 @@ export type RegisterResponse = {
         id: string;
         email: string;
         username: string;
+        fullName: string | null;
+        phone: string | null;
         role: string;
         status: string;
+        emailVerified: boolean;
         enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
@@ -47,8 +50,11 @@ export type AuthResponse = {
         id: string;
         email: string;
         username: string;
+        fullName: string | null;
+        phone: string | null;
         role: string;
         status: string;
+        emailVerified: boolean;
         enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
@@ -68,8 +74,11 @@ export type UserDto = {
     id: string;
     email: string;
     username: string;
+    fullName: string | null;
+    phone: string | null;
     role: string;
     status: string;
+    emailVerified: boolean;
     enterpriseId: string | null;
     createdAt?: string;
     updatedAt?: string;
@@ -142,6 +151,25 @@ export type ChangePasswordResponse = {
     };
 };
 
+export type DocumentResponse = {
+    id: string;
+    ownerId: string;
+    type: 'cv' | 'cover_letter';
+    fileUrl: string;
+    fileName: string;
+    mimeType: string;
+    size: number;
+    createdAt: string;
+};
+
+export type PaginatedDocumentsResponse = {
+    items: Array<DocumentResponse>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
 export type JobPostingResponse = {
     id: string;
     enterpriseId: string;
@@ -162,6 +190,34 @@ export type JobPostingResponse = {
     expiresAt?: string;
     createdAt: string;
     updatedAt: string;
+};
+
+export type PaginatedJobPostingsResponse = {
+    items: Array<JobPostingResponse>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type UserListResponse = {
+    items: Array<{
+        id: string;
+        email: string;
+        username: string;
+        fullName: string | null;
+        phone: string | null;
+        role: string;
+        status: string;
+        emailVerified: boolean;
+        enterpriseId: string | null;
+        createdAt?: string;
+        updatedAt?: string;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
 };
 
 export type EnterpriseListResponse = {
@@ -357,21 +413,6 @@ export type ApplicationDto = {
     updatedAt: string;
 };
 
-export type MyApplicationResponse = {
-    item: {
-        id: string;
-        jobPostingId: string;
-        status: string;
-        cvId: string;
-        coverLetterId: string | null;
-        message: string | null;
-        reappliedFrom: string | null;
-        reappliedAs: string | null;
-        createdAt: string;
-        updatedAt: string;
-    } | null;
-};
-
 export type ApplicationDetailDto = {
     id: string;
     jobId: string;
@@ -462,22 +503,6 @@ export type ApplicationHistoryResponse = {
 export type WithdrawApplicationBody = {
     expectedVersion: number;
     reason?: string;
-};
-
-export type PaginatedJobPostingsResponse = {
-    items: Array<JobPostingResponse>;
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-};
-
-export type UserListResponse = {
-    items: Array<UserDto>;
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
 };
 
 export type GetHealthData = {
@@ -737,7 +762,12 @@ export type PostApiV1AuthChangePasswordResponse = PostApiV1AuthChangePasswordRes
 export type GetApiV1DocumentsData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        type?: 'cv' | 'cover_letter';
+        page?: number;
+        limit?: number;
+        sort_order?: 'asc' | 'desc';
+    };
     url: '/api/v1/documents';
 };
 
@@ -745,8 +775,10 @@ export type GetApiV1DocumentsResponses = {
     /**
      * Paginated documents
      */
-    200: unknown;
+    200: PaginatedDocumentsResponse;
 };
+
+export type GetApiV1DocumentsResponse = GetApiV1DocumentsResponses[keyof GetApiV1DocumentsResponses];
 
 export type PostApiV1DocumentsData = {
     body?: never;
@@ -785,7 +817,6 @@ export type GetApiV1JobPostingsData = {
         location?: string;
         employment_type?: string;
         level?: string;
-        enterprise_id?: string;
         sort_by?: 'created_at' | 'title' | 'expires_at';
         sort_order?: 'asc' | 'desc';
         page?: number;
@@ -802,31 +833,6 @@ export type GetApiV1JobPostingsResponses = {
 };
 
 export type GetApiV1JobPostingsResponse = GetApiV1JobPostingsResponses[keyof GetApiV1JobPostingsResponses];
-
-export type GetApiV1JobPostingsByIdPublicData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/api/v1/job-postings/{id}/public';
-};
-
-export type GetApiV1JobPostingsByIdPublicErrors = {
-    /**
-     * Job posting not found, not published, or expired
-     */
-    404: unknown;
-};
-
-export type GetApiV1JobPostingsByIdPublicResponses = {
-    /**
-     * Job posting
-     */
-    200: JobPostingResponse;
-};
-
-export type GetApiV1JobPostingsByIdPublicResponse = GetApiV1JobPostingsByIdPublicResponses[keyof GetApiV1JobPostingsByIdPublicResponses];
 
 export type PostApiV1JobPostingsData = {
     body?: never;
@@ -951,6 +957,50 @@ export type PatchApiV1JobPostingsByIdResponses = {
 
 export type PatchApiV1JobPostingsByIdResponse = PatchApiV1JobPostingsByIdResponses[keyof PatchApiV1JobPostingsByIdResponses];
 
+export type GetApiV1UsersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        search?: string;
+        role?: 'user' | 'admin' | 'recruiter' | 'applicant' | 'interviewer';
+        status?: 'active' | 'inactive' | 'suspended' | 'blocked';
+        emailVerified?: 'true' | 'false';
+        sortBy?: 'createdAt' | 'id' | 'name' | 'username' | 'email';
+        sortOrder?: 'asc' | 'desc';
+    };
+    url: '/api/v1/users';
+};
+
+export type GetApiV1UsersErrors = {
+    /**
+     * Invalid page, limit, search, role or status
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a System Administrator
+     */
+    403: unknown;
+    /**
+     * Account storage unavailable, retry later
+     */
+    503: unknown;
+};
+
+export type GetApiV1UsersResponses = {
+    /**
+     * One page of user accounts (empty items when nothing matches)
+     */
+    200: UserListResponse;
+};
+
+export type GetApiV1UsersResponse = GetApiV1UsersResponses[keyof GetApiV1UsersResponses];
+
 export type GetApiV1UsersByIdData = {
     body?: never;
     path: {
@@ -962,9 +1012,17 @@ export type GetApiV1UsersByIdData = {
 
 export type GetApiV1UsersByIdErrors = {
     /**
+     * Invalid user ID
+     */
+    400: unknown;
+    /**
      * Authentication required
      */
     401: unknown;
+    /**
+     * Caller is not a System Administrator
+     */
+    403: unknown;
     /**
      * User not found
      */
@@ -979,6 +1037,51 @@ export type GetApiV1UsersByIdResponses = {
 };
 
 export type GetApiV1UsersByIdResponse = GetApiV1UsersByIdResponses[keyof GetApiV1UsersByIdResponses];
+
+export type PatchApiV1UsersByIdData = {
+    body: {
+        fullName?: string;
+        phone?: string | null;
+        role?: 'admin' | 'user';
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}';
+};
+
+export type PatchApiV1UsersByIdErrors = {
+    /**
+     * Invalid user ID or body, or nothing to update
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a System Administrator, or is changing their own role
+     */
+    403: unknown;
+    /**
+     * User not found
+     */
+    404: unknown;
+    /**
+     * Account storage unavailable, retry later
+     */
+    503: unknown;
+};
+
+export type PatchApiV1UsersByIdResponses = {
+    /**
+     * The updated user account
+     */
+    200: UserDto;
+};
+
+export type PatchApiV1UsersByIdResponse = PatchApiV1UsersByIdResponses[keyof PatchApiV1UsersByIdResponses];
 
 export type GetApiV1EnterprisesData = {
     body?: never;
@@ -1190,39 +1293,6 @@ export type PatchApiV1EnterprisesByEnterpriseIdStatusResponses = {
 
 export type PatchApiV1EnterprisesByEnterpriseIdStatusResponse = PatchApiV1EnterprisesByEnterpriseIdStatusResponses[keyof PatchApiV1EnterprisesByEnterpriseIdStatusResponses];
 
-export type GetApiV1MeApplicationsMineData = {
-    body?: never;
-    path?: never;
-    query: {
-        jobPostingId: string;
-    };
-    url: '/api/v1/me/applications/mine';
-};
-
-export type GetApiV1MeApplicationsMineErrors = {
-    /**
-     * Invalid job posting ID
-     */
-    400: unknown;
-    /**
-     * Authentication required
-     */
-    401: unknown;
-    /**
-     * Caller is not an Applicant
-     */
-    403: unknown;
-};
-
-export type GetApiV1MeApplicationsMineResponses = {
-    /**
-     * The application (any status) or null
-     */
-    200: MyApplicationResponse;
-};
-
-export type GetApiV1MeApplicationsMineResponse = GetApiV1MeApplicationsMineResponses[keyof GetApiV1MeApplicationsMineResponses];
-
 export type GetApiV1MeApplicationsData = {
     body?: never;
     path?: never;
@@ -1421,36 +1491,3 @@ export type PatchApiV1MeApplicationsByIdWithdrawResponses = {
 };
 
 export type PatchApiV1MeApplicationsByIdWithdrawResponse = PatchApiV1MeApplicationsByIdWithdrawResponses[keyof PatchApiV1MeApplicationsByIdWithdrawResponses];
-
-export type GetApiV1UsersData = {
-    body?: never;
-    path?: never;
-    query?: {
-        page?: number;
-        limit?: number;
-        search?: string;
-        role?: 'user' | 'admin';
-        status?: 'active' | 'inactive' | 'suspended';
-    };
-    url: '/api/v1/users';
-};
-
-export type GetApiV1UsersErrors = {
-    /**
-     * Authentication required
-     */
-    401: unknown;
-    /**
-     * Forbidden: insufficient permissions
-     */
-    403: unknown;
-};
-
-export type GetApiV1UsersResponses = {
-    /**
-     * User list retrieved successfully
-     */
-    200: UserListResponse;
-};
-
-export type GetApiV1UsersResponse = GetApiV1UsersResponses[keyof GetApiV1UsersResponses];

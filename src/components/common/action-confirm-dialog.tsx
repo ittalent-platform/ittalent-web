@@ -28,6 +28,7 @@ export function ActionConfirmDialog({
   action,
   cancelLabel = "Cancel",
   children,
+  confirmDisabled,
   description,
   disabled,
   error,
@@ -43,6 +44,8 @@ export function ActionConfirmDialog({
   cancelLabel?: string;
   /** Extra body between the description and the footer, e.g. a reason field. */
   children?: ReactNode;
+  /** Disables only the confirm button (the dialog can still be cancelled). */
+  confirmDisabled?: boolean;
   description: ReactNode;
   disabled?: boolean;
   error?: ReactNode;
@@ -71,7 +74,7 @@ export function ActionConfirmDialog({
             {error ? <div className="mt-4"><InlineErrorAlert>{error}</InlineErrorAlert></div> : null}
             <AlertDialogFooter className="mt-6 gap-3">
               <AlertDialogCancel className="h-10 px-4 text-[13.5px] font-semibold" disabled={disabled} shape="default">{cancelLabel}</AlertDialogCancel>
-              <AlertDialogAction className="h-10 px-4 text-[13.5px] font-semibold" disabled={disabled} onClick={(event) => { if (keepOpenOnConfirm) event.preventDefault(); onConfirm(); }} shape="default" variant={variant}>{action}</AlertDialogAction>
+              <AlertDialogAction className="h-10 px-4 text-[13.5px] font-semibold" disabled={disabled || confirmDisabled} onClick={(event) => { if (keepOpenOnConfirm) event.preventDefault(); onConfirm(); }} shape="default" variant={variant}>{action}</AlertDialogAction>
             </AlertDialogFooter>
           </div>
         </div>
