@@ -109,7 +109,6 @@ export function EnterpriseDetailPage() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
-    setTab("about");
   }, [id]);
 
   // Underline the section tab that is currently in view.
