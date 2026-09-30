@@ -129,6 +129,6 @@ describe("RegisterPage", () => {
     expect(mockedResend).toHaveBeenCalledWith({
       body: { email: "newuser@example.com" },
     });
-    expect(await screen.findByText(/new verification link has been sent/i)).toBeInTheDocument();
+    expect(await screen.findByText(/new link sent/i)).toBeInTheDocument();
   });
 });

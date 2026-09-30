@@ -89,6 +89,11 @@ describe("ForgotPasswordPage", () => {
     expect(await screen.findByRole("heading", { name: /check your email/i })).toBeInTheDocument();
     expect(screen.getByText("user@example.com")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /back to sign in/i })).toHaveAttribute("href", "/login");
+    expect(screen.getByText(/works once and expires in 24 hours/i)).toBeInTheDocument();
+
+    // "Wrong email?" returns to the form so another address can be tried.
+    await user.click(screen.getByRole("button", { name: /use a different email/i }));
+    expect(screen.getByRole("heading", { name: /reset your password/i })).toBeInTheDocument();
   });
 
   it("handles rate limit 429 response gracefully", async () => {

@@ -184,7 +184,7 @@ export function ResetPasswordPage() {
   }
 
   const requestNewLink = (
-    <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant="outline">
+    <Button asChild className={AUTH_ACTION_CLASS} shape="xl">
       <Link to={forgotPasswordPath}>{t("auth.reset.requestNewLinkShort")}</Link>
     </Button>
   );
@@ -265,10 +265,10 @@ export function ResetPasswordPage() {
 
   return (
     <AuthCardPage>
-      <AuthStatusCard className="flex flex-col gap-4">
+      <AuthStatusCard className="flex flex-col gap-[22px]">
         <AuthFormHeader description={t("auth.reset.subtitle")} title={t("auth.reset.title")} />
 
-        <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <form className="flex flex-col gap-[22px]" onSubmit={form.handleSubmit(onSubmit)}>
           <PasswordField
             error={form.formState.errors.newPassword?.message}
             hint={t("auth.reset.passwordHint")}
@@ -297,7 +297,7 @@ export function ResetPasswordPage() {
           </Button>
         </form>
 
-        <Link className="self-center text-[13.5px] font-semibold text-fg-link no-underline hover:underline" to="/login">
+        <Link className="self-start text-[13.5px] font-semibold text-fg-link no-underline hover:underline" to="/login">
           {t("auth.reset.backToSignInPlain")}
         </Link>
       </AuthStatusCard>

@@ -1,21 +1,23 @@
-import { useEffect, useMemo, useState, type FormEvent, type MouseEvent } from "react";
-import type { TFunction } from "i18next";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
-import { AlertTriangle, Check, CircleX, Clock3, Info, Loader2, Mail, type LucideIcon } from "lucide-react";
+import { AlertTriangle, Check, CircleX, Clock3, Info, Loader2, Mail } from "lucide-react";
 
-import { getApiV1AuthVerifyEmail, postApiV1AuthResendVerificationEmail } from "@/api/generated";
-import { Button } from "@/components/ui/button";
+import { getApiV1AuthVerifyEmail } from "@/api/generated";
 import { FormField } from "@/components/common/form-field";
-import { StatusPanel, type StatusPanelTone } from "@/components/common/status-panel";
+import { StatusPanel } from "@/components/common/status-panel";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthCardPage, AuthStatusCard } from "./auth-status-card";
 import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS, VERIFY_NEW_LINK_PATH } from "./auth-status.constants";
+import { CheckEmailScreen } from "./check-email-screen";
 import {
   emailVerificationPath,
   getEmailVerificationCallbackURL,
 } from "./email-verification";
-import { getAuthErrorMessage } from "./auth-utils";
+import { forgotPasswordPath } from "./password-reset";
+import { ResendBanners, ResendButton } from "./resend-button";
+import { useResendVerification } from "./use-resend-verification";
 
 type VerificationMode =
   | "registration"
@@ -128,34 +130,8 @@ export function resolveVerificationMode(
   return "success";
 }
 
-type ModeCopy = {
-  body: string;
-  icon: LucideIcon;
-  iconClassName?: string;
-  note: string | null;
-  title: string;
-  tone: StatusPanelTone;
-};
-
-function getModeCopy(mode: VerificationMode, t: TFunction): ModeCopy {
-  switch (mode) {
-    case "verifying":
-      return { body: t("auth.verify.verifying.body"), icon: Loader2, iconClassName: "animate-spin", note: null, title: t("auth.verify.verifying.title"), tone: "neutral" };
-    case "registration":
-      return { body: t("auth.verify.registration.body"), icon: Mail, note: t("auth.verify.registration.note"), title: t("auth.verify.registration.title"), tone: "success" };
-    case "already-verified":
-      return { body: t("auth.verify.alreadyVerified.body"), icon: Info, note: null, title: t("auth.verify.alreadyVerified.title"), tone: "info" };
-    case "invalid":
-      return { body: t("auth.verify.invalid.body"), icon: CircleX, note: t("auth.verify.invalid.note"), title: t("auth.verify.invalid.title"), tone: "danger" };
-    case "expired":
-      return { body: t("auth.verify.expired.body"), icon: Clock3, note: t("auth.verify.expired.note"), title: t("auth.verify.expired.title"), tone: "warning" };
-    case "retry-later":
-      return { body: t("auth.verify.retryLater.body"), icon: AlertTriangle, note: t("auth.verify.invalid.note"), title: t("auth.verify.retryLater.title"), tone: "warning" };
-    case "success":
-    default:
-      return { body: t("auth.verify.success.body"), icon: Check, note: null, title: t("auth.verify.success.title"), tone: "success" };
-  }
-}
+const STRONG = { strong: <strong className="font-semibold text-foreground" /> };
+const LINK_CLASS = "font-semibold text-fg-link hover:underline";
 
 export function EmailVerificationPage() {
   const { t } = useTranslation();
@@ -176,10 +152,9 @@ export function EmailVerificationPage() {
   const deliveryFailed = searchParams.get("delivery") === "failed";
   const emailFromQuery = searchParams.get("email")?.trim() ?? "";
   const [email, setEmail] = useState(emailFromQuery);
-  const [resendStatus, setResendStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-  const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [formSent, setFormSent] = useState(false);
+  const resend = useResendVerification();
 
   useEffect(() => {
     if (!token || hasStage) return;
@@ -223,147 +198,190 @@ export function EmailVerificationPage() {
     };
   }, [token, hasStage, searchParams, setSearchParams]);
 
-  const copy = getModeCopy(mode, t);
-  const lockedEmail = mode === "registration" && emailFromQuery.length > 0;
-  const buttonText =
-    resendStatus === "loading" ? t("auth.verify.sending") : t("auth.verify.resend");
-
-  async function handleResend(
-    event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>,
-  ) {
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    const targetEmail = (lockedEmail ? emailFromQuery : email).trim();
-    if (!targetEmail) {
-      setResendStatus("error");
-      setResendMessage(
-        t("auth.verify.emailRequired"),
-      );
+    const target = email.trim();
+    if (!target) {
+      setEmailError(t("auth.verify.emailRequired"));
       return;
     }
-
-    setResendStatus("loading");
-    setResendMessage(null);
-
-    let response;
-    try {
-      response = await postApiV1AuthResendVerificationEmail({
-        body: {
-          email: targetEmail,
-        },
-      });
-    } catch (error) {
-      setResendStatus("error");
-      setResendMessage(
-        getAuthErrorMessage(
-          error,
-          t("auth.verify.resendError"),
-        ),
-      );
-      return;
-    }
-
-    if (response.error) {
-      const message = getAuthErrorMessage(
-        response.error,
-        t("auth.verify.resendError"),
-      );
-      setResendStatus("error");
-      setResendMessage(message);
-      return;
-    }
-
-    setResendStatus("success");
-    setResendMessage(response.data?.message ?? t("auth.verify.resendSuccess"));
+    setEmailError(null);
+    if (await resend.resend(target)) setFormSent(true);
   }
 
-  const description =
-    mode === "registration" && emailFromQuery ? (
-      <Trans
-        components={{ strong: <strong className="font-semibold text-foreground" /> }}
-        i18nKey="auth.verify.registration.bodyWithEmail"
-        values={{ email: emailFromQuery }}
-      />
-    ) : (
-      copy.body
-    );
-  const resendFeedback = resendMessage ? (
-    <p
-      aria-live="polite"
-      className={`max-w-[400px] text-[13px] leading-[1.55] ${resendStatus === "error" ? "text-(--danger-fg)" : "text-(--status-success-fg)"}`}
-    >
-      {resendMessage}
-    </p>
-  ) : null;
-
-  // Expired link, no address known yet: the design's "Resend verification email" form.
-  if (mode === "expired" && !lockedEmail) {
+  function screen(props: Parameters<typeof StatusPanel>[0]) {
     return (
       <AuthCardPage>
         <AuthStatusCard>
-          <StatusPanel description={copy.body} icon={copy.icon} note={copy.note} title={copy.title} tone={copy.tone}>
-            <form className="mt-2 flex w-full flex-col gap-4 text-left" onSubmit={handleResend}>
-              <FormField htmlFor="verification-email" label={t("auth.verify.emailAddress")}>
-                <Input
-                  id="verification-email"
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder={t("auth.verify.emailPlaceholder")}
-                  type="email"
-                  value={email}
-                />
-              </FormField>
-              <Button className={AUTH_FULL_ACTION_CLASS} disabled={resendStatus === "loading"} shape="xl" type="submit">
-                {resendStatus === "loading" ? t("auth.verify.sending") : t("auth.verify.sendNewLink")}
-              </Button>
-            </form>
-            {resendFeedback}
-          </StatusPanel>
+          <StatusPanel {...props} />
         </AuthStatusCard>
       </AuthCardPage>
     );
   }
 
-  const actions =
-    mode === "registration" ? (
-      <>
-        <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant="outline">
-          <Link to="/login">{t("auth.verify.goToSignIn")}</Link>
-        </Button>
-        <Button className={AUTH_ACTION_CLASS} disabled={resendStatus === "loading"} onClick={handleResend} shape="xl" type="button">
-          {buttonText}
-        </Button>
-      </>
-    ) : mode === "success" ? (
-      <Button asChild className={AUTH_ACTION_CLASS} shape="xl">
-        <Link to="/login">{t("auth.verify.signIn")}</Link>
-      </Button>
-    ) : mode === "already-verified" ? (
-      <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant="outline">
-        <Link to="/login">{t("auth.verify.goToSignIn")}</Link>
-      </Button>
-    ) : mode === "invalid" ? (
-      <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant="outline">
-        <Link to={VERIFY_NEW_LINK_PATH}>{t("auth.verify.requestNewLink")}</Link>
-      </Button>
-    ) : undefined;
+  const signInLink = (variant: "default" | "outline", label: string) => (
+    <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant={variant}>
+      <Link to="/login">{label}</Link>
+    </Button>
+  );
 
+  switch (mode) {
+    case "registration":
+      return <CheckEmailScreen deliveryFailed={deliveryFailed} email={emailFromQuery || undefined} />;
+
+    case "verifying":
+      return screen({
+        description: t("auth.verify.verifying.body"),
+        icon: Loader2,
+        iconClassName: "animate-spin",
+        title: t("auth.verify.verifying.title"),
+        tone: "info",
+      });
+
+    case "success":
+      return screen({
+        actions: signInLink("default", t("auth.verify.signIn")),
+        description: t("auth.verify.success.body"),
+        icon: Check,
+        note: t("auth.verify.success.note"),
+        title: t("auth.verify.success.title"),
+        tone: "success",
+      });
+
+    case "already-verified":
+      return screen({
+        actions: signInLink("default", t("auth.verify.signIn")),
+        description: t("auth.verify.alreadyVerified.body"),
+        footer: (
+          <>
+            {t("auth.verify.alreadyVerified.forgot")}{" "}
+            <Link className={LINK_CLASS} to={forgotPasswordPath}>
+              {t("auth.verify.alreadyVerified.reset")}
+            </Link>
+          </>
+        ),
+        icon: Info,
+        title: t("auth.verify.alreadyVerified.title"),
+        tone: "info",
+      });
+
+    case "invalid":
+      return screen({
+        actions: (
+          <>
+            {signInLink("outline", t("auth.verify.goToSignIn"))}
+            <Button asChild className={AUTH_ACTION_CLASS} shape="xl">
+              <Link to={VERIFY_NEW_LINK_PATH}>{t("auth.verify.requestNewLink")}</Link>
+            </Button>
+          </>
+        ),
+        description: t("auth.verify.invalid.body"),
+        icon: CircleX,
+        note: t("auth.verify.invalid.note"),
+        title: t("auth.verify.invalid.title"),
+        tone: "danger",
+      });
+
+    case "retry-later":
+      return screen({
+        actions: signInLink("outline", t("auth.verify.goToSignIn")),
+        description: t("auth.verify.retryLater.body"),
+        icon: AlertTriangle,
+        note: t("auth.verify.retryLater.note"),
+        title: t("auth.verify.retryLater.title"),
+        tone: "warning",
+      });
+
+    case "expired":
+    default:
+      break;
+  }
+
+  // Expired link with the account's address known: send a new link straight away.
+  if (emailFromQuery) {
+    return screen({
+      actions: (
+        <>
+          {signInLink("outline", t("auth.verify.goToSignIn"))}
+          <ResendButton
+            idleLabel={t("auth.verify.sendNewLink")}
+            onResend={() => void resend.resend(emailFromQuery)}
+            resend={resend}
+          />
+        </>
+      ),
+      children: <ResendBanners resend={resend} />,
+      description: t("auth.verify.expired.body"),
+      icon: Clock3,
+      note: t("auth.verify.expired.note"),
+      title: t("auth.verify.expired.title"),
+      tone: "warning",
+    });
+  }
+
+  // The form was sent: the neutral "Check your email" result (same text for every address).
+  if (formSent) {
+    return screen({
+      actions: (
+        <>
+          <ResendButton
+            idleLabel={t("auth.verify.sendAgain")}
+            onResend={() => void resend.resend(email.trim())}
+            resend={resend}
+            variant="outline"
+          />
+          <Button asChild className={AUTH_ACTION_CLASS} shape="xl">
+            <Link to="/login">{t("auth.verify.backToSignIn")}</Link>
+          </Button>
+        </>
+      ),
+      children: <ResendBanners announceAfter={1} resend={resend} />,
+      description: <Trans components={STRONG} i18nKey="auth.verify.sentResult.body" values={{ email: email.trim() }} />,
+      icon: Mail,
+      note: (
+        <>
+          {t("auth.verify.sentResult.note")}{" "}
+          <button className={LINK_CLASS} onClick={() => setFormSent(false)} type="button">
+            {t("auth.verify.sentResult.differentEmail")}
+          </button>
+        </>
+      ),
+      title: t("auth.verify.checkEmail.title"),
+      tone: "success",
+    });
+  }
+
+  // Expired link, no address known yet: the design's "Resend verification email" form.
   return (
     <AuthCardPage>
       <AuthStatusCard>
-        <StatusPanel
-          actions={actions}
-          description={description}
-          icon={copy.icon}
-          iconClassName={copy.iconClassName}
-          note={copy.note}
-          title={copy.title}
-          tone={copy.tone}
-        >
-          {deliveryFailed ? (
-            <p className="max-w-[400px] text-[13px] leading-[1.55] text-(--danger-fg)">{t("auth.verify.deliveryFailed")}</p>
-          ) : null}
-          {resendFeedback}
-        </StatusPanel>
+        <form className="flex flex-col gap-[22px]" noValidate onSubmit={handleFormSubmit}>
+          <div className="flex flex-col gap-2">
+            <h1 className="itt-display text-[30px] font-semibold tracking-[-0.01em] text-foreground">
+              {t("auth.verify.form.title")}
+            </h1>
+            <p className="text-[14.5px] leading-[1.55] text-muted-foreground">{t("auth.verify.form.description")}</p>
+          </div>
+          {resend.errorMessage ? <ResendBanners resend={resend} /> : null}
+          <FormField error={emailError ?? undefined} htmlFor="verification-email" label={t("auth.verify.emailAddress")} required>
+            <Input
+              aria-invalid={emailError ? true : undefined}
+              id="verification-email"
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder={t("auth.verify.emailPlaceholder")}
+              type="email"
+              value={email}
+            />
+          </FormField>
+          <Button className={AUTH_FULL_ACTION_CLASS} disabled={resend.loading} shape="xl" type="submit">
+            {resend.loading ? t("auth.verify.sending") : t("auth.verify.form.submit")}
+          </Button>
+          <p className="text-[13.5px]">
+            <Link className={LINK_CLASS} to="/login">
+              {t("auth.verify.backToSignIn")}
+            </Link>
+          </p>
+        </form>
       </AuthStatusCard>
     </AuthCardPage>
   );

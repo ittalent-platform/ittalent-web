@@ -1,18 +1,13 @@
-import { Mail } from "lucide-react";
 import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 
-import {
-  postApiV1AuthRegister,
-  postApiV1AuthResendVerificationEmail,
-} from "@/api/generated";
+import { postApiV1AuthRegister } from "@/api/generated";
 import { authClient } from "@/auth/auth-client";
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
-import { StatusPanel } from "@/components/common/status-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -22,7 +17,7 @@ import { getPasswordRules } from "./password-rules";
 import { PasswordField } from "./password-field";
 import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
-import { AuthCardPage, AuthStatusCard } from "./auth-status-card";
+import { CheckEmailScreen } from "./check-email-screen";
 
 function PasswordRules({ password, confirmPassword }: { password: string; confirmPassword: string }) {
   const { t } = useTranslation();
@@ -57,8 +52,6 @@ export function RegisterPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const [deliveryFailed, setDeliveryFailed] = useState(false);
-  const [resendStatus, setResendStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [resendMessage, setResendMessage] = useState<string | null>(null);
 
   const form = useForm<RegisterFormValues>({
     defaultValues: {
@@ -102,75 +95,10 @@ export function RegisterPage() {
     }
   }
 
-  async function handleResend() {
-    if (!submittedEmail) return;
-    setResendStatus("loading");
-    setResendMessage(null);
-
-    try {
-      await postApiV1AuthResendVerificationEmail({
-        body: { email: submittedEmail },
-      });
-      setResendStatus("success");
-      setDeliveryFailed(false);
-      setResendMessage(t("auth.register.resendSuccess"));
-    } catch (error) {
-      setResendStatus("error");
-      setResendMessage(
-        getAuthErrorMessage(error, t("auth.register.resendError"))
-      );
-    }
-  }
-
   const errors = form.formState.errors;
 
   if (submittedEmail) {
-    return (
-      <AuthCardPage>
-        <AuthStatusCard>
-          <StatusPanel
-            actions={
-              <>
-                <Button asChild className="h-11 px-5" shape="xl" variant="outline">
-                  <Link to="/login">{t("auth.register.goToSignIn")}</Link>
-                </Button>
-                <Button
-                  className="h-11 px-5"
-                  disabled={resendStatus === "loading"}
-                  onClick={handleResend}
-                  shape="xl"
-                  type="button"
-                >
-                  {resendStatus === "loading" ? t("auth.register.resendSending") : t("auth.register.resend")}
-                </Button>
-              </>
-            }
-            description={
-              <Trans
-                components={{ strong: <strong className="font-semibold text-foreground" /> }}
-                i18nKey="auth.register.checkEmailBody"
-                values={{ email: submittedEmail }}
-              />
-            }
-            icon={Mail}
-            note={t("auth.register.resendLimit")}
-            title={t("auth.register.checkEmailTitle")}
-            tone="success"
-          >
-            {deliveryFailed ? (
-              <div className="w-full text-left">
-                <InlineBanner tone="warning">{t("auth.register.deliveryFailed")}</InlineBanner>
-              </div>
-            ) : null}
-            {resendMessage ? (
-              <div className="w-full text-left">
-                <InlineBanner tone={resendStatus === "success" ? "success" : "error"}>{resendMessage}</InlineBanner>
-              </div>
-            ) : null}
-          </StatusPanel>
-        </AuthStatusCard>
-      </AuthCardPage>
-    );
+    return <CheckEmailScreen deliveryFailed={deliveryFailed} email={submittedEmail} />;
   }
 
   return (

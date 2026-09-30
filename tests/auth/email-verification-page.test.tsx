@@ -34,7 +34,8 @@ describe("EmailVerificationPage", () => {
     ["stage=already-verified&code=EMAIL_ALREADY_VERIFIED", /Email already verified/i],
     ["stage=invalid&code=INVALID_VERIFICATION_TOKEN", /This link isn.t valid/i],
     ["stage=retry-later&code=RATE_LIMITED", /Please try again later/i],
-    ["stage=expired", /This link has expired/i],
+    ["stage=expired&email=known@example.com", /This link has expired/i],
+    ["stage=expired", /Resend verification email/i],
     ["stage=success", /Email verified/i],
     ["stage=registration&email=user@example.com", /Check your email/i],
     ["status=invalid&code=INVALID_VERIFICATION_TOKEN", /This link isn.t valid/i],
@@ -44,10 +45,12 @@ describe("EmailVerificationPage", () => {
     expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
   });
 
-  it("renders locked email badge on registration stage", () => {
+  it("shows the address, the three steps and the way back on the registration stage", () => {
     renderPage("stage=registration&email=tester@example.com");
 
     expect(screen.getByText("tester@example.com")).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    expect(screen.getByRole("link", { name: /sign up again/i })).toHaveAttribute("href", "/register");
   });
 
   it("handles resend verification email for locked email on registration stage", async () => {
@@ -72,9 +75,8 @@ describe("EmailVerificationPage", () => {
       },
     });
 
-    expect(
-      await screen.findByText(/Verification email resent successfully/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/New link sent/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /resend again in 1:00/i })).toBeDisabled();
   });
 
   it("handles resend verification email with input field on expired stage", async () => {
@@ -90,10 +92,10 @@ describe("EmailVerificationPage", () => {
     const user = userEvent.setup();
     renderPage("stage=expired");
 
-    const input = screen.getByLabelText(/^email$/i);
+    const input = screen.getByLabelText(/^email/i);
     await user.type(input, "expired-user@example.com");
 
-    const resendButton = screen.getByRole("button", { name: /send a new link/i });
+    const resendButton = screen.getByRole("button", { name: /send link/i });
     await user.click(resendButton);
 
     expect(mockedResendEmail).toHaveBeenCalledWith({
@@ -102,9 +104,24 @@ describe("EmailVerificationPage", () => {
       },
     });
 
-    expect(
-      await screen.findByText(/New verification link sent/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /check your email/i })).toBeInTheDocument();
+    expect(screen.getByText("expired-user@example.com")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /back to sign in/i })).toHaveAttribute("href", "/login");
+  });
+
+  it("offers a new link straight away when the expired link comes with an address", async () => {
+    mockedResendEmail.mockResolvedValue({
+      data: { success: true },
+      response: new Response(null, { status: 200 }),
+    } as never);
+
+    const user = userEvent.setup();
+    renderPage("stage=expired&email=known@example.com");
+
+    await user.click(screen.getByRole("button", { name: /send a new link/i }));
+
+    expect(mockedResendEmail).toHaveBeenCalledWith({ body: { email: "known@example.com" } });
+    expect(await screen.findByText(/New link sent/i)).toBeInTheDocument();
   });
 
   it("shows error feedback when resend verification email fails", async () => {

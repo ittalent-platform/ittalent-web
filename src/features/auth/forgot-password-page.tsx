@@ -62,7 +62,7 @@ export function ForgotPasswordPage() {
         <AuthStatusCard>
           <StatusPanel
             actions={
-              <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant="outline">
+              <Button asChild className={AUTH_ACTION_CLASS} shape="xl">
                 <Link to="/login">{t("auth.forgot.backToSignInPlain")}</Link>
               </Button>
             }
@@ -73,7 +73,20 @@ export function ForgotPasswordPage() {
                 values={{ email: sentTo }}
               />
             }
+            footer={
+              <>
+                {t("auth.forgot.wrongEmail")}{" "}
+                <button
+                  className="cursor-pointer font-semibold text-fg-link hover:underline"
+                  onClick={() => setSentTo(null)}
+                  type="button"
+                >
+                  {t("auth.forgot.useDifferentEmail")}
+                </button>
+              </>
+            }
             icon={Mail}
+            note={t("auth.forgot.sentNote")}
             title={t("auth.forgot.sentTitle")}
             tone="success"
           />
@@ -84,10 +97,12 @@ export function ForgotPasswordPage() {
 
   return (
     <AuthCardPage>
-      <AuthStatusCard className="flex flex-col gap-4">
+      <AuthStatusCard className="flex flex-col gap-[22px]">
         <AuthFormHeader description={t("auth.forgot.subtitle")} title={t("auth.forgot.title")} />
 
-        <form className="flex flex-col gap-4" noValidate onSubmit={form.handleSubmit(onSubmit, () => setBanner(null))}>
+        {banner ? <InlineBanner tone={banner.tone}>{banner.message}</InlineBanner> : null}
+
+        <form className="flex flex-col gap-[22px]" noValidate onSubmit={form.handleSubmit(onSubmit, () => setBanner(null))}>
           <FormField error={form.formState.errors.email?.message} htmlFor="forgot-password-email" label={t("auth.forgot.email")}>
             <Input
               aria-invalid={form.formState.errors.email ? true : undefined}
@@ -98,14 +113,12 @@ export function ForgotPasswordPage() {
             />
           </FormField>
 
-          {banner ? <InlineBanner tone={banner.tone}>{banner.message}</InlineBanner> : null}
-
           <Button className={AUTH_FULL_ACTION_CLASS} disabled={form.formState.isSubmitting} shape="xl" type="submit">
             {form.formState.isSubmitting ? t("auth.forgot.submitting") : t("auth.forgot.submit")}
           </Button>
         </form>
 
-        <Link className="self-center text-[13.5px] font-semibold text-fg-link no-underline hover:underline" to="/login">
+        <Link className="self-start text-[13.5px] font-semibold text-fg-link no-underline hover:underline" to="/login">
           {t("auth.forgot.backToSignInPlain")}
         </Link>
       </AuthStatusCard>

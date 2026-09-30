@@ -260,7 +260,10 @@
       "tooMany": "Too many reset requests for this email. Try again in 15 minutes.",
       "backToSignInPlain": "Back to sign in",
       "sentTitle": "Check your email",
-      "sentBody": "If an account exists for <strong>{{email}}</strong>, we sent reset instructions."
+      "sentBody": "If an account exists for <strong>{{email}}</strong>, we sent reset instructions.",
+      "sentNote": "The link works once and expires in 24 hours. Nothing after a few minutes? Check Spam or Promotions.",
+      "wrongEmail": "Wrong email?",
+      "useDifferentEmail": "Use a different email"
     },
     "hero": {
       "body": "Apply to IT jobs from verified companies and follow every application in one place.",
@@ -311,28 +314,19 @@
       "show": "Show {{label}}"
     },
     "register": {
-      "checkEmailBody": "If <strong>{{email}}</strong> can be used, we sent a link to verify it. The link works once and expires in 24 hours.",
-      "checkEmailTitle": "Check your email",
       "confirmPassword": "Confirm password",
-      "deliveryFailed": "Your account was created, but we couldn't send the verification email.",
       "email": "Email",
       "emailPlaceholder": "you@example.com",
       "errorFallback": "Unable to create your account right now.",
       "fullName": "Full name",
       "fullNameHint": "2–100 characters",
       "fullNamePlaceholder": "Nguyen Van A",
-      "goToSignIn": "Go to sign in",
       "haveAccount": "Already have an account?",
       "mobile": "Mobile",
       "mobileHint": "Optional · 10–15 digits",
       "mobilePlaceholder": "0901 234 567",
       "password": "Password",
       "passwordHint": "8–64 characters with upper case, lower case, a number and a special character.",
-      "resend": "Resend email",
-      "resendError": "We could not send the verification email. Please try again later.",
-      "resendLimit": "Resend is limited to 3 times per 24 hours.",
-      "resendSending": "Sending...",
-      "resendSuccess": "A new verification link has been sent to your email.",
       "signIn": "Sign in",
       "signInInstead": "Sign in instead",
       "submit": "Create account",
@@ -388,49 +382,73 @@
     },
     "verify": {
       "alreadyVerified": {
-        "body": "No further action is needed.",
-        "title": "Email already verified"
+        "body": "This account’s email is verified. Nothing else to do. Sign in to continue.",
+        "title": "Email already verified",
+        "forgot": "Forgot your password?",
+        "reset": "Reset it"
       },
-      "deliveryFailed": "We could not send the verification email. Please request a new verification email.",
       "emailAddress": "Email",
       "emailPlaceholder": "you@example.com",
       "emailRequired": "Enter the email address that should receive the verification link.",
       "expired": {
-        "body": "Verification links last 24 hours. Send a new link to the email on this account.",
-        "note": "Resend is limited to 3 times per 24 hours.",
+        "body": "Verification links last 24 hours. We can send a new one to the email on this account.",
+        "note": "The new link replaces every earlier one. Resend is limited to 3 times per 24 hours.",
         "title": "This link has expired"
       },
       "goToSignIn": "Go to sign in",
       "invalid": {
-        "body": "Open the most recent email from ITTalent, or request a new link.",
-        "note": "Repeated invalid attempts are paused for 10 minutes.",
-        "title": "This link isn't valid"
-      },
-      "registration": {
-        "body": "We sent a link to verify your email. The link works once and expires in 24 hours.",
-        "note": "Resend is limited to 3 times per 24 hours.",
-        "title": "Check your email",
-        "bodyWithEmail": "If <strong>{{email}}</strong> can be used, we sent a link to verify it. The link works once and expires in 24 hours."
+        "body": "It may be incomplete, already used, or replaced by a newer link. Open the most recent email from ITTalent, or ask for a new link.",
+        "note": "Copying the link by hand? Make sure you have all of it. After several invalid tries, checks pause for 10 minutes.",
+        "title": "This link isn’t valid"
       },
       "resend": "Resend email",
       "resendError": "We could not send the verification email. Please try again later.",
-      "resendSuccess": "Verification email sent. Please check your inbox.",
       "retryLater": {
         "body": "Too many verification attempts were made in a short period. Please wait before retrying.",
-        "title": "Please try again later"
+        "title": "Please try again later",
+        "note": "Repeated invalid attempts are paused for 10 minutes."
       },
       "sending": "Sending...",
       "signIn": "Sign in",
       "success": {
-        "body": "Your account is ready. Sign in to apply for jobs.",
-        "title": "Email verified"
+        "body": "Your account is ready. Sign in to complete your profile and apply for jobs.",
+        "title": "Email verified",
+        "note": "For your security we don’t sign you in automatically from an email link."
       },
       "verifying": {
         "body": "Please wait while we verify your email address...",
         "title": "Verifying your email"
       },
       "sendNewLink": "Send a new link",
-      "requestNewLink": "Request a new link"
+      "requestNewLink": "Request a new link",
+      "checkEmail": {
+        "title": "Check your email",
+        "body": "If <strong>{{email}}</strong> can be used, we sent it a link to verify your account.",
+        "bodyNoEmail": "We sent you a link to verify your account.",
+        "step1": "Open the email from <strong>ITTalent</strong>. It can take a minute to arrive.",
+        "step2": "Select <strong>Verify email</strong>. The link works once and expires in 24 hours.",
+        "step3": "Come back and sign in to start applying.",
+        "note": "Can’t find it? Check Spam or Promotions. Resend is limited to 3 times per 24 hours, one minute apart.",
+        "wrongEmail": "Wrong email?",
+        "signUpAgain": "Sign up again",
+        "deliveryFailed": "Your account was created, but we couldn't send the verification email."
+      },
+      "resendAgainIn": "Resend again in {{time}}",
+      "resendLimitReached": "Resend limit reached",
+      "resendSent": "New link sent. Links from earlier emails no longer work.",
+      "resendLimited": "You’ve asked for 3 links in 24 hours. Use the newest email, or try again tomorrow.",
+      "sendAgain": "Send again",
+      "backToSignIn": "Back to sign in",
+      "sentResult": {
+        "body": "If <strong>{{email}}</strong> belongs to an account that still needs verifying, a new link is on its way. Links from earlier emails no longer work.",
+        "note": "Nothing after a few minutes? Check Spam, or make sure the email is spelled right.",
+        "differentEmail": "Use a different email"
+      },
+      "form": {
+        "title": "Resend verification email",
+        "description": "Enter the email you signed up with. If it belongs to an account that still needs verifying, we’ll send a new link.",
+        "submit": "Send link"
+      }
     }
   },
   "footer": {
