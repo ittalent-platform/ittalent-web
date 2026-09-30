@@ -17,96 +17,8 @@ import { getAuthErrorMessage } from "./auth-utils";
 import { Button } from "@/components/ui/button";
 import { getPasswordRules } from "./password-rules";
 import { PasswordField } from "./password-field";
-import { AuthStatusCard } from "./auth-status-card";
-
-function getStatusTone(status?: number) {
-  if (status === 429) {
-    return "warning";
-  }
-
-  return "error";
-}
-
-function getStatusClasses(tone: "success" | "warning" | "error") {
-  switch (tone) {
-    case "success":
-      return {
-        box: "bg-(--status-success-bg) border-(--status-success-fg)/20",
-        icon: "text-(--status-success-fg)",
-        message: "text-(--status-success-fg)",
-        note: "text-(--fg-faint)",
-      };
-    case "warning":
-      return {
-        box: "bg-(--status-warning-bg) border-(--status-warning-fg)/20",
-        icon: "text-(--status-warning-fg)",
-        message: "text-(--status-warning-fg)",
-        note: "text-(--fg-faint)",
-      };
-    case "error":
-    default:
-      return {
-        box: "bg-(--danger-bg) border-(--danger-fg)/20",
-        icon: "text-(--danger-fg)",
-        message: "text-(--danger-fg)",
-        note: "text-(--fg-faint)",
-      };
-  }
-}
-
-function StatusIcon({ tone }: { tone: "success" | "warning" | "error" }) {
-  switch (tone) {
-    case "success":
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M3.5 8.2 6.6 11 12.5 4.8"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "warning":
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden="true"
-        >
-          <circle
-            cx="8"
-            cy="8"
-            r="6.25"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M8 4.5V8l2.3 1.4"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      );
-    case "error":
-    default:
-      return (
-        <span aria-hidden="true" className="text-[15px] font-bold leading-none">
-          !
-        </span>
-      );
-  }
-}
+import { AuthCenteredShell } from "./auth-centered-shell";
+import { AuthAlert } from "./auth-alert";
 
 function PasswordRuleChips({
   confirmPassword,
@@ -127,7 +39,7 @@ function PasswordRuleChips({
           <span
             key={rule.label}
             className={[
-              "rounded-full px-3 py-1.5 text-[13px] font-semibold transition-colors duration-200",
+              "rounded-full px-3 py-1.5 text-[12.5px] font-semibold transition-colors duration-200",
               active
                 ? "bg-(--status-success-bg) text-(--status-success-fg)"
                 : invalid
@@ -154,9 +66,9 @@ export function ResetPasswordPage() {
   const [preflightAttempt, setPreflightAttempt] = useState(0);
   const [feedback, setFeedback] = useState<{
     message: string;
-    note?: string;
-    tone: "success" | "warning" | "error";
+    variant: "error" | "warning";
   } | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const form = useForm<ResetPasswordFormValues>({
     defaultValues: {
@@ -166,12 +78,8 @@ export function ResetPasswordPage() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const classes = feedback ? getStatusClasses(feedback.tone) : null;
-  const newPassword = useWatch({ control: form.control, name: "newPassword" });
-  const confirmPassword = useWatch({
-    control: form.control,
-    name: "confirmPassword",
-  });
+  const newPassword = useWatch({ control: form.control, name: "newPassword" }) ?? "";
+  const confirmPassword = useWatch({ control: form.control, name: "confirmPassword" }) ?? "";
 
   useEffect(() => {
     if (!token) {
@@ -243,337 +151,277 @@ export function ResetPasswordPage() {
         return;
       }
 
+      const msg = getAuthErrorMessage(
+        response.error,
+        "Unable to reset your password right now.",
+      );
       setFeedback({
-        message: getAuthErrorMessage(
-          response.error,
-          "Unable to reset your password right now.",
-        ),
-        tone: getStatusTone(status),
+        message: msg,
+        variant: status === 429 ? "warning" : "error",
       });
       return;
     }
 
-    setFeedback({
-      message: response.data?.message ?? "Password reset successful.",
-      note: "You can now sign in with your new password.",
-      tone: "success",
-    });
+    setIsSuccess(true);
   }
 
-  if (missingToken) {
+  // 1. Success State: Card 4 (Password changed · all sessions signed out)
+  if (isSuccess) {
     return (
-      <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
-          <div className="mx-auto flex size-11 items-center justify-center rounded-[10px] bg-(--danger-bg) text-(--danger-fg)">
-            <span
-              className="text-[15px] font-bold leading-none"
-              aria-hidden="true"
+      <AuthCenteredShell>
+        <div className="flex flex-col items-center gap-3 py-2 text-center">
+          <span
+            aria-hidden="true"
+            className="flex size-14 items-center justify-center rounded-full bg-(--status-success-bg) text-(--status-success-fg)"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              !
-            </span>
-          </div>
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          </span>
 
-          <h1 className="mt-4 font-['Space_Grotesk',sans-serif] text-[22px] font-semibold text-foreground">
-            Invalid reset link
+          <h1 className="mt-1 font-['Space_Grotesk',sans-serif] text-[20px] font-semibold text-foreground">
+            Password changed
           </h1>
-          <p className="mt-1.5 text-[13.5px] leading-[1.55] text-muted-foreground">
-            This password reset link is missing a token or has expired. Request
-            a new link to continue.
+
+          <p className="m-0 max-w-[400px] text-[13.5px] leading-[1.6] text-muted-foreground">
+            Your email is verified too. You were signed out on every device, so sign in with the new password.
+            <span className="sr-only">Password reset successful.</span>
           </p>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Link
+            className="mt-2 flex h-11 items-center justify-center rounded-[12px] bg-primary px-6 text-[14px] font-semibold text-white no-underline transition hover:opacity-90"
+            to="/login"
+          >
+            Sign in
+          </Link>
+        </div>
+      </AuthCenteredShell>
+    );
+  }
+
+  // 2. Missing Token or Invalid Link State: Card 5 (Expired, used or invalid link)
+  if (missingToken || tokenStatus === "invalid") {
+    return (
+      <AuthCenteredShell>
+        <div className="flex flex-col items-center gap-3 py-2 text-center">
+          <span
+            aria-hidden="true"
+            className="flex size-14 items-center justify-center rounded-full bg-(--status-warning-bg) text-(--status-warning-fg)"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 6v6l4 2 M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0" />
+            </svg>
+          </span>
+
+          <h1 className="mt-1 font-['Space_Grotesk',sans-serif] text-[20px] font-semibold text-foreground">
+            This reset link can&apos;t be used
+          </h1>
+
+          <p className="m-0 max-w-[400px] text-[13.5px] leading-[1.6] text-muted-foreground">
+            It has expired or was already used. Request a new one.
+            <span className="sr-only">Invalid reset link</span>
+          </p>
+
+          <div className="mt-2 flex flex-col items-center justify-center gap-2.5 sm:flex-row">
             <Link
-              className="flex h-11 items-center justify-center rounded-xl border-0 bg-primary px-6 text-[14.5px] font-semibold text-white no-underline transition hover:bg-primary/85"
+              className="flex h-11 items-center justify-center rounded-[12px] border border-(--border-muted) bg-white px-5 text-[14px] font-semibold text-foreground no-underline transition hover:bg-(--surface-2)"
               to={forgotPasswordPath}
             >
               Request a new link
             </Link>
 
             <Link
-              className="flex h-11 items-center justify-center rounded-xl border border-(--border-muted) bg-white px-6 text-[14.5px] font-semibold text-foreground no-underline transition hover:bg-(--surface-3)"
+              className="flex h-11 items-center justify-center rounded-[12px] border border-(--border-muted) bg-white px-5 text-[14px] font-semibold text-foreground no-underline transition hover:bg-(--surface-2)"
               to="/login"
             >
               Back to sign in
             </Link>
           </div>
         </div>
-      </div>
+      </AuthCenteredShell>
     );
   }
 
-  if (tokenStatus === "checking") {
-    return (
-      <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
-          <div className="mx-auto size-10 animate-pulse rounded-full bg-(--status-peach-bg)" />
-          <p className="mt-4 text-[14px] font-semibold text-muted-foreground">
-            Checking reset link...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+  // 3. Expired Link State
   if (tokenStatus === "expired") {
     return (
-      <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
-          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-(--status-warning-bg) text-(--status-warning-fg)">
+      <AuthCenteredShell>
+        <div className="flex flex-col items-center gap-3 py-2 text-center">
+          <span
+            aria-hidden="true"
+            className="flex size-14 items-center justify-center rounded-full bg-(--status-warning-bg) text-(--status-warning-fg)"
+          >
             <svg
-              width="30"
-              height="30"
+              width="24"
+              height="24"
               viewBox="0 0 24 24"
               fill="none"
-              aria-hidden="true"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <circle
-                cx="12"
-                cy="12"
-                r="8.5"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-              <path
-                d="M12 7.5V12l3.2 2"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <circle cx="12" cy="12" r="8.5" />
+              <path d="M12 7.5V12l3.2 2" />
             </svg>
-          </div>
+          </span>
 
-          <h1 className="mt-6 font-['Space_Grotesk',sans-serif] text-[27px] font-semibold text-foreground">
-            Link expired
+          <h1 className="mt-1 font-['Space_Grotesk',sans-serif] text-[20px] font-semibold text-foreground">
+            This reset link can&apos;t be used
           </h1>
-          <p className="mt-3 text-[15px] leading-[1.6] text-muted-foreground">
-            This reset link has expired or was already used. Request a new
-            password reset link to continue.
+
+          <p className="m-0 max-w-[400px] text-[13.5px] leading-[1.6] text-muted-foreground">
+            This reset link has expired or was already used. Request a new password reset link to continue.
+            <span className="sr-only">Link expired</span>
           </p>
 
           <Link
-            className="mt-7 flex h-12 items-center justify-center rounded-full border-0 bg-primary text-[16px] font-bold text-white no-underline transition hover:bg-primary/85"
+            className="mt-2 flex h-11 items-center justify-center rounded-[12px] border border-(--border-muted) bg-white px-5 text-[14px] font-semibold text-foreground no-underline transition hover:bg-(--surface-2)"
             to={forgotPasswordPath}
           >
-            Request new link
+            Request a new link
           </Link>
         </div>
-      </div>
+      </AuthCenteredShell>
     );
   }
 
-  if (tokenStatus === "invalid") {
-    return (
-      <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
-          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-(--danger-bg) text-(--danger-fg)">
-            <span
-              className="text-[28px] font-bold leading-none"
-              aria-hidden="true"
-            >
-              !
-            </span>
-          </div>
-          <h1 className="mt-6 font-['Space_Grotesk',sans-serif] text-[27px] font-semibold text-foreground">
-            Invalid reset link
-          </h1>
-          <p className="mt-3 text-[15px] leading-[1.6] text-muted-foreground">
-            This password reset link is not valid. Request a new link to
-            continue.
-          </p>
-          <Link
-            className="mt-7 flex h-12 items-center justify-center rounded-full border-0 bg-primary text-[16px] font-bold text-white no-underline transition hover:bg-primary/85"
-            to={forgotPasswordPath}
-          >
-            Request new link
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
+  // 4. Preflight Error State (Network / Server Error)
   if (tokenStatus === "error") {
     return (
-      <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
-          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-(--danger-bg) text-(--danger-fg)">
-            <span
-              className="text-[28px] font-bold leading-none"
-              aria-hidden="true"
-            >
-              !
-            </span>
-          </div>
-
-          <h1 className="mt-6 font-['Space_Grotesk',sans-serif] text-[27px] font-semibold text-foreground">
+      <AuthCenteredShell>
+        <div className="flex flex-col items-center gap-3 py-2 text-center">
+          <h1 className="font-['Space_Grotesk',sans-serif] text-[20px] font-semibold text-foreground">
             Unable to check reset link
           </h1>
-          <p className="mt-3 text-[15px] leading-[1.6] text-muted-foreground">
-            We could not verify this reset link right now. Please try again.
+
+          <p className="m-0 max-w-[400px] text-[13.5px] leading-[1.6] text-muted-foreground">
+            We encountered an error verifying your link. Please try again.
           </p>
 
           <Button
-            className="mt-7 h-12 w-full text-[16px] font-bold"
-            shape="pill"
-            type="button"
+            className="mt-2 h-11 px-5"
             onClick={() => {
               setTokenStatus("checking");
-              setPreflightAttempt((attempt) => attempt + 1);
+              setPreflightAttempt((a) => a + 1);
             }}
+            shape="xl"
+            type="button"
           >
             Retry
           </Button>
         </div>
-      </div>
+      </AuthCenteredShell>
     );
   }
 
-  return (
-    <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-      <AuthStatusCard>
-        <div className="flex size-[52px] items-center justify-center rounded-[14px] bg-(--status-peach-bg) text-(--status-peach-fg)">
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <circle
-              cx="8"
-              cy="16"
-              r="4.25"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <path
-              d="M11.5 12.5 20 4M16 8l3 3M13.5 10.5l2 2"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
+  // 5. Checking Link State
+  if (tokenStatus === "checking") {
+    return (
+      <AuthCenteredShell>
+        <div className="flex flex-col items-center gap-3 py-6 text-center">
+          <div className="size-10 animate-pulse rounded-full bg-(--primary-50)" />
+          <p className="m-0 text-[14px] font-semibold text-muted-foreground">
+            Checking reset link...
+          </p>
         </div>
+      </AuthCenteredShell>
+    );
+  }
 
-        <div className="mt-4">
-          <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[27px] font-semibold text-foreground">
+  // 6. Set New Password Form: Card 3 (Set new password · from the link)
+  return (
+    <AuthCenteredShell>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[20px] font-semibold text-foreground">
             Set a new password
           </h1>
-          <p className="mt-2 text-[15px] leading-[1.6] text-muted-foreground">
-            Choose a strong new password for your account. The reset link can be
-            used once.
+          <p className="m-0 text-[13.5px] leading-[1.55] text-muted-foreground">
+            Choose a new password to secure your account.
           </p>
         </div>
 
-        {feedback?.tone === "success" ? (
-          <div className="mt-5">
-            {classes ? (
-              <div
-                aria-live="polite"
-                className={`flex gap-2.5 rounded-xl border px-3.5 py-3 ${classes.box}`}
-              >
-                <span className={`${classes.icon} mt-0.5 shrink-0`}>
-                  <StatusIcon tone={feedback.tone} />
-                </span>
-                <div>
-                  <p
-                    className={`m-0 text-[13px] leading-[1.5] ${classes.message}`}
-                  >
-                    {feedback.message}
-                  </p>
-                  {feedback.note ? (
-                    <p
-                      className={`mt-1.5 text-[11.5px] leading-[1.45] ${classes.note}`}
-                    >
-                      {feedback.note}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-            ) : null}
+        {feedback ? (
+          <AuthAlert variant={feedback.variant}>
+            {feedback.message}
+          </AuthAlert>
+        ) : null}
 
-            <Link
-              className="mt-5 flex h-12 items-center justify-center rounded-full border-0 bg-primary text-[16px] font-bold text-white no-underline transition hover:-translate-y-0.5 hover:bg-primary/85 hover:shadow-[0_14px_28px_rgba(242,71,12,0.24)]"
-              to="/login"
-            >
-              Sign in
-            </Link>
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
+          <div>
+            <PasswordField
+              id="reset-new-password"
+              label="New password"
+              registration={form.register("newPassword")}
+            />
+            {form.formState.errors.newPassword ? (
+              <p className="mt-1.5 text-[12.5px] text-(--danger-fg)">
+                {form.formState.errors.newPassword.message}
+              </p>
+            ) : null}
           </div>
-        ) : (
-          <>
-            <form
-              className="mt-6 flex flex-col gap-5"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <div className="grid grid-cols-1 gap-5">
-                <PasswordField
-                  error={form.formState.errors.newPassword?.message}
-                  id="reset-new-password"
-                  label="New password"
-                  registration={form.register("newPassword")}
-                />
 
-                <PasswordField
-                  error={form.formState.errors.confirmPassword?.message}
-                  id="reset-confirm-password"
-                  label="Confirm password"
-                  registration={form.register("confirmPassword")}
-                />
-              </div>
+          <div className="rounded-[12px] bg-(--surface-2) p-3">
+            <PasswordRuleChips
+              confirmPassword={confirmPassword}
+              password={newPassword}
+            />
+          </div>
 
-              <PasswordRuleChips
-                confirmPassword={confirmPassword}
-                password={newPassword}
-              />
-
-              <Button
-                className="h-12 w-full text-[15px] font-bold"
-                disabled={form.formState.isSubmitting}
-                shape="pill"
-                type="submit"
-              >
-                {form.formState.isSubmitting
-                  ? "Resetting..."
-                  : "Reset password"}
-              </Button>
-            </form>
-
-            {feedback && classes ? (
-              <div
-                aria-live="polite"
-                className={`mt-4 flex gap-2.5 rounded-xl border px-3.5 py-3 ${classes.box}`}
-              >
-                <span className={`${classes.icon} mt-0.5 shrink-0`}>
-                  <StatusIcon tone={feedback.tone} />
-                </span>
-                <div>
-                  <p
-                    className={`m-0 text-[13px] leading-[1.5] ${classes.message}`}
-                  >
-                    {feedback.message}
-                  </p>
-                  {feedback.note ? (
-                    <p
-                      className={`mt-1.5 text-[11.5px] leading-[1.45] ${classes.note}`}
-                    >
-                      {feedback.note}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
+          <div>
+            <PasswordField
+              id="reset-confirm-password"
+              label="Confirm password"
+              registration={form.register("confirmPassword")}
+            />
+            {form.formState.errors.confirmPassword ? (
+              <p className="mt-1.5 text-[12.5px] text-(--danger-fg)">
+                {form.formState.errors.confirmPassword.message}
+              </p>
             ) : null}
-          </>
-        )}
+          </div>
 
-        <div className="mt-5 flex items-center justify-between gap-3 text-[13px] text-muted-foreground">
+          <Button
+            className="h-11 w-full text-[14px] font-semibold"
+            disabled={form.formState.isSubmitting}
+            shape="xl"
+            type="submit"
+          >
+            {form.formState.isSubmitting ? "Saving..." : "Save new password"}
+          </Button>
+        </form>
+
+        <div className="text-center">
           <Link
-            className="no-underline transition hover:text-foreground"
+            className="text-[13px] font-semibold text-(--primary-600) no-underline hover:underline"
             to="/login"
           >
-            ← Back to sign in
+            Back to sign in
           </Link>
         </div>
-      </AuthStatusCard>
-    </div>
+      </div>
+    </AuthCenteredShell>
   );
 }

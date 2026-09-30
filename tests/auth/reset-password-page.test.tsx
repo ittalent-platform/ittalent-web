@@ -59,7 +59,7 @@ describe("ResetPasswordPage", () => {
       screen.getByLabelText(/^confirm password$/i),
       "Password123!",
     );
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
+    await user.click(screen.getByRole("button", { name: /save new password/i }));
 
     expect(mockedPostResetPassword).toHaveBeenCalledWith({
       body: {
@@ -96,7 +96,7 @@ describe("ResetPasswordPage", () => {
 
     expect(await screen.findByText(/Invalid reset link/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /request new link/i }),
+      screen.getByRole("link", { name: /request (a )?new link/i }),
     ).toHaveAttribute("href", "/forgot-password");
   });
 
@@ -131,7 +131,7 @@ describe("ResetPasswordPage", () => {
       screen.getByLabelText(/^confirm password$/i),
       "Password123!",
     );
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
+    await user.click(screen.getByRole("button", { name: /save new password/i }));
 
     expect(await screen.findByText(/Link expired/i)).toBeInTheDocument();
   });
@@ -236,7 +236,7 @@ describe("ResetPasswordPage", () => {
       screen.getByLabelText(/^confirm password$/i),
       "Password123!",
     );
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
+    await user.click(screen.getByRole("button", { name: /save new password/i }));
 
     expect(
       await screen.findByText(/Too many password reset attempts/i),
