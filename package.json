@@ -8,7 +8,6 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "test:integration": "tsx scripts/verify-fe-be-integration.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "generate:client": "openapi-ts",
