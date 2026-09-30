@@ -66,3 +66,11 @@ export const COUNTRY_OPTIONS = [
 
 export type EnterpriseSortField = "id" | "name" | "email" | "status" | "createdAt";
 export type EnterpriseSortOrder = "asc" | "desc";
+
+/** Social link keys shown on the detail page, in display order. */
+export const SOCIAL_LINK_LABELS = [
+  ["linkedin", "LinkedIn"],
+  ["facebook", "Facebook"],
+  ["github", "GitHub"],
+  ["twitter", "X"],
+] as const;

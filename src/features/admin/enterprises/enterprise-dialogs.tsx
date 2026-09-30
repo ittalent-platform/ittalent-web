@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Ban, Check, Trash2, X } from "lucide-react";
+import { Ban, Check, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   Dialog,
@@ -60,15 +60,7 @@ export function SuspendEnterpriseDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[500px] p-6 rounded-2xl bg-card border border-border shadow-2xl relative">
-        <button
-          aria-label={t("adminEnterprises.suspendDialog.close", "Close")}
-          className="absolute right-4 top-4 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 cursor-pointer"
-          onClick={onClose}
-          type="button"
-        >
-          <X className="size-4" />
-        </button>
+      <DialogContent showCloseButton={false} className="max-w-[500px] p-6 rounded-2xl bg-card border border-border shadow-2xl">
 
         <form onSubmit={handleSubmit} className="flex gap-4">
           <span className="size-10 shrink-0 rounded-xl bg-(--danger-bg) text-(--danger-fg) flex items-center justify-center">
@@ -184,15 +176,7 @@ export function ActivateEnterpriseDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[500px] p-6 rounded-2xl bg-card border border-border shadow-2xl relative">
-        <button
-          aria-label={t("adminEnterprises.suspendDialog.close", "Close")}
-          className="absolute right-4 top-4 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 cursor-pointer"
-          onClick={onClose}
-          type="button"
-        >
-          <X className="size-4" />
-        </button>
+      <DialogContent showCloseButton={false} className="max-w-[500px] p-6 rounded-2xl bg-card border border-border shadow-2xl">
 
         <form onSubmit={handleSubmit} className="flex gap-4">
           <span className="size-10 shrink-0 rounded-xl bg-(--status-success-bg) text-(--status-success-fg) flex items-center justify-center">
@@ -290,15 +274,7 @@ export function DeleteEnterpriseDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[500px] p-6 rounded-2xl bg-card border border-border shadow-2xl relative">
-        <button
-          aria-label={t("adminEnterprises.suspendDialog.close", "Close")}
-          className="absolute right-4 top-4 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 cursor-pointer"
-          onClick={onClose}
-          type="button"
-        >
-          <X className="size-4" />
-        </button>
+      <DialogContent showCloseButton={false} className="max-w-[500px] p-6 rounded-2xl bg-card border border-border shadow-2xl">
 
         <form onSubmit={handleSubmit} className="flex gap-4">
           <span className="size-10 shrink-0 rounded-xl bg-(--danger-bg) text-(--danger-fg) flex items-center justify-center">

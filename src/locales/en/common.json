@@ -610,7 +610,7 @@
     "toolbar": {
       "search": "Search by ID, name, or email...",
       "status": "Status",
-      "allStatuses": "All statuses",
+      "allStatuses": "All",
       "industry": "Industry",
       "allIndustries": "All",
       "size": "Size",
@@ -641,10 +641,10 @@
       "noMatchesDescription": "No enterprise matches the current search or filters. Try adjusting your query."
     },
     "suspendDialog": {
-      "title": "Suspend Enterprise Profile",
+      "title": "Suspend {{name}}?",
       "description": "This action will suspend the company profile and deactivate all its {{count}} open jobs. The enterprise will not be able to publish new jobs until reactivated.",
       "reasonLabel": "Reason for suspension",
-      "reasonPlaceholder": "Why is this enterprise suspended? (minimum 10 characters)...",
+      "reasonPlaceholder": "Why is this enterprise suspended?",
       "counterMin": "{{current}}/{{min}} min chars",
       "counterOk": "{{current}} chars",
       "cancel": "Cancel",
@@ -652,21 +652,21 @@
       "close": "Close"
     },
     "activateDialog": {
-      "title": "Activate Enterprise Profile",
+      "title": "Activate {{name}}?",
       "description": "Are you sure you want to activate {{name}}? The company will be allowed to post jobs and access platform features.",
       "cancel": "Cancel",
-      "confirm": "Activate"
+      "confirm": "Activate enterprise"
     },
     "deleteDialog": {
-      "title": "Delete Enterprise Profile",
+      "title": "Delete {{name}}?",
       "description": "Are you sure you want to delete {{name}}? This action cannot be undone.",
       "cancel": "Cancel",
-      "confirm": "Delete"
+      "confirm": "Delete enterprise"
     },
     "detail": {
       "back": "Back to enterprises",
       "overview": "Company Overview",
-      "contact": "Contact & Location",
+      "contact": "Contact",
       "techStack": "Tech Stack & Benefits",
       "metadata": "Profile Metadata",
       "legalName": "Legal name",
@@ -691,7 +691,10 @@
       "noBenefits": "No benefits specified",
       "noTechStack": "No tech stack specified",
       "notFoundTitle": "Enterprise not found",
-      "notFoundDescription": "The requested enterprise profile could not be loaded or was removed."
+      "notFoundDescription": "The requested enterprise profile could not be loaded or was removed.",
+      "subIndustries": "Sub-industries",
+      "branch": "Branch",
+      "culture": "Culture"
     },
     "form": {
       "createTitle": "Create enterprise profile",
@@ -699,7 +702,7 @@
       "createSubtitle": "Register a new verified enterprise to post tech jobs on ITTalent",
       "editSubtitle": "Update company profile and recruitment details",
       "basicInfo": "Basic Information",
-      "legalTax": "Legal & Tax Identity",
+      "legalTax": "Legal identity",
       "contactLocation": "Contact & Location",
       "techBenefits": "Tech Stack & Benefits",
       "save": "Save changes",

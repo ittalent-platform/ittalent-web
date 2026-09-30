@@ -85,7 +85,7 @@ describe("Enterprise Profiles Feature Tests", () => {
     expect(screen.getByText("+84 28 3822 1100")).toBeInTheDocument();
     expect(screen.getByText(/28 Sept 2026/)).toBeInTheDocument();
     expect(screen.getByText(/by admin_1/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Corporate email/i })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: /Corporate email/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Company/i })).toBeInTheDocument();
     expect(screen.getByText("Create enterprise")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Search by ID, name, or email...")).toBeInTheDocument();

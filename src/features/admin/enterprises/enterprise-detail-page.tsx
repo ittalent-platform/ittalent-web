@@ -12,6 +12,7 @@ import {
   CompanyTypeBadge,
   formatEnterpriseId,
 } from "./enterprise-badges";
+import { SOCIAL_LINK_LABELS } from "./enterprises.constants";
 import { formatEnterpriseDateTime, formatTaxCode } from "./enterprises.formatters";
 import {
   useEnterpriseDetailQuery,
@@ -21,17 +22,6 @@ import {
   ActivateEnterpriseDialog,
   SuspendEnterpriseDialog,
 } from "./enterprise-dialogs";
-
-/** Maps raw creator IDs to human-readable names. */
-function formatCreatorName(id?: string | null): string {
-  if (!id) return "System";
-  // Known system/test IDs
-  if (id === "u1" || id.toLowerCase() === "admin") return "System Admin";
-  // MongoDB ObjectId (24 hex chars)
-  if (/^[0-9a-f]{24}$/i.test(id)) return "System Admin";
-  // Already a readable name
-  return id;
-}
 
 export function AdminEnterpriseDetailPage() {
   const { t } = useTranslation();
@@ -88,8 +78,15 @@ export function AdminEnterpriseDetailPage() {
     draftJobsCount?: number;
     closedJobsCount?: number;
   };
-  const draftJobsCount = extraJobCounts.draftJobsCount ?? 0;
-  const closedJobsCount = extraJobCounts.closedJobsCount ?? 0;
+  const jobCounts = [
+    { key: "open", label: "Open", value: enterprise.activeJobsCount },
+    { key: "draft", label: "Draft", value: extraJobCounts.draftJobsCount },
+    { key: "closed", label: "Closed", value: extraJobCounts.closedJobsCount },
+  ].filter((item) => item.value !== undefined);
+  const socialLinks = SOCIAL_LINK_LABELS.flatMap(([key, label]) => {
+    const href = enterprise.socialLinks?.[key];
+    return href ? [{ label, href }] : [];
+  });
   const address = enterprise.address as {
     street?: string;
     district?: string;
@@ -98,7 +95,10 @@ export function AdminEnterpriseDetailPage() {
     postalCode?: string;
     country?: string;
   } | undefined;
-  const postalCode = address?.postal_code || address?.postalCode;
+  const addresses = [
+    ...(address?.street || address?.city ? [{ key: "hq", label: "Headquarters", value: address }] : []),
+    ...(enterprise.branches ?? []).map((branch, index) => ({ key: `branch-${index}`, label: "Branch", value: branch })),
+  ];
 
   async function handleConfirmSuspend(reason: string) {
     try {
@@ -278,11 +278,17 @@ export function AdminEnterpriseDetailPage() {
               <div className="flex flex-col gap-1.5 min-w-0">
                 <dt className="text-[13px] text-muted-foreground">Social links</dt>
                 <dd className="m-0 text-[14.5px] font-semibold text-foreground break-words">
-                  <span className="inline-flex gap-3 text-brand">
-                    <a href="#" className="hover:underline">LinkedIn</a>
-                    <a href="#" className="hover:underline">Facebook</a>
-                    <a href="#" className="hover:underline">GitHub</a>
-                  </span>
+                  {socialLinks.length > 0 ? (
+                    <span className="inline-flex flex-wrap gap-3 text-brand">
+                      {socialLinks.map((link) => (
+                        <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                          {link.label}
+                        </a>
+                      ))}
+                    </span>
+                  ) : (
+                    "—"
+                  )}
                 </dd>
               </div>
             </dl>
@@ -310,29 +316,48 @@ export function AdminEnterpriseDetailPage() {
               </div>
               <div className="flex flex-col gap-1.5 min-w-0">
                 <dt className="text-[13px] text-muted-foreground">Working days</dt>
-                <dd className="m-0 text-[14.5px] font-semibold text-foreground break-words">Mon – Fri</dd>
+                <dd className="m-0 text-[14.5px] font-semibold text-foreground break-words">{enterprise.workingDays || "—"}</dd>
               </div>
+              {enterprise.subIndustries && enterprise.subIndustries.length > 0 ? (
+                <div className="flex flex-col gap-2 min-w-0 sm:col-span-2">
+                  <dt className="text-[13px] text-muted-foreground">{t("adminEnterprises.detail.subIndustries", "Sub-industries")}</dt>
+                  <dd className="m-0 flex flex-wrap gap-1.5">
+                    {enterprise.subIndustries.map((item) => (
+                      <span key={item} className="h-7 px-2.5 rounded-lg bg-surface-readonly dark:bg-muted text-foreground text-xs font-semibold inline-flex items-center">
+                        {item}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
             </dl>
           </section>
 
           {/* Addresses Card */}
-          <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
-            <h2 className="text-[15px] font-bold text-foreground">
-              Addresses
-            </h2>
-            <div className="flex gap-3 p-3.5 rounded-xl border border-border/70 bg-background dark:bg-muted/30">
-              <MapPin className="size-4 text-muted-foreground shrink-0 mt-0.5" />
-              <div className="flex flex-col gap-1">
-                <span className="font-bold text-[13.5px] text-foreground">Headquarters</span>
-                <span className="text-[13.5px] leading-relaxed text-foreground/70 dark:text-muted-foreground">
-                  {[address?.street, address?.district].filter(Boolean).join(", ") || "12 Tôn Đản, Phường 13, Quận 4"}
-                  <br />
-                  {[address?.city, address?.country].filter(Boolean).join(", ") || "Hồ Chí Minh, Vietnam"}
-                  {postalCode ? ` · ${postalCode}` : " · 700000"}
-                </span>
-              </div>
-            </div>
-          </section>
+          {addresses.length > 0 ? (
+            <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+              <h2 className="text-[15px] font-bold text-foreground">Addresses</h2>
+              {addresses.map((item) => {
+                const postal = item.value.postal_code;
+                return (
+                  <div key={item.key} className="flex gap-3 p-3.5 rounded-xl border border-border/70 bg-background dark:bg-muted/30">
+                    <MapPin className="size-4 text-muted-foreground shrink-0 mt-0.5" />
+                    <div className="flex flex-col gap-1">
+                      <span className="font-bold text-[13.5px] text-foreground">
+                        {item.key === "hq" ? "Headquarters" : t("adminEnterprises.detail.branch", "Branch")}
+                      </span>
+                      <span className="text-[13.5px] leading-relaxed text-foreground/70 dark:text-muted-foreground">
+                        {[item.value.street, item.value.district].filter(Boolean).join(", ")}
+                        <br />
+                        {[item.value.city, item.value.country].filter(Boolean).join(", ")}
+                        {postal ? ` · ${postal}` : ""}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+          ) : null}
 
           {/* Public Profile Card */}
           <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
@@ -341,7 +366,10 @@ export function AdminEnterpriseDetailPage() {
             </h2>
             <div className="flex flex-col gap-4">
               {/* Gradient cover banner with avatar overlay */}
-              <div className="h-[120px] rounded-[14px] bg-gradient-to-r from-foreground via-foreground/80 to-brand relative">
+              <div
+                className="h-[120px] rounded-[14px] bg-gradient-to-r from-foreground via-foreground/80 to-brand relative bg-cover bg-center"
+                style={enterprise.coverUrl ? { backgroundImage: `url(${enterprise.coverUrl})` } : undefined} /* dynamic: runtime value */
+              >
                 <span className="absolute left-[18px] -bottom-[22px] border-4 border-card rounded-2xl">
                   <EnterpriseAvatar name={enterprise.name} logoUrl={enterprise.logoUrl} size="lg" />
                 </span>
@@ -360,6 +388,15 @@ export function AdminEnterpriseDetailPage() {
                   <span className="text-[13px] text-muted-foreground">Description</span>
                   <p className="text-[14px] text-foreground/70 dark:text-muted-foreground leading-relaxed whitespace-pre-line">
                     {enterprise.description}
+                  </p>
+                </div>
+              ) : null}
+
+              {enterprise.cultureSummary ? (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[13px] text-muted-foreground">{t("adminEnterprises.detail.culture", "Culture")}</span>
+                  <p className="text-[14px] text-foreground/70 dark:text-muted-foreground leading-relaxed whitespace-pre-line">
+                    {enterprise.cultureSummary}
                   </p>
                 </div>
               ) : null}
@@ -407,129 +444,39 @@ export function AdminEnterpriseDetailPage() {
             <h2 className="text-[15px] font-bold text-foreground">Status</h2>
             <div className="flex items-center gap-2.5">
               <EnterpriseStatusBadge status={enterprise.status} />
-              <span className="text-[13px] text-muted-foreground">
-                since {formatEnterpriseDateTime(enterprise.createdAt)}
-              </span>
             </div>
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2.5 text-[13.5px] m-0">
-              <dt className="text-muted-foreground">Set by</dt>
-              <dd className="m-0 text-right font-semibold text-foreground">Minh System Admin</dd>
-              <dt className="text-muted-foreground">Reason</dt>
-              <dd className="m-0 text-right font-semibold text-foreground">
-                {enterprise.statusReason || (isActive ? "Active enterprise" : "Created after offline vetting")}
-              </dd>
-            </dl>
+            {enterprise.statusReason ? (
+              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2.5 text-[13.5px] m-0">
+                <dt className="text-muted-foreground">Reason</dt>
+                <dd className="m-0 text-right font-semibold text-foreground">{enterprise.statusReason}</dd>
+              </dl>
+            ) : null}
             <p className="text-[12.5px] leading-relaxed text-muted-foreground m-0">
               Active enterprises are public and can publish jobs. Suspending hides the company and its jobs.
             </p>
-          </section>
-
-          {/* Company admin Card */}
-          <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
-            <h2 className="text-[15px] font-bold text-foreground">Company admin</h2>
-            <div className="flex items-center gap-3">
-              <span className="size-10 rounded-full bg-(--status-info-bg) text-(--status-info-fg) font-bold text-sm flex items-center justify-center shrink-0">
-                TB
-              </span>
-              <div className="flex flex-col min-w-0">
-                <span className="text-sm font-semibold text-foreground">Tran Thi B</span>
-                <span className="text-[12.5px] text-muted-foreground truncate">tran.b@novafintech.vn</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <span className="h-6 px-2.5 rounded-full bg-(--status-warning-bg) text-(--status-warning-fg) text-xs font-semibold inline-flex items-center">
-                Invitation pending
-              </span>
-              <span className="text-[12.5px] text-muted-foreground">sent 28 Sept · valid 7 days</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                toast.showToast({
-                  tone: "success",
-                  title: "Invitation resent",
-                  message: "A new invitation email was sent.",
-                });
-              }}
-              className="text-[13px] font-semibold text-brand text-start hover:underline cursor-pointer"
-            >
-              Resend invitation
-            </button>
           </section>
 
           {/* Job Postings Card */}
           <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
             <h2 className="text-[15px] font-bold text-foreground">Job postings</h2>
             <div className="flex gap-2.5">
-              <div className="flex-1 p-3.5 rounded-xl border border-border bg-card flex flex-col gap-0.5">
-                <span className="text-xl font-bold text-foreground">{enterprise.activeJobsCount ?? 0}</span>
-                <span className="text-[12.5px] text-muted-foreground">Open</span>
-              </div>
-              <div className="flex-1 p-3.5 rounded-xl border border-border bg-card flex flex-col gap-0.5">
-                <span className="text-xl font-bold text-foreground">{draftJobsCount}</span>
-                <span className="text-[12.5px] text-muted-foreground">Draft</span>
-              </div>
-              <div className="flex-1 p-3.5 rounded-xl border border-border bg-card flex flex-col gap-0.5">
-                <span className="text-xl font-bold text-foreground">{closedJobsCount}</span>
-                <span className="text-[12.5px] text-muted-foreground">Closed</span>
-              </div>
+              {jobCounts.map((item) => (
+                <div key={item.key} className="flex-1 p-3.5 rounded-xl border border-border bg-card flex flex-col gap-0.5">
+                  <span className="text-xl font-bold text-foreground">{item.value}</span>
+                  <span className="text-[12.5px] text-muted-foreground">{item.label}</span>
+                </div>
+              ))}
             </div>
-            <a href="#" className="text-[13px] font-semibold text-brand hover:underline">
-              View job postings
-            </a>
-          </section>
-
-          {/* Audit History Card */}
-          <section aria-label="Audit history" className="p-[22px] rounded-2xl border border-border bg-card flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle uppercase">AUDIT HISTORY</span>
-              <span className="font-mono text-xs text-muted-foreground">3</span>
-            </div>
-            <ul className="list-none m-0 p-0 flex flex-col">
-              <li className="flex gap-3.5">
-                <div className="w-3 shrink-0 flex flex-col items-center">
-                  <span className="size-3 mt-1 rounded-full bg-(--status-info-fg)" />
-                  <span className="flex-grow w-px my-1 bg-border" />
-                </div>
-                <div className="pb-4 flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[14.5px] font-semibold text-foreground">Profile updated · phone, website</span>
-                  <span className="text-[12.5px] text-muted-foreground">{formatEnterpriseDateTime(enterprise.updatedAt)} · by Minh System Admin</span>
-                </div>
-              </li>
-              <li className="flex gap-3.5">
-                <div className="w-3 shrink-0 flex flex-col items-center">
-                  <span className="size-3 mt-1 rounded-full bg-(--status-info-fg)" />
-                  <span className="flex-grow w-px my-1 bg-border" />
-                </div>
-                <div className="pb-4 flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[14.5px] font-semibold text-foreground">Logo and cover uploaded</span>
-                  <span className="text-[12.5px] text-muted-foreground">28 Sept 2026, 09:10 · by Minh System Admin</span>
-                </div>
-              </li>
-              <li className="flex gap-3.5">
-                <div className="w-3 shrink-0 flex flex-col items-center">
-                  <span className="size-3 mt-1 rounded-full bg-brand" />
-                </div>
-                <div className="pb-2 flex flex-col gap-0.5 min-w-0">
-                  <span className="text-[14.5px] font-semibold text-foreground">Enterprise created · Active</span>
-                  <span className="text-[12.5px] text-muted-foreground">{formatEnterpriseDateTime(enterprise.createdAt)} · by Minh System Admin</span>
-                </div>
-              </li>
-            </ul>
           </section>
 
           {/* Record Card */}
           <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
             <h2 className="text-[15px] font-bold text-foreground">Record</h2>
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2.5 text-[13.5px] m-0">
-              <dt className="text-muted-foreground">Created by</dt>
-              <dd className="m-0 text-right font-semibold text-foreground">{formatCreatorName(enterprise.creatorAccountId)}</dd>
               <dt className="text-muted-foreground">Created</dt>
               <dd className="m-0 text-right font-semibold text-foreground">{formatEnterpriseDateTime(enterprise.createdAt)}</dd>
               <dt className="text-muted-foreground">Last updated</dt>
               <dd className="m-0 text-right font-semibold text-foreground">{formatEnterpriseDateTime(enterprise.updatedAt)}</dd>
-              <dt className="text-muted-foreground">Employees</dt>
-              <dd className="m-0 text-right font-semibold text-foreground">38</dd>
             </dl>
             <p className="text-[12.5px] leading-relaxed text-muted-foreground m-0">
               An enterprise can only be deleted when it has no employees, so Delete is not offered here.

@@ -150,16 +150,7 @@ export function EnterprisesTable({
 
           {/* Corporate email */}
           <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap">
-            {onSort ? (
-              <SortableHeaderButton
-                active={sortBy === "email"}
-                direction={sortBy === "email" ? sortOrder ?? null : null}
-                label={t("adminEnterprises.table.email", "Corporate email")}
-                onClick={() => onSort("email")}
-              />
-            ) : (
-              t("adminEnterprises.table.email", "Corporate email")
-            )}
+            {t("adminEnterprises.table.email", "Corporate email")}
           </TableHeaderCell>
 
           {/* Phone */}
@@ -179,16 +170,7 @@ export function EnterprisesTable({
 
           {/* Status */}
           <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap">
-            {onSort ? (
-              <SortableHeaderButton
-                active={sortBy === "status"}
-                direction={sortBy === "status" ? sortOrder ?? null : null}
-                label={t("adminEnterprises.table.status", "Status")}
-                onClick={() => onSort("status")}
-              />
-            ) : (
-              t("adminEnterprises.table.status", "Status")
-            )}
+            {t("adminEnterprises.table.status", "Status")}
           </TableHeaderCell>
 
           {/* Created */}
