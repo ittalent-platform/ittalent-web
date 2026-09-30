@@ -13,7 +13,7 @@ export function ApplyButton({ jobTitle }: ApplyButtonProps) {
   return (
     <button
       type="button"
-      className="mb-3 h-12 w-full rounded-full bg-[var(--primary)] text-[15px] font-semibold text-white"
+      className="flex h-[46px] w-full items-center justify-center rounded-full bg-mkt-accent text-[14.5px] font-semibold text-white hover:bg-mkt-accent-hover"
       onClick={() =>
         showToast({
           message: jobTitle

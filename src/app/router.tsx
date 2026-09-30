@@ -3,7 +3,7 @@ import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
 import { AppLayout } from "@/components/layout/admin-layout";
-import { PublicLayout } from "@/components/layout/public-layout";
+import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
 import { LandingPage } from "@/features/public-site/landing-page";
 
@@ -49,7 +49,7 @@ const EnterpriseDetailPage = lazy(() =>
 
 export const appRoutes = [
   {
-    element: <PublicLayout />,
+    element: <MarketplaceLayout />,
     children: [
       { path: "/", element: <LandingPage /> },
       { path: "/career", element: <CareerPage /> },

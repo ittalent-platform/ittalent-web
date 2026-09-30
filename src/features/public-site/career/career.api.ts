@@ -11,6 +11,8 @@ type JobPostingSummaryDto = {
   salaryMax: number | null;
   currency: string | null;
   postedAt: string;
+  /** Not part of the list contract today; shown when the backend starts sending it. */
+  deadline?: string | null;
 };
 
 type JobPostingDetailDto = JobPostingSummaryDto & {
@@ -54,11 +56,20 @@ export type Job = {
 
 export type JobSort = "newest" | "oldest" | "salary_high" | "salary_low";
 
+export type PostedWithin = "24h" | "7d" | "30d";
+
 export type JobListQuery = {
-  employment_type?: string;
-  level?: string;
+  employment_type?: string[];
+  level?: string[];
   limit?: number;
   location?: string;
+  enterpriseId?: string;
+  /** Million VND / month. */
+  salaryMin?: number;
+  salaryMax?: number;
+  /** Only matters while a salary bound is set. Defaults to true. */
+  includeNegotiable?: boolean;
+  postedWithin?: PostedWithin;
   page?: number;
   search?: string;
   sort?: JobSort;
@@ -71,6 +82,7 @@ export type JobListResponse = {
   filters: {
     employmentTypes: JobFilterOption[];
     locations: JobFilterOption[];
+    enterprises: JobFilterOption[];
   };
   limit: number;
   page: number;
@@ -106,7 +118,7 @@ function toJob(dto: JobPostingSummaryDto | JobPostingDetailDto): Job {
     requirements: detail.requirements ?? undefined,
     benefits: detail.benefits ?? undefined,
     openings: detail.openings,
-    expires_at: detail.deadline ?? undefined,
+    expires_at: dto.deadline ?? undefined,
     published_at: dto.postedAt,
     createdAt: dto.postedAt,
   };
@@ -205,17 +217,59 @@ function countBy(
     .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
 }
 
+const MILLION = 1_000_000;
+
+const POSTED_WITHIN_MS: Record<PostedWithin, number> = {
+  "24h": 24 * 60 * 60 * 1000,
+  "7d": 7 * 24 * 60 * 60 * 1000,
+  "30d": 30 * 24 * 60 * 60 * 1000,
+};
+
+function matchesSalary(job: Job, query: JobListQuery): boolean {
+  const { salaryMin, salaryMax } = query;
+  if (salaryMin === undefined && salaryMax === undefined) return true;
+
+  const low = job.salary_min && job.salary_min > 0 ? job.salary_min : undefined;
+  const high = job.salary_max && job.salary_max > 0 ? job.salary_max : undefined;
+
+  // "Negotiable" jobs publish no figure.
+  if (!low && !high) return query.includeNegotiable ?? true;
+  // The bounds are in million VND, so other currencies cannot be compared.
+  if (job.currency && job.currency !== "VND") return true;
+
+  const top = high ?? low!;
+  const bottom = low ?? high!;
+  if (salaryMin !== undefined && top < salaryMin * MILLION) return false;
+  if (salaryMax !== undefined && bottom > salaryMax * MILLION) return false;
+  return true;
+}
+
 export async function fetchJobs(query: JobListQuery): Promise<JobListResponse> {
   const all = await getAllJobs();
   const page = query.page ?? 1;
   const limit = query.limit ?? 5;
   const term = query.search?.trim().toLowerCase();
+  const types = query.employment_type?.length ? query.employment_type : undefined;
+  const levels = query.level?.length
+    ? query.level.map((level) => level.toLowerCase())
+    : undefined;
+  const postedSince = query.postedWithin
+    ? Date.now() - POSTED_WITHIN_MS[query.postedWithin]
+    : undefined;
 
   const filtered = all.filter((job) => {
-    if (query.employment_type && job.employment_type !== query.employment_type)
+    if (types && !(job.employment_type && types.includes(job.employment_type)))
+      return false;
+    if (levels && !(job.level && levels.includes(job.level.toLowerCase())))
       return false;
     if (query.location && job.location !== query.location) return false;
-    if (query.level && job.level !== query.level) return false;
+    if (query.enterpriseId && job.enterpriseId !== query.enterpriseId)
+      return false;
+    if (postedSince !== undefined) {
+      const postedAt = new Date(job.createdAt ?? 0).getTime();
+      if (!(postedAt >= postedSince)) return false;
+    }
+    if (!matchesSalary(job, query)) return false;
     if (term) {
       // The list endpoint does not return descriptions, so search covers the summary fields.
       const haystack = [job.title, job.location, job.level, job.employment_type]
@@ -234,6 +288,7 @@ export async function fetchJobs(query: JobListQuery): Promise<JobListResponse> {
     filters: {
       employmentTypes: countBy(all, (job) => job.employment_type),
       locations: countBy(all, (job) => job.location),
+      enterprises: countBy(all, (job) => job.enterpriseId),
     },
     limit,
     page,

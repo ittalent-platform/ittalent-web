@@ -1,35 +1,31 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
-  ArrowRight,
-  ArrowUpRight,
-  Briefcase,
   Building2,
-  ExternalLink,
-  Factory,
   Globe,
   MapPin,
+  RefreshCw,
   TriangleAlert,
 } from "lucide-react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 
-import { ErrorState } from "@/components/common/error-state";
+import { useSession } from "@/auth/use-session";
 import { getErrorStatus } from "@/lib/api-errors";
-
-import { DetailTextBlock } from "@/features/public-site/career/career-detail-blocks";
+import { cn } from "@/lib/utils";
 import {
   EMPLOYMENT_LABELS,
-  formatSalary,
-  timeAgo,
+  formatDeadline,
+  formatSalaryCard,
+  LEVEL_LABELS,
+  postedAgo,
 } from "@/features/public-site/career/career-format";
-import {
-  fetchEnterprise,
-  fetchEnterprises,
-  fetchEnterpriseJobs,
-} from "./enterprise.api";
-import { EnterpriseCover } from "./enterprise-cover";
+import { StateCard } from "@/features/public-site/career/state-card";
+
+import { fetchEnterprise, fetchEnterpriseJobs } from "./enterprise.api";
 import { EnterpriseLogo } from "./enterprise-logo";
+
+const JOBS_SHOWN = 6;
 
 function safeUrl(value?: string) {
   if (!value) return undefined;
@@ -45,42 +41,54 @@ function hostname(url: string) {
   return new URL(url).hostname.replace(/^www\./, "");
 }
 
-function Eyebrow({ children }: { children: ReactNode }) {
+const card =
+  "flex flex-col rounded-2xl border border-mkt-line bg-white";
+const h2 =
+  "font-['Space_Grotesk',sans-serif] text-[21px] font-semibold text-mkt-ink";
+
+function Fact({
+  icon,
+  label,
+  children,
+}: {
+  icon: ReactNode;
+  label: string;
+  children: ReactNode;
+}) {
   return (
-    <div className="itt-mono mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--primary)]">
-      <span className="inline-block h-[2px] w-[18px] bg-[var(--primary)]" />{" "}
-      {children}
+    <div className="flex items-start gap-3">
+      <span className="mt-px shrink-0 text-mkt-subtle">{icon}</span>
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <dt className="text-xs text-mkt-muted">{label}</dt>
+        <dd className="break-words text-[13.5px] font-semibold text-mkt-ink">
+          {children}
+        </dd>
+      </div>
     </div>
   );
 }
 
-function FactTile({
-  children,
-  icon,
-  label,
-}: {
-  children: ReactNode;
-  icon: ReactNode;
-  label: string;
-}) {
+function DetailSkeleton() {
   return (
-    <div className="flex min-w-0 items-center gap-4 rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-5">
-      <div className="flex size-11 shrink-0 items-center justify-center rounded-[12px] bg-[var(--primary-50)] text-[var(--primary)]">
-        {icon}
+    <main>
+      <div className="h-5 w-40 animate-pulse rounded bg-mkt-chip mx-4 mt-5 md:mx-12" />
+      <div className="mx-4 mt-4 h-[220px] animate-pulse rounded-[20px] bg-mkt-chip md:mx-12" />
+      <div className="flex items-end gap-[22px] px-4 md:px-[80px]">
+        <div className="relative z-10 -mt-11 size-[112px] shrink-0 animate-pulse rounded-[20px] border-4 border-white bg-mkt-line" />
+        <div className="mb-2 h-8 w-64 animate-pulse rounded bg-mkt-chip" />
       </div>
-      <div className="min-w-0">
-        <div className="itt-mono mb-1 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--fg-subtle)]">
-          {label}
-        </div>
-        <div className="truncate text-[15px] font-semibold">{children}</div>
+      <div className="mx-4 mt-16 grid gap-4 md:mx-12 lg:grid-cols-12">
+        <div className="h-64 animate-pulse rounded-2xl bg-mkt-chip lg:col-span-8" />
+        <div className="h-64 animate-pulse rounded-2xl bg-mkt-chip lg:col-span-4" />
       </div>
-    </div>
+    </main>
   );
 }
 
 export function EnterpriseDetailPage() {
-  const navigate = useNavigate();
   const { id } = useParams();
+  const { data: session } = useSession();
+  const [tab, setTab] = useState<"about" | "open-jobs">("about");
 
   const {
     data: enterprise,
@@ -98,311 +106,397 @@ export function EnterpriseDetailPage() {
     queryFn: () => fetchEnterpriseJobs(id!),
     enabled: !!id,
   });
-  const industry = enterprise?.industry;
-  const { data: related } = useQuery({
-    queryKey: ["enterprise-related", industry],
-    queryFn: () => fetchEnterprises({ industry, limit: 4 }),
-    enabled: !!industry,
-  });
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
+    setTab("about");
   }, [id]);
 
-  if (isLoading) {
-    return (
-      <main>
-        <div className="h-[230px] animate-pulse bg-[var(--surface-2)]" />
-        <div className="mx-auto max-w-[1320px] px-8">
-          <div className="-mt-16 size-[128px] animate-pulse rounded-[28px] border-[6px] border-[var(--bg)] bg-[var(--surface-2)]" />
-          <div className="mt-6 h-10 w-1/3 animate-pulse rounded bg-[var(--surface-2)]" />
-          <div className="mt-8 h-32 animate-pulse rounded-[16px] bg-[var(--surface-2)]" />
-        </div>
-      </main>
-    );
+  // Underline the section tab that is currently in view.
+  useEffect(() => {
+    function onScroll() {
+      const el = document.getElementById("open-jobs");
+      if (!el) return;
+      setTab(el.getBoundingClientRect().top < 160 ? "open-jobs" : "about");
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  function jumpTo(section: "about" | "open-jobs") {
+    setTab(section);
+    document
+      .getElementById(section)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  if (isError && getErrorStatus(error) !== 404) {
+  if (isLoading) return <DetailSkeleton />;
+
+  const notFound = isError && getErrorStatus(error) === 404;
+
+  if (isError && !notFound) {
     return (
-      <main className="mx-auto max-w-[1320px] px-8 pb-20 pt-[140px]">
-        <ErrorState
-          description="Could not load this enterprise. Please try again."
-          icon={TriangleAlert}
-          onRetry={() => refetch()}
-          secondaryAction={{
-            label: "Back to enterprises",
-            onClick: () => navigate("/enterprises"),
-          }}
-          title="Could not load enterprise"
-        />
+      <main className="mx-auto w-full max-w-[1344px] px-4 py-16 md:px-12">
+        <StateCard
+          description="Something went wrong on our side. Please try again."
+          icon={
+            <TriangleAlert
+              aria-hidden="true"
+              className="size-[26px] text-mkt-danger"
+            />
+          }
+          iconBg="#fbe9e7"
+          title="We couldn't load this company"
+        >
+          <div className="flex flex-wrap justify-center gap-2.5">
+            <button
+              className="flex h-10 items-center gap-2 rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+              onClick={() => refetch()}
+              type="button"
+            >
+              <RefreshCw aria-hidden="true" className="size-4" />
+              Try again
+            </button>
+            <Link
+              className="flex h-10 items-center rounded-full border border-mkt-line-strong bg-white px-[18px] text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+              to="/enterprises"
+            >
+              Back to companies
+            </Link>
+          </div>
+        </StateCard>
       </main>
     );
   }
 
   if (!enterprise) {
     return (
-      <main className="mx-auto flex max-w-[1320px] flex-col items-center gap-4 px-8 pb-20 pt-[160px] text-center">
-        <Building2 className="size-10 text-[var(--fg-subtle)]" />
-        <p className="font-medium text-[var(--fg-muted)]">
-          Enterprise not found.
-        </p>
-        <button
-          className="h-11 rounded-full border border-[var(--border-strong)] bg-transparent px-6 text-[14px] font-semibold text-[var(--fg)]"
-          onClick={() => navigate("/enterprises")}
-          type="button"
+      <main className="mx-auto w-full max-w-[1344px] px-4 py-16 md:px-12">
+        <StateCard
+          description="This company doesn't exist or is no longer listed."
+          icon={
+            <Building2
+              aria-hidden="true"
+              className="size-[26px] text-mkt-accent-hover"
+            />
+          }
+          iconBg="#fde8e0"
+          title="Company not found"
         >
-          Back to enterprises
-        </button>
+          <Link
+            className="flex h-10 items-center rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+            to="/enterprises"
+          >
+            Browse companies
+          </Link>
+        </StateCard>
       </main>
     );
   }
 
   const website = safeUrl(enterprise.website);
-  const others = (related?.data ?? [])
-    .filter((e) => e.id !== enterprise.id)
-    .slice(0, 3);
-  const openRoles = jobs?.length;
+  const jobCount = jobs?.length ?? 0;
+  const shownJobs = (jobs ?? []).slice(0, JOBS_SHOWN);
+  const aboutText = enterprise.description ?? enterprise.shortDescription;
+  const aboutParagraphs = (aboutText ?? "")
+    .split(/\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  const meta: ReactNode[] = [];
+  if (enterprise.industry)
+    meta.push(<span key="industry">{enterprise.industry}</span>);
+  if (enterprise.location)
+    meta.push(<span key="hq">Headquarters: {enterprise.location}</span>);
+  if (website)
+    meta.push(
+      <a
+        className="font-semibold text-mkt-accent-hover hover:text-mkt-accent-dark"
+        href={website}
+        key="site"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        {hostname(website)}
+      </a>,
+    );
+  // "A · B · C" — each dot is its own item so the spacing is one 14px gap.
+  const metaItems = meta.flatMap((node, i) =>
+    i === 0
+      ? [node]
+      : [
+          <span aria-hidden="true" className="text-mkt-subtle" key={`dot-${i}`}>
+            ·
+          </span>,
+          node,
+        ],
+  );
+
+  const tabClass = (active: boolean) =>
+    cn(
+      "flex h-12 items-center text-[13.5px] font-semibold",
+      active
+        ? "text-mkt-ink shadow-[inset_0_-2px_0_#d73c03]"
+        : "text-mkt-muted hover:text-mkt-ink",
+    );
 
   return (
-    <main>
-      <EnterpriseCover className="h-[230px]">
-        <div className="relative mx-auto max-w-[1320px] px-8 pt-[104px]">
-          <button
-            className="inline-flex items-center gap-2 rounded-full bg-[var(--surface)]/80 px-4 py-2 text-[13px] font-semibold text-[var(--fg)] backdrop-blur-sm"
-            onClick={() => navigate("/enterprises")}
-            type="button"
+    <main className="flex flex-col">
+      {/* Header block */}
+      <section className="border-b border-mkt-line bg-white">
+        <div className="px-4 pt-5 md:px-12">
+          <Link
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-mkt-accent-hover hover:text-mkt-accent-dark"
+            to="/enterprises"
           >
-            <ArrowLeft className="size-4" /> All enterprises
-          </button>
+            <ArrowLeft aria-hidden="true" className="size-4" />
+            Back to companies
+          </Link>
         </div>
-      </EnterpriseCover>
 
-      <div className="mx-auto max-w-[1320px] px-8 pb-20">
-        <div className="relative -mt-16 flex flex-wrap items-end justify-between gap-6">
-          <div className="flex min-w-0 flex-wrap items-end gap-6">
-            <EnterpriseLogo
-              className="relative z-10 size-[128px] rounded-[28px] border-[6px] border-[var(--bg)] text-[40px] shadow-md"
-              logoUrl={enterprise.logoUrl}
-              name={enterprise.name}
-            />
-            <div className="min-w-0 pb-2">
-              {enterprise.industry && (
-                <span className="itt-mono mb-3 inline-block rounded-full bg-[var(--primary-50)] px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.05em] text-[var(--primary)]">
-                  {enterprise.industry}
-                </span>
-              )}
-              <h1
-                className="text-[40px] font-bold normal-case leading-[1.05] tracking-[-0.025em] [overflow-wrap:anywhere]"
-                style={{ textTransform: "none" }}
-              >
-                {enterprise.name}
-              </h1>
-            </div>
+        <div
+          aria-hidden="true"
+          className="relative mx-4 mt-4 h-[220px] overflow-hidden rounded-[20px] bg-mkt-ink md:mx-12"
+        >
+          <div className="absolute -right-[60px] -top-20 size-[360px] rounded-full bg-mkt-brand opacity-90" />
+          <div className="absolute right-[220px] top-[90px] size-40 rounded-full border-2 border-white/25" />
+        </div>
+
+        {/* The logo is pulled up over the banner with a negative margin; the
+            name block is never pulled up, so it always starts below the banner. */}
+        <div className="flex flex-wrap items-end gap-[22px] px-4 pb-7 md:px-[80px]">
+          <EnterpriseLogo
+            className="relative z-10 -mt-11 size-[112px] rounded-[20px] border-4 border-white text-[32px] shadow-[0_2px_8px_rgba(0,0,0,0.07)]"
+            logoUrl={enterprise.logoUrl}
+            name={enterprise.name}
+            seed={enterprise.id}
+          />
+          <div className="flex min-w-0 flex-1 flex-col gap-2 pb-1">
+            <h1 className="font-['Space_Grotesk',sans-serif] text-[32px] font-semibold leading-[1.25] text-mkt-ink [overflow-wrap:anywhere]">
+              {enterprise.name}
+            </h1>
+            {metaItems.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[13.5px] text-mkt-ink-2">
+                {metaItems}
+              </div>
+            ) : null}
           </div>
-          <div className="flex flex-wrap gap-3 pb-2">
+          {jobCount > 0 ? (
             <button
-              className="inline-flex h-12 items-center gap-2 rounded-full border border-[var(--border-strong)] bg-transparent px-6 text-[14.5px] font-semibold text-[var(--fg)]"
-              onClick={() =>
-                document
-                  .getElementById("open-roles")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
+              className="mb-1 flex h-11 items-center gap-2 rounded-full bg-mkt-accent px-[22px] text-sm font-semibold text-white hover:bg-mkt-accent-hover"
+              onClick={() => jumpTo("open-jobs")}
               type="button"
             >
-              <Briefcase className="size-4" /> View open roles
+              See {jobCount} open {jobCount === 1 ? "job" : "jobs"}
             </button>
-            {website && (
-              <a
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-[var(--primary)] px-6 text-[14.5px] font-semibold text-white no-underline"
-                href={website}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                Visit website <ExternalLink className="size-4" />
-              </a>
-            )}
-          </div>
+          ) : null}
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <FactTile icon={<Factory className="size-5" />} label="Industry">
-            {enterprise.industry ?? "—"}
-          </FactTile>
-          <FactTile icon={<MapPin className="size-5" />} label="Headquarters">
-            {enterprise.location ?? "—"}
-          </FactTile>
-          <FactTile icon={<Globe className="size-5" />} label="Website">
-            {website ? (
-              <a
-                className="text-[var(--fg)] no-underline hover:text-[var(--primary)]"
-                href={website}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                {hostname(website)}
-              </a>
+        <nav
+          aria-label="Company sections"
+          className="flex gap-7 border-t border-mkt-line-soft px-4 md:px-12"
+        >
+          <button
+            aria-current={tab === "about" ? "true" : undefined}
+            className={tabClass(tab === "about")}
+            onClick={() => jumpTo("about")}
+            type="button"
+          >
+            About
+          </button>
+          <button
+            aria-current={tab === "open-jobs" ? "true" : undefined}
+            className={tabClass(tab === "open-jobs")}
+            onClick={() => jumpTo("open-jobs")}
+            type="button"
+          >
+            Open jobs
+            <span className="ml-1.5 flex h-5 items-center rounded-full bg-mkt-chip px-[7px] text-[11.5px] text-mkt-ink-2">
+              {jobsLoading ? "—" : jobCount}
+            </span>
+          </button>
+        </nav>
+      </section>
+
+      {/* Body */}
+      <div className="grid items-start gap-6 px-4 pb-[72px] pt-8 md:px-12 lg:grid-cols-12">
+        <div className="flex min-w-0 flex-col gap-4 lg:col-span-8">
+          <section
+            className={cn(card, "scroll-mt-4 gap-3.5 p-7")}
+            id="about"
+          >
+            <h2 className={h2}>About {enterprise.name}</h2>
+            {aboutParagraphs.length > 0 ? (
+              aboutParagraphs.map((p, i) => (
+                <p
+                  className="text-[14.5px] leading-[1.7] text-mkt-ink-2"
+                  key={i}
+                >
+                  {p}
+                </p>
+              ))
             ) : (
-              "—"
-            )}
-          </FactTile>
-          <FactTile icon={<Briefcase className="size-5" />} label="Open roles">
-            {openRoles ?? "—"}
-          </FactTile>
-        </div>
-
-        <section className="mt-16 grid gap-8 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-14">
-          <div>
-            <Eyebrow>Company</Eyebrow>
-            <h2 className="text-[30px] font-bold leading-[1.1] tracking-[-0.02em]">
-              About {enterprise.name}
-            </h2>
-          </div>
-          <div className="min-w-0">
-            {enterprise.shortDescription && (
-              <p className="mb-6 border-l-[3px] border-[var(--primary)] pl-5 text-[20px] font-medium leading-[1.5] tracking-[-0.01em]">
-                {enterprise.shortDescription}
+              <p className="text-[14.5px] leading-[1.7] text-mkt-muted">
+                This company hasn't added a description yet.
               </p>
             )}
-            {enterprise.description ? (
-              <DetailTextBlock text={enterprise.description} />
-            ) : (
-              !enterprise.shortDescription && (
-                <p className="text-[14.5px] text-[var(--fg-muted)]">
-                  This company has not added a description yet.
-                </p>
-              )
-            )}
-          </div>
-        </section>
+          </section>
 
-        <section className="mt-16 scroll-mt-[100px]" id="open-roles">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <Eyebrow>Careers</Eyebrow>
-              <h2 className="text-[30px] font-bold leading-[1.1] tracking-[-0.02em]">
-                Open positions
-              </h2>
+          <section
+            className={cn(card, "scroll-mt-4 gap-1.5 p-7")}
+            id="open-jobs"
+          >
+            <div className="flex flex-wrap items-center gap-y-1 pb-2.5">
+              <h2 className={h2}>Open jobs</h2>
+              {jobCount > JOBS_SHOWN ? (
+                <span className="ml-2.5 text-[13px] text-mkt-muted">
+                  Showing {shownJobs.length} of {jobCount}
+                </span>
+              ) : null}
+              <div className="flex-1" />
+              {jobCount > 0 ? (
+                <Link
+                  className="text-[13.5px] font-semibold text-mkt-accent-hover hover:text-mkt-accent-dark"
+                  to={`/career?company=${enterprise.id}`}
+                >
+                  View all {jobCount} {jobCount === 1 ? "job" : "jobs"} →
+                </Link>
+              ) : null}
             </div>
-            <span className="itt-mono text-[12.5px] text-[var(--fg-muted)]">
-              {jobsLoading ? "—" : `${openRoles ?? 0} open`}
-            </span>
-          </div>
 
-          {jobsLoading ? (
-            <div className="grid gap-4 md:grid-cols-2">
-              {[...Array(2)].map((_, i) => (
+            {jobsLoading ? (
+              Array.from({ length: 3 }, (_, i) => (
                 <div
-                  className="h-[170px] animate-pulse rounded-[16px] bg-[var(--surface-2)]"
+                  className="my-1 h-[68px] animate-pulse rounded-xl bg-mkt-chip"
                   key={i}
                 />
-              ))}
-            </div>
-          ) : !jobs || jobs.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 rounded-[16px] border border-dashed border-[var(--border)] py-14 text-center">
-              <Briefcase className="size-8 text-[var(--fg-subtle)]" />
-              <p className="text-[14px] text-[var(--fg-muted)]">
-                No open positions at the moment. Check back soon.
+              ))
+            ) : shownJobs.length === 0 ? (
+              <p className="border-t border-mkt-line-soft pt-5 text-[14px] text-mkt-muted">
+                No open jobs right now. Check back soon.
               </p>
-            </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {jobs.map((job) => (
-                <article
-                  className="group flex min-w-0 cursor-pointer flex-col rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-6 transition duration-200 hover:-translate-y-1 hover:shadow-lg"
-                  key={job._id}
-                  onClick={() => navigate(`/career/${job.slug}`)}
-                >
-                  <div className="mb-3 flex items-start justify-between gap-4">
-                    <h3 className="line-clamp-2 text-[18px] font-semibold leading-[1.3] tracking-[-0.01em]">
-                      {job.title}
-                    </h3>
-                    {timeAgo(job.createdAt) && (
-                      <span className="itt-mono shrink-0 pt-1 text-[11px] text-[var(--fg-subtle)]">
-                        {timeAgo(job.createdAt)}
+            ) : (
+              shownJobs.map((job) => {
+                const type = job.employment_type
+                  ? (EMPLOYMENT_LABELS[job.employment_type] ??
+                    job.employment_type)
+                  : null;
+                const level = job.level
+                  ? (LEVEL_LABELS[job.level.toLowerCase()] ?? job.level)
+                  : null;
+                const deadline = formatDeadline(job.expires_at);
+                const posted = postedAgo(job.createdAt);
+                return (
+                  <Link
+                    className="-mx-3.5 flex items-center gap-4 rounded-xl border-t border-mkt-line-soft px-3.5 py-4 text-mkt-ink hover:bg-mkt-canvas"
+                    key={job._id}
+                    to={`/career/${job.slug}`}
+                  >
+                    <div className="flex min-w-0 flex-1 flex-col gap-[5px]">
+                      <span className="truncate text-[15.5px] font-semibold">
+                        {job.title}
                       </span>
-                    )}
-                  </div>
-                  <div className="mb-5 flex flex-wrap items-center gap-2">
-                    {job.employment_type && (
-                      <span className="itt-mono rounded-[6px] bg-[var(--primary-50)] px-[9px] py-1 text-[10.5px] font-semibold uppercase tracking-[0.04em] text-[var(--primary)]">
-                        {EMPLOYMENT_LABELS[job.employment_type] ??
-                          job.employment_type}
+                      <span className="text-[13px] text-mkt-ink-2">
+                        {[job.location, type, level]
+                          .filter(Boolean)
+                          .join(" · ")}
                       </span>
-                    )}
-                    {job.level && (
-                      <span className="itt-mono rounded-[6px] bg-[var(--surface-2)] px-[9px] py-1 text-[10.5px] font-semibold uppercase tracking-[0.04em] text-[var(--fg-muted)]">
-                        {job.level}
-                      </span>
-                    )}
-                    {job.location && (
-                      <span className="flex items-center gap-1 text-[12.5px] text-[var(--fg-muted)]">
-                        <MapPin className="size-[14px]" />
-                        {job.location}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-auto flex items-center justify-between border-t border-[var(--border)] pt-4">
-                    <span className="itt-mono text-[13.5px] font-semibold">
-                      {formatSalary(
-                        job.salary_min,
-                        job.salary_max,
-                        job.currency,
-                      )}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[var(--primary)]">
-                      View role
-                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-                    </span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {others.length > 0 && (
-          <section className="mt-16">
-            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <Eyebrow>Keep exploring</Eyebrow>
-                <h2 className="text-[26px] font-bold leading-[1.1] tracking-[-0.02em]">
-                  More in {industry}
-                </h2>
-              </div>
-              <button
-                className="inline-flex items-center gap-1.5 bg-transparent text-[13.5px] font-semibold text-[var(--primary)]"
-                onClick={() => navigate("/enterprises")}
-                type="button"
-              >
-                Browse all <ArrowUpRight className="size-4" />
-              </button>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {others.map((item) => (
-                <article
-                  className="group flex min-w-0 cursor-pointer items-center gap-4 rounded-[16px] border border-[var(--border)] bg-[var(--surface)] p-4 transition-transform duration-200 hover:-translate-y-1"
-                  key={item.id}
-                  onClick={() => navigate(`/enterprises/${item.id}`)}
-                >
-                  <EnterpriseLogo
-                    className="size-12 rounded-[12px] text-[16px]"
-                    logoUrl={item.logoUrl}
-                    name={item.name}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-[15px] font-semibold">
-                      {item.name}
                     </div>
-                    <div className="truncate text-[12.5px] text-[var(--fg-muted)]">
-                      {item.location ?? "—"}
+                    <div className="hidden w-[180px] shrink-0 flex-col items-end gap-1 sm:flex">
+                      <span className="text-sm font-semibold">
+                        {formatSalaryCard(
+                          job.salary_min,
+                          job.salary_max,
+                          job.currency,
+                        )}
+                      </span>
+                      {deadline ? (
+                        <span className="text-xs text-mkt-subtle">
+                          Apply by {deadline}
+                        </span>
+                      ) : posted ? (
+                        <span className="text-xs text-mkt-subtle">
+                          Posted {posted}
+                        </span>
+                      ) : null}
                     </div>
-                  </div>
-                  <ArrowUpRight className="size-5 shrink-0 text-[var(--fg-subtle)] transition-colors group-hover:text-[var(--primary)]" />
-                </article>
-              ))}
-            </div>
+                    <svg
+                      aria-hidden="true"
+                      className="shrink-0 text-mkt-subtle"
+                      fill="none"
+                      height="18"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      width="18"
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </Link>
+                );
+              })
+            )}
           </section>
-        )}
+        </div>
+
+        <aside className="flex flex-col gap-4 lg:col-span-4">
+          <section className={cn(card, "gap-4 p-6")}>
+            <h2 className="text-[15px] font-semibold text-mkt-ink">
+              Company facts
+            </h2>
+            <dl className="flex flex-col gap-3.5">
+              <Fact
+                icon={<Building2 aria-hidden="true" className="size-[18px]" />}
+                label="Industry"
+              >
+                {enterprise.industry ?? "—"}
+              </Fact>
+              <Fact
+                icon={<MapPin aria-hidden="true" className="size-[18px]" />}
+                label="Headquarters"
+              >
+                {enterprise.location ?? "—"}
+              </Fact>
+              <Fact
+                icon={<Globe aria-hidden="true" className="size-[18px]" />}
+                label="Website"
+              >
+                {website ? (
+                  <a
+                    className="text-mkt-accent-hover hover:text-mkt-accent-dark"
+                    href={website}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {hostname(website)}
+                  </a>
+                ) : (
+                  "—"
+                )}
+              </Fact>
+            </dl>
+          </section>
+
+          {!session ? (
+            <section className="flex flex-col gap-3 rounded-2xl bg-mkt-ink p-6 text-white">
+              <h2 className="font-['Space_Grotesk',sans-serif] text-[19px] font-semibold">
+                Want to work here?
+              </h2>
+              <p className="text-[13.5px] leading-[1.55] text-mkt-on-dark">
+                Create one ITTalent profile and apply to {enterprise.name} and
+                any other company with the same CV.
+              </p>
+              <Link
+                className="mt-1 flex h-[42px] items-center self-start rounded-full bg-white px-5 text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+                to="/register"
+              >
+                Create an account
+              </Link>
+            </section>
+          ) : null}
+        </aside>
       </div>
     </main>
   );
