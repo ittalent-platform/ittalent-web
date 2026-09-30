@@ -1,5 +1,7 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactElement } from "react";
 import { MemoryRouter } from "react-router";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -20,13 +22,21 @@ vi.mock("@/auth/auth-client", () => ({
 const mockedLogin = vi.mocked(postApiV1AuthLogin);
 const mockedAuthClientLogin = vi.mocked(authClient.login);
 
+
+// The pages read and write the session cache, so they need a QueryClient like the real app provides.
+function renderWithClient(ui: ReactElement): QueryClient {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+  return queryClient;
+}
+
 describe("LoginPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders email or username input and password field", () => {
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/login"]}>
         <LoginPage />
       </MemoryRouter>,
@@ -42,7 +52,7 @@ describe("LoginPage", () => {
   it("toggles password visibility", async () => {
     const user = userEvent.setup();
 
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/login"]}>
         <LoginPage />
       </MemoryRouter>,
@@ -58,7 +68,7 @@ describe("LoginPage", () => {
   });
 
   it("displays session expired alert banner when query reason=session_expired", () => {
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/login?reason=session_expired"]}>
         <LoginPage />
       </MemoryRouter>,
@@ -70,7 +80,7 @@ describe("LoginPage", () => {
   });
 
   it("displays signed out alert banner when query reason=logged_out", () => {
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/login?reason=logged_out"]}>
         <LoginPage />
       </MemoryRouter>,
@@ -100,7 +110,7 @@ describe("LoginPage", () => {
       error: undefined,
     } as unknown as Awaited<ReturnType<typeof postApiV1AuthLogin>>);
 
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/login"]}>
         <LoginPage />
       </MemoryRouter>,
@@ -119,12 +129,43 @@ describe("LoginPage", () => {
     expect(mockedAuthClientLogin).toHaveBeenCalled();
   });
 
+  it("replaces a stale signed-out session with the signed-in user", async () => {
+    const user = userEvent.setup();
+    const signedIn = {
+      id: "user-1",
+      email: "admin@example.com",
+      username: "admin",
+      role: "admin",
+      status: "active",
+      enterpriseId: null,
+    };
+
+    mockedLogin.mockResolvedValueOnce({
+      data: { tokens: { accessToken: "a", refreshToken: "r" }, user: signedIn },
+      error: undefined,
+    } as unknown as Awaited<ReturnType<typeof postApiV1AuthLogin>>);
+
+    const queryClient = renderWithClient(
+      <MemoryRouter initialEntries={["/login"]}>
+        <LoginPage />
+      </MemoryRouter>,
+    );
+    // An earlier /auth/me check with an expired token left "signed out" in the cache.
+    queryClient.setQueryData(["auth", "me"], null);
+
+    await user.type(screen.getByLabelText(/email or username/i), "admin@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "Admin123456!");
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
+
+    await waitFor(() => expect(queryClient.getQueryData(["auth", "me"])).toEqual(signedIn));
+  });
+
   it("displays error alert banner on invalid credentials", async () => {
     const user = userEvent.setup();
 
     mockedLogin.mockRejectedValueOnce(new Error("Invalid credentials"));
 
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/login"]}>
         <LoginPage />
       </MemoryRouter>,
@@ -144,7 +185,7 @@ describe("LoginPage", () => {
 
     mockedLogin.mockRejectedValueOnce(new Error("Too many requests"));
 
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/login"]}>
         <LoginPage />
       </MemoryRouter>,
@@ -164,7 +205,7 @@ describe("LoginPage", () => {
 
     mockedLogin.mockRejectedValueOnce(new Error("Email verification required"));
 
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/login"]}>
         <LoginPage />
       </MemoryRouter>,

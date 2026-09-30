@@ -1,3 +1,5 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactElement } from "react";
 import { MemoryRouter } from "react-router";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -25,13 +27,21 @@ const mockedRegister = vi.mocked(postApiV1AuthRegister);
 const mockedResend = vi.mocked(postApiV1AuthResendVerificationEmail);
 const mockedAuthLogin = vi.mocked(authClient.login);
 
+
+// The pages read and write the session cache, so they need a QueryClient like the real app provides.
+function renderWithClient(ui: ReactElement): QueryClient {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+  return queryClient;
+}
+
 describe("RegisterPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders candidate registration fields and terms checkbox", () => {
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/register"]}>
         <RegisterPage />
       </MemoryRouter>,
@@ -51,7 +61,7 @@ describe("RegisterPage", () => {
   it("updates password requirement rules as the user types", async () => {
     const user = userEvent.setup();
 
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/register"]}>
         <RegisterPage />
       </MemoryRouter>,
@@ -90,7 +100,7 @@ describe("RegisterPage", () => {
 
     const user = userEvent.setup();
 
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/register"]}>
         <RegisterPage />
       </MemoryRouter>,
