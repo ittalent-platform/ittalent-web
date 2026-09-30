@@ -29,7 +29,7 @@ const NO_HARDCODED_HEX_RULE = {
 };
 
 export default defineConfig([
-  globalIgnores(["dist", "src/api/generated", "scripts"]),
+  globalIgnores(["dist", "src/api/generated"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [

@@ -20,8 +20,7 @@ import {
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/common/empty-state";
 import { SearchEmptyState } from "@/components/common/search-empty-state";
-import { LogoTile } from "@/components/common/logo-tile";
-import { EnterpriseStatusBadge } from "./enterprise-badges";
+import { EnterpriseAvatar, EnterpriseStatusBadge } from "./enterprise-badges";
 import { formatEnterpriseDateTime } from "./enterprises.formatters";
 import type { EnterpriseSummaryDto } from "./enterprises.queries";
 import type { EnterpriseSortField, EnterpriseSortOrder } from "./enterprises.constants";
@@ -180,7 +179,7 @@ export function EnterprisesTable({
               {/* Company Column: LogoTile + Name + City underneath */}
               <TableCell>
                 <Link to={detailPath} className="flex min-w-0 items-center gap-3 no-underline group/link">
-                  <LogoTile name={ent.name} size="md" />
+                  <EnterpriseAvatar name={ent.name} logoUrl={ent.logoUrl} size="md" />
                   <div className="flex flex-col min-w-0">
                     <span className="font-bold text-[13.5px] text-foreground group-hover/link:text-primary transition truncate">
                       {ent.name}
@@ -209,12 +208,18 @@ export function EnterprisesTable({
 
               {/* Created (date + "by ...") */}
               <TableCell>
-                <div className="flex flex-col text-xs text-foreground/80">
-                  <span>{formatEnterpriseDateTime(ent.createdAt)}</span>
-                  <span className="text-muted-foreground">
-                    {t("adminEnterprises.table.by", { author: ent.creatorAccountId || "admin" })}
-                  </span>
-                </div>
+                {ent.createdAt ? (
+                  <div className="flex flex-col text-xs text-foreground/80">
+                    <span>{formatEnterpriseDateTime(ent.createdAt)}</span>
+                    {ent.creatorAccountId ? (
+                      <span className="text-muted-foreground">
+                        {t("adminEnterprises.table.by", { author: ent.creatorAccountId })}
+                      </span>
+                    ) : null}
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground">—</span>
+                )}
               </TableCell>
 
               {/* Actions Dropdown */}

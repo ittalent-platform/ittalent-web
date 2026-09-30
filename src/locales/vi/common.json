@@ -549,7 +549,9 @@
     "toolbar": {
       "search": "Tìm theo ID, tên hoặc email...",
       "status": "Trạng thái",
-      "allStatuses": "Tất cả trạng thái"
+      "allStatuses": "Tất cả trạng thái",
+      "industry": "Ngành nghề",
+      "allIndustries": "Tất cả"
     },
     "table": {
       "company": "Doanh nghiệp",
@@ -665,7 +667,24 @@
       "benefitsPlaceholder": "Thêm đãi ngộ (ví dụ: Lương tháng 13, Làm việc từ xa)...",
       "techStackLabel": "Ngăn xếp công nghệ",
       "techStackPlaceholder": "Thêm công nghệ (ví dụ: React, Node.js, Go)...",
-      "add": "Thêm"
+      "add": "Thêm",
+      "placeholders": {
+        "name": "vd: Nova Fintech, CloudBridge Solutions",
+        "legalName": "vd: CÔNG TY CỔ PHẦN CÔNG NGHỆ NOVA FINTECH",
+        "foundedYear": "vd: 2018",
+        "taxCode": "10–13 chữ số",
+        "taxCodeFormat": "10–13 chữ số (vd: 0312345678)",
+        "regNumber": "vd: 0312345678-001",
+        "email": "contact@company.com",
+        "phone": "vd: +84 28 3822 1100",
+        "website": "https://company.com",
+        "street": "vd: 12 Tôn Đản, Phường 13",
+        "district": "vd: Quận 4",
+        "postalCode": "vd: 700000",
+        "shortDescription": "vd: Nền tảng cổng thanh toán và ngân hàng số hàng đầu",
+        "description": "Chia sẻ về sứ mệnh, sản phẩm cốt lõi và định hướng công ty...",
+        "statusReason": "Ghi chú tuỳ chọn cho nhật ký kiểm toán..."
+      }
     }
   },
   "landing": {

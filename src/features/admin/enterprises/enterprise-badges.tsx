@@ -82,14 +82,14 @@ export function EnterpriseAvatar({
     sm: "sm",
     md: "md",
     lg: "lg",
-    xl: "lg",
+    xl: "xl",
   };
 
   const imgSizeClasses = {
     sm: "size-8 rounded-lg",
     md: "size-9 rounded-[10px]",
     lg: "size-14 rounded-2xl",
-    xl: "size-16 rounded-2xl",
+    xl: "size-[52px] rounded-[14px]",
   }[size];
 
   if (logoUrl && !imageError) {

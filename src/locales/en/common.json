@@ -555,7 +555,9 @@
     "toolbar": {
       "search": "Search by ID, name, or email...",
       "status": "Status",
-      "allStatuses": "All statuses"
+      "allStatuses": "All statuses",
+      "industry": "Industry",
+      "allIndustries": "All"
     },
     "table": {
       "company": "Company",
@@ -671,7 +673,24 @@
       "benefitsPlaceholder": "Add a perk (e.g. 13th month salary, Remote work)...",
       "techStackLabel": "Tech Stack",
       "techStackPlaceholder": "Add a technology (e.g. React, Node.js, Go)...",
-      "add": "Add"
+      "add": "Add",
+      "placeholders": {
+        "name": "e.g. Nova Fintech, CloudBridge Solutions",
+        "legalName": "e.g. CÔNG TY CỔ PHẦN CÔNG NGHỆ NOVA FINTECH",
+        "foundedYear": "e.g. 2018",
+        "taxCode": "10–13 numeric digits",
+        "taxCodeFormat": "10–13 numeric digits (e.g. 0312345678)",
+        "regNumber": "e.g. 0312345678-001",
+        "email": "contact@company.com",
+        "phone": "e.g. +84 28 3822 1100",
+        "website": "https://company.com",
+        "street": "e.g. 12 Ton Dan, Ward 13",
+        "district": "e.g. District 4",
+        "postalCode": "e.g. 700000",
+        "shortDescription": "e.g. Leading payment gateway and digital banking platform",
+        "description": "Tell candidates about company mission, core products, and vision...",
+        "statusReason": "Optional note for the audit log..."
+      }
     }
   },
   "landing": {

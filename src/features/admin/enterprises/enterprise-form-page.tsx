@@ -16,6 +16,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Breadcrumb } from "@/components/common/breadcrumb";
 import { useToast } from "@/components/toast/toast-provider";
 import {
@@ -384,7 +391,7 @@ export function EnterpriseFormPage() {
               </label>
               <Input
                 id="company-name"
-                placeholder="e.g. Nova Fintech, CloudBridge Solutions"
+                placeholder={t("adminEnterprises.form.placeholders.name", "e.g. Nova Fintech, CloudBridge Solutions")}
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
@@ -403,7 +410,7 @@ export function EnterpriseFormPage() {
               </label>
               <Input
                 id="legal-name"
-                placeholder="e.g. CÔNG TY CỔ PHẦN CÔNG NGHỆ NOVA FINTECH"
+                placeholder={t("adminEnterprises.form.placeholders.legalName", "e.g. CÔNG TY CỔ PHẦN CÔNG NGHỆ NOVA FINTECH")}
                 value={legalName}
                 onChange={(e) => setLegalName(e.target.value)}
               />
@@ -415,57 +422,54 @@ export function EnterpriseFormPage() {
               <label htmlFor="industry-select" className="text-sm font-semibold text-foreground">
                 {t("adminEnterprises.form.industryLabel", "Industry")}
               </label>
-              <select
-                id="industry-select"
-                value={industry}
-                onChange={(e) => setIndustry(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              >
-                <option value="">{t("adminEnterprises.form.selectIndustry", "Select industry...")}</option>
-                {INDUSTRY_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
+              <Select value={industry} onValueChange={setIndustry}>
+                <SelectTrigger id="industry-select" className="w-full h-10 rounded-xl">
+                  <SelectValue placeholder={t("adminEnterprises.form.selectIndustry", "Select industry...")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {INDUSTRY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-1.5">
               <label htmlFor="company-type-select" className="text-sm font-semibold text-foreground">
                 {t("adminEnterprises.form.typeLabel", "Company Type")}
               </label>
-              <select
-                id="company-type-select"
-                value={companyType}
-                onChange={(e) => setCompanyType(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              >
-                <option value="">{t("adminEnterprises.form.selectType", "Select company type...")}</option>
-                {COMPANY_TYPE_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
+              <Select value={companyType} onValueChange={setCompanyType}>
+                <SelectTrigger id="company-type-select" className="w-full h-10 rounded-xl">
+                  <SelectValue placeholder={t("adminEnterprises.form.selectType", "Select company type...")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {COMPANY_TYPE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-1.5">
               <label htmlFor="company-size-select" className="text-sm font-semibold text-foreground">
                 {t("adminEnterprises.form.sizeLabel", "Company Size")}
               </label>
-              <select
-                id="company-size-select"
-                value={companySize}
-                onChange={(e) => setCompanySize(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              >
-                <option value="">{t("adminEnterprises.form.selectSize", "Select company size...")}</option>
-                {COMPANY_SIZE_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt} employees
-                  </option>
-                ))}
-              </select>
+              <Select value={companySize} onValueChange={setCompanySize}>
+                <SelectTrigger id="company-size-select" className="w-full h-10 rounded-xl">
+                  <SelectValue placeholder={t("adminEnterprises.form.selectSize", "Select company size...")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {COMPANY_SIZE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt} employees
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -479,7 +483,7 @@ export function EnterpriseFormPage() {
                 type="number"
                 min={1950}
                 max={2030}
-                placeholder="e.g. 2018"
+                placeholder={t("adminEnterprises.form.placeholders.foundedYear", "e.g. 2018")}
                 value={foundedYear}
                 onChange={(e) => setFoundedYear(e.target.value ? parseInt(e.target.value, 10) : "")}
               />
@@ -512,7 +516,7 @@ export function EnterpriseFormPage() {
               <div className="relative">
                 <Input
                   id="tax-code"
-                  placeholder="10–13 numeric digits"
+                  placeholder={t("adminEnterprises.form.placeholders.taxCode", "10–13 numeric digits")}
                   value={taxCode}
                   disabled={isEditMode}
                   onChange={(e) => {
@@ -528,7 +532,7 @@ export function EnterpriseFormPage() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                {isEditMode ? "Locked after creation · 10–13 digits" : "10–13 numeric digits (e.g. 0312345678)"}
+                {isEditMode ? t("adminEnterprises.form.taxCodeLocked", "Locked after creation · 10–13 digits") : t("adminEnterprises.form.placeholders.taxCodeFormat", "10–13 numeric digits (e.g. 0312345678)")}
               </p>
               {fieldErrors.taxCode && (
                 <p className="text-xs text-destructive font-medium">{fieldErrors.taxCode}</p>
@@ -541,7 +545,7 @@ export function EnterpriseFormPage() {
               </label>
               <Input
                 id="reg-number"
-                placeholder="e.g. 0312345678-001"
+                placeholder={t("adminEnterprises.form.placeholders.regNumber", "e.g. 0312345678-001")}
                 value={registrationNumber}
                 onChange={(e) => setRegistrationNumber(e.target.value)}
               />
@@ -590,7 +594,7 @@ export function EnterpriseFormPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="contact@company.com"
+                placeholder={t("adminEnterprises.form.placeholders.email", "contact@company.com")}
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -609,7 +613,7 @@ export function EnterpriseFormPage() {
               </label>
               <Input
                 id="phone"
-                placeholder="e.g. +84 28 3822 1100"
+                placeholder={t("adminEnterprises.form.placeholders.phone", "e.g. +84 28 3822 1100")}
                 value={phone}
                 onChange={(e) => {
                   setPhone(e.target.value);
@@ -629,7 +633,7 @@ export function EnterpriseFormPage() {
               <Input
                 id="website"
                 type="url"
-                placeholder="https://company.com"
+                placeholder={t("adminEnterprises.form.placeholders.website", "https://company.com")}
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
               />
@@ -643,7 +647,7 @@ export function EnterpriseFormPage() {
               </label>
               <Input
                 id="street"
-                placeholder="e.g. 12 Ton Dan, Ward 13"
+                placeholder={t("adminEnterprises.form.placeholders.street", "e.g. 12 Ton Dan, Ward 13")}
                 value={street}
                 onChange={(e) => {
                   setStreet(e.target.value);
@@ -662,7 +666,7 @@ export function EnterpriseFormPage() {
               </label>
               <Input
                 id="district"
-                placeholder="e.g. District 4"
+                placeholder={t("adminEnterprises.form.placeholders.district", "e.g. District 4")}
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
               />
@@ -674,19 +678,18 @@ export function EnterpriseFormPage() {
               <label htmlFor="city-select" className="text-sm font-semibold text-foreground">
                 {t("adminEnterprises.form.cityLabel", "City")}
               </label>
-              <select
-                id="city-select"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              >
-                <option value="">{t("adminEnterprises.form.selectCity", "Select city...")}</option>
-                {CITY_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
+              <Select value={city} onValueChange={setCity}>
+                <SelectTrigger id="city-select" className="w-full h-10 rounded-xl">
+                  <SelectValue placeholder={t("adminEnterprises.form.selectCity", "Select city...")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {CITY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-1.5">
@@ -695,7 +698,7 @@ export function EnterpriseFormPage() {
               </label>
               <Input
                 id="postal-code"
-                placeholder="e.g. 700000"
+                placeholder={t("adminEnterprises.form.placeholders.postalCode", "e.g. 700000")}
                 value={postalCode}
                 onChange={(e) => setPostalCode(e.target.value)}
               />
@@ -705,19 +708,18 @@ export function EnterpriseFormPage() {
               <label htmlFor="country-select" className="text-sm font-semibold text-foreground">
                 {t("adminEnterprises.form.countryLabel", "Country")}
               </label>
-              <select
-                id="country-select"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              >
-                <option value="">{t("adminEnterprises.form.selectCountry", "Select country...")}</option>
-                {COUNTRY_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
+              <Select value={country} onValueChange={setCountry}>
+                <SelectTrigger id="country-select" className="w-full h-10 rounded-xl">
+                  <SelectValue placeholder={t("adminEnterprises.form.selectCountry", "Select country...")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </section>
@@ -734,7 +736,7 @@ export function EnterpriseFormPage() {
             </label>
             <Input
               id="short-desc"
-              placeholder="e.g. Leading payment gateway and digital banking platform"
+              placeholder={t("adminEnterprises.form.placeholders.shortDescription", "e.g. Leading payment gateway and digital banking platform")}
               value={shortDescription}
               onChange={(e) => setShortDescription(e.target.value)}
             />
@@ -747,7 +749,7 @@ export function EnterpriseFormPage() {
             <Textarea
               id="full-desc"
               rows={4}
-              placeholder="Tell candidates about company mission, core products, and vision..."
+              placeholder={t("adminEnterprises.form.placeholders.description", "Tell candidates about company mission, core products, and vision...")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="rounded-xl border-input p-3 text-sm focus-visible:ring-primary/20"

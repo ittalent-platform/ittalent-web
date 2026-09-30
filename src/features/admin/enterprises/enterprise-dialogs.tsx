@@ -224,7 +224,7 @@ export function ActivateEnterpriseDialog({
               <Textarea
                 id="activate-reason"
                 rows={2}
-                placeholder="Optional note for the audit log..."
+                placeholder={t("adminEnterprises.form.placeholders.statusReason", "Optional note for the audit log...")}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 className="rounded-xl border-border p-3 text-sm focus-visible:ring-primary/20"

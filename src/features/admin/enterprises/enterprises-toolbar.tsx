@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { FilterSelect } from "@/components/ui/filter-select";
 import { Button } from "@/components/ui/button";
 import { ListToolbar } from "@/components/common/list-toolbar";
+import { INDUSTRY_OPTIONS } from "./enterprises.constants";
 
 export type EnterpriseStatusFilter = "all" | "active" | "pending" | "suspended" | "rejected" | "inactive";
 
@@ -55,18 +56,16 @@ export function EnterprisesToolbar({
         <FilterSelect
           onChange={onIndustryChange}
           options={[
-            { label: "Industry: All", value: "all" },
-            { label: "Software & IT Services", value: "Software & IT Services" },
-            { label: "Fintech & Banking", value: "Fintech & Banking" },
-            { label: "E-commerce & Retail", value: "E-commerce & Retail" },
-            { label: "Healthcare & Biotech", value: "Healthcare & Biotech" },
-            { label: "Education & Edtech", value: "Education & Edtech" },
-            { label: "Telecommunications", value: "Telecommunications" },
-            { label: "Gaming & Entertainment", value: "Gaming & Entertainment" },
-            { label: "Artificial Intelligence & Data", value: "Artificial Intelligence & Data" },
-            { label: "Other", value: "Other" },
+            {
+              label: `${t("adminEnterprises.toolbar.industry", "Industry")}: ${t("adminEnterprises.toolbar.allIndustries", "All")}`,
+              value: "all",
+            },
+            ...INDUSTRY_OPTIONS.map((opt) => ({
+              label: opt,
+              value: opt,
+            })),
           ]}
-          placeholder="Industry: All"
+          placeholder={`${t("adminEnterprises.toolbar.industry", "Industry")}: ${t("adminEnterprises.toolbar.allIndustries", "All")}`}
           value={industry || "all"}
         />
 

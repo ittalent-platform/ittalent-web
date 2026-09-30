@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router";
-import { ArrowLeft, Ban, Check, ExternalLink, Globe, Mail, MapPin, Pencil, Phone } from "lucide-react";
+import { Ban, Check, ExternalLink, Globe, Mail, MapPin, Pencil, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
   EnterpriseAvatar,
   EnterpriseStatusBadge,
   CompanyTypeBadge,
+  formatEnterpriseId,
 } from "./enterprise-badges";
 import { formatEnterpriseDateTime, formatTaxCode } from "./enterprises.formatters";
 import {
@@ -140,7 +141,7 @@ export function AdminEnterpriseDetailPage() {
         ariaLabel={t("adminEnterprises.page.title", "Enterprise Profiles")}
         items={[
           { label: t("adminEnterprises.page.title", "Enterprise Profiles"), to: "/admin/enterprises" },
-          { label: enterprise.name, mono: false },
+          { label: formatEnterpriseId(enterprise.id), mono: true },
         ]}
       />
 
@@ -160,23 +161,16 @@ export function AdminEnterpriseDetailPage() {
               <EnterpriseStatusBadge status={enterprise.status} />
               <CompanyTypeBadge type={enterprise.companyType} />
             </div>
-            {enterprise.shortDescription ? (
-              <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
-                {enterprise.shortDescription}
-              </p>
-            ) : null}
+            <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
+              {[enterprise.email, enterprise.industry, enterprise.address?.city]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
           </div>
         </div>
 
-        {/* Header Actions: Back, Edit, and Suspend/Activate */}
+        {/* Header Actions: Edit and Suspend/Activate (Design has only Edit + Suspend; breadcrumb provides back navigation) */}
         <div className="flex flex-wrap items-center gap-2.5">
-          <Button asChild variant="outline" size="sm" className="h-9 px-3 gap-1.5 border-border">
-            <Link to="/admin/enterprises">
-              <ArrowLeft className="size-4" />
-              <span>{t("adminEnterprises.detail.back", "Back to enterprises")}</span>
-            </Link>
-          </Button>
-
           <Button asChild variant="outline" size="sm" className="h-9 px-3.5 gap-1.5 border-border">
             <Link to={`/admin/enterprises/${enterprise.id}/edit`}>
               <Pencil className="size-4 text-muted-foreground" />
@@ -258,11 +252,13 @@ export function AdminEnterpriseDetailPage() {
                 label={t("adminEnterprises.detail.foundedYear", "Founded year")}
                 value={enterprise.foundedYear ? String(enterprise.foundedYear) : "—"}
               />
-              <DetailRow
-                layout="grid"
-                label={t("adminEnterprises.detail.activeJobs", "Active jobs")}
-                value={enterprise.activeJobsCount}
-              />
+              {typeof enterprise.activeJobsCount === "number" ? (
+                <DetailRow
+                  layout="grid"
+                  label={t("adminEnterprises.detail.activeJobs", "Active jobs")}
+                  value={enterprise.activeJobsCount}
+                />
+              ) : null}
               {enterprise.description ? (
                 <DetailRow
                   layout="grid"
@@ -414,11 +410,6 @@ export function AdminEnterpriseDetailPage() {
                 layout="split"
                 label={t("adminEnterprises.detail.createdAt", "Created at")}
                 value={formatEnterpriseDateTime(enterprise.createdAt)}
-              />
-              <DetailRow
-                layout="split"
-                label={t("adminEnterprises.detail.createdBy", "Created by")}
-                value={<span className="font-mono text-xs">{enterprise.creatorAccountId || "admin"}</span>}
               />
               <DetailRow
                 layout="split"

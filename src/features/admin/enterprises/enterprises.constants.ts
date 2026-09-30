@@ -24,8 +24,10 @@ export const COMPANY_SIZE_OPTIONS = [
 export const COMPANY_TYPE_OPTIONS = [
   "Product",
   "Outsourcing",
+  "IT Service",
   "Consulting",
-  "Headhunt",
+  "Agency",
+  "Hybrid",
   "Other",
 ] as const;
 
