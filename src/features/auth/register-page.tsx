@@ -49,10 +49,13 @@ export function RegisterPage() {
 
   const form = useForm<RegisterFormValues>({
     defaultValues: {
+      fullName: "",
       email: "",
       username: "",
+      mobile: "",
       password: "",
       confirmPassword: "",
+      termsAccepted: false,
     },
     resolver: zodResolver(registerSchema),
   });
