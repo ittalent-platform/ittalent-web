@@ -4,26 +4,31 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 export function PasswordField({
+  className,
   error,
   id,
+  inputClassName,
   label,
   labelExtra,
   registration,
 }: {
+  className?: string;
   error?: ReactNode;
   id: string;
+  inputClassName?: string;
   label: string;
   labelExtra?: ReactNode;
   registration: UseFormRegisterReturn;
 }) {
   const [visible, setVisible] = useState(false);
   return (
-    <div>
-      <div className="mb-1.5 flex items-baseline justify-between gap-3">
+    <div className={className}>
+      <div className="mb-2 flex items-baseline justify-between gap-3">
         <label
-          className="text-[13px] font-semibold text-foreground"
+          className="text-[13.5px] font-semibold text-foreground"
           htmlFor={id}
         >
           {label}
@@ -32,7 +37,10 @@ export function PasswordField({
       </div>
       <div className="relative">
         <Input
-          className="pr-12"
+          className={cn(
+            "h-[46px] rounded-[12px] border-(--border-muted) px-[15px] pr-12 text-[14px] outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15",
+            inputClassName,
+          )}
           id={id}
           placeholder="••••••••"
           type={visible ? "text" : "password"}
