@@ -86,17 +86,11 @@ test.describe("UC-MYAPP-01 view my applications", () => {
       "Hired",
       "Rejected",
       "Withdrawn",
-      "Position filled",
     ]) {
       await expect(page.getByRole("region", { name: column })).toBeVisible();
     }
     await expect(
       page.getByRole("region", { name: "Interviewing" }).getByRole("checkbox"),
-    ).toHaveCount(0);
-    await expect(
-      page
-        .getByRole("region", { name: "Position filled" })
-        .getByRole("checkbox"),
     ).toHaveCount(0);
     await expect(
       page.getByRole("checkbox", {
@@ -135,7 +129,7 @@ test.describe("UC-MYAPP-01 view my applications", () => {
     await expect(
       page.getByRole("heading", { name: "My applications" }),
     ).toBeVisible();
-    await page.route("**/api/v1/me/applications?*", (route) =>
+    await page.route("**/api/v1/applications?*", (route) =>
       route.fulfill({
         status: 401,
         json: { message: "Authentication required" },
@@ -152,7 +146,7 @@ test.describe("UC-MYAPP-01 view my applications", () => {
     candidate: page,
   }) => {
     let fail = true;
-    await page.route("**/api/v1/me/applications?*", (route) =>
+    await page.route("**/api/v1/applications?*", (route) =>
       fail
         ? route.fulfill({ status: 500, json: { message: "boom" } })
         : route.continue(),
@@ -194,7 +188,7 @@ test.describe("UC-MYAPP-01 view my applications", () => {
   });
 
   test("API enforces scope: the list never contains another candidate's record", async () => {
-    const list = await api(ACCOUNTS.demo, "/api/v1/me/applications?limit=100");
+    const list = await api(ACCOUNTS.demo, "/api/v1/applications?limit=100");
     const body = list.json as { items: { id: string }[]; total: number };
     expect(list.status).toBe(200);
     expect(body.total).toBe(TOTAL_APPLICATIONS);
@@ -216,7 +210,7 @@ test.describe("UC-MYAPP-01 view my applications", () => {
     ]) {
       const response = await api(
         ACCOUNTS.demo,
-        `/api/v1/me/applications?${query}`,
+        `/api/v1/applications?${query}`,
       );
       expect(response.status, query).toBe(400);
     }
@@ -271,11 +265,11 @@ test.describe("UC-MYAPP-02 view my application detail", () => {
     await expect(page.getByText("Hidden Corp")).toHaveCount(0);
     const foreign = await api(
       ACCOUNTS.demo,
-      `/api/v1/me/applications/${FOREIGN_APPLICATION_ID}`,
+      `/api/v1/applications/${FOREIGN_APPLICATION_ID}`,
     );
     const missing = await api(
       ACCOUNTS.demo,
-      `/api/v1/me/applications/${"a".repeat(24)}`,
+      `/api/v1/applications/${"a".repeat(24)}`,
     );
     expect(foreign.status).toBe(404);
     expect(foreign.json).toEqual(missing.json);
@@ -297,7 +291,7 @@ test.describe("UC-MYAPP-02 view my application detail", () => {
   }) => {
     let fail = true;
     await page.route(
-      `**/api/v1/me/applications/${applicationId(SEED.underReview)}`,
+      `**/api/v1/applications/${applicationId(SEED.underReview)}`,
       (route) =>
         fail
           ? route.fulfill({ status: 500, json: { message: "boom" } })
@@ -351,7 +345,7 @@ test.describe("UC-MYAPP-02 view my application detail", () => {
     ).toHaveAttribute("href", /\/jobs\//);
   });
 
-  test("statuses the candidate cannot withdraw show no Withdraw action (Interviewing, Offered, Hired, Rejected, Position filled)", async ({
+  test("statuses the candidate cannot withdraw show no Withdraw action (Interviewing, Offered, Hired, Rejected)", async ({
     candidate: page,
   }) => {
     for (const index of [
@@ -359,7 +353,6 @@ test.describe("UC-MYAPP-02 view my application detail", () => {
       SEED.offered,
       SEED.hired,
       SEED.rejected,
-      SEED.positionFilled,
     ]) {
       await page.goto(`/my-applications/${applicationId(index)}`);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -394,7 +387,7 @@ test.describe("UC-MYAPP-03 view my application history", () => {
     await expect(page.getByText("Submitted · applied again")).toBeVisible();
     const history = await api(
       ACCOUNTS.demo,
-      `/api/v1/me/applications/${applicationId(SEED.reapplication)}/history`,
+      `/api/v1/applications/${applicationId(SEED.reapplication)}/history`,
     );
     expect((history.json as { total: number }).total).toBe(1);
   });
@@ -404,12 +397,12 @@ test.describe("UC-MYAPP-03 view my application history", () => {
       (
         await api(
           ACCOUNTS.demo,
-          `/api/v1/me/applications/${FOREIGN_APPLICATION_ID}/history`,
+          `/api/v1/applications/${FOREIGN_APPLICATION_ID}/history`,
         )
       ).status,
     ).toBe(404);
     expect(
-      (await api(ACCOUNTS.demo, "/api/v1/me/applications/not-an-id/history"))
+      (await api(ACCOUNTS.demo, "/api/v1/applications/not-an-id/history"))
         .status,
     ).toBe(400);
   });
@@ -417,7 +410,7 @@ test.describe("UC-MYAPP-03 view my application history", () => {
   test("history is append-only from the candidate side: no write endpoint exists", async () => {
     const attempt = await api(
       ACCOUNTS.demo,
-      `/api/v1/me/applications/${applicationId(SEED.hired)}/history`,
+      `/api/v1/applications/${applicationId(SEED.hired)}/history`,
       { method: "POST", body: { status: "hired" } },
     );
     expect([404, 405]).toContain(attempt.status);

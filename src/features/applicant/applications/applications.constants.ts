@@ -10,10 +10,10 @@ export type ReviewStage = NonNullable<ApplicationDetailDto["reviewStage"]>;
 export type ActorRole = ApplicationHistoryResponse["items"][number]["actorRole"];
 
 // Board columns and filter options follow the candidate-facing lifecycle (UC-MYAPP-01.AC.3).
-export const APPLICATION_STATUSES: readonly ApplicationStatus[] = ["submitted", "under_review", "interviewing", "offered", "hired", "rejected", "withdrawn", "position_filled"];
+export const APPLICATION_STATUSES: readonly ApplicationStatus[] = ["submitted", "under_review", "interviewing", "offered", "hired", "rejected", "withdrawn"];
 // Quick presets in the status filter popover.
 export const IN_PROGRESS_STATUSES: readonly ApplicationStatus[] = ["submitted", "under_review", "interviewing", "offered"];
-export const CLOSED_STATUSES: readonly ApplicationStatus[] = ["hired", "rejected", "withdrawn", "position_filled"];
+export const CLOSED_STATUSES: readonly ApplicationStatus[] = ["hired", "rejected", "withdrawn"];
 export const REVIEW_STAGES: readonly ReviewStage[] = ["screening", "interview", "offer", "hired", "rejected"];
 export const JOB_ID_PATTERN = /^[a-f\d]{24}$/i;
 export const STATUS_LIST_SEPARATOR = ",";
@@ -62,7 +62,6 @@ export const STATUS_TONES: Record<ApplicationStatus, { badge: string; text: stri
   hired: { badge: "bg-(--status-success-bg) text-(--status-success-fg)", text: "text-(--status-success-fg)", dot: "bg-(--status-success-fg)", border: "border-t-(--status-success-fg)", ring: "ring-(--status-success-fg)/40" },
   rejected: { badge: "bg-(--status-error-bg) text-(--status-error-fg)", text: "text-(--status-error-fg)", dot: "bg-(--status-error-fg)", border: "border-t-(--status-error-fg)", ring: "ring-(--status-error-fg)/40" },
   withdrawn: { badge: "bg-(--status-neutral-bg) text-muted-foreground", text: "text-muted-foreground", dot: "bg-muted-foreground", border: "border-t-muted-foreground", ring: "ring-muted-foreground/40" },
-  position_filled: { badge: "bg-(--status-neutral-bg) text-slate-subtle", text: "text-slate-subtle", dot: "bg-slate-subtle", border: "border-t-slate-subtle", ring: "ring-slate-subtle/40" },
 };
 
 // Only an interview asks the candidate to act, so it is the one "next step" set in a status colour.
@@ -76,7 +75,6 @@ export const TIMELINE_TONES: Record<ApplicationStatus, TimelineTone> = {
   hired: "success",
   rejected: "error",
   withdrawn: "neutral",
-  position_filled: "neutral",
 };
 
 export function isWithdrawable(status: ApplicationStatus): boolean {

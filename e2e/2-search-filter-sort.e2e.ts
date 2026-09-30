@@ -50,7 +50,7 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await page.goto("/my-applications");
     await expect(page.getByText(displayId(SEED.submitted))).toBeVisible();
     let listCalls = 0;
-    await page.route("**/api/v1/me/applications?*", (route) => {
+    await page.route("**/api/v1/applications?*", (route) => {
       listCalls += 1;
       return route.continue();
     });
@@ -77,12 +77,13 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await expect(page.getByText(displayId(SEED.withdrawnOpen))).toHaveCount(0);
 
     await page.getByRole("button", { name: "Closed" }).click();
-    await expect(page.getByText(displayId(SEED.positionFilled))).toBeVisible();
+    await expect(page.getByText(displayId(SEED.hired))).toBeVisible();
     await expect(page.getByText(displayId(SEED.rejected))).toBeVisible();
     await expect(page.getByText(displayId(SEED.submitted))).toHaveCount(0);
 
-    await page.locator("label", { hasText: "Position filled" }).click();
-    await expect(page.getByText(displayId(SEED.positionFilled))).toHaveCount(0);
+    await page.locator("label", { hasText: "Hired" }).click();
+    await expect(page.getByText(displayId(SEED.hired))).toHaveCount(0);
+    await expect(page.getByText(displayId(SEED.rejected))).toBeVisible();
     await page.getByRole("button", { name: "Select all" }).click();
     await expect(
       page.getByText(
@@ -160,12 +161,12 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
   }) => {
     const detail = await api(
       ACCOUNTS.demo,
-      `/api/v1/me/applications?search=Orbit`,
+      `/api/v1/applications?search=Pixel`,
     );
     const jobId = (detail.json as { items: { jobId: string }[] }).items[0]!
       .jobId;
     await page.goto(`/my-applications?jobId=${jobId}`);
-    await expect(page.getByText(displayId(SEED.positionFilled))).toBeVisible();
+    await expect(page.getByText(displayId(SEED.offered))).toBeVisible();
     await expect(page.getByText(displayId(SEED.submitted))).toHaveCount(0);
     await page.getByRole("button", { name: "Clear job filter" }).click();
     await expect(page.getByText(displayId(SEED.submitted))).toBeVisible();
@@ -189,7 +190,7 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await page.goto("/my-applications?limit=50");
     const firstId = async () =>
       (await page.getByRole("row").nth(1).textContent()) ?? "";
-    expect(await firstId()).toContain(displayId(SEED.rowMenu)); // newest submitted first
+    await expect.poll(firstId).toContain(displayId(SEED.rowMenu)); // newest submitted first
     await page.getByRole("button", { name: "Submitted", exact: true }).click(); // toggles to ascending
     await expect(page).toHaveURL(/sortOrder=asc/);
     await expect.poll(firstId).toContain(displayId(SEED.hired)); // oldest submitted first
@@ -201,7 +202,7 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     const closed = (
       await api(
         ACCOUNTS.demo,
-        "/api/v1/me/applications?status=hired,rejected&limit=100",
+        "/api/v1/applications?status=hired,rejected&limit=100",
       )
     ).json as { items: { status: string }[]; total: number };
     expect(closed.total).toBe(2);
@@ -211,13 +212,14 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     const asc = (
       await api(
         ACCOUNTS.demo,
-        "/api/v1/me/applications?sortBy=submittedAt&sortOrder=asc&limit=100",
+        "/api/v1/applications?sortBy=submittedAt&sortOrder=asc&limit=100",
       )
     ).json as { items: { submittedAt: string }[] };
     const dates = asc.items.map((item) => item.submittedAt);
     expect([...dates].sort()).toEqual(dates);
-    const other = (await api(ACCOUNTS.other, "/api/v1/me/applications"))
-      .json as { total: number };
+    const other = (await api(ACCOUNTS.other, "/api/v1/applications")).json as {
+      total: number;
+    };
     expect(other.total).toBe(1);
   });
 });

@@ -93,8 +93,7 @@
       "offered": "Offered",
       "hired": "Hired",
       "rejected": "Rejected",
-      "withdrawn": "Withdrawn",
-      "position_filled": "Position filled"
+      "withdrawn": "Withdrawn"
     },
     "attachment": {
       "cv": "CV",
@@ -177,8 +176,7 @@
       "offered": "Offer received. The company will contact you by email with the details.",
       "hired": "You are hired. Congratulations!",
       "rejected": "Not selected this time. You can keep applying to other jobs.",
-      "withdrawn": "You withdrew this application.",
-      "position_filled": "The company filled this position. Your application is closed and can't be withdrawn."
+      "withdrawn": "You withdrew this application."
     },
     "history": {
       "title": "Status history",
@@ -219,7 +217,7 @@
       "reappliedAs": "Reapplied as {{id}}"
     },
     "applyAgain": "Apply again",
-    "applyAgainRule": "The job is still open. You can apply once more, as a new application; this one stays here as Withdrawn.",
+    "applyAgainRule": "The job is still open. You can apply once more, as a new application; this one stays here as it is.",
     "viewJob": "View job posting",
     "invalidLink": "This link isn't valid",
     "invalidLinkDescription": "The application address is malformed. Go back to your applications and open it from the list.",

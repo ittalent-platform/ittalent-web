@@ -23,7 +23,7 @@ const summary: ApplicationListResponse["items"][number] = {
   id, jobId: "507f1f77bcf86cd799439012", job: { title: "Kỹ sư Backend", companyName: "Công ty An", location: "Hà Nội", jobType: "Full-time", deadline: null, publicStatus: "closed" },
   status: "submitted", reviewStage: null, submittedDocuments: [], canWithdraw: true, submittedAt: "2026-09-01T10:00:00.000Z", latestStatusAt: "2026-09-02T10:00:00.000Z", withdrawnAt: null,
 };
-const list: ApplicationListResponse = { items: [summary], total: 1, totalPages: 1, page: 1, limit: 10, statusCounts: { submitted: 1, under_review: 0, interviewing: 0, offered: 0, hired: 0, rejected: 0, withdrawn: 0, position_filled: 0 } };
+const list: ApplicationListResponse = { items: [summary], total: 1, totalPages: 1, page: 1, limit: 10, statusCounts: { submitted: 1, under_review: 0, interviewing: 0, offered: 0, hired: 0, rejected: 0, withdrawn: 0 } };
 const detail: ApplicationDetailDto = { ...summary, message: null, withdrawalReason: null, attachments: [], version: 0, createdAt: summary.submittedAt, updatedAt: summary.latestStatusAt };
 const history: ApplicationHistoryResponse = { items: [{ status: "submitted", reviewStage: null, actorRole: "candidate", occurredAt: summary.submittedAt }], page: 1, limit: 100, total: 1, totalPages: 1 };
 
@@ -178,7 +178,7 @@ describe("Candidate My Applications", () => {
     expect(refetch).toHaveBeenCalled();
   });
 
-  it.each(["interviewing", "offered", "hired", "rejected", "position_filled", "withdrawn"] as const)("hides Withdraw for %s (UC-MYAPP-04.EX.3)", (status) => {
+  it.each(["interviewing", "offered", "hired", "rejected", "withdrawn"] as const)("hides Withdraw for %s (UC-MYAPP-04.EX.3)", (status) => {
     vi.mocked(applicationQueries.useApplication).mockReturnValue({ data: { ...detail, status, canWithdraw: false }, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplication>);
     renderApp(`/my-applications/${id}`);
     expect(screen.queryByRole("button", { name: "Withdraw application" })).not.toBeInTheDocument();

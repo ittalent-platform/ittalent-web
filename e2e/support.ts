@@ -22,15 +22,14 @@ export const SEED = {
   hired: 4,
   rejected: 5,
   withdrawnLinked: 6,
-  positionFilled: 7,
-  reapplication: 8,
-  withdrawnOpen: 9,
-  rowMenu: 10,
-  drag: 11,
-  bulkA: 12,
-  bulkB: 13,
+  reapplication: 7,
+  withdrawnOpen: 8,
+  rowMenu: 9,
+  drag: 10,
+  bulkA: 11,
+  bulkB: 12,
 } as const;
-export const TOTAL_APPLICATIONS = 14;
+export const TOTAL_APPLICATIONS = 13;
 const ID_BASE = 1001;
 
 const hex = (index: number) => (ID_BASE + index).toString(16).padStart(24, "0");

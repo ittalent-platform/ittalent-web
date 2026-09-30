@@ -22,6 +22,7 @@ export type RegisterResponse = {
         username: string;
         role: string;
         status: string;
+        enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
     };
@@ -48,6 +49,7 @@ export type AuthResponse = {
         username: string;
         role: string;
         status: string;
+        enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
     };
@@ -68,6 +70,7 @@ export type UserDto = {
     username: string;
     role: string;
     status: string;
+    enterpriseId: string | null;
     createdAt?: string;
     updatedAt?: string;
 };
@@ -137,6 +140,28 @@ export type ChangePasswordResponse = {
     data?: {
         [key: string]: unknown;
     };
+};
+
+export type JobPostingResponse = {
+    id: string;
+    enterpriseId: string;
+    postedByUserId: string;
+    title: string;
+    slug: string;
+    location?: string;
+    employmentType?: string;
+    salaryMin?: number;
+    salaryMax?: number;
+    currency: string;
+    level?: string;
+    description?: string;
+    requirements?: string;
+    benefits?: string;
+    openings?: number;
+    status: 'draft' | 'published' | 'archived';
+    expiresAt?: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type EnterpriseListResponse = {
@@ -312,6 +337,41 @@ export type EnterpriseMessageResponse = {
     message: string;
 };
 
+export type CreateApplicationRequest = {
+    jobPostingId: string;
+    cvId: string;
+    coverLetterId?: string;
+    message?: string;
+};
+
+export type ApplicationDto = {
+    id: string;
+    jobPostingId: string;
+    status: string;
+    cvId: string;
+    coverLetterId: string | null;
+    message: string | null;
+    reappliedFrom: string | null;
+    reappliedAs: string | null;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type MyApplicationResponse = {
+    item: {
+        id: string;
+        jobPostingId: string;
+        status: string;
+        cvId: string;
+        coverLetterId: string | null;
+        message: string | null;
+        reappliedFrom: string | null;
+        reappliedAs: string | null;
+        createdAt: string;
+        updatedAt: string;
+    } | null;
+};
+
 export type ApplicationDetailDto = {
     id: string;
     jobId: string;
@@ -323,7 +383,7 @@ export type ApplicationDetailDto = {
         deadline: string | null;
         publicStatus: string;
     };
-    status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+    status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn';
     reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
     submittedDocuments: Array<'cv' | 'cover_letter'>;
     canWithdraw: boolean;
@@ -364,7 +424,7 @@ export type ApplicationListResponse = {
             deadline: string | null;
             publicStatus: string;
         };
-        status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+        status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn';
         reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
         submittedDocuments: Array<'cv' | 'cover_letter'>;
         canWithdraw: boolean;
@@ -383,7 +443,6 @@ export type ApplicationListResponse = {
         hired: number;
         rejected: number;
         withdrawn: number;
-        position_filled: number;
     };
 };
 
@@ -393,7 +452,7 @@ export type ApplicationHistoryResponse = {
     total: number;
     totalPages: number;
     items: Array<{
-        status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+        status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn';
         reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
         actorRole: 'candidate' | 'company' | 'system';
         occurredAt: string;
@@ -701,6 +760,143 @@ export type GetApiV1AdminDocumentsResponses = {
     200: unknown;
 };
 
+export type GetApiV1JobPostingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/job-postings';
+};
+
+export type GetApiV1JobPostingsResponses = {
+    /**
+     * Paginated job postings
+     */
+    200: unknown;
+};
+
+export type PostApiV1JobPostingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/job-postings';
+};
+
+export type PostApiV1JobPostingsErrors = {
+    /**
+     * Recruiter access and enterprise membership required
+     */
+    403: unknown;
+};
+
+export type PostApiV1JobPostingsResponses = {
+    /**
+     * Job posting created
+     */
+    201: JobPostingResponse;
+};
+
+export type PostApiV1JobPostingsResponse = PostApiV1JobPostingsResponses[keyof PostApiV1JobPostingsResponses];
+
+export type GetApiV1RecruiterJobPostingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/recruiter/job-postings';
+};
+
+export type GetApiV1RecruiterJobPostingsErrors = {
+    /**
+     * Recruiter is not assigned to an enterprise
+     */
+    403: unknown;
+};
+
+export type GetApiV1RecruiterJobPostingsResponses = {
+    /**
+     * Enterprise job postings
+     */
+    200: unknown;
+};
+
+export type DeleteApiV1JobPostingsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}';
+};
+
+export type DeleteApiV1JobPostingsByIdErrors = {
+    /**
+     * Job posting belongs to another enterprise
+     */
+    403: unknown;
+};
+
+export type DeleteApiV1JobPostingsByIdResponses = {
+    /**
+     * Job posting deleted
+     */
+    204: void;
+};
+
+export type DeleteApiV1JobPostingsByIdResponse = DeleteApiV1JobPostingsByIdResponses[keyof DeleteApiV1JobPostingsByIdResponses];
+
+export type GetApiV1JobPostingsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}';
+};
+
+export type GetApiV1JobPostingsByIdErrors = {
+    /**
+     * Job posting belongs to another enterprise
+     */
+    403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+};
+
+export type GetApiV1JobPostingsByIdResponses = {
+    /**
+     * Job posting
+     */
+    200: JobPostingResponse;
+};
+
+export type GetApiV1JobPostingsByIdResponse = GetApiV1JobPostingsByIdResponses[keyof GetApiV1JobPostingsByIdResponses];
+
+export type PatchApiV1JobPostingsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}';
+};
+
+export type PatchApiV1JobPostingsByIdErrors = {
+    /**
+     * Job posting belongs to another enterprise
+     */
+    403: unknown;
+};
+
+export type PatchApiV1JobPostingsByIdResponses = {
+    /**
+     * Job posting updated
+     */
+    200: JobPostingResponse;
+};
+
+export type PatchApiV1JobPostingsByIdResponse = PatchApiV1JobPostingsByIdResponses[keyof PatchApiV1JobPostingsByIdResponses];
+
 export type GetApiV1UsersByIdData = {
     body?: never;
     path: {
@@ -940,7 +1136,40 @@ export type PatchApiV1EnterprisesByEnterpriseIdStatusResponses = {
 
 export type PatchApiV1EnterprisesByEnterpriseIdStatusResponse = PatchApiV1EnterprisesByEnterpriseIdStatusResponses[keyof PatchApiV1EnterprisesByEnterpriseIdStatusResponses];
 
-export type GetApiV1MeApplicationsData = {
+export type GetApiV1ApplicationsMineData = {
+    body?: never;
+    path?: never;
+    query: {
+        jobPostingId: string;
+    };
+    url: '/api/v1/applications/mine';
+};
+
+export type GetApiV1ApplicationsMineErrors = {
+    /**
+     * Invalid job posting ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not an Applicant
+     */
+    403: unknown;
+};
+
+export type GetApiV1ApplicationsMineResponses = {
+    /**
+     * The application (any status) or null
+     */
+    200: MyApplicationResponse;
+};
+
+export type GetApiV1ApplicationsMineResponse = GetApiV1ApplicationsMineResponses[keyof GetApiV1ApplicationsMineResponses];
+
+export type GetApiV1ApplicationsData = {
     body?: never;
     path?: never;
     query?: {
@@ -955,12 +1184,12 @@ export type GetApiV1MeApplicationsData = {
         submittedFrom?: string | null;
         submittedTo?: string | null;
     };
-    url: '/api/v1/me/applications';
+    url: '/api/v1/applications';
 };
 
-export type GetApiV1MeApplicationsErrors = {
+export type GetApiV1ApplicationsErrors = {
     /**
-     * Invalid or contradictory filter values
+     * Invalid or contradictory filter, sort or paging values
      */
     400: unknown;
     /**
@@ -968,32 +1197,71 @@ export type GetApiV1MeApplicationsErrors = {
      */
     401: unknown;
     /**
-     * Forbidden: candidate role required
+     * Forbidden: applicant role required, or the account cannot be resolved to a candidate
      */
     403: unknown;
 };
 
-export type GetApiV1MeApplicationsResponses = {
+export type GetApiV1ApplicationsResponses = {
     /**
-     * Paginated application list with status counts
+     * Paginated applications with status counts
      */
     200: ApplicationListResponse;
 };
 
-export type GetApiV1MeApplicationsResponse = GetApiV1MeApplicationsResponses[keyof GetApiV1MeApplicationsResponses];
+export type GetApiV1ApplicationsResponse = GetApiV1ApplicationsResponses[keyof GetApiV1ApplicationsResponses];
 
-export type GetApiV1MeApplicationsByIdData = {
+export type PostApiV1ApplicationsData = {
+    body: CreateApplicationRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/applications';
+};
+
+export type PostApiV1ApplicationsErrors = {
+    /**
+     * Validation failed (bad IDs, message too long, CV/cover letter not available)
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Email not verified, account not active, or caller is not an Applicant
+     */
+    403: unknown;
+    /**
+     * Job not found / no longer available
+     */
+    404: unknown;
+    /**
+     * ALREADY_APPLIED (an active application exists), APPLY_AGAIN_NOT_ALLOWED (Hired, or two applications already used), or POSITION_FILLED
+     */
+    409: unknown;
+};
+
+export type PostApiV1ApplicationsResponses = {
+    /**
+     * Application submitted
+     */
+    201: ApplicationDto;
+};
+
+export type PostApiV1ApplicationsResponse = PostApiV1ApplicationsResponses[keyof PostApiV1ApplicationsResponses];
+
+export type GetApiV1ApplicationsByIdData = {
     body?: never;
     path: {
         id: string;
     };
     query?: never;
-    url: '/api/v1/me/applications/{id}';
+    url: '/api/v1/applications/{id}';
 };
 
-export type GetApiV1MeApplicationsByIdErrors = {
+export type GetApiV1ApplicationsByIdErrors = {
     /**
-     * Invalid application ID format
+     * Invalid application ID
      */
     400: unknown;
     /**
@@ -1001,25 +1269,25 @@ export type GetApiV1MeApplicationsByIdErrors = {
      */
     401: unknown;
     /**
-     * Forbidden: candidate role required
+     * Forbidden: applicant role required, or the account cannot be resolved to a candidate
      */
     403: unknown;
     /**
-     * Application not found or not owned by the candidate
+     * Application not found or not owned by the caller
      */
     404: unknown;
 };
 
-export type GetApiV1MeApplicationsByIdResponses = {
+export type GetApiV1ApplicationsByIdResponses = {
     /**
      * Application detail
      */
     200: ApplicationDetailDto;
 };
 
-export type GetApiV1MeApplicationsByIdResponse = GetApiV1MeApplicationsByIdResponses[keyof GetApiV1MeApplicationsByIdResponses];
+export type GetApiV1ApplicationsByIdResponse = GetApiV1ApplicationsByIdResponses[keyof GetApiV1ApplicationsByIdResponses];
 
-export type GetApiV1MeApplicationsByIdHistoryData = {
+export type GetApiV1ApplicationsByIdHistoryData = {
     body?: never;
     path: {
         id: string;
@@ -1028,12 +1296,12 @@ export type GetApiV1MeApplicationsByIdHistoryData = {
         page?: number;
         limit?: number;
     };
-    url: '/api/v1/me/applications/{id}/history';
+    url: '/api/v1/applications/{id}/history';
 };
 
-export type GetApiV1MeApplicationsByIdHistoryErrors = {
+export type GetApiV1ApplicationsByIdHistoryErrors = {
     /**
-     * Invalid application ID format
+     * Invalid application ID or paging values
      */
     400: unknown;
     /**
@@ -1041,36 +1309,36 @@ export type GetApiV1MeApplicationsByIdHistoryErrors = {
      */
     401: unknown;
     /**
-     * Forbidden: candidate role required
+     * Forbidden: applicant role required, or the account cannot be resolved to a candidate
      */
     403: unknown;
     /**
-     * Application not found or not owned by the candidate
+     * Application not found or not owned by the caller
      */
     404: unknown;
 };
 
-export type GetApiV1MeApplicationsByIdHistoryResponses = {
+export type GetApiV1ApplicationsByIdHistoryResponses = {
     /**
-     * Paginated application history
+     * Paginated history
      */
     200: ApplicationHistoryResponse;
 };
 
-export type GetApiV1MeApplicationsByIdHistoryResponse = GetApiV1MeApplicationsByIdHistoryResponses[keyof GetApiV1MeApplicationsByIdHistoryResponses];
+export type GetApiV1ApplicationsByIdHistoryResponse = GetApiV1ApplicationsByIdHistoryResponses[keyof GetApiV1ApplicationsByIdHistoryResponses];
 
-export type PatchApiV1MeApplicationsByIdWithdrawData = {
-    body?: WithdrawApplicationBody;
+export type PatchApiV1ApplicationsByIdWithdrawData = {
+    body: WithdrawApplicationBody;
     path: {
         id: string;
     };
     query?: never;
-    url: '/api/v1/me/applications/{id}/withdraw';
+    url: '/api/v1/applications/{id}/withdraw';
 };
 
-export type PatchApiV1MeApplicationsByIdWithdrawErrors = {
+export type PatchApiV1ApplicationsByIdWithdrawErrors = {
     /**
-     * Validation failed: application not in withdrawable state, reason too long, or missing expectedVersion
+     * Invalid input, or the status is not Submitted / Under Review
      */
     400: unknown;
     /**
@@ -1078,24 +1346,24 @@ export type PatchApiV1MeApplicationsByIdWithdrawErrors = {
      */
     401: unknown;
     /**
-     * Forbidden: candidate role required
+     * Forbidden: applicant role required, or the account cannot be resolved to a candidate
      */
     403: unknown;
     /**
-     * Application not found or not owned by the candidate
+     * Application not found or not owned by the caller
      */
     404: unknown;
     /**
-     * Concurrent modification: the expectedVersion did not match the current application version
+     * The application changed after the client read it
      */
     409: unknown;
 };
 
-export type PatchApiV1MeApplicationsByIdWithdrawResponses = {
+export type PatchApiV1ApplicationsByIdWithdrawResponses = {
     /**
-     * Application detail after withdrawal
+     * Application after withdrawal
      */
     200: ApplicationDetailDto;
 };
 
-export type PatchApiV1MeApplicationsByIdWithdrawResponse = PatchApiV1MeApplicationsByIdWithdrawResponses[keyof PatchApiV1MeApplicationsByIdWithdrawResponses];
+export type PatchApiV1ApplicationsByIdWithdrawResponse = PatchApiV1ApplicationsByIdWithdrawResponses[keyof PatchApiV1ApplicationsByIdWithdrawResponses];

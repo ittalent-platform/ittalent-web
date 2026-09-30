@@ -91,8 +91,7 @@
       "offered": "Đã nhận offer",
       "hired": "Đã trúng tuyển",
       "rejected": "Bị từ chối",
-      "withdrawn": "Đã rút đơn",
-      "position_filled": "Đã đủ người"
+      "withdrawn": "Đã rút đơn"
     },
     "attachment": {
       "cv": "CV",
@@ -173,8 +172,7 @@
       "offered": "Bạn đã nhận offer. Công ty sẽ liên hệ qua email với thông tin chi tiết.",
       "hired": "Bạn đã trúng tuyển. Chúc mừng!",
       "rejected": "Lần này bạn chưa được chọn. Bạn có thể tiếp tục ứng tuyển các vị trí khác.",
-      "withdrawn": "Bạn đã rút đơn ứng tuyển này.",
-      "position_filled": "Công ty đã tuyển đủ người cho vị trí này. Đơn của bạn đã đóng và không thể rút."
+      "withdrawn": "Bạn đã rút đơn ứng tuyển này."
     },
     "history": {
       "title": "Lịch sử trạng thái",
@@ -215,7 +213,7 @@
       "reappliedAs": "Đã ứng tuyển lại: {{id}}"
     },
     "applyAgain": "Ứng tuyển lại",
-    "applyAgainRule": "Vị trí vẫn còn mở. Bạn có thể ứng tuyển lại một lần bằng đơn mới; đơn này vẫn ở trạng thái Đã rút đơn.",
+    "applyAgainRule": "Vị trí vẫn còn mở. Bạn có thể ứng tuyển lại một lần bằng đơn mới; đơn này giữ nguyên như hiện tại.",
     "viewJob": "Xem tin tuyển dụng",
     "invalidLink": "Liên kết không hợp lệ",
     "invalidLinkDescription": "Địa chỉ đơn ứng tuyển bị sai. Hãy quay lại danh sách và mở đơn từ đó.",
