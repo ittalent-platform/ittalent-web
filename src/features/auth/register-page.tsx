@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -6,6 +7,7 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { postApiV1AuthRegister } from "@/api/generated";
 import { authClient } from "@/auth/auth-client";
+import { authKeys } from "@/auth/use-session";
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
@@ -49,6 +51,7 @@ function PasswordRules({ password, confirmPassword }: { password: string; confir
 
 export function RegisterPage() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const [deliveryFailed, setDeliveryFailed] = useState(false);
@@ -86,6 +89,7 @@ export function RegisterPage() {
       }
 
       authClient.login(result.data.tokens, result.data.user);
+      queryClient.setQueryData(authKeys.me(), result.data.user);
       setSubmittedEmail(values.email);
       if (!result.data.verificationEmailSent) {
         setDeliveryFailed(true);
