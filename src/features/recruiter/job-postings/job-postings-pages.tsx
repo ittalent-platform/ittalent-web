@@ -1,16 +1,13 @@
-import {
-  JobPostingCreatePage,
-  JobPostingDetailPage,
-  JobPostingEditPage,
-  JobPostingListPage,
-} from "@/features/job-postings/job-posting-management-pages";
+import { JobPostingDetailPage } from "@/features/job-postings/job-posting-detail-page";
+import { JobPostingCreatePage, JobPostingEditPage } from "@/features/job-postings/job-posting-editor-pages";
+import { JobPostingListPage } from "@/features/job-postings/job-posting-list-page";
 
 export function RecruiterCreateJobPostingPage() {
-  return <JobPostingCreatePage actor="recruiter" />;
+  return <JobPostingCreatePage />;
 }
 
 export function RecruiterEditJobPostingPage() {
-  return <JobPostingEditPage actor="recruiter" />;
+  return <JobPostingEditPage />;
 }
 
 export function RecruiterJobPostingDetailPage() {
