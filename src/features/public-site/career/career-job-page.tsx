@@ -22,7 +22,7 @@ import {
   getApiV1JobPostings,
   getApiV1JobPostingsByIdPublic,
   type EnterpriseDetailDto,
-  type JobPostingResponse,
+  type JobPosting,
 } from "@/api/generated";
 
 import { ApplyButton } from "./apply-button";
@@ -47,7 +47,7 @@ type Job = {
   createdAt?: string;
 };
 
-const toJob = (dto: JobPostingResponse): Job => ({
+const toJob = (dto: JobPosting): Job => ({
   _id: dto.id,
   enterpriseId: dto.enterpriseId,
   title: dto.title,
@@ -202,7 +202,7 @@ export function CareerJobPage() {
   const { data: companyJobs } = useQuery({
     queryKey: ["enterprise-jobs", enterpriseId],
     queryFn: async () => {
-      const result = await getApiV1JobPostings({ query: { enterprise_id: enterpriseId!, limit: 100, page: 1, status: "published" } });
+      const result = await getApiV1JobPostings({ query: { enterprise_id: enterpriseId!, limit: 100, page: 1 } });
       if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
       const now = Date.now();
       const jobs = result.data.items

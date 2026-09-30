@@ -532,7 +532,7 @@
           "message"
         ]
       },
-      "DocumentResponse": {
+      "Document": {
         "type": "object",
         "properties": {
           "id": {
@@ -576,26 +576,119 @@
           "createdAt"
         ]
       },
-      "PaginatedDocumentsResponse": {
+      "UploadDocumentRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "cv",
+              "cover_letter"
+            ]
+          },
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "PDF, DOC, or DOCX file up to 5 MB"
+          }
+        },
+        "required": [
+          "type",
+          "file"
+        ]
+      },
+      "DocumentListQuery": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "cv",
+              "cover_letter"
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          "sort_order": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "default": "desc"
+          }
+        }
+      },
+      "PaginatedDocuments": {
         "type": "object",
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DocumentResponse"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "ownerId": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "cv",
+                    "cover_letter"
+                  ]
+                },
+                "fileUrl": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "fileName": {
+                  "type": "string"
+                },
+                "mimeType": {
+                  "type": "string"
+                },
+                "size": {
+                  "type": "number"
+                },
+                "createdAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "ownerId",
+                "type",
+                "fileUrl",
+                "fileName",
+                "mimeType",
+                "size",
+                "createdAt"
+              ]
             }
           },
           "page": {
-            "type": "number"
+            "type": "integer"
           },
           "limit": {
-            "type": "number"
+            "type": "integer"
           },
           "total": {
-            "type": "number"
+            "type": "integer"
           },
           "totalPages": {
-            "type": "number"
+            "type": "integer"
           }
         },
         "required": [
@@ -606,7 +699,27 @@
           "totalPages"
         ]
       },
-      "JobPostingResponse": {
+      "JobPostingEnterpriseSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "logoUrl"
+        ]
+      },
+      "JobPosting": {
         "type": "object",
         "properties": {
           "id": {
@@ -614,6 +727,26 @@
           },
           "enterpriseId": {
             "type": "string"
+          },
+          "enterprise": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "logoUrl": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "logoUrl"
+            ]
           },
           "postedByUserId": {
             "type": "string"
@@ -635,6 +768,9 @@
           },
           "salaryMax": {
             "type": "number"
+          },
+          "salaryNegotiable": {
+            "type": "boolean"
           },
           "currency": {
             "type": "string"
@@ -662,6 +798,16 @@
               "archived"
             ]
           },
+          "recruitmentStatus": {
+            "type": "string",
+            "enum": [
+              "open",
+              "closed"
+            ]
+          },
+          "applicationCount": {
+            "type": "integer"
+          },
           "expiresAt": {
             "type": "string"
           },
@@ -675,35 +821,357 @@
         "required": [
           "id",
           "enterpriseId",
+          "enterprise",
           "postedByUserId",
           "title",
           "slug",
+          "salaryNegotiable",
           "currency",
           "status",
+          "recruitmentStatus",
           "createdAt",
           "updatedAt"
         ]
       },
-      "PaginatedJobPostingsResponse": {
+      "CreateJobPostingRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 150
+          },
+          "location": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "employment_type": {
+            "type": "string",
+            "enum": [
+              "Full-time",
+              "Part-time",
+              "Internship",
+              "Contract",
+              "Remote"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000
+          },
+          "requirements": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000
+          },
+          "benefits": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "salary_min": {
+            "type": "number",
+            "minimum": 0
+          },
+          "salary_max": {
+            "type": "number",
+            "minimum": 0
+          },
+          "salary_negotiable": {
+            "type": "boolean"
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "level": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "openings": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "title",
+          "location",
+          "employment_type",
+          "description",
+          "requirements",
+          "benefits",
+          "expires_at"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateJobPostingRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 150
+          },
+          "location": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "employment_type": {
+            "type": "string",
+            "enum": [
+              "Full-time",
+              "Part-time",
+              "Internship",
+              "Contract",
+              "Remote"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000
+          },
+          "requirements": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000
+          },
+          "benefits": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "salary_min": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0
+          },
+          "salary_max": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0
+          },
+          "salary_negotiable": {
+            "type": "boolean"
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "level": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "openings": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "JobPostingListQuery": {
+        "type": "object",
+        "properties": {
+          "search": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "location": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "employment_type": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "level": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "enterprise_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "sort_by": {
+            "type": "string",
+            "enum": [
+              "created_at",
+              "title",
+              "expires_at"
+            ],
+            "default": "created_at"
+          },
+          "sort_order": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "default": "desc"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        }
+      },
+      "PaginatedJobPostings": {
         "type": "object",
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/JobPostingResponse"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "enterpriseId": {
+                  "type": "string"
+                },
+                "enterprise": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "logoUrl": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "logoUrl"
+                  ]
+                },
+                "postedByUserId": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "location": {
+                  "type": "string"
+                },
+                "employmentType": {
+                  "type": "string"
+                },
+                "salaryMin": {
+                  "type": "number"
+                },
+                "salaryMax": {
+                  "type": "number"
+                },
+                "salaryNegotiable": {
+                  "type": "boolean"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "level": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "requirements": {
+                  "type": "string"
+                },
+                "benefits": {
+                  "type": "string"
+                },
+                "openings": {
+                  "type": "number"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "draft",
+                    "published",
+                    "archived"
+                  ]
+                },
+                "recruitmentStatus": {
+                  "type": "string",
+                  "enum": [
+                    "open",
+                    "closed"
+                  ]
+                },
+                "applicationCount": {
+                  "type": "integer"
+                },
+                "expiresAt": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "enterpriseId",
+                "enterprise",
+                "postedByUserId",
+                "title",
+                "slug",
+                "salaryNegotiable",
+                "currency",
+                "status",
+                "recruitmentStatus",
+                "createdAt",
+                "updatedAt"
+              ]
             }
           },
           "page": {
-            "type": "number"
+            "type": "integer"
           },
           "limit": {
-            "type": "number"
+            "type": "integer"
           },
           "total": {
-            "type": "number"
+            "type": "integer"
           },
           "totalPages": {
-            "type": "number"
+            "type": "integer"
           }
         },
         "required": [
@@ -713,6 +1181,108 @@
           "total",
           "totalPages"
         ]
+      },
+      "UserListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "fullName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "phone": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "role": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "emailVerified": {
+                  "type": "boolean"
+                },
+                "enterpriseId": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "email",
+                "username",
+                "fullName",
+                "phone",
+                "role",
+                "status",
+                "emailVerified",
+                "enterpriseId"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "user"
+            ]
+          }
+        },
+        "additionalProperties": false
       },
       "EnterpriseListResponse": {
         "type": "object",
@@ -759,8 +1329,28 @@
                   },
                   "default": []
                 },
+                "openRoleCount": {
+                  "type": "number",
+                  "default": 0
+                },
                 "status": {
                   "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "phone": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "creatorAccountId": {
+                  "type": "string",
+                  "nullable": true
                 }
               },
               "required": [
@@ -963,6 +1553,7 @@
           },
           "socialLinks": {
             "type": "object",
+            "nullable": true,
             "properties": {
               "linkedin": {
                 "anyOf": [
@@ -1020,8 +1611,7 @@
                   }
                 ]
               }
-            },
-            "nullable": true
+            }
           },
           "workingDays": {
             "type": "string",
@@ -2222,36 +2812,6 @@
         "required": [
           "expectedVersion"
         ]
-      },
-      "UserListResponse": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserDTO"
-            }
-          },
-          "total": {
-            "type": "integer"
-          },
-          "page": {
-            "type": "integer"
-          },
-          "limit": {
-            "type": "integer"
-          },
-          "totalPages": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "total",
-          "page",
-          "limit",
-          "totalPages"
-        ]
       }
     },
     "parameters": {}
@@ -2616,9 +3176,35 @@
             "bearerAuth": []
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadDocumentRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
-            "description": "Document uploaded"
+            "description": "Document uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid document type or file"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "502": {
+            "description": "Document storage upload failed"
           }
         }
       },
@@ -2682,14 +3268,20 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated documents",
+            "description": "Paginated documents owned by the caller",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedDocumentsResponse"
+                  "$ref": "#/components/schemas/PaginatedDocuments"
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid document list query"
+          },
+          "401": {
+            "description": "Authentication required"
           }
         }
       }
@@ -2705,9 +3297,73 @@
             "bearerAuth": []
           }
         ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cv",
+                "cover_letter"
+              ]
+            },
+            "required": false,
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "required": false,
+            "name": "sort_order",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Paginated documents"
+            "description": "Paginated documents across all owners",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedDocuments"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid document list query"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Administrator role required"
           }
         }
       }
@@ -2732,21 +3388,8 @@
           {
             "schema": {
               "type": "string",
-              "enum": [
-                "draft",
-                "published",
-                "archived"
-              ]
-            },
-            "required": false,
-            "name": "status",
-            "in": "query"
-          },
-          {
-            "schema": {
-              "type": "string",
               "minLength": 1,
-              "maxLength": 200
+              "maxLength": 150
             },
             "required": false,
             "name": "location",
@@ -2774,7 +3417,8 @@
           },
           {
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
             },
             "required": false,
             "name": "enterprise_id",
@@ -2831,14 +3475,17 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated job postings",
+            "description": "Paginated published job postings",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedJobPostingsResponse"
+                  "$ref": "#/components/schemas/PaginatedJobPostings"
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid list filter, sort, or pagination value"
           }
         }
       },
@@ -2846,25 +3493,80 @@
         "tags": [
           "Job Postings"
         ],
-        "summary": "Create a job posting for the authenticated recruiter enterprise",
+        "summary": "Create and publish a job posting for the authenticated recruiter enterprise",
+        "description": "Saving always publishes: the posting is Published and Open. There is no status field and sending one is rejected. The enterprise is derived from the session and must be Active. The deadline is a date (YYYY-MM-DD) meaning the end of that day in Asia/Ho_Chi_Minh and must be today or later.",
         "security": [
           {
             "bearerAuth": []
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJobPostingRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Job posting created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JobPostingResponse"
+                  "$ref": "#/components/schemas/JobPosting"
                 }
               }
             }
           },
+          "400": {
+            "description": "Invalid job posting payload"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
           "403": {
-            "description": "Recruiter access and enterprise membership required"
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/public": {
+      "get": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Get a published, still-open job posting (public)",
+        "description": "Not found for drafts, archived or expired postings, postings being deleted and postings of enterprises that are not Active.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid job posting ID"
+          },
+          "404": {
+            "description": "Job posting not found, not published, or no longer open"
           }
         }
       }
@@ -2880,12 +3582,257 @@
             "bearerAuth": []
           }
         ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 150
+            },
+            "required": false,
+            "name": "location",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "employment_type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "level",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterprise_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "title",
+                "expires_at"
+              ],
+              "default": "created_at"
+            },
+            "required": false,
+            "name": "sort_by",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "required": false,
+            "name": "sort_order",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Enterprise job postings"
+            "description": "Paginated job postings for the recruiter enterprise",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedJobPostings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid list filter, sort, or pagination value"
+          },
+          "401": {
+            "description": "Authentication required"
           },
           "403": {
-            "description": "Recruiter is not assigned to an enterprise"
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/job-postings": {
+      "get": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "List all job postings for administrators",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 150
+            },
+            "required": false,
+            "name": "location",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "employment_type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "level",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterprise_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "title",
+                "expires_at"
+              ],
+              "default": "created_at"
+            },
+            "required": false,
+            "name": "sort_by",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "required": false,
+            "name": "sort_order",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated job postings across all enterprises",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedJobPostings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid list filter, sort, or pagination value"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Administrator role required"
           }
         }
       }
@@ -2895,7 +3842,7 @@
         "tags": [
           "Job Postings"
         ],
-        "summary": "Get a job posting for management",
+        "summary": "Get a job posting for management (recruiter of the owning enterprise, or admin read-only)",
         "security": [
           {
             "bearerAuth": []
@@ -2918,13 +3865,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JobPostingResponse"
+                  "$ref": "#/components/schemas/JobPosting"
                 }
               }
             }
           },
+          "400": {
+            "description": "Invalid job posting ID"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
           "403": {
-            "description": "Job posting belongs to another enterprise"
+            "description": "Caller lacks the required role or cannot manage this job posting"
           },
           "404": {
             "description": "Job posting not found"
@@ -2936,6 +3889,7 @@
           "Job Postings"
         ],
         "summary": "Update a job posting for management",
+        "description": "Recruiters of the owning enterprise only. Omit a field to leave it unchanged; send null to clear salary_min, salary_max, level or openings. Publication status, enterprise ownership and application data cannot be changed and are rejected. Archived postings (legacy data) cannot be edited.",
         "security": [
           {
             "bearerAuth": []
@@ -2952,19 +3906,38 @@
             "in": "path"
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateJobPostingRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Job posting updated",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JobPostingResponse"
+                  "$ref": "#/components/schemas/JobPosting"
                 }
               }
             }
           },
+          "400": {
+            "description": "Invalid job posting ID or update payload"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
           "403": {
-            "description": "Job posting belongs to another enterprise"
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
           }
         }
       },
@@ -2973,6 +3946,7 @@
           "Job Postings"
         ],
         "summary": "Delete a job posting for management",
+        "description": "Recruiters of the owning enterprise only. Hard-removes the posting in any state, and only while no application has ever been recorded for it.",
         "security": [
           {
             "bearerAuth": []
@@ -2993,8 +3967,20 @@
           "204": {
             "description": "Job posting deleted"
           },
+          "400": {
+            "description": "Invalid job posting ID"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
           "403": {
-            "description": "Job posting belongs to another enterprise"
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Cannot delete job posting because applications already exist (or it is already being deleted)"
           }
         }
       }
@@ -3145,8 +4131,9 @@
         "tags": [
           "Users"
         ],
+        "operationId": "patchApiV1UsersById",
         "summary": "Edit a user account",
-        "description": "System Administrator only (UC-USER-03). Changes only the fields sent: `fullName` (2–100 characters), `phone` (9–15 digits, optional leading +; null or an empty string clears it) and `role` (`admin` or `user`). Email and status are not editable here, and an administrator cannot change their own role.",
+        "description": "System Administrator only. Updates only fullName, phone, and role; null or an empty phone clears the stored number. An administrator cannot change their own role.",
         "security": [
           {
             "bearerAuth": []
@@ -3168,33 +4155,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "fullName": {
-                    "type": "string",
-                    "minLength": 2,
-                    "maxLength": 100
-                  },
-                  "phone": {
-                    "type": "string",
-                    "nullable": true
-                  },
-                  "role": {
-                    "type": "string",
-                    "enum": [
-                      "admin",
-                      "user"
-                    ]
-                  }
-                },
-                "additionalProperties": false
+                "$ref": "#/components/schemas/UpdateUserRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "The updated user account",
+            "description": "Updated user account",
             "content": {
               "application/json": {
                 "schema": {
@@ -3204,19 +4172,19 @@
             }
           },
           "400": {
-            "description": "Invalid user ID or body, or nothing to update"
+            "description": "Invalid user ID or update body"
           },
           "401": {
             "description": "Authentication required"
           },
           "403": {
-            "description": "Caller is not a System Administrator, or is changing their own role"
+            "description": "Administrator role required or self-role change blocked"
           },
           "404": {
             "description": "User not found"
           },
           "503": {
-            "description": "Account storage unavailable, retry later"
+            "description": "Account storage unavailable"
           }
         }
       },
@@ -3997,40 +4965,6 @@
           },
           "409": {
             "description": "The application changed after the client read it"
-          }
-        }
-      }
-    },
-    "/api/v1/job-postings/{id}/public": {
-      "get": {
-        "tags": [
-          "Job Postings"
-        ],
-        "summary": "Get a published, still-open job posting (public)",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^[0-9a-fA-F]{24}$"
-            },
-            "required": true,
-            "name": "id",
-            "in": "path"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Job posting",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JobPostingResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Job posting not found, not published, or expired"
           }
         }
       }

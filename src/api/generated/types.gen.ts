@@ -151,7 +151,7 @@ export type ChangePasswordResponse = {
     };
 };
 
-export type DocumentResponse = {
+export type Document = {
     id: string;
     ownerId: string;
     type: 'cv' | 'cover_letter';
@@ -162,17 +162,52 @@ export type DocumentResponse = {
     createdAt: string;
 };
 
-export type PaginatedDocumentsResponse = {
-    items: Array<DocumentResponse>;
+export type UploadDocumentRequest = {
+    type: 'cv' | 'cover_letter';
+    /**
+     * PDF, DOC, or DOCX file up to 5 MB
+     */
+    file: Blob | File;
+};
+
+export type DocumentListQuery = {
+    type?: 'cv' | 'cover_letter';
+    page?: number;
+    limit?: number;
+    sort_order?: 'asc' | 'desc';
+};
+
+export type PaginatedDocuments = {
+    items: Array<{
+        id: string;
+        ownerId: string;
+        type: 'cv' | 'cover_letter';
+        fileUrl: string;
+        fileName: string;
+        mimeType: string;
+        size: number;
+        createdAt: string;
+    }>;
     page: number;
     limit: number;
     total: number;
     totalPages: number;
 };
 
-export type JobPostingResponse = {
+export type JobPostingEnterpriseSummary = {
+    id: string;
+    name: string;
+    logoUrl: string | null;
+};
+
+export type JobPosting = {
     id: string;
     enterpriseId: string;
+    enterprise: {
+        id: string;
+        name: string;
+        logoUrl: string | null;
+    };
     postedByUserId: string;
     title: string;
     slug: string;
@@ -180,6 +215,7 @@ export type JobPostingResponse = {
     employmentType?: string;
     salaryMin?: number;
     salaryMax?: number;
+    salaryNegotiable: boolean;
     currency: string;
     level?: string;
     description?: string;
@@ -187,17 +223,117 @@ export type JobPostingResponse = {
     benefits?: string;
     openings?: number;
     status: 'draft' | 'published' | 'archived';
+    recruitmentStatus: 'open' | 'closed';
+    applicationCount?: number;
     expiresAt?: string;
     createdAt: string;
     updatedAt: string;
 };
 
-export type PaginatedJobPostingsResponse = {
-    items: Array<JobPostingResponse>;
+export type CreateJobPostingRequest = {
+    title: string;
+    location: string;
+    employment_type: 'Full-time' | 'Part-time' | 'Internship' | 'Contract' | 'Remote';
+    description: string;
+    requirements: string;
+    benefits: string;
+    expires_at: string;
+    salary_min?: number;
+    salary_max?: number;
+    salary_negotiable?: boolean;
+    currency?: string;
+    level?: string;
+    openings?: number;
+};
+
+export type UpdateJobPostingRequest = {
+    title?: string;
+    location?: string;
+    employment_type?: 'Full-time' | 'Part-time' | 'Internship' | 'Contract' | 'Remote';
+    description?: string;
+    requirements?: string;
+    benefits?: string;
+    expires_at?: string;
+    salary_min?: number | null;
+    salary_max?: number | null;
+    salary_negotiable?: boolean;
+    currency?: string;
+    level?: string | null;
+    openings?: number | null;
+};
+
+export type JobPostingListQuery = {
+    search?: string;
+    location?: string;
+    employment_type?: string;
+    level?: string;
+    enterprise_id?: string;
+    sort_by?: 'created_at' | 'title' | 'expires_at';
+    sort_order?: 'asc' | 'desc';
+    page?: number;
+    limit?: number;
+};
+
+export type PaginatedJobPostings = {
+    items: Array<{
+        id: string;
+        enterpriseId: string;
+        enterprise: {
+            id: string;
+            name: string;
+            logoUrl: string | null;
+        };
+        postedByUserId: string;
+        title: string;
+        slug: string;
+        location?: string;
+        employmentType?: string;
+        salaryMin?: number;
+        salaryMax?: number;
+        salaryNegotiable: boolean;
+        currency: string;
+        level?: string;
+        description?: string;
+        requirements?: string;
+        benefits?: string;
+        openings?: number;
+        status: 'draft' | 'published' | 'archived';
+        recruitmentStatus: 'open' | 'closed';
+        applicationCount?: number;
+        expiresAt?: string;
+        createdAt: string;
+        updatedAt: string;
+    }>;
     page: number;
     limit: number;
     total: number;
     totalPages: number;
+};
+
+export type UserListResponse = {
+    items: Array<{
+        id: string;
+        email: string;
+        username: string;
+        fullName: string | null;
+        phone: string | null;
+        role: string;
+        status: string;
+        emailVerified: boolean;
+        enterpriseId: string | null;
+        createdAt?: string;
+        updatedAt?: string;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type UpdateUserRequest = {
+    fullName?: string;
+    phone?: string | null;
+    role?: 'admin' | 'user';
 };
 
 export type EnterpriseListResponse = {
@@ -211,7 +347,12 @@ export type EnterpriseListResponse = {
         companySize: string | null;
         companyType: string | null;
         techStack?: Array<string>;
+        openRoleCount?: number;
         status: string;
+        email?: string | null;
+        phone?: string | null;
+        createdAt?: string | null;
+        creatorAccountId?: string | null;
     }>;
     page: number;
     limit: number;
@@ -485,14 +626,6 @@ export type WithdrawApplicationBody = {
     reason?: string;
 };
 
-export type UserListResponse = {
-    items: Array<UserDto>;
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-};
-
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -759,49 +892,98 @@ export type GetApiV1DocumentsData = {
     url: '/api/v1/documents';
 };
 
+export type GetApiV1DocumentsErrors = {
+    /**
+     * Invalid document list query
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+};
+
 export type GetApiV1DocumentsResponses = {
     /**
-     * Paginated documents
+     * Paginated documents owned by the caller
      */
-    200: PaginatedDocumentsResponse;
+    200: PaginatedDocuments;
 };
 
 export type GetApiV1DocumentsResponse = GetApiV1DocumentsResponses[keyof GetApiV1DocumentsResponses];
 
 export type PostApiV1DocumentsData = {
-    body?: never;
+    body: UploadDocumentRequest;
     path?: never;
     query?: never;
     url: '/api/v1/documents';
+};
+
+export type PostApiV1DocumentsErrors = {
+    /**
+     * Invalid document type or file
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Document storage upload failed
+     */
+    502: unknown;
 };
 
 export type PostApiV1DocumentsResponses = {
     /**
      * Document uploaded
      */
-    201: unknown;
+    201: Document;
 };
+
+export type PostApiV1DocumentsResponse = PostApiV1DocumentsResponses[keyof PostApiV1DocumentsResponses];
 
 export type GetApiV1AdminDocumentsData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        type?: 'cv' | 'cover_letter';
+        page?: number;
+        limit?: number;
+        sort_order?: 'asc' | 'desc';
+    };
     url: '/api/v1/admin/documents';
+};
+
+export type GetApiV1AdminDocumentsErrors = {
+    /**
+     * Invalid document list query
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Administrator role required
+     */
+    403: unknown;
 };
 
 export type GetApiV1AdminDocumentsResponses = {
     /**
-     * Paginated documents
+     * Paginated documents across all owners
      */
-    200: unknown;
+    200: PaginatedDocuments;
 };
+
+export type GetApiV1AdminDocumentsResponse = GetApiV1AdminDocumentsResponses[keyof GetApiV1AdminDocumentsResponses];
 
 export type GetApiV1JobPostingsData = {
     body?: never;
     path?: never;
     query?: {
         search?: string;
-        status?: 'draft' | 'published' | 'archived';
         location?: string;
         employment_type?: string;
         level?: string;
@@ -814,17 +996,24 @@ export type GetApiV1JobPostingsData = {
     url: '/api/v1/job-postings';
 };
 
+export type GetApiV1JobPostingsErrors = {
+    /**
+     * Invalid list filter, sort, or pagination value
+     */
+    400: unknown;
+};
+
 export type GetApiV1JobPostingsResponses = {
     /**
-     * Paginated job postings
+     * Paginated published job postings
      */
-    200: PaginatedJobPostingsResponse;
+    200: PaginatedJobPostings;
 };
 
 export type GetApiV1JobPostingsResponse = GetApiV1JobPostingsResponses[keyof GetApiV1JobPostingsResponses];
 
 export type PostApiV1JobPostingsData = {
-    body?: never;
+    body: CreateJobPostingRequest;
     path?: never;
     query?: never;
     url: '/api/v1/job-postings';
@@ -832,7 +1021,15 @@ export type PostApiV1JobPostingsData = {
 
 export type PostApiV1JobPostingsErrors = {
     /**
-     * Recruiter access and enterprise membership required
+     * Invalid job posting payload
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
      */
     403: unknown;
 };
@@ -841,31 +1038,121 @@ export type PostApiV1JobPostingsResponses = {
     /**
      * Job posting created
      */
-    201: JobPostingResponse;
+    201: JobPosting;
 };
 
 export type PostApiV1JobPostingsResponse = PostApiV1JobPostingsResponses[keyof PostApiV1JobPostingsResponses];
 
+export type GetApiV1JobPostingsByIdPublicData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}/public';
+};
+
+export type GetApiV1JobPostingsByIdPublicErrors = {
+    /**
+     * Invalid job posting ID
+     */
+    400: unknown;
+    /**
+     * Job posting not found, not published, or no longer open
+     */
+    404: unknown;
+};
+
+export type GetApiV1JobPostingsByIdPublicResponses = {
+    /**
+     * Job posting
+     */
+    200: JobPosting;
+};
+
+export type GetApiV1JobPostingsByIdPublicResponse = GetApiV1JobPostingsByIdPublicResponses[keyof GetApiV1JobPostingsByIdPublicResponses];
+
 export type GetApiV1RecruiterJobPostingsData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        search?: string;
+        location?: string;
+        employment_type?: string;
+        level?: string;
+        enterprise_id?: string;
+        sort_by?: 'created_at' | 'title' | 'expires_at';
+        sort_order?: 'asc' | 'desc';
+        page?: number;
+        limit?: number;
+    };
     url: '/api/v1/recruiter/job-postings';
 };
 
 export type GetApiV1RecruiterJobPostingsErrors = {
     /**
-     * Recruiter is not assigned to an enterprise
+     * Invalid list filter, sort, or pagination value
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
      */
     403: unknown;
 };
 
 export type GetApiV1RecruiterJobPostingsResponses = {
     /**
-     * Enterprise job postings
+     * Paginated job postings for the recruiter enterprise
      */
-    200: unknown;
+    200: PaginatedJobPostings;
 };
+
+export type GetApiV1RecruiterJobPostingsResponse = GetApiV1RecruiterJobPostingsResponses[keyof GetApiV1RecruiterJobPostingsResponses];
+
+export type GetApiV1AdminJobPostingsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        search?: string;
+        location?: string;
+        employment_type?: string;
+        level?: string;
+        enterprise_id?: string;
+        sort_by?: 'created_at' | 'title' | 'expires_at';
+        sort_order?: 'asc' | 'desc';
+        page?: number;
+        limit?: number;
+    };
+    url: '/api/v1/admin/job-postings';
+};
+
+export type GetApiV1AdminJobPostingsErrors = {
+    /**
+     * Invalid list filter, sort, or pagination value
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Administrator role required
+     */
+    403: unknown;
+};
+
+export type GetApiV1AdminJobPostingsResponses = {
+    /**
+     * Paginated job postings across all enterprises
+     */
+    200: PaginatedJobPostings;
+};
+
+export type GetApiV1AdminJobPostingsResponse = GetApiV1AdminJobPostingsResponses[keyof GetApiV1AdminJobPostingsResponses];
 
 export type DeleteApiV1JobPostingsByIdData = {
     body?: never;
@@ -878,9 +1165,25 @@ export type DeleteApiV1JobPostingsByIdData = {
 
 export type DeleteApiV1JobPostingsByIdErrors = {
     /**
-     * Job posting belongs to another enterprise
+     * Invalid job posting ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
      */
     403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+    /**
+     * Cannot delete job posting because applications already exist (or it is already being deleted)
+     */
+    409: unknown;
 };
 
 export type DeleteApiV1JobPostingsByIdResponses = {
@@ -903,7 +1206,15 @@ export type GetApiV1JobPostingsByIdData = {
 
 export type GetApiV1JobPostingsByIdErrors = {
     /**
-     * Job posting belongs to another enterprise
+     * Invalid job posting ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
      */
     403: unknown;
     /**
@@ -916,13 +1227,13 @@ export type GetApiV1JobPostingsByIdResponses = {
     /**
      * Job posting
      */
-    200: JobPostingResponse;
+    200: JobPosting;
 };
 
 export type GetApiV1JobPostingsByIdResponse = GetApiV1JobPostingsByIdResponses[keyof GetApiV1JobPostingsByIdResponses];
 
 export type PatchApiV1JobPostingsByIdData = {
-    body?: never;
+    body: UpdateJobPostingRequest;
     path: {
         id: string;
     };
@@ -932,16 +1243,28 @@ export type PatchApiV1JobPostingsByIdData = {
 
 export type PatchApiV1JobPostingsByIdErrors = {
     /**
-     * Job posting belongs to another enterprise
+     * Invalid job posting ID or update payload
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
      */
     403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
 };
 
 export type PatchApiV1JobPostingsByIdResponses = {
     /**
      * Job posting updated
      */
-    200: JobPostingResponse;
+    200: JobPosting;
 };
 
 export type PatchApiV1JobPostingsByIdResponse = PatchApiV1JobPostingsByIdResponses[keyof PatchApiV1JobPostingsByIdResponses];
@@ -1028,11 +1351,7 @@ export type GetApiV1UsersByIdResponses = {
 export type GetApiV1UsersByIdResponse = GetApiV1UsersByIdResponses[keyof GetApiV1UsersByIdResponses];
 
 export type PatchApiV1UsersByIdData = {
-    body: {
-        fullName?: string;
-        phone?: string | null;
-        role?: 'admin' | 'user';
-    };
+    body: UpdateUserRequest;
     path: {
         id: string;
     };
@@ -1042,7 +1361,7 @@ export type PatchApiV1UsersByIdData = {
 
 export type PatchApiV1UsersByIdErrors = {
     /**
-     * Invalid user ID or body, or nothing to update
+     * Invalid user ID or update body
      */
     400: unknown;
     /**
@@ -1050,7 +1369,7 @@ export type PatchApiV1UsersByIdErrors = {
      */
     401: unknown;
     /**
-     * Caller is not a System Administrator, or is changing their own role
+     * Administrator role required or self-role change blocked
      */
     403: unknown;
     /**
@@ -1058,14 +1377,14 @@ export type PatchApiV1UsersByIdErrors = {
      */
     404: unknown;
     /**
-     * Account storage unavailable, retry later
+     * Account storage unavailable
      */
     503: unknown;
 };
 
 export type PatchApiV1UsersByIdResponses = {
     /**
-     * The updated user account
+     * Updated user account
      */
     200: UserDto;
 };
@@ -1480,28 +1799,3 @@ export type PatchApiV1MeApplicationsByIdWithdrawResponses = {
 };
 
 export type PatchApiV1MeApplicationsByIdWithdrawResponse = PatchApiV1MeApplicationsByIdWithdrawResponses[keyof PatchApiV1MeApplicationsByIdWithdrawResponses];
-
-export type GetApiV1JobPostingsByIdPublicData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/api/v1/job-postings/{id}/public';
-};
-
-export type GetApiV1JobPostingsByIdPublicErrors = {
-    /**
-     * Job posting not found, not published, or expired
-     */
-    404: unknown;
-};
-
-export type GetApiV1JobPostingsByIdPublicResponses = {
-    /**
-     * Job posting
-     */
-    200: JobPostingResponse;
-};
-
-export type GetApiV1JobPostingsByIdPublicResponse = GetApiV1JobPostingsByIdPublicResponses[keyof GetApiV1JobPostingsByIdPublicResponses];

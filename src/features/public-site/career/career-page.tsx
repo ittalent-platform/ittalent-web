@@ -20,7 +20,7 @@ import {
 import {
   getApiV1Enterprises,
   getApiV1JobPostings,
-  type JobPostingResponse,
+  type JobPosting,
 } from "@/api/generated";
 
 type Job = {
@@ -61,7 +61,7 @@ type JobListQuery = {
 
 type EnterpriseSummary = { id: string; name: string };
 
-const toJob = (dto: JobPostingResponse): Job => ({
+const toJob = (dto: JobPosting): Job => ({
   _id: dto.id,
   enterpriseId: dto.enterpriseId,
   title: dto.title,
@@ -81,11 +81,11 @@ const toJob = (dto: JobPostingResponse): Job => ({
 });
 
 async function loadAllPublicJobs(): Promise<Job[]> {
-  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100, status: "published" } });
+  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100 } });
   if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
   const pages = await Promise.all(
     Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
-      getApiV1JobPostings({ query: { page: index + 2, limit: 100, status: "published" } }),
+      getApiV1JobPostings({ query: { page: index + 2, limit: 100 } }),
     ),
   );
   return [first.data, ...pages.map((result) => {

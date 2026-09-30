@@ -76,11 +76,11 @@ async function loadAllEnterprises(): Promise<Enterprise[]> {
 }
 
 async function loadOpenJobCounts(): Promise<Record<string, number>> {
-  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100, status: "published" } });
+  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100 } });
   if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
   const pages = await Promise.all(
     Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
-      getApiV1JobPostings({ query: { page: index + 2, limit: 100, status: "published" } }),
+      getApiV1JobPostings({ query: { page: index + 2, limit: 100 } }),
     ),
   );
   const jobs = [first.data, ...pages.map((result) => {

@@ -26,7 +26,7 @@ import {
   getApiV1EnterprisesByEnterpriseId,
   getApiV1JobPostings,
   type EnterpriseDetailDto,
-  type JobPostingResponse,
+  type JobPosting,
 } from "@/api/generated";
 import { EnterpriseLogo } from "./enterprise-logo";
 
@@ -67,7 +67,7 @@ const toEnterprise = (dto: EnterpriseDetailDto): Enterprise => ({
   website: dto.website ?? undefined,
 });
 
-const toJob = (dto: JobPostingResponse): Job => ({
+const toJob = (dto: JobPosting): Job => ({
   _id: dto.id,
   enterpriseId: dto.enterpriseId,
   title: dto.title,
@@ -170,7 +170,7 @@ export function EnterpriseDetailPage() {
   } = useQuery({
     queryKey: ["enterprise-jobs", id],
     queryFn: async () => {
-      const result = await getApiV1JobPostings({ query: { enterprise_id: id!, limit: 100, page: 1, status: "published" } });
+      const result = await getApiV1JobPostings({ query: { enterprise_id: id!, limit: 100, page: 1 } });
       if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
       const now = Date.now();
       return result.data.items
