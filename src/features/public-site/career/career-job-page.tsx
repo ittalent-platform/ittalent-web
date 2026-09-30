@@ -172,6 +172,9 @@ function PageShell({ children }: { children: ReactNode }) {
   return <main className="mx-auto w-full max-w-[1440px]">{children}</main>;
 }
 
+/** Other jobs of the same company shown under a job; more than this gets a "View all" link. */
+const MORE_JOBS_SHOWN = 3;
+
 export function CareerJobPage() {
   const navigate = useNavigate();
   const { slug } = useParams();
@@ -341,9 +344,8 @@ export function CareerJobPage() {
       ? salaryMatch[2].replace(/^M /, "").replace(" / mo", " / month")
       : null;
 
-  const otherJobs = (companyJobs ?? [])
-    .filter((j) => j._id !== job._id)
-    .slice(0, 3);
+  const otherJobsAll = (companyJobs ?? []).filter((j) => j._id !== job._id);
+  const otherJobs = otherJobsAll.slice(0, MORE_JOBS_SHOWN);
   const companyJobCount = companyJobs?.length ?? 0;
 
   const keyFacts = [
@@ -640,12 +642,15 @@ export function CareerJobPage() {
               More jobs at {company.name}
             </h2>
             <div className="flex-1" />
-            <Link
-              className="text-[13.5px] font-semibold hover:text-mkt-accent-hover"
-              to={`/enterprises/${company.id}`}
-            >
-              View all {companyJobCount} jobs →
-            </Link>
+            {/* Only worth a link when the cards below are not already every job of the company. */}
+            {otherJobsAll.length > otherJobs.length ? (
+              <Link
+                className="text-[13.5px] font-semibold text-mkt-accent-hover hover:text-mkt-accent-dark"
+                to={`/enterprises/${company.id}`}
+              >
+                View all {companyJobCount} jobs →
+              </Link>
+            ) : null}
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {otherJobs.map((j) => {

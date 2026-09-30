@@ -107,6 +107,7 @@ async function loadAllEnterprises(): Promise<EnterpriseSummary[]> {
     return result.data;
   })].flatMap((page) => page.items).map((item) => ({ id: item.id, name: item.name }));
 }
+import { MarketSelect } from "@/components/common/market-select";
 import { StateCard } from "./state-card";
 import {
   companyInitials,
@@ -192,8 +193,6 @@ const HERO_CHIPS = [
 
 const legendClass =
   "pb-2.5 text-[11.5px] font-bold tracking-[0.05em] text-mkt-label";
-const selectClass =
-  "w-full border-0 bg-transparent font-[inherit] text-mkt-ink outline-none";
 
 type ActiveChip = { key: string; label: string; remove: () => void };
 
@@ -717,22 +716,15 @@ export function CareerPage() {
             ) : null}
           </div>
 
-          <label className="flex h-12 items-center gap-2 rounded-xl border border-mkt-line bg-white px-3.5 text-mkt-muted md:w-60">
-            <MapPin aria-hidden="true" className="size-[18px] shrink-0" />
-            <span className="sr-only">City</span>
-            <select
-              className={cn(selectClass, "text-sm")}
-              onChange={(e) => patch({ location: e.target.value || undefined })}
-              value={query.location ?? ""}
-            >
-              <option value="">All cities</option>
-              {cities.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.value}
-                </option>
-              ))}
-            </select>
-          </label>
+          <MarketSelect
+            allLabel="All cities"
+            ariaLabel="City"
+            className="md:w-60"
+            icon={<MapPin aria-hidden="true" className="size-[18px]" />}
+            onChange={(value) => patch({ location: value || undefined })}
+            options={cities.map((c) => ({ label: c.value, value: c.value }))}
+            value={query.location ?? ""}
+          />
 
           <button
             className="h-12 rounded-full bg-mkt-accent px-7 text-[14.5px] font-semibold text-white hover:bg-mkt-accent-hover"
@@ -856,45 +848,28 @@ export function CareerPage() {
             />
           </fieldset>
 
-          <label className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
             <span className={legendClass.replace("pb-2.5", "")}>COMPANY</span>
-            <select
-              className="h-11 rounded-xl border border-mkt-line bg-white px-3 text-[13.5px] text-mkt-ink outline-none focus:border-mkt-accent"
-              onChange={(e) =>
-                patch({ enterpriseId: e.target.value || undefined })
-              }
+            <MarketSelect
+              allLabel="Any company"
+              ariaLabel="Company"
+              onChange={(value) => patch({ enterpriseId: value || undefined })}
+              options={companyOptions.map((c) => ({ label: c.name, value: c.id }))}
               value={query.enterpriseId ?? ""}
-            >
-              <option value="">Any company</option>
-              {companyOptions.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
+              variant="compact"
+            />
+          </div>
 
-          <label className="flex flex-col gap-2">
-            <span className={legendClass.replace("pb-2.5", "")}>
-              POSTED WITHIN
-            </span>
-            <select
-              className="h-11 rounded-xl border border-mkt-line bg-white px-3 text-[13.5px] text-mkt-ink outline-none focus:border-mkt-accent"
-              onChange={(e) =>
-                patch({
-                  postedWithin: (e.target.value || undefined) as
-                    PostedWithin | undefined,
-                })
-              }
+          <div className="flex flex-col gap-2">
+            <span className={legendClass.replace("pb-2.5", "")}>POSTED WITHIN</span>
+            <MarketSelect
+              ariaLabel="Posted within"
+              onChange={(value) => patch({ postedWithin: (value || undefined) as PostedWithin | undefined })}
+              options={POSTED_OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
               value={query.postedWithin ?? ""}
-            >
-              {POSTED_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              variant="compact"
+            />
+          </div>
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -907,20 +882,16 @@ export function CareerPage() {
               {!isLoading && total > 0 ? ` · showing ${from}–${to}` : ""}
             </span>
             <div className="flex-1" />
-            <label className="flex items-center gap-2 text-[13px] text-mkt-muted">
+            <div className="flex items-center gap-2 text-[13px] text-mkt-muted">
               Sort by
-              <select
-                className="h-9 rounded-full border border-mkt-line-strong bg-white px-2.5 text-[13px] font-semibold text-mkt-ink outline-none focus:border-mkt-accent"
-                onChange={(e) => patch({ sort: e.target.value as JobSort })}
+              <MarketSelect
+                ariaLabel="Sort by"
+                onChange={(value) => patch({ sort: value as JobSort })}
+                options={SORT_OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
                 value={query.sort ?? "newest"}
-              >
-                {SORT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+                variant="pill"
+              />
+            </div>
           </div>
 
           {isLoading ? (
