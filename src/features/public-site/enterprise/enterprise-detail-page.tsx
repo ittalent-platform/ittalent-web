@@ -1,11 +1,13 @@
 import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
+  Building,
   Building2,
   Globe,
   MapPin,
   RefreshCw,
   TriangleAlert,
+  Users,
 } from "lucide-react";
 import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -26,7 +28,7 @@ import {
   getApiV1EnterprisesByEnterpriseId,
   getApiV1JobPostings,
   type EnterpriseDetailDto,
-  type JobPostingResponse,
+  type JobPosting,
 } from "@/api/generated";
 import { EnterpriseLogo } from "./enterprise-logo";
 
@@ -39,6 +41,8 @@ type Enterprise = {
   shortDescription?: string;
   description?: string;
   website?: string;
+  companySize?: string;
+  offices?: string[];
 };
 
 type Job = {
@@ -65,13 +69,16 @@ const toEnterprise = (dto: EnterpriseDetailDto): Enterprise => ({
   shortDescription: dto.shortDescription ?? undefined,
   description: dto.description ?? undefined,
   website: dto.website ?? undefined,
+  companySize: dto.companySize ?? undefined,
+  // Offices other than the headquarters.
+  offices: (dto.branches ?? []).map((branch) => branch.city).filter(Boolean),
 });
 
-const toJob = (dto: JobPostingResponse): Job => ({
+const toJob = (dto: JobPosting): Job => ({
   _id: dto.id,
   enterpriseId: dto.enterpriseId,
   title: dto.title,
-  slug: dto.slug || dto.id,
+  slug: dto.id,
   location: dto.location,
   employment_type: dto.employmentType,
   salary_min: dto.salaryMin,
@@ -162,12 +169,21 @@ export function EnterpriseDetailPage() {
     },
     enabled: !!id,
   });
-  const { data: jobs, isLoading: jobsLoading } = useQuery({
+  const {
+    data: jobs,
+    isLoading: jobsLoading,
+    isError: jobsError,
+    refetch: refetchJobs,
+  } = useQuery({
     queryKey: ["enterprise-jobs", id],
     queryFn: async () => {
       const result = await getApiV1JobPostings({ query: { enterprise_id: id!, limit: 100, page: 1 } });
       if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      return result.data.items.map(toJob);
+      const now = Date.now();
+      return result.data.items
+        .filter((item) => item.enterpriseId === id)
+        .filter((item) => !item.expiresAt || new Date(item.expiresAt).getTime() >= now)
+        .map(toJob);
     },
     enabled: !!id,
   });
@@ -270,6 +286,8 @@ export function EnterpriseDetailPage() {
   const meta: ReactNode[] = [];
   if (enterprise.industry)
     meta.push(<span key="industry">{enterprise.industry}</span>);
+  if (enterprise.companySize)
+    meta.push(<span key="size">{enterprise.companySize} people</span>);
   if (enterprise.location)
     meta.push(<span key="hq">Headquarters: {enterprise.location}</span>);
   if (website)
@@ -435,6 +453,17 @@ export function EnterpriseDetailPage() {
                   key={i}
                 />
               ))
+            ) : jobsError ? (
+              <p className="border-t border-mkt-line-soft pt-5 text-[14px] text-mkt-danger">
+                Couldn't load open jobs.{" "}
+                <button
+                  className="font-semibold underline"
+                  onClick={() => refetchJobs()}
+                  type="button"
+                >
+                  Retry
+                </button>
+              </p>
             ) : shownJobs.length === 0 ? (
               <p className="border-t border-mkt-line-soft pt-5 text-[14px] text-mkt-muted">
                 No open jobs right now. Check back soon.
@@ -517,12 +546,28 @@ export function EnterpriseDetailPage() {
               >
                 {enterprise.industry ?? "—"}
               </Fact>
+              {enterprise.companySize ? (
+                <Fact
+                  icon={<Users aria-hidden="true" className="size-[18px]" />}
+                  label="Company size"
+                >
+                  {enterprise.companySize} people
+                </Fact>
+              ) : null}
               <Fact
                 icon={<MapPin aria-hidden="true" className="size-[18px]" />}
                 label="Headquarters"
               >
                 {enterprise.location ?? "—"}
               </Fact>
+              {enterprise.offices && enterprise.offices.length > 0 ? (
+                <Fact
+                  icon={<Building aria-hidden="true" className="size-[18px]" />}
+                  label="Offices"
+                >
+                  {enterprise.offices.join(", ")}
+                </Fact>
+              ) : null}
               <Fact
                 icon={<Globe aria-hidden="true" className="size-[18px]" />}
                 label="Website"

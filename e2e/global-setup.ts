@@ -3,15 +3,26 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { backendEnv, E2E_API_URL } from "../playwright.config";
 import { ACCOUNTS, PASSWORD, TOKEN_DIR, tokenFile } from "./support";
 
+const isWindows = process.platform === "win32";
+const npmCommand = isWindows ? "cmd.exe" : "npm";
+
 function runBackendScript(
   script: string,
   extraEnv: Record<string, string> = {},
 ): void {
-  const result = spawnSync("npm", ["run", script], {
-    cwd: "../ittalent-backend",
-    env: { ...process.env, ...backendEnv, ...extraEnv },
-    encoding: "utf8",
-  });
+  const result = spawnSync(
+    npmCommand,
+    isWindows ? ["/d", "/s", "/c", "npm.cmd", "run", script] : ["run", script],
+    {
+      cwd: "../ittalent-backend",
+      env: { ...process.env, ...backendEnv, ...extraEnv },
+      encoding: "utf8",
+    },
+  );
+  if (result.error)
+    throw new Error(
+      `Could not start ${npmCommand} for ${script}: ${result.error.message}`,
+    );
   if (result.status !== 0)
     throw new Error(
       `npm run ${script} failed:\n${result.stdout}\n${result.stderr}`,

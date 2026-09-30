@@ -22,7 +22,7 @@ import {
   getApiV1JobPostings,
   getApiV1JobPostingsByIdPublic,
   type EnterpriseDetailDto,
-  type JobPostingResponse,
+  type JobPosting,
 } from "@/api/generated";
 
 import { ApplyButton } from "./apply-button";
@@ -47,11 +47,11 @@ type Job = {
   createdAt?: string;
 };
 
-const toJob = (dto: JobPostingResponse): Job => ({
+const toJob = (dto: JobPosting): Job => ({
   _id: dto.id,
   enterpriseId: dto.enterpriseId,
   title: dto.title,
-  slug: dto.slug || dto.id,
+  slug: dto.id,
   location: dto.location,
   employment_type: dto.employmentType,
   salary_min: dto.salaryMin,
@@ -204,7 +204,11 @@ export function CareerJobPage() {
     queryFn: async () => {
       const result = await getApiV1JobPostings({ query: { enterprise_id: enterpriseId!, limit: 100, page: 1 } });
       if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      const jobs = result.data.items.map(toJob);
+      const now = Date.now();
+      const jobs = result.data.items
+        .filter((item) => item.enterpriseId === enterpriseId)
+        .filter((item) => !item.expiresAt || new Date(item.expiresAt).getTime() >= now)
+        .map(toJob);
       return jobs;
     },
     enabled: !!enterpriseId,

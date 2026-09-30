@@ -18,7 +18,7 @@ export function DetailRow({
 }) {
   if (layout === "grid") {
     return (
-      <div className={cn("grid min-w-0 gap-1 border-t border-line-muted py-3 sm:grid-cols-[160px_minmax(0,1fr)] sm:gap-4", className)}>
+      <div className={cn("grid min-w-0 gap-1 border-t border-border/50 first:border-t-0 py-3 sm:grid-cols-[160px_minmax(0,1fr)] sm:gap-4", className)}>
         <dt className="text-[13px] text-muted-foreground">{label}</dt>
         <dd className="m-0 min-w-0 wrap-anywhere text-[13.5px] text-foreground">{value}</dd>
       </div>

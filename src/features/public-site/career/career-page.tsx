@@ -20,7 +20,7 @@ import {
 import {
   getApiV1Enterprises,
   getApiV1JobPostings,
-  type JobPostingResponse,
+  type JobPosting,
 } from "@/api/generated";
 
 type Job = {
@@ -61,11 +61,11 @@ type JobListQuery = {
 
 type EnterpriseSummary = { id: string; name: string };
 
-const toJob = (dto: JobPostingResponse): Job => ({
+const toJob = (dto: JobPosting): Job => ({
   _id: dto.id,
   enterpriseId: dto.enterpriseId,
   title: dto.title,
-  slug: dto.slug || dto.id,
+  slug: dto.id,
   location: dto.location,
   employment_type: dto.employmentType,
   salary_min: dto.salaryMin,
@@ -400,7 +400,10 @@ export function CareerPage() {
   const { data, isError, isFetching, isLoading, refetch } = useQuery({
     queryKey: ["jobs", query],
     queryFn: async () => {
-      const all = await loadAllPublicJobs();
+      const now = Date.now();
+      const all = (await loadAllPublicJobs()).filter(
+        (job) => !job.expires_at || new Date(job.expires_at).getTime() >= now,
+      );
       const page = query.page ?? 1;
       const limit = query.limit ?? PAGE_SIZE;
       const term = query.search?.trim().toLowerCase();

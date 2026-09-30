@@ -8,6 +8,7 @@ import {
   Search,
   SearchX,
   TriangleAlert,
+  Users,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -38,12 +39,14 @@ type Enterprise = {
   shortDescription?: string;
   description?: string;
   website?: string;
+  companySize?: string;
 };
 
 type EnterpriseDirectoryQuery = {
   keyword?: string;
   industry?: string;
   location?: string;
+  size?: string;
   hiringOnly?: boolean;
   sort?: EnterpriseSort;
   page?: number;
@@ -59,6 +62,7 @@ const toEnterprise = (item: EnterpriseListResponse["items"][number]): Enterprise
   industry: item.industry ?? undefined,
   location: item.location ?? undefined,
   shortDescription: item.shortDescription ?? undefined,
+  companySize: item.companySize ?? undefined,
 });
 
 async function loadAllEnterprises(): Promise<Enterprise[]> {
@@ -88,7 +92,11 @@ async function loadOpenJobCounts(): Promise<Record<string, number>> {
     return result.data;
   })].flatMap((page) => page.items);
   const counts: Record<string, number> = {};
-  for (const job of jobs) counts[job.enterpriseId] = (counts[job.enterpriseId] ?? 0) + 1;
+  const now = Date.now();
+  for (const job of jobs) {
+    if (job.expiresAt && new Date(job.expiresAt).getTime() < now) continue;
+    counts[job.enterpriseId] = (counts[job.enterpriseId] ?? 0) + 1;
+  }
   return counts;
 }
 import { EnterpriseLogo } from "./enterprise-logo";
@@ -114,6 +122,9 @@ const HERO_TILES = [
 
 const selectClass =
   "w-full border-0 bg-transparent font-[inherit] text-sm text-mkt-ink outline-none";
+
+/** Company size bands the API accepts, smallest first. */
+const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"] as const;
 
 type ActiveChip = { key: string; label: string; remove: () => void };
 
@@ -161,12 +172,20 @@ function CompanyCard({
         {item.shortDescription ?? "No description provided yet."}
       </p>
 
-      {item.location ? (
+      {item.location || item.companySize ? (
         <div className="flex flex-wrap gap-3 text-[12.5px] text-mkt-ink-2">
-          <span className="flex items-center gap-[5px]">
-            <MapPin aria-hidden="true" className="size-3.5 text-mkt-subtle" />
-            {item.location}
-          </span>
+          {item.location ? (
+            <span className="flex items-center gap-[5px]">
+              <MapPin aria-hidden="true" className="size-3.5 text-mkt-subtle" />
+              {item.location}
+            </span>
+          ) : null}
+          {item.companySize ? (
+            <span className="flex items-center gap-[5px]">
+              <Users aria-hidden="true" className="size-3.5 text-mkt-subtle" />
+              {item.companySize} people
+            </span>
+          ) : null}
         </div>
       ) : null}
 
@@ -218,6 +237,7 @@ export function EnterprisePage() {
       const filtered = all.filter((item) => {
         if (query.industry && item.industry !== query.industry) return false;
         if (query.location && item.location !== query.location) return false;
+        if (query.size && item.companySize !== query.size) return false;
         if (query.hiringOnly && !(roleCounts[item.id] ?? 0)) return false;
         if (term && !item.name.toLowerCase().includes(term)) return false;
         return true;
@@ -342,6 +362,13 @@ export function EnterprisePage() {
       key: "city",
       label: `City: ${query.location}`,
       remove: () => patch({ location: undefined }),
+    });
+
+  if (query.size)
+    chips.push({
+      key: "size",
+      label: `Size: ${query.size} people`,
+      remove: () => patch({ size: undefined }),
     });
 
   const hasFilters = chips.length > 0 || Boolean(query.hiringOnly);
@@ -492,6 +519,22 @@ export function EnterprisePage() {
               {cities.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.value}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex h-12 items-center rounded-xl border border-mkt-line bg-white px-3 md:w-[160px]">
+            <span className="sr-only">Company size</span>
+            <select
+              className={selectClass}
+              onChange={(e) => patch({ size: e.target.value || undefined })}
+              value={query.size ?? ""}
+            >
+              <option value="">Any size</option>
+              {COMPANY_SIZES.map((size) => (
+                <option key={size} value={size}>
+                  {size} people
                 </option>
               ))}
             </select>

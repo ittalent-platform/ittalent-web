@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getApiV1Enterprises,
   getApiV1JobPostings,
-  type JobPostingResponse,
+  type JobPosting,
 } from "@/api/generated";
 
 import {
@@ -16,7 +16,7 @@ import {
   TOP_COMPANIES_COUNT,
 } from "./home.constants";
 
-export type HomeJob = JobPostingResponse & { companyName: string };
+export type HomeJob = JobPosting & { companyName: string };
 
 export type HomeCompany = {
   id: string;
