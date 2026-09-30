@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ChecklistPopover } from "@/components/common/checklist-popover";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { FilterSelect } from "@/components/ui/filter-select";
-import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { ViewToggle } from "@/components/ui/view-toggle";
 import {
   APPLICATION_STATUSES, CLOSED_STATUSES, IN_PROGRESS_STATUSES, MAX_SEARCH_LENGTH, PARAM, REVIEW_STAGES, STATUS_TONES, SUBMITTED_RANGES, VIEW_MODES,
@@ -77,8 +77,8 @@ export function ApplicationsToolbar({ state, statusCounts, showCounts }: { state
 
       {state.range === "custom" ? (
         <div className="flex flex-wrap items-center gap-3 text-[13px] text-muted-foreground">
-          <label className="flex items-center gap-2">{t("applications.filter.from")}<Input aria-describedby={rangeError ? errorId : undefined} aria-invalid={Boolean(rangeError)} className="h-11 w-44" max={state.to || undefined} onChange={(event) => state.set("from", event.target.value || null)} type="date" value={state.from} /></label>
-          <label className="flex items-center gap-2">{t("applications.filter.to")}<Input aria-describedby={rangeError ? errorId : undefined} aria-invalid={Boolean(rangeError)} className="h-11 w-44" min={state.from || undefined} onChange={(event) => state.set("to", event.target.value || null)} type="date" value={state.to} /></label>
+          <label className="flex items-center gap-2">{t("applications.filter.from")}<DatePicker aria-invalid={Boolean(rangeError)} className="h-11 w-44" clearable max={state.to || undefined} onChange={(value) => state.set("from", value || null)} value={state.from} /></label>
+          <label className="flex items-center gap-2">{t("applications.filter.to")}<DatePicker aria-invalid={Boolean(rangeError)} className="h-11 w-44" clearable min={state.from || undefined} onChange={(value) => state.set("to", value || null)} value={state.to} /></label>
           {rangeError ? <span className="text-destructive" id={errorId} role="alert">{t(`applications.errors.${rangeError}`)}</span> : null}
         </div>
       ) : null}

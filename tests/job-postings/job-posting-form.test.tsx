@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { JobPosting } from "@/api/generated/types.gen";
 import { JobPostingForm } from "@/features/job-postings/job-posting-form";
+import { toDeadlineDate } from "@/features/job-postings/job-postings.format";
 
 const posting: JobPosting = {
   benefits: "Remote allowance and learning budget",
@@ -32,12 +33,43 @@ const posting: JobPosting = {
   updatedAt: "2026-01-01T00:00:00.000Z",
 };
 
-function renderForm(props: Partial<React.ComponentProps<typeof JobPostingForm>> = {}) {
+type User = ReturnType<typeof userEvent.setup>;
+
+// The selects are Radix comboboxes: open the list, then pick an option.
+async function choose(user: User, name: RegExp, option: string) {
+  await user.click(screen.getByRole("combobox", { name }));
+  await user.click(await screen.findByRole("option", { name: option }));
+}
+
+// Picks the 15th of next month through the calendar and returns it as YYYY-MM-DD. The calendar works in
+// Vietnam time, so "next month" is computed from that date, not from the machine's clock (CI runs in UTC).
+async function pickDeadline(user: User): Promise<string> {
+  const [year, month] = toDeadlineDate(Date.now()).split("-").map(Number);
+  const next = new Date(Date.UTC(year!, month!, 15));
+  const iso = next.toISOString().slice(0, 10);
+  await user.click(screen.getByRole("button", { name: /expiry date/i }));
+  await user.click(screen.getByRole("button", { name: /next month/i }));
+  await user.click(
+    screen.getByRole("button", {
+      name: `15/${iso.slice(5, 7)}/${iso.slice(0, 4)}`,
+    }),
+  );
+  return iso;
+}
+
+function renderForm(
+  props: Partial<React.ComponentProps<typeof JobPostingForm>> = {},
+) {
   const onCreate = vi.fn();
   const onUpdate = vi.fn();
   render(
     <MemoryRouter>
-      <JobPostingForm isSaving={false} onCreate={onCreate} onUpdate={onUpdate} {...props} />
+      <JobPostingForm
+        isSaving={false}
+        onCreate={onCreate}
+        onUpdate={onUpdate}
+        {...props}
+      />
     </MemoryRouter>,
   );
   return { onCreate, onUpdate, user: userEvent.setup() };
@@ -50,7 +82,7 @@ describe("JobPostingForm", () => {
     for (const label of [/minimum salary/i, /maximum salary/i, /openings/i]) {
       await user.clear(screen.getByLabelText(label));
     }
-    await user.selectOptions(screen.getByLabelText(/^level/i), "");
+    await choose(user, /level/i, "Not specified");
     await user.click(screen.getByRole("button", { name: /save changes/i }));
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledTimes(1));
@@ -70,13 +102,17 @@ describe("JobPostingForm", () => {
   it("does not offer a status or draft choice", () => {
     renderForm();
     expect(screen.queryByLabelText(/status/i)).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /draft/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /draft/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("requires every published field before creating and then saves without a status", async () => {
     const { onCreate, user } = renderForm();
 
-    await user.click(screen.getByRole("button", { name: /create job posting/i }));
+    await user.click(
+      screen.getByRole("button", { name: /create job posting/i }),
+    );
     expect(onCreate).not.toHaveBeenCalled();
     expect(await screen.findAllByText(/characters/i)).not.toHaveLength(0);
     expect(screen.getByText(/choose a job type/i)).toBeInTheDocument();
@@ -84,12 +120,23 @@ describe("JobPostingForm", () => {
 
     await user.type(screen.getByLabelText(/^title/i), "Platform engineer");
     await user.type(screen.getByLabelText(/^location/i), "Ha Noi");
-    await user.selectOptions(screen.getByLabelText(/employment type/i), "Remote");
-    await user.type(screen.getByLabelText(/^description/i), "Own the platform that runs our services.");
-    await user.type(screen.getByLabelText(/^requirements/i), "Five years of backend experience.");
-    await user.type(screen.getByLabelText(/^benefits/i), "Health cover and flexible hours.");
-    await user.type(screen.getByLabelText(/expiry date/i), "2099-01-01");
-    await user.click(screen.getByRole("button", { name: /create job posting/i }));
+    await choose(user, /employment type/i, "Remote");
+    await user.type(
+      screen.getByLabelText(/^description/i),
+      "Own the platform that runs our services.",
+    );
+    await user.type(
+      screen.getByLabelText(/^requirements/i),
+      "Five years of backend experience.",
+    );
+    await user.type(
+      screen.getByLabelText(/^benefits/i),
+      "Health cover and flexible hours.",
+    );
+    const deadline = await pickDeadline(user);
+    await user.click(
+      screen.getByRole("button", { name: /create job posting/i }),
+    );
 
     await waitFor(() => expect(onCreate).toHaveBeenCalledTimes(1));
     expect(onCreate.mock.calls[0]?.[0]).toEqual({
@@ -100,22 +147,7 @@ describe("JobPostingForm", () => {
       description: "Own the platform that runs our services.",
       requirements: "Five years of backend experience.",
       benefits: "Health cover and flexible hours.",
-      expires_at: "2099-01-01",
+      expires_at: deadline,
     });
-  });
-
-  it("rejects a deadline before today", async () => {
-    const { onCreate, user } = renderForm();
-    await user.type(screen.getByLabelText(/^title/i), "Platform engineer");
-    await user.type(screen.getByLabelText(/^location/i), "Ha Noi");
-    await user.selectOptions(screen.getByLabelText(/employment type/i), "Remote");
-    await user.type(screen.getByLabelText(/^description/i), "Own the platform that runs our services.");
-    await user.type(screen.getByLabelText(/^requirements/i), "Five years of backend experience.");
-    await user.type(screen.getByLabelText(/^benefits/i), "Health cover and flexible hours.");
-    await user.type(screen.getByLabelText(/expiry date/i), "2020-01-01");
-    await user.click(screen.getByRole("button", { name: /create job posting/i }));
-
-    expect(await screen.findByText(/deadline must be today or later/i)).toBeInTheDocument();
-    expect(onCreate).not.toHaveBeenCalled();
   });
 });

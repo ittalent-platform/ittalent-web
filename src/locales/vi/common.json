@@ -498,7 +498,14 @@
     "optional": "Không bắt buộc",
     "cancel": "Hủy",
     "create": "Tạo tin tuyển dụng",
-    "save": "Lưu thay đổi",
+    "save": {
+      "createdTitle": "Đã đăng tin tuyển dụng",
+      "updatedTitle": "Đã cập nhật tin tuyển dụng",
+      "message": "Các thay đổi của bạn đã được lưu.",
+      "failedTitle": "Không lưu được tin tuyển dụng",
+      "noEnterprise": "Tài khoản nhà tuyển dụng của bạn chưa được gán vào doanh nghiệp. Vui lòng liên hệ quản trị viên.",
+      "action": "Lưu thay đổi"
+    },
     "requiredMark": "bắt buộc",
     "optionalMark": "tùy chọn",
     "level_placeholder": "Chọn cấp bậc",
@@ -534,7 +541,91 @@
     },
     "applications": "Hồ sơ ứng tuyển",
     "status": "Trạng thái",
-    "deadline": "Hạn nộp"
+    "deadline": "Hạn nộp",
+    "subtitleCount_other": "{{count}} tin tuyển dụng · mới nhất trước",
+    "subtitleAdmin_other": "{{count}} tin tuyển dụng của mọi công ty · chỉ xem",
+    "searchPlaceholder": "Tìm theo tiêu đề, mô tả hoặc địa điểm…",
+    "toolbar": {
+      "type": "Loại",
+      "level": "Cấp bậc",
+      "all": "Tất cả",
+      "clear": "Xóa bộ lọc"
+    },
+    "table": {
+      "id": "Mã",
+      "job": "Công việc",
+      "typeLevel": "Loại",
+      "salary": "Mức lương",
+      "applications": "Hồ sơ",
+      "deadline": "Hạn nộp",
+      "posted": "Đăng lúc",
+      "status": "Trạng thái",
+      "actions": "Thao tác",
+      "actionsFor": "Thao tác cho {{title}}",
+      "view": "Xem",
+      "edit": "Sửa",
+      "delete": "Xóa",
+      "sortBy": "Sắp xếp theo {{column}}"
+    },
+    "empty": {
+      "title": "Chưa có tin tuyển dụng",
+      "description": "Tạo tin tuyển dụng đầu tiên để bắt đầu nhận hồ sơ.",
+      "adminDescription": "Chưa có công ty nào đăng tin.",
+      "noMatchesTitle": "Không có tin phù hợp",
+      "noMatchesDescription": "Không có tin tuyển dụng nào khớp với tìm kiếm hoặc bộ lọc hiện tại. Hãy thử điều chỉnh lại."
+    },
+    "loadFailed": "Không tải được danh sách tin tuyển dụng",
+    "detail": {
+      "back": "Quay lại danh sách",
+      "overview": "Tổng quan",
+      "description": "Mô tả công việc",
+      "requirements": "Yêu cầu",
+      "benefits": "Quyền lợi",
+      "notProvided": "Chưa cung cấp",
+      "location": "Địa điểm",
+      "type": "Loại công việc",
+      "level": "Cấp bậc",
+      "salary": "Mức lương",
+      "openings": "Số lượng tuyển",
+      "deadline": "Hạn nộp",
+      "company": "Công ty",
+      "created": "Ngày tạo",
+      "updated": "Cập nhật lần cuối",
+      "notFoundTitle": "Không tìm thấy tin tuyển dụng",
+      "accessDenied": "Không có quyền truy cập",
+      "loadFailedTitle": "Không tải được tin tuyển dụng",
+      "otherEnterprise": "Tin tuyển dụng này thuộc doanh nghiệp khác.",
+      "loading": "Đang tải tin tuyển dụng…",
+      "statusCard": "Trạng thái",
+      "statusNote": "Lưu là đăng tin ngay. Tin mở đến hết ngày hạn nộp (giờ Việt Nam); dời hạn nộp ra sau để mở lại.",
+      "applicationsCard": "Hồ sơ ứng tuyển",
+      "applicationCount_other": "{{count}} hồ sơ",
+      "applicationNote": "Tin đã nhận bất kỳ hồ sơ nào thì không thể xóa.",
+      "recordCard": "Bản ghi"
+    },
+    "delete": {
+      "title": "Xóa “{{title}}”?",
+      "description": "Thao tác này xóa vĩnh viễn tin tuyển dụng. Tin đã nhận bất kỳ hồ sơ nào thì không thể xóa. Không thể hoàn tác.",
+      "confirm": "Xóa tin tuyển dụng",
+      "deleting": "Đang xóa…",
+      "doneTitle": "Đã xóa tin tuyển dụng",
+      "doneMessage": "“{{title}}” đã bị xóa vĩnh viễn.",
+      "failedTitle": "Không xóa được tin tuyển dụng"
+    },
+    "form": {
+      "createDescription": "Lưu là đăng tin ngay. Các trường có dấu * là bắt buộc.",
+      "editDescription": "Thay đổi được ghi vào nhật ký kiểm tra. Các trường có dấu * là bắt buộc.",
+      "basicDescription": "Phần ứng viên thấy đầu tiên trên thẻ công việc.",
+      "compensationDescription": "Tùy chọn. Để trống nếu không công khai mức lương.",
+      "contentDescription": "Hiển thị nguyên văn trên trang công việc công khai.",
+      "railSystemTitle": "Hệ thống tự đặt",
+      "railSystemBody": "Trạng thái <strong>Đã đăng</strong> và mở đến hết hạn nộp, công ty của bạn, người tạo (bạn) và thời điểm tạo. Trạng thái không được chọn trong biểu mẫu này.",
+      "railNotEditableTitle": "Không sửa tại đây",
+      "railNotEditableBody": "Công ty và trạng thái do hệ thống đặt. Tin đóng vào cuối ngày hạn nộp và mở lại nếu bạn dời hạn nộp ra sau.",
+      "railCurrentStatus": "Trạng thái hiện tại",
+      "fixErrors": "Kiểm tra các trường được đánh dấu rồi thử lại."
+    },
+    "notSpecified": "Không chỉ định"
   },
   "adminLayout": {
     "openMenu": "Mở menu",
@@ -959,5 +1050,12 @@
     "cta": {
       "title": "Cùng nhau xây dựng điều tuyệt vời"
     }
+  },
+  "datePicker": {
+    "placeholder": "dd/mm/yyyy",
+    "today": "Hôm nay",
+    "clear": "Xóa",
+    "previousMonth": "Tháng trước",
+    "nextMonth": "Tháng sau"
   }
 }
