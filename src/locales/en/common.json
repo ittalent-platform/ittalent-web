@@ -493,11 +493,13 @@
   "adminUsers": {
     "page": {
       "title": "Users",
-      "description": "View and inspect registered user accounts and system permissions."
+      "create": "Create user",
+      "count_one": "{{count}} account in your authorized scope",
+      "count_other": "{{count}} accounts in your authorized scope"
     },
     "role": {
       "admin": "Admin",
-      "user": "User"
+      "user": "Applicant"
     },
     "status": {
       "active": "Active",
@@ -505,36 +507,66 @@
       "suspended": "Suspended"
     },
     "toolbar": {
-      "search": "Search by username or email...",
+      "search": "Search by ID, name or email…",
       "role": "Role",
       "status": "Status",
-      "allRoles": "All roles",
-      "allStatuses": "All statuses"
+      "all": "All"
     },
     "table": {
       "id": "ID",
-      "user": "User",
+      "name": "Name",
+      "email": "Email",
       "role": "Role",
-      "status": "Status",
+      "accountStatus": "Account status",
       "created": "Created",
       "actions": "Actions",
-      "viewDetails": "View details for {{name}}",
-      "view": "View",
+      "rowActions": "Actions for {{name}}",
+      "view": "View details",
+      "edit": "Edit",
+      "suspend": "Suspend",
       "empty": "No users found."
     },
     "detail": {
       "back": "Back to users",
+      "breadcrumb": "Breadcrumb",
       "notFoundTitle": "User not found",
       "notFoundDescription": "The requested user profile could not be loaded.",
-      "idLabel": "ID: {{id}}",
-      "account": "Account details",
+      "account": "Account information",
       "username": "Username",
-      "email": "Email address",
-      "fullId": "Full ID",
-      "permissions": "Permissions & lifecycle",
-      "assignedRole": "Assigned role",
+      "email": "Email",
+      "role": "Role",
       "accountStatus": "Account status",
-      "memberSince": "Member since"
+      "created": "Created",
+      "accountId": "Account ID",
+      "suspend": "Suspend"
+    },
+    "form": {
+      "createTitle": "Create internal user",
+      "createDescription": "Avatar is generated from initials · recorded in audit log",
+      "editTitle": "Edit user",
+      "created": "created {{date}}",
+      "unavailable": "Saving changes isn't available yet: the users API is read-only for now.",
+      "identity": "Identity",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Nguyen Van A",
+      "fullNameHint": "{{min}}–{{max}} characters",
+      "email": "Email",
+      "emailPlaceholder": "name@company.vn",
+      "emailHint": "Max {{max}} characters · must be unique",
+      "access": "Access",
+      "accessPermissions": "Access & permissions",
+      "role": "Role",
+      "status": "Status",
+      "accountStatus": "Account status",
+      "since": "since {{date}}",
+      "statusNote": "Status can't be changed in this form. To suspend or activate the account, use the row menu in the user list or the user's detail page.",
+      "save": "Save changes",
+      "create": "Create user"
+    },
+    "suspend": {
+      "title": "Suspend {{name}}?",
+      "description": "They will be signed out everywhere and can't sign in or perform protected actions while suspended. This is recorded in the audit log.",
+      "confirm": "Suspend account"
     }
   },
   "landing": {

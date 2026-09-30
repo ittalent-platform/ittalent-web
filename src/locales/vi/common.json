@@ -487,48 +487,79 @@
   "adminUsers": {
     "page": {
       "title": "Người dùng",
-      "description": "Xem và kiểm tra các tài khoản người dùng đã đăng ký cùng quyền hạn trong hệ thống."
+      "create": "Tạo người dùng",
+      "count_other": "{{count}} tài khoản trong phạm vi quản lý của bạn"
     },
     "role": {
       "admin": "Quản trị viên",
-      "user": "Người dùng"
+      "user": "Ứng viên"
     },
     "status": {
       "active": "Đang hoạt động",
       "inactive": "Không hoạt động",
-      "suspended": "Bị đình chỉ"
+      "suspended": "Đã tạm khóa"
     },
     "toolbar": {
-      "search": "Tìm theo tên người dùng hoặc email...",
+      "search": "Tìm theo ID, tên hoặc email…",
       "role": "Vai trò",
       "status": "Trạng thái",
-      "allRoles": "Tất cả vai trò",
-      "allStatuses": "Tất cả trạng thái"
+      "all": "Tất cả"
     },
     "table": {
-      "id": "Mã",
-      "user": "Người dùng",
+      "id": "ID",
+      "name": "Tên",
+      "email": "Email",
       "role": "Vai trò",
-      "status": "Trạng thái",
+      "accountStatus": "Trạng thái tài khoản",
       "created": "Ngày tạo",
       "actions": "Thao tác",
-      "viewDetails": "Xem chi tiết của {{name}}",
-      "view": "Xem",
-      "empty": "Không tìm thấy người dùng nào."
+      "rowActions": "Thao tác cho {{name}}",
+      "view": "Xem chi tiết",
+      "edit": "Chỉnh sửa",
+      "suspend": "Tạm khóa",
+      "empty": "Không tìm thấy người dùng."
     },
     "detail": {
-      "back": "Quay lại danh sách người dùng",
+      "back": "Quay lại danh sách",
+      "breadcrumb": "Đường dẫn",
       "notFoundTitle": "Không tìm thấy người dùng",
-      "notFoundDescription": "Không thể tải hồ sơ người dùng được yêu cầu.",
-      "idLabel": "Mã: {{id}}",
+      "notFoundDescription": "Không thể tải hồ sơ người dùng này.",
       "account": "Thông tin tài khoản",
-      "username": "Tên người dùng",
-      "email": "Địa chỉ email",
-      "fullId": "Mã đầy đủ",
-      "permissions": "Quyền hạn & vòng đời",
-      "assignedRole": "Vai trò được gán",
+      "username": "Tên đăng nhập",
+      "email": "Email",
+      "role": "Vai trò",
       "accountStatus": "Trạng thái tài khoản",
-      "memberSince": "Tham gia từ"
+      "created": "Ngày tạo",
+      "accountId": "Mã tài khoản",
+      "suspend": "Tạm khóa"
+    },
+    "form": {
+      "createTitle": "Tạo người dùng nội bộ",
+      "createDescription": "Ảnh đại diện được tạo từ chữ cái đầu · được ghi vào nhật ký kiểm toán",
+      "editTitle": "Chỉnh sửa người dùng",
+      "created": "tạo ngày {{date}}",
+      "unavailable": "Chưa thể lưu thay đổi: API người dùng hiện chỉ cho phép xem.",
+      "identity": "Danh tính",
+      "fullName": "Họ và tên",
+      "fullNamePlaceholder": "Nguyễn Văn A",
+      "fullNameHint": "{{min}}–{{max}} ký tự",
+      "email": "Email",
+      "emailPlaceholder": "name@company.vn",
+      "emailHint": "Tối đa {{max}} ký tự · không được trùng",
+      "access": "Quyền truy cập",
+      "accessPermissions": "Quyền truy cập & phân quyền",
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "accountStatus": "Trạng thái tài khoản",
+      "since": "từ {{date}}",
+      "statusNote": "Không thể đổi trạng thái trong biểu mẫu này. Để tạm khóa hoặc kích hoạt tài khoản, hãy dùng menu ở dòng trong danh sách hoặc trang chi tiết người dùng.",
+      "save": "Lưu thay đổi",
+      "create": "Tạo người dùng"
+    },
+    "suspend": {
+      "title": "Tạm khóa {{name}}?",
+      "description": "Họ sẽ bị đăng xuất khỏi mọi thiết bị và không thể đăng nhập hay thực hiện các thao tác được bảo vệ khi bị tạm khóa. Việc này được ghi vào nhật ký kiểm toán.",
+      "confirm": "Tạm khóa tài khoản"
     }
   },
   "landing": {

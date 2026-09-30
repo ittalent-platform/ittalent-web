@@ -1,58 +1,51 @@
-import { FilterSelect } from "@/components/ui/filter-select";
-import { ListToolbar } from "@/components/common/list-toolbar";
 import { useTranslation } from "react-i18next";
 
-type RoleFilter = "user" | "admin" | "all";
-type StatusFilter = "active" | "inactive" | "suspended" | "all";
+import { ListToolbar } from "@/components/common/list-toolbar";
+import { FilterSelect } from "@/components/ui/filter-select";
+
+import { ALL_FILTER, type UserRoleFilter, type UserStatusFilter, USER_ROLE_FILTERS, USER_STATUS_FILTERS } from "./users.constants";
 
 type UsersToolbarProps = {
-  onRoleChange: (role: RoleFilter) => void;
+  onRoleChange: (role: UserRoleFilter) => void;
   onSearchChange: (value: string) => void;
-  onStatusChange: (status: StatusFilter) => void;
-  role: RoleFilter;
+  onStatusChange: (status: UserStatusFilter) => void;
+  role: UserRoleFilter;
   search: string;
-  status: StatusFilter;
+  status: UserStatusFilter;
 };
 
-export function UsersToolbar({
-  onRoleChange,
-  onSearchChange,
-  onStatusChange,
-  role,
-  search,
-  status,
-}: UsersToolbarProps) {
-  const { t } = useTranslation();
-  return (
-    <ListToolbar
-      onSearchChange={onSearchChange}
-      search={search}
-      searchPlaceholder={t("adminUsers.toolbar.search")}
-    >
-      <div className="flex flex-wrap items-center gap-2">
-        <FilterSelect
-          onChange={(val) => onRoleChange(val as RoleFilter)}
-          options={[
-            { label: t("adminUsers.toolbar.allRoles"), value: "all" },
-            { label: t("adminUsers.role.admin"), value: "admin" },
-            { label: t("adminUsers.role.user"), value: "user" },
-          ]}
-          placeholder={t("adminUsers.toolbar.role")}
-          value={role}
-        />
+/** "Role: All" style trigger: muted prefix, emphasised value (Users design). */
+function prefixedTrigger(prefix: string) {
+  return (selected: string) => (
+    <>
+      <span className="text-muted-foreground">{prefix}</span> <span className="text-foreground">{selected}</span>
+    </>
+  );
+}
 
-        <FilterSelect
-          onChange={(val) => onStatusChange(val as StatusFilter)}
-          options={[
-            { label: t("adminUsers.toolbar.allStatuses"), value: "all" },
-            { label: t("adminUsers.status.active"), value: "active" },
-            { label: t("adminUsers.status.inactive"), value: "inactive" },
-            { label: t("adminUsers.status.suspended"), value: "suspended" },
-          ]}
-          placeholder={t("adminUsers.toolbar.status")}
-          value={status}
-        />
-      </div>
+export function UsersToolbar({ onRoleChange, onSearchChange, onStatusChange, role, search, status }: UsersToolbarProps) {
+  const { t } = useTranslation();
+  const all = t("adminUsers.toolbar.all");
+  return (
+    <ListToolbar onSearchChange={onSearchChange} search={search} searchPlaceholder={t("adminUsers.toolbar.search")}>
+      <FilterSelect
+        onChange={onRoleChange}
+        options={[
+          { label: all, value: ALL_FILTER },
+          ...USER_ROLE_FILTERS.map((value) => ({ label: t(`adminUsers.role.${value}`), value })),
+        ]}
+        renderTrigger={prefixedTrigger(`${t("adminUsers.toolbar.role")}:`)}
+        value={role}
+      />
+      <FilterSelect
+        onChange={onStatusChange}
+        options={[
+          { label: all, value: ALL_FILTER },
+          ...USER_STATUS_FILTERS.map((value) => ({ label: t(`adminUsers.status.${value}`), value })),
+        ]}
+        renderTrigger={prefixedTrigger(`${t("adminUsers.toolbar.status")}:`)}
+        value={status}
+      />
     </ListToolbar>
   );
 }
