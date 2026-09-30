@@ -79,11 +79,22 @@
               "username": {
                 "type": "string"
               },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
               "role": {
                 "type": "string"
               },
               "status": {
                 "type": "string"
+              },
+              "emailVerified": {
+                "type": "boolean"
               },
               "enterpriseId": {
                 "type": "string",
@@ -100,8 +111,11 @@
               "id",
               "email",
               "username",
+              "fullName",
+              "phone",
               "role",
               "status",
+              "emailVerified",
               "enterpriseId"
             ]
           },
@@ -175,11 +189,22 @@
               "username": {
                 "type": "string"
               },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
               "role": {
                 "type": "string"
               },
               "status": {
                 "type": "string"
+              },
+              "emailVerified": {
+                "type": "boolean"
               },
               "enterpriseId": {
                 "type": "string",
@@ -196,8 +221,11 @@
               "id",
               "email",
               "username",
+              "fullName",
+              "phone",
               "role",
               "status",
+              "emailVerified",
               "enterpriseId"
             ]
           },
@@ -250,11 +278,22 @@
           "username": {
             "type": "string"
           },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
           "role": {
             "type": "string"
           },
           "status": {
             "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean"
           },
           "enterpriseId": {
             "type": "string",
@@ -271,8 +310,11 @@
           "id",
           "email",
           "username",
+          "fullName",
+          "phone",
           "role",
           "status",
+          "emailVerified",
           "enterpriseId"
         ]
       },
@@ -490,6 +532,80 @@
           "message"
         ]
       },
+      "DocumentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "cv",
+              "cover_letter"
+            ]
+          },
+          "fileUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ownerId",
+          "type",
+          "fileUrl",
+          "fileName",
+          "mimeType",
+          "size",
+          "createdAt"
+        ]
+      },
+      "PaginatedDocumentsResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
       "JobPostingResponse": {
         "type": "object",
         "properties": {
@@ -566,6 +682,36 @@
           "status",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "PaginatedJobPostingsResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobPostingResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
         ]
       },
       "EnterpriseListResponse": {
@@ -817,7 +963,6 @@
           },
           "socialLinks": {
             "type": "object",
-            "nullable": true,
             "properties": {
               "linkedin": {
                 "anyOf": [
@@ -875,7 +1020,8 @@
                   }
                 ]
               }
-            }
+            },
+            "nullable": true
           },
           "workingDays": {
             "type": "string",
@@ -1628,66 +1774,6 @@
           "updatedAt"
         ]
       },
-      "MyApplicationResponse": {
-        "type": "object",
-        "properties": {
-          "item": {
-            "type": "object",
-            "nullable": true,
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "jobPostingId": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string"
-              },
-              "cvId": {
-                "type": "string"
-              },
-              "coverLetterId": {
-                "type": "string",
-                "nullable": true
-              },
-              "message": {
-                "type": "string",
-                "nullable": true
-              },
-              "reappliedFrom": {
-                "type": "string",
-                "nullable": true
-              },
-              "reappliedAs": {
-                "type": "string",
-                "nullable": true
-              },
-              "createdAt": {
-                "type": "string"
-              },
-              "updatedAt": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "jobPostingId",
-              "status",
-              "cvId",
-              "coverLetterId",
-              "message",
-              "reappliedFrom",
-              "reappliedAs",
-              "createdAt",
-              "updatedAt"
-            ]
-          }
-        },
-        "required": [
-          "item"
-        ]
-      },
       "ApplicationDetailDTO": {
         "type": "object",
         "properties": {
@@ -2137,36 +2223,6 @@
           "expectedVersion"
         ]
       },
-      "PaginatedJobPostingsResponse": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/JobPostingResponse"
-            }
-          },
-          "page": {
-            "type": "number"
-          },
-          "limit": {
-            "type": "number"
-          },
-          "total": {
-            "type": "number"
-          },
-          "totalPages": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "items",
-          "page",
-          "limit",
-          "total",
-          "totalPages"
-        ]
-      },
       "UserListResponse": {
         "type": "object",
         "properties": {
@@ -2576,9 +2632,64 @@
             "bearerAuth": []
           }
         ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cv",
+                "cover_letter"
+              ]
+            },
+            "required": false,
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "required": false,
+            "name": "sort_order",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Paginated documents"
+            "description": "Paginated documents",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedDocumentsResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -2663,8 +2774,7 @@
           },
           {
             "schema": {
-              "type": "string",
-              "pattern": "^[0-9a-fA-F]{24}$"
+              "type": "string"
             },
             "required": false,
             "name": "enterprise_id",
@@ -2889,12 +2999,233 @@
         }
       }
     },
+    "/api/v1/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "List user accounts",
+        "description": "System Administrator only (UC-USER-01). Newest first (createdAt desc, id desc). `search` matches username or email as literal, case-insensitive text. Only allow-listed fields are returned.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "user",
+                "admin",
+                "recruiter",
+                "applicant",
+                "interviewer"
+              ]
+            },
+            "required": false,
+            "name": "role",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "suspended",
+                "blocked"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "required": false,
+            "name": "emailVerified",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "createdAt",
+                "id",
+                "name",
+                "username",
+                "email"
+              ],
+              "default": "createdAt"
+            },
+            "required": false,
+            "name": "sortBy",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "required": false,
+            "name": "sortOrder",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of user accounts (empty items when nothing matches)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid page, limit, search, role or status"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a System Administrator"
+          },
+          "503": {
+            "description": "Account storage unavailable, retry later"
+          }
+        }
+      }
+    },
     "/api/v1/users/{id}": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Edit a user account",
+        "description": "System Administrator only (UC-USER-03). Changes only the fields sent: `fullName` (2–100 characters), `phone` (9–15 digits, optional leading +; null or an empty string clears it) and `role` (`admin` or `user`). Email and status are not editable here, and an administrator cannot change their own role.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 100
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "admin",
+                      "user"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated user account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user ID or body, or nothing to update"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a System Administrator, or is changing their own role"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "503": {
+            "description": "Account storage unavailable, retry later"
+          }
+        }
+      },
       "get": {
         "tags": [
           "Users"
         ],
         "summary": "Get user by ID",
+        "description": "System Administrator only (UC-USER-02). Own-profile reads use GET /auth/me.",
         "security": [
           {
             "bearerAuth": []
@@ -2922,8 +3253,14 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid user ID"
+          },
           "401": {
             "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a System Administrator"
           },
           "404": {
             "description": "User not found"
@@ -3283,52 +3620,6 @@
           },
           "404": {
             "description": "Enterprise not found"
-          }
-        }
-      }
-    },
-    "/api/v1/me/applications/mine": {
-      "get": {
-        "tags": [
-          "Applications"
-        ],
-        "summary": "Get my application for a job",
-        "description": "Applicant only. Returns the caller's latest application for the given job, or { item: null } when none exists.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "schema": {
-              "type": "string",
-              "pattern": "^[0-9a-fA-F]{24}$"
-            },
-            "required": true,
-            "name": "jobPostingId",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The application (any status) or null",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MyApplicationResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid job posting ID"
-          },
-          "401": {
-            "description": "Authentication required"
-          },
-          "403": {
-            "description": "Caller is not an Applicant"
           }
         }
       }
@@ -3706,85 +3997,6 @@
           },
           "409": {
             "description": "The application changed after the client read it"
-          }
-        }
-      }
-    },
-    "/api/v1/users": {
-      "get": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "List users (requires admin authorization)",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 10
-            }
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "role",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "user",
-                "admin"
-              ]
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "active",
-                "inactive",
-                "suspended"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User list retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserListResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Authentication required"
-          },
-          "403": {
-            "description": "Forbidden: insufficient permissions"
           }
         }
       }

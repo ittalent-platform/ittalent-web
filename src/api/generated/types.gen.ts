@@ -200,26 +200,6 @@ export type PaginatedJobPostingsResponse = {
     totalPages: number;
 };
 
-export type UserListResponse = {
-    items: Array<{
-        id: string;
-        email: string;
-        username: string;
-        fullName: string | null;
-        phone: string | null;
-        role: string;
-        status: string;
-        emailVerified: boolean;
-        enterpriseId: string | null;
-        createdAt?: string;
-        updatedAt?: string;
-    }>;
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-};
-
 export type EnterpriseListResponse = {
     items: Array<{
         id: string;
@@ -503,6 +483,14 @@ export type ApplicationHistoryResponse = {
 export type WithdrawApplicationBody = {
     expectedVersion: number;
     reason?: string;
+};
+
+export type UserListResponse = {
+    items: Array<UserDto>;
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 };
 
 export type GetHealthData = {
@@ -817,6 +805,7 @@ export type GetApiV1JobPostingsData = {
         location?: string;
         employment_type?: string;
         level?: string;
+        enterprise_id?: string;
         sort_by?: 'created_at' | 'title' | 'expires_at';
         sort_order?: 'asc' | 'desc';
         page?: number;
@@ -1491,3 +1480,28 @@ export type PatchApiV1MeApplicationsByIdWithdrawResponses = {
 };
 
 export type PatchApiV1MeApplicationsByIdWithdrawResponse = PatchApiV1MeApplicationsByIdWithdrawResponses[keyof PatchApiV1MeApplicationsByIdWithdrawResponses];
+
+export type GetApiV1JobPostingsByIdPublicData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}/public';
+};
+
+export type GetApiV1JobPostingsByIdPublicErrors = {
+    /**
+     * Job posting not found, not published, or expired
+     */
+    404: unknown;
+};
+
+export type GetApiV1JobPostingsByIdPublicResponses = {
+    /**
+     * Job posting
+     */
+    200: JobPostingResponse;
+};
+
+export type GetApiV1JobPostingsByIdPublicResponse = GetApiV1JobPostingsByIdPublicResponses[keyof GetApiV1JobPostingsByIdPublicResponses];
