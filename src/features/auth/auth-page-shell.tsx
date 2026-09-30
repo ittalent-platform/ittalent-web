@@ -5,7 +5,7 @@ export function AuthPageShell({ aside, children }: { aside: ReactNode; children:
   return (
     <div className="flex min-h-screen w-full bg-white">
       <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[480px_1fr] xl:grid-cols-[540px_1fr]">
-        <aside className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-b from-[#ea4315] to-[#d4400b] px-12 py-14 text-white lg:flex">
+        <aside className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-b from-primary to-primary/90 px-12 py-14 text-white lg:flex">
           {/* Breathing Concentric Arcs */}
           <svg
             className="pointer-events-none absolute -bottom-24 -left-24 text-white/20 select-none animate-[pulse_6s_ease-in-out_infinite]"
@@ -30,7 +30,7 @@ export function AuthPageShell({ aside, children }: { aside: ReactNode; children:
         </aside>
 
         <main className="flex min-h-screen flex-col bg-white overflow-y-auto">
-          <div className="flex items-center bg-[#ea4315] px-6 py-5 text-white lg:hidden">
+          <div className="flex items-center bg-primary px-6 py-5 text-white lg:hidden">
             <AuthBrand />
           </div>
           <div className="flex flex-1 items-center justify-center w-full">
