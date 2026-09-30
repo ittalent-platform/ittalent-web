@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -151,7 +151,6 @@ export function JobPostingForm({
     defaultValues: valuesFrom(posting),
     resolver: zodResolver(schema),
   });
-  const selectedStatus = useWatch({ control: form.control, name: "status" });
   useEffect(() => form.reset(valuesFrom(posting)), [form, posting]);
   const field = (
     name: keyof Values,
@@ -187,21 +186,6 @@ export function JobPostingForm({
         {field("currency", "Currency")}{" "}
         {field("openings", "Openings", { type: "number" })}
         {field("expiresAt", "Expiry date", { type: "date" })}
-        <div className="space-y-1.5">
-          <FormFieldLabel htmlFor="status">Status</FormFieldLabel>
-          <select
-            className="h-10 w-full rounded-md border border-input bg-transparent px-3 text-sm"
-            id="status"
-            {...form.register("status")}
-          >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="archived">Archived</option>
-          </select>
-          <FormFieldMessage error>
-            {form.formState.errors.status?.message}
-          </FormFieldMessage>
-        </div>
       </div>
       {field("description", "Description", { multiline: true })}
       {field("requirements", "Requirements", { multiline: true })}
@@ -211,17 +195,7 @@ export function JobPostingForm({
           <Button disabled={isSaving || !form.formState.isDirty} type="submit">
             {isSaving ? "Saving…" : "Save changes"}
           </Button>
-        ) : (
-          <Button disabled={isSaving} type="submit">
-            {isSaving
-              ? "Saving…"
-              : selectedStatus === "published"
-                ? "Publish"
-                : selectedStatus === "archived"
-                  ? "Archive job posting"
-                  : "Save as draft"}
-          </Button>
-        )}
+        ) : <Button disabled={isSaving} type="submit">{isSaving ? "Saving…" : "Create job posting"}</Button>}
       </div>
     </form>
   );

@@ -7,8 +7,7 @@ import { Sidebar } from "./sidebar";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
-// export function AppLayout({ actor = "admin" }: { actor?: "admin" | "recruiter" }) {
-export function AppLayout() {
+export function AppLayout({ actor = "admin" }: { actor?: "admin" | "recruiter" }) {
   const { t } = useTranslation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);

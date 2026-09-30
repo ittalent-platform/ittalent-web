@@ -457,6 +457,7 @@
   },
   "sidebar": {
     "users": "Users",
+    "jobPostings": "Job postings",
     "collapse": "Collapse sidebar",
     "closeMenu": "Close menu"
   },

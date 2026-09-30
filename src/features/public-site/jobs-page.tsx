@@ -24,12 +24,12 @@ export function JobsPage() {
   });
   return (
     <main className="mx-auto min-h-[60vh] max-w-6xl px-5 py-12">
-      <h1 className="text-3xl font-bold">Open positions</h1>
+      <h1 className="text-3xl font-bold">Job opportunities</h1>
       <p className="mt-2 text-muted-foreground">
-        Explore currently published opportunities.
+        Explore current opportunities.
       </p>
       <input
-        aria-label="Search open positions"
+        aria-label="Search job opportunities"
         className="mt-6 h-10 w-full max-w-md rounded-md border border-input bg-transparent px-3 text-sm"
         onChange={(event) => set("search", event.target.value)}
         placeholder="Search roles or locations"
@@ -67,7 +67,7 @@ export function JobsPage() {
             description={
               search ? "Try another search." : "Please check back later."
             }
-            title="No open positions"
+            title="No job opportunities"
           />
         </div>
       )}

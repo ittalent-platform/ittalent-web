@@ -1,12 +1,14 @@
 import {
+  BriefcaseBusiness,
   PanelLeftClose,
   Users,
   X,
 } from "lucide-react";
-import { BrandLogo } from "./brand-logo";
 
-import { UserMenu } from "./user-menu";
+import { RECRUITER_JOB_POSTINGS_PATH } from "@/config/routes";
 import { SidebarNavList } from "./sidebar-nav-list";
+import { BrandLogo } from "./brand-logo";
+import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
@@ -29,8 +31,12 @@ import { useTranslation } from "react-i18next";
 //   },
 // ] as const;
 
-const navItems = [
+const adminNavItems = [
   { end: false, icon: Users, labelKey: "sidebar.users", to: "/admin/users" },
+] as const;
+
+const recruiterNavItems = [
+  { end: false, icon: BriefcaseBusiness, labelKey: "sidebar.jobPostings", to: RECRUITER_JOB_POSTINGS_PATH },
 ] as const;
 
 type SidebarProps = {
@@ -48,8 +54,9 @@ type SidebarProps = {
 //   onCloseMobile,
 //   onToggleCollapsed,
 // }: SidebarProps) {
-export function Sidebar({ collapsed, mobileOpen, onCloseMobile, onToggleCollapsed }: SidebarProps) {
+export function Sidebar({ actor, collapsed, mobileOpen, onCloseMobile, onToggleCollapsed }: SidebarProps) {
   const { t } = useTranslation();
+  const navItems = actor === "recruiter" ? recruiterNavItems : adminNavItems;
   return (
     <aside
       className={cn(

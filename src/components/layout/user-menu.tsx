@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { BriefcaseBusiness, ChevronDown, LogOut, Users } from "lucide-react";
+import { BriefcaseBusiness, ChevronDown, FileText, LogOut, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";

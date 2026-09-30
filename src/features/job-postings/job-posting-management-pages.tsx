@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Archive, ArrowLeft, Eye, Pencil, Plus, Send, Trash2 } from "lucide-react";
+import { ArrowLeft, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -13,12 +13,9 @@ import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FilterSelect } from "@/components/ui/filter-select";
-import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { useToast } from "@/components/toast/toast-provider";
 import { JobPostingForm } from "./job-posting-form";
-import { JobPostingStatusBadge } from "./job-posting-status-badge";
-import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useListParams } from "@/hooks/use-list-params";
 import { formatDate } from "@/lib/format";
 
@@ -32,7 +29,6 @@ import {
   type JobPosting,
   type JobPostingListParams,
   type JobPostingPayload,
-  type JobPostingStatus,
   updateJobPosting,
 } from "./job-postings.api";
 
@@ -43,12 +39,6 @@ const listKeys = {
   root: (actor: Actor) => ["job-postings", actor] as const,
 };
 
-const statusOptions: { label: string; value: "all" | JobPostingStatus }[] = [
-  { label: "All statuses", value: "all" },
-  { label: "Draft", value: "draft" },
-  { label: "Published", value: "published" },
-  { label: "Archived", value: "archived" },
-];
 type JobPostingSortBy = NonNullable<JobPostingListParams["sort_by"]>;
 const sortOptions: { label: string; value: JobPostingSortBy }[] = [
   { label: "Created date", value: "created_at" },
@@ -66,18 +56,6 @@ function errorDescription(error: unknown) {
     return "Your recruiter account has not been assigned to an enterprise yet. Please contact the administrator.";
   }
   return message;
-}
-
-function publishChecklist(posting: JobPosting) {
-  const missing = [
-    !posting.description || posting.description.trim().length < 20 ? "description" : null,
-    !posting.requirements?.trim() ? "requirements" : null,
-    !posting.benefits?.trim() ? "benefits" : null,
-    !posting.location?.trim() ? "location" : null,
-    !posting.employmentType?.trim() ? "employment type" : null,
-    !posting.expiresAt ? "expiry date" : null,
-  ].filter((field): field is string => Boolean(field));
-  return missing;
 }
 
 function useJobPostingEditor(actor: Actor, posting?: JobPosting) {
@@ -110,7 +88,7 @@ function JobPostingEditor({ actor, posting }: { actor: Actor; posting?: JobPosti
 export function JobPostingCreatePage({ actor }: { actor: Actor }) {
   return (
     <div className="flex flex-col gap-6">
-      <AdminPageHeader description="Create a draft or publish a new opportunity." title="Create job posting" />
+      <AdminPageHeader description="Create a new opportunity." title="Create job posting" />
       <JobPostingEditor actor={actor} />
     </div>
   );
@@ -154,57 +132,40 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
   const navigate = useNavigate();
   const client = useQueryClient();
   const { showToast } = useToast();
-  const [pendingAction, setPendingAction] = useState<"archive" | "delete" | "publish" | null>(null);
+  const [pendingAction, setPendingAction] = useState<"delete" | null>(null);
   const query = useQuery({
     enabled: Boolean(jobPostingId),
     queryKey: listKeys.detail(jobPostingId ?? ""),
     queryFn: () => getJobPostingById(jobPostingId as string),
   });
   const mutation = useMutation({
-    mutationFn: async (action: NonNullable<typeof pendingAction>) => {
+    mutationFn: () => {
       if (!jobPostingId) throw new Error("Job posting not found");
-      if (action === "delete") return deleteJobPosting(jobPostingId);
-      return updateJobPosting(jobPostingId, { status: action === "publish" ? "published" : "archived" });
+      return deleteJobPosting(jobPostingId);
     },
     onError: (error) => showToast({ title: "Could not update job posting", message: errorDescription(error), tone: "error" }),
-    onSuccess: async (_, action) => {
+    onSuccess: async () => {
       await client.invalidateQueries({ queryKey: listKeys.root(actor) });
       await client.invalidateQueries({ queryKey: listKeys.detail(jobPostingId ?? "") });
-      if (action === "delete") {
-        showToast({ title: "Job posting deleted", message: "The posting was permanently deleted.", tone: "success" });
-        navigate(basePath(actor));
-      } else {
-        setPendingAction(null);
-        showToast({ title: action === "publish" ? "Job posting published" : "Job posting archived", message: "Your changes have been saved.", tone: "success" });
-      }
+      showToast({ title: "Job posting deleted", message: "The posting was permanently deleted.", tone: "success" });
+      navigate(basePath(actor));
     },
   });
   if (query.isPending) return <div className="py-10 text-muted-foreground">Loading job posting…</div>;
   if (query.isError || !query.data) return <JobPostingError actionTo={basePath(actor)} error={query.error} />;
   const posting = query.data;
-  const canPublish = posting.status !== "published";
-  const canArchive = posting.status !== "archived";
-  const missingPublishFields = publishChecklist(posting);
-  const actionLabel = pendingAction === "delete" ? "Delete" : pendingAction === "archive" ? "Archive" : "Publish";
+  const actionLabel = "Delete";
   return (
     <div className="flex max-w-4xl flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button asChild size="sm" variant="ghost"><Link to={basePath(actor)}><ArrowLeft />Back to job postings</Link></Button>
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm" variant="outline"><Link to={`${basePath(actor)}/${posting.id}/edit`}><Pencil />Edit</Link></Button>
-          {canPublish ? <Button onClick={() => {
-            if (missingPublishFields.length) {
-              showToast({ title: "Complete the job posting before publishing", message: `Add ${missingPublishFields.join(", ")}, then publish from the edit page.`, tone: "warning" });
-              return;
-            }
-            setPendingAction("publish");
-          }} size="sm"><Send />Publish</Button> : null}
-          {canArchive ? <Button onClick={() => setPendingAction("archive")} size="sm" variant="outline"><Archive />Archive</Button> : null}
           <Button onClick={() => setPendingAction("delete")} size="sm" variant="destructive"><Trash2 />Delete</Button>
         </div>
       </div>
-      <AdminPageHeader description="Review the job posting and manage its publication status." title={posting.title} />
-      <Card><CardContent className="pt-6"><div className="mb-5"><JobPostingStatusBadge status={posting.status} /></div>
+      <AdminPageHeader description="Review the job posting details." title={posting.title} />
+      <Card><CardContent className="pt-6">
         <div className="grid gap-x-8 sm:grid-cols-2">
           <DetailRow label="Location" value={posting.location ?? "—"} />
           <DetailRow label="Employment type" value={posting.employmentType ?? "—"} />
@@ -215,27 +176,20 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
         </div>
         {(["description", "requirements", "benefits"] as const).map((field) => posting[field] ? <section className="mt-6" key={field}><h2 className="font-semibold capitalize">{field}</h2><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{posting[field]}</p></section> : null)}
       </CardContent></Card>
-      {pendingAction ? <ActionConfirmDialog action={mutation.isPending ? `${actionLabel}ing…` : actionLabel} description={pendingAction === "delete" ? "This permanently removes the job posting. This action cannot be undone." : `This will ${pendingAction} the job posting.`} disabled={mutation.isPending} icon={pendingAction === "delete" ? Trash2 : pendingAction === "archive" ? Archive : Send} onConfirm={() => mutation.mutate(pendingAction)} onOpenChange={(open) => !open && setPendingAction(null)} open title={`${actionLabel} “${posting.title}”?`} variant={pendingAction === "delete" ? "destructive-solid" : pendingAction === "archive" ? "warning-solid" : "success-solid"} /> : null}
+      {pendingAction ? <ActionConfirmDialog action={mutation.isPending ? "Deleting…" : actionLabel} description="This permanently removes the job posting. This action cannot be undone." disabled={mutation.isPending} icon={Trash2} onConfirm={() => mutation.mutate()} onOpenChange={(open) => !open && setPendingAction(null)} open title={`${actionLabel} “${posting.title}”?`} variant="destructive-solid" /> : null}
     </div>
   );
 }
 
 export function JobPostingListPage({ actor }: { actor: Actor }) {
   const { page, limit, search, debouncedSearch, set } = useListParams({ defaultLimit: 10 });
-  const [status, setStatus] = useState<"all" | JobPostingStatus>("all");
-  const [location, setLocation] = useState("");
-  const [employmentType, setEmploymentType] = useState("");
-  const [level, setLevel] = useState("");
   const [sortBy, setSortBy] = useState<JobPostingSortBy>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const debouncedLocation = useDebouncedValue(location, 300);
-  const debouncedEmploymentType = useDebouncedValue(employmentType, 300);
-  const debouncedLevel = useDebouncedValue(level, 300);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [pendingDelete, setPendingDelete] = useState<JobPosting | null>(null);
-  const params: JobPostingListParams = { page, limit, sort_by: sortBy, sort_order: sortOrder, ...(debouncedSearch ? { search: debouncedSearch } : {}), ...(status === "all" ? {} : { status }), ...(debouncedLocation ? { location: debouncedLocation } : {}), ...(debouncedEmploymentType ? { employment_type: debouncedEmploymentType } : {}), ...(debouncedLevel ? { level: debouncedLevel } : {}) };
+  const params: JobPostingListParams = { page, limit, sort_by: sortBy, sort_order: sortOrder, ...(debouncedSearch ? { search: debouncedSearch } : {}) };
   const query = useQuery({ queryKey: [...listKeys.root(actor), params], queryFn: () => actor === "admin" ? listAdminJobPostings(params) : listRecruiterJobPostings(params) });
   const deletion = useMutation({
     mutationFn: deleteJobPosting,
@@ -247,10 +201,6 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
     <AdminPageHeader actions={<Button asChild><Link to={`${basePath(actor)}/create`}><Plus />Create job posting</Link></Button>} description={actor === "admin" ? "Manage all job postings." : "Manage job postings for your enterprise."} title="Job postings" />
     <ListToolbar onSearchChange={(value) => set("search", value)} search={search} searchPlaceholder="Search title or location…">
       <div className="flex flex-1 flex-wrap gap-2">
-        <FilterSelect onChange={(value) => setStatus(value as "all" | JobPostingStatus)} options={statusOptions} value={status} />
-        <Input aria-label="Filter by location" className="w-36" onChange={(event) => setLocation(event.target.value)} placeholder="Location" value={location} />
-        <Input aria-label="Filter by employment type" className="w-40" onChange={(event) => setEmploymentType(event.target.value)} placeholder="Employment type" value={employmentType} />
-        <Input aria-label="Filter by level" className="w-30" onChange={(event) => setLevel(event.target.value)} placeholder="Level" value={level} />
         <FilterSelect onChange={(value) => setSortBy(value as JobPostingSortBy)} options={sortOptions} value={sortBy} />
         <FilterSelect onChange={(value) => setSortOrder(value as "asc" | "desc")} options={[{ label: "Descending", value: "desc" }, { label: "Ascending", value: "asc" }]} value={sortOrder} />
       </div>
@@ -259,7 +209,6 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
       { key: "title", header: "Title", cell: (row: JobPosting) => <div><p className="font-medium">{row.title}</p><p className="text-xs text-muted-foreground">{row.location ?? "No location"}</p></div> },
       { key: "employmentType", header: "Employment type", cell: (row: JobPosting) => row.employmentType ?? "—" },
       { key: "level", header: "Level", cell: (row: JobPosting) => row.level ?? "—" },
-      { key: "status", header: "Status", cell: (row: JobPosting) => <JobPostingStatusBadge status={row.status} /> },
       { key: "created", header: "Created", cell: (row: JobPosting) => formatDate(row.createdAt) },
       { key: "expires", header: "Expiry", cell: (row: JobPosting) => formatDate(row.expiresAt) },
       { key: "actions", header: "", cell: (row: JobPosting) => <div className="flex justify-end gap-1"><Button aria-label={`View ${row.title}`} onClick={(event) => { event.stopPropagation(); navigate(`${basePath(actor)}/${row.id}`); }} size="icon" variant="ghost"><Eye /></Button><Button aria-label={`Edit ${row.title}`} onClick={(event) => { event.stopPropagation(); navigate(`${basePath(actor)}/${row.id}/edit`); }} size="icon" variant="ghost"><Pencil /></Button><Button aria-label={`Delete ${row.title}`} onClick={(event) => { event.stopPropagation(); setPendingDelete(row); }} size="icon" variant="ghost"><Trash2 className="text-destructive" /></Button></div> },

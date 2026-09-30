@@ -1,5 +1,6 @@
 /** Route paths shared by layout chrome and feature code, so neither hardcodes a URL. */
 export const APPLICATIONS_PATH = "/my-applications";
+export const RECRUITER_JOB_POSTINGS_PATH = "/recruiter/job-postings";
 
 /** Public job page and its apply flow (UC-BJOB-03); applications link here to view or apply again. */
 export function jobPath(jobId: string): string {
