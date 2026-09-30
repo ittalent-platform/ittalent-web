@@ -33,7 +33,7 @@ describe("ForgotPasswordPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /send reset instructions/i }),
+      screen.getByRole("button", { name: /send reset link/i }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /back to sign in/i }),
@@ -45,7 +45,7 @@ describe("ForgotPasswordPage", () => {
     renderPage();
 
     const submitButton = screen.getByRole("button", {
-      name: /send reset instructions/i,
+      name: /send reset link/i,
     });
     await user.click(submitButton);
 
@@ -62,7 +62,7 @@ describe("ForgotPasswordPage", () => {
     expect(mockedForgotPassword).not.toHaveBeenCalled();
   });
 
-  it("submits email and displays success notification on 200", async () => {
+  it("submits email and displays Check your email confirmation on 200", async () => {
     mockedForgotPassword.mockResolvedValue({
       data: {
         success: true,
@@ -77,7 +77,7 @@ describe("ForgotPasswordPage", () => {
 
     await user.type(screen.getByLabelText(/^email$/i), "user@example.com");
     await user.click(
-      screen.getByRole("button", { name: /send reset instructions/i }),
+      screen.getByRole("button", { name: /send reset link/i }),
     );
 
     expect(mockedForgotPassword).toHaveBeenCalledWith({
@@ -86,7 +86,10 @@ describe("ForgotPasswordPage", () => {
       },
     });
 
-    expect(await screen.findByText("Reset email dispatched.")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /check your email/i })).toBeInTheDocument();
+    expect(screen.getByText(/user@example\.com/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /back to sign in/i })).toHaveAttribute("href", "/login");
+    expect(screen.getByRole("button", { name: /send another link/i })).toBeInTheDocument();
   });
 
   it("handles rate limit 429 response gracefully", async () => {
@@ -105,12 +108,12 @@ describe("ForgotPasswordPage", () => {
       "rate-limited@example.com",
     );
     await user.click(
-      screen.getByRole("button", { name: /send reset instructions/i }),
+      screen.getByRole("button", { name: /send reset link/i }),
     );
 
     expect(
       await screen.findByText(
-        /too many reset requests for this email\. please try again later\./i,
+        /too many reset requests for this email\. try again in 15 minutes\./i,
       ),
     ).toBeInTheDocument();
   });
@@ -128,12 +131,12 @@ describe("ForgotPasswordPage", () => {
 
     await user.type(screen.getByLabelText(/^email$/i), "fail@example.com");
     await user.click(
-      screen.getByRole("button", { name: /send reset instructions/i }),
+      screen.getByRole("button", { name: /send reset link/i }),
     );
 
     expect(
       await screen.findByText(
-        /we couldn't send the email right now\. please try again later\./i,
+        /we couldn't send the email right now\. try again later\./i,
       ),
     ).toBeInTheDocument();
   });

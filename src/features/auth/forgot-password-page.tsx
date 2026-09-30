@@ -6,275 +6,164 @@ import { useForm } from "react-hook-form";
 import { postApiV1AuthForgotPassword } from "@/api/generated";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthStatusCard } from "./auth-status-card";
+import { AuthCenteredShell } from "./auth-centered-shell";
+import { AuthAlert } from "./auth-alert";
 import {
   forgotPasswordSchema,
   type ForgotPasswordFormValues,
 } from "./forgot-password.schema";
 import { getAuthErrorMessage } from "./auth-utils";
 
-type ToastTone = "success" | "warning" | "error";
-
-type ToastState = {
+interface ForgotAlertState {
+  variant: "error" | "warning";
   message: string;
-  note?: string;
-  tone: ToastTone;
-};
-
-function getToastTone(status?: number): ToastTone {
-  if (status === 429 || status === 503) {
-    return "warning";
-  }
-
-  return "error";
-}
-
-function getToastCopy(
-  tone: ToastTone,
-  status?: number,
-  fallbackMessage?: string,
-): ToastState {
-  if (tone === "success") {
-    return {
-      message:
-        fallbackMessage ??
-        "If an account exists for this email, reset instructions have been sent. Check your inbox.",
-      tone,
-    };
-  }
-
-  if (status === 429) {
-    return {
-      message:
-        fallbackMessage ??
-        "Too many reset requests for this email. Please try again later.",
-      tone,
-    };
-  }
-
-  if (status === 503) {
-    return {
-      message:
-        fallbackMessage ??
-        "We couldn't send the email right now. Please try again later.",
-      tone,
-    };
-  }
-
-  return {
-    message: fallbackMessage ?? "Email must be a valid email address.",
-    tone,
-  };
-}
-
-function getToastStyles(tone: ToastTone) {
-  switch (tone) {
-    case "success":
-      return {
-        box: "bg-(--status-success-bg) border-[#bce0cc]",
-        icon: "text-(--status-success-fg)",
-        message: "text-[#0e5c3a]",
-        note: "text-(--fg-faint)",
-      };
-    case "warning":
-      return {
-        box: "bg-(--status-warning-bg) border-[#f0d9ad]",
-        icon: "text-[#b43709]",
-        message: "text-[#8a4b06]",
-        note: "text-(--fg-faint)",
-      };
-    case "error":
-    default:
-      return {
-        box: "bg-(--danger-bg) border-[#efc3bd]",
-        icon: "text-(--danger-fg)",
-        message: "text-(--danger-fg)",
-        note: "text-(--fg-faint)",
-      };
-  }
-}
-
-function ToastIcon({ tone }: { tone: ToastTone }) {
-  switch (tone) {
-    case "success":
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M3.5 8.2 6.6 11 12.5 4.8"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "warning":
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden="true"
-        >
-          <circle
-            cx="8"
-            cy="8"
-            r="6.25"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M8 4.5V8l2.3 1.4"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      );
-    case "error":
-    default:
-      return (
-        <span aria-hidden="true" className="text-[15px] font-bold leading-none">
-          !
-        </span>
-      );
-  }
-}
-
-function ToastCard({ toast }: { toast: ToastState }) {
-  const styles = getToastStyles(toast.tone);
-
-  return (
-    <div
-      className={`flex gap-2.5 rounded-[0.5rem] border px-3.5 py-3 ${styles.box}`}
-      aria-live="polite"
-      role="status"
-    >
-      <span className={`${styles.icon} mt-0.5 shrink-0`}>
-        <ToastIcon tone={toast.tone} />
-      </span>
-
-      <div>
-        <p className={`m-0 text-[13px] leading-[1.5] ${styles.message}`}>
-          {toast.message}
-        </p>
-        {toast.note ? (
-          <p className={`mt-1.5 text-[11.5px] leading-[1.45] ${styles.note}`}>
-            {toast.note}
-          </p>
-        ) : null}
-      </div>
-    </div>
-  );
 }
 
 export function ForgotPasswordPage() {
-  const [toast, setToast] = useState<ToastState | null>(null);
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
+  const [alert, setAlert] = useState<ForgotAlertState | null>(null);
 
   const form = useForm<ForgotPasswordFormValues>({
-    defaultValues: {
-      email: "",
-    },
+    defaultValues: { email: "" },
     resolver: zodResolver(forgotPasswordSchema),
   });
 
   async function onSubmit(values: ForgotPasswordFormValues) {
-    setToast(null);
+    setAlert(null);
 
-    const response = await postApiV1AuthForgotPassword({
-      body: {
-        email: values.email,
-      },
-    });
+    try {
+      const response = await postApiV1AuthForgotPassword({
+        body: { email: values.email },
+      });
 
-    if (response.error) {
-      const status = response.response?.status;
-      const tone = getToastTone(status);
-      setToast(
-        getToastCopy(
-          tone,
-          status,
-          getAuthErrorMessage(
-            response.error,
-            "Unable to send reset instructions right now.",
-          ),
-        ),
-      );
-      return;
+      if (response.error) {
+        const status = response.response?.status;
+        const msg = getAuthErrorMessage(response.error, "Unable to send reset instructions right now.");
+        const lower = msg.toLowerCase();
+
+        if (status === 429 || lower.includes("too many") || lower.includes("rate limit")) {
+          setAlert({
+            variant: "error",
+            message: "Too many reset requests for this email. Try again in 15 minutes.",
+          });
+        } else if (status === 503 || lower.includes("couldn't send") || lower.includes("service")) {
+          setAlert({
+            variant: "warning",
+            message: "We couldn't send the email right now. Try again later.",
+          });
+        } else {
+          setAlert({
+            variant: "error",
+            message: msg,
+          });
+        }
+        return;
+      }
+
+      setSubmittedEmail(values.email);
+    } catch (error) {
+      const msg = getAuthErrorMessage(error, "Unable to send reset instructions right now.");
+      const lower = msg.toLowerCase();
+
+      if (lower.includes("too many") || lower.includes("rate limit")) {
+        setAlert({
+          variant: "error",
+          message: "Too many reset requests for this email. Try again in 15 minutes.",
+        });
+      } else {
+        setAlert({
+          variant: "error",
+          message: msg,
+        });
+      }
     }
-
-    setToast(
-      getToastCopy(
-        "success",
-        response.response?.status,
-        response.data?.message ??
-          "If an account exists for this email, reset instructions have been sent. Check your inbox.",
-      ),
-    );
-    form.reset({ email: values.email });
   }
 
-  function onInvalid() {
-    setToast(null);
-  }
-
-  return (
-    <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-      <AuthStatusCard>
-        <div className="flex size-[58px] items-center justify-center rounded-[14px] bg-(--status-peach-bg) text-(--status-peach-fg)">
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
+  // Confirmation screen: Same confirmation for every email
+  if (submittedEmail) {
+    return (
+      <AuthCenteredShell>
+        <div className="flex flex-col items-center gap-3 py-2 text-center">
+          <span
             aria-hidden="true"
+            className="flex size-14 items-center justify-center rounded-full bg-(--status-success-bg) text-(--status-success-fg)"
           >
-            <circle
-              cx="8"
-              cy="16"
-              r="4.25"
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
               stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <path
-              d="M11.5 12.5 20 4M16 8l3 3M13.5 10.5l2 2"
-              stroke="currentColor"
-              strokeWidth="1.8"
+              strokeWidth="2"
               strokeLinecap="round"
-            />
-          </svg>
-        </div>
+              strokeLinejoin="round"
+            >
+              <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z m18 2-10 7L2 6" />
+            </svg>
+          </span>
 
-        <div className="mt-4">
-          <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[28px] font-semibold text-foreground">
+          <h1 className="mt-1 font-['Space_Grotesk',sans-serif] text-[20px] font-semibold text-foreground">
+            Check your email
+          </h1>
+
+          <p className="m-0 max-w-[400px] text-[13.5px] leading-[1.6] text-muted-foreground">
+            If an account exists for{" "}
+            <strong className="font-semibold text-foreground">{submittedEmail}</strong>
+            , we sent reset instructions.
+          </p>
+
+          <div className="mt-2 flex flex-col items-center justify-center gap-2.5 sm:flex-row">
+            <Link
+              className="flex h-11 items-center justify-center rounded-[12px] border border-(--border-muted) bg-white px-5 text-[14px] font-semibold text-foreground no-underline transition hover:bg-(--surface-2)"
+              to="/login"
+            >
+              Back to sign in
+            </Link>
+
+            <Button
+              className="h-11 text-[13.5px] font-semibold text-(--primary-600) hover:text-(--primary-600)"
+              onClick={() => {
+                setSubmittedEmail(null);
+                setAlert(null);
+                form.reset();
+              }}
+              type="button"
+              variant="ghost"
+            >
+              Send another link
+            </Button>
+          </div>
+        </div>
+      </AuthCenteredShell>
+    );
+  }
+
+  // Request Reset Link Form (Card 1)
+  return (
+    <AuthCenteredShell>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[20px] font-semibold text-foreground">
             Reset your password
           </h1>
-          <p className="mt-2 text-[16px] leading-[1.6] text-muted-foreground">
-            Enter your registered email and we'll send reset instructions. The
-            link expires in 24 hours and can be used once.
+          <p className="m-0 text-[13.5px] leading-[1.55] text-muted-foreground">
+            Enter your email. We&apos;ll send a link that works once and expires in 24 hours.
           </p>
         </div>
 
-        {toast ? (
-          <div className="mt-5">
-            <ToastCard toast={toast} />
-          </div>
+        {alert ? (
+          <AuthAlert variant={alert.variant}>
+            {alert.message}
+          </AuthAlert>
         ) : null}
 
         <form
-          className="mt-7 flex flex-col gap-5"
-          onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+          className="flex flex-col gap-4"
+          onSubmit={form.handleSubmit(onSubmit)}
         >
           <div>
             <label
-              className="mb-2 block text-[15px] font-semibold text-foreground"
+              className="mb-2 block text-[13.5px] font-semibold text-foreground"
               htmlFor="forgot-password-email"
             >
               Email
@@ -282,38 +171,38 @@ export function ForgotPasswordPage() {
 
             <Input
               id="forgot-password-email"
-              className="h-12 w-full rounded-[1rem] border border-(--border-muted) bg-white px-5 text-[16px] text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-4 focus:ring-primary/15"
+              className="h-[46px] w-full rounded-[12px] border border-(--border-muted) bg-white px-[15px] text-[14px] text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
               placeholder="you@example.com"
               type="email"
               {...form.register("email")}
             />
 
             {form.formState.errors.email ? (
-              <p className="mt-1.5 text-sm text-red-600">
+              <p className="mt-1.5 text-[12.5px] text-(--danger-fg)">
                 {form.formState.errors.email.message}
               </p>
             ) : null}
           </div>
 
           <Button
-            className="h-12 w-full text-[16px] font-bold"
+            className="h-11 w-full text-[14px] font-semibold"
             disabled={form.formState.isSubmitting}
-            shape="pill"
+            shape="xl"
             type="submit"
           >
-            {form.formState.isSubmitting
-              ? "Sending..."
-              : "Send reset instructions"}
+            {form.formState.isSubmitting ? "Sending..." : "Send reset link"}
           </Button>
         </form>
 
-        <Link
-          className="mt-7 block text-center text-[15px] text-muted-foreground no-underline hover:text-foreground"
-          to="/login"
-        >
-          ← Back to sign in
-        </Link>
-      </AuthStatusCard>
-    </div>
+        <div className="text-center">
+          <Link
+            className="text-[13px] font-semibold text-(--primary-600) no-underline hover:underline"
+            to="/login"
+          >
+            Back to sign in
+          </Link>
+        </div>
+      </div>
+    </AuthCenteredShell>
   );
 }
