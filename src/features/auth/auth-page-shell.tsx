@@ -5,7 +5,7 @@ export function AuthPageShell({ aside, children }: { aside: ReactNode; children:
   return (
     <div className="flex min-h-screen w-full bg-white">
       <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[480px_1fr] xl:grid-cols-[540px_1fr]">
-        <aside className="relative hidden flex-col justify-between overflow-hidden bg-primary px-12 py-14 text-white lg:flex">
+        <aside className="relative hidden flex-col overflow-hidden bg-primary px-14 py-11 text-white lg:flex">
           {/* Authentic Breathing Concentric Circles Background */}
           <svg
             aria-hidden="true"
@@ -28,7 +28,7 @@ export function AuthPageShell({ aside, children }: { aside: ReactNode; children:
             </g>
           </svg>
 
-          <div className="relative z-10 flex h-full flex-col justify-between">
+          <div className="relative z-10 flex flex-col">
             {aside}
           </div>
         </aside>
