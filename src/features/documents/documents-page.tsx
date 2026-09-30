@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ExternalLink, Upload } from "lucide-react";
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 
+import { requestErrorMessage } from "@/api/request-error";
+import type { Document } from "@/api/generated/types.gen";
 import { DataTable, TableSurface } from "@/components/common/data-table";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
@@ -9,16 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { useToast } from "@/components/toast/toast-provider";
 import { formatDate } from "@/lib/format";
-import {
-  getApiErrorMessage,
-  listDocuments,
-  type CandidateDocument,
-  type DocumentType,
-  uploadDocument,
-} from "@/features/job-postings/job-postings.api";
 import { useListParams } from "@/hooks/use-list-params";
+import { type DocumentType, useDocuments, useUploadDocument } from "./documents.queries";
 
-const documentKey = ["documents"] as const;
 const allowedMimeTypes = new Set([
   "application/pdf",
   "application/msword",
@@ -40,43 +34,8 @@ export function DocumentsPage() {
   const [listType, setListType] = useState<DocumentType | "all">("all");
   const input = useRef<HTMLInputElement>(null);
   const toast = useToast();
-  const client = useQueryClient();
-  const query = useQuery({
-    queryKey: [...documentKey, { page, limit, listType }],
-    queryFn: () =>
-      listDocuments({
-        page,
-        limit,
-        sort_order: "desc",
-        ...(listType === "all" ? {} : { type: listType }),
-      }),
-  });
-  const upload = useMutation({
-    mutationFn: ({
-      file,
-      type: documentType,
-    }: {
-      file: File;
-      type: DocumentType;
-    }) => uploadDocument(documentType, file),
-    onSuccess: async (_, variables) => {
-      await client.invalidateQueries({ queryKey: documentKey });
-      toast.showToast({
-        title: "Document uploaded",
-        message: `${variables.file.name} is now available in your documents.`,
-        tone: "success",
-      });
-    },
-    onError: (error) =>
-      toast.showToast({
-        title: "Could not upload document",
-        message: getApiErrorMessage(
-          error,
-          "The document could not be uploaded.",
-        ),
-        tone: "error",
-      }),
-  });
+  const query = useDocuments({ page, limit, sort_order: "desc", ...(listType === "all" ? {} : { type: listType }) });
+  const upload = useUploadDocument();
   const selectFile = (file?: File) => {
     if (!file || upload.isPending) return;
     const error = fileError(file);
@@ -84,7 +43,19 @@ export function DocumentsPage() {
       toast.showToast({ title: "Invalid file", message: error, tone: "error" });
       return;
     }
-    upload.mutate({ file, type: uploadType });
+    upload.mutate(
+      { file, type: uploadType },
+      {
+        onSuccess: () => {
+          toast.showToast({
+            title: "Document uploaded",
+            message: `${file.name} is now available in your documents.`,
+            tone: "success",
+          });
+        },
+        onError: (uploadError) => toast.showToast({ title: "Could not upload document", message: requestErrorMessage(uploadError, "The document could not be uploaded."), tone: "error" }),
+      },
+    );
   };
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     selectFile(event.target.files?.[0]);
@@ -166,12 +137,12 @@ export function DocumentsPage() {
       <div className="mt-6">
         {query.isError ? (
           <ErrorState
-            description={getApiErrorMessage(query.error)}
+            description={requestErrorMessage(query.error)}
             title="Could not load documents"
           />
         ) : (
           <TableSurface>
-            <DataTable<CandidateDocument>
+            <DataTable<Document>
               columns={[
                 {
                   key: "name",

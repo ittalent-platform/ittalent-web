@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
@@ -15,6 +15,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FilterSelect } from "@/components/ui/filter-select";
 import { Pagination } from "@/components/ui/pagination";
 import { useToast } from "@/components/toast/toast-provider";
+import { requestErrorMessage, requestStatus } from "@/api/request-error";
+import type { CreateJobPostingRequest, JobPosting } from "@/api/generated/types.gen";
 import { JobPostingForm } from "./job-posting-form";
 import { useListParams } from "@/hooks/use-list-params";
 import { formatDate } from "@/lib/format";
@@ -22,22 +24,14 @@ import { formatDate } from "@/lib/format";
 import {
   createJobPosting,
   deleteJobPosting,
-  getApiErrorMessage,
-  getJobPostingById,
-  listAdminJobPostings,
-  listRecruiterJobPostings,
-  type JobPosting,
+  jobPostingKeys,
   type JobPostingListParams,
-  type JobPostingPayload,
   updateJobPosting,
-} from "./job-postings.api";
+  useJobPosting,
+  useJobPostingList,
+} from "./job-postings.queries";
 
 type Actor = "admin" | "recruiter";
-
-const listKeys = {
-  detail: (id: string) => ["job-postings", "detail", id] as const,
-  root: (actor: Actor) => ["job-postings", actor] as const,
-};
 
 type JobPostingSortBy = NonNullable<JobPostingListParams["sort_by"]>;
 const sortOptions: { label: string; value: JobPostingSortBy }[] = [
@@ -51,7 +45,7 @@ function basePath(actor: Actor) {
 }
 
 function errorDescription(error: unknown) {
-  const message = getApiErrorMessage(error);
+  const message = requestErrorMessage(error);
   if (message === "Recruiter is not assigned to an enterprise") {
     return "Your recruiter account has not been assigned to an enterprise yet. Please contact the administrator.";
   }
@@ -63,13 +57,13 @@ function useJobPostingEditor(actor: Actor, posting?: JobPosting) {
   const client = useQueryClient();
   const { showToast } = useToast();
   return useMutation({
-    mutationFn: (payload: JobPostingPayload) =>
+    mutationFn: (payload: CreateJobPostingRequest) =>
       posting ? updateJobPosting(posting.id, payload) : createJobPosting(payload),
     onError: (error) =>
       showToast({ title: "Could not save job posting", message: errorDescription(error), tone: "error" }),
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: listKeys.root(actor) });
-      if (posting) await client.invalidateQueries({ queryKey: listKeys.detail(posting.id) });
+      await client.invalidateQueries({ queryKey: jobPostingKeys.root(actor) });
+      if (posting) await client.invalidateQueries({ queryKey: jobPostingKeys.detail(posting.id) });
       showToast({
         title: posting ? "Job posting updated" : "Job posting created",
         message: "Your changes have been saved.",
@@ -96,11 +90,7 @@ export function JobPostingCreatePage({ actor }: { actor: Actor }) {
 
 export function JobPostingEditPage({ actor }: { actor: Actor }) {
   const { jobPostingId } = useParams<{ jobPostingId: string }>();
-  const query = useQuery({
-    enabled: Boolean(jobPostingId),
-    queryKey: listKeys.detail(jobPostingId ?? ""),
-    queryFn: () => getJobPostingById(jobPostingId as string),
-  });
+  const query = useJobPosting(jobPostingId);
   if (query.isPending) return <div className="py-10 text-muted-foreground">Loading job posting…</div>;
   if (query.isError) return <JobPostingError error={query.error} actionTo={basePath(actor)} />;
   return (
@@ -112,8 +102,8 @@ export function JobPostingEditPage({ actor }: { actor: Actor }) {
 }
 
 function JobPostingError({ actionTo, error }: { actionTo: string; error: unknown }) {
-  const status = (error as { status?: number }).status;
-  const message = getApiErrorMessage(error);
+  const status = requestStatus(error);
+  const message = requestErrorMessage(error);
   return (
     <ErrorState
       description={
@@ -133,11 +123,7 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
   const client = useQueryClient();
   const { showToast } = useToast();
   const [pendingAction, setPendingAction] = useState<"delete" | null>(null);
-  const query = useQuery({
-    enabled: Boolean(jobPostingId),
-    queryKey: listKeys.detail(jobPostingId ?? ""),
-    queryFn: () => getJobPostingById(jobPostingId as string),
-  });
+  const query = useJobPosting(jobPostingId);
   const mutation = useMutation({
     mutationFn: () => {
       if (!jobPostingId) throw new Error("Job posting not found");
@@ -145,8 +131,8 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
     },
     onError: (error) => showToast({ title: "Could not update job posting", message: errorDescription(error), tone: "error" }),
     onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: listKeys.root(actor) });
-      await client.invalidateQueries({ queryKey: listKeys.detail(jobPostingId ?? "") });
+      await client.invalidateQueries({ queryKey: jobPostingKeys.root(actor) });
+      await client.invalidateQueries({ queryKey: jobPostingKeys.detail(jobPostingId ?? "") });
       showToast({ title: "Job posting deleted", message: "The posting was permanently deleted.", tone: "success" });
       navigate(basePath(actor));
     },
@@ -190,11 +176,11 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
   const { showToast } = useToast();
   const [pendingDelete, setPendingDelete] = useState<JobPosting | null>(null);
   const params: JobPostingListParams = { page, limit, sort_by: sortBy, sort_order: sortOrder, ...(debouncedSearch ? { search: debouncedSearch } : {}) };
-  const query = useQuery({ queryKey: [...listKeys.root(actor), params], queryFn: () => actor === "admin" ? listAdminJobPostings(params) : listRecruiterJobPostings(params) });
+  const query = useJobPostingList(actor, params);
   const deletion = useMutation({
     mutationFn: deleteJobPosting,
     onError: (error) => showToast({ title: "Could not delete job posting", message: errorDescription(error), tone: "error" }),
-    onSuccess: async () => { await queryClient.invalidateQueries({ queryKey: listKeys.root(actor) }); setPendingDelete(null); showToast({ title: "Job posting deleted", message: "The posting was permanently deleted.", tone: "success" }); },
+    onSuccess: async () => { await queryClient.invalidateQueries({ queryKey: jobPostingKeys.root(actor) }); setPendingDelete(null); showToast({ title: "Job posting deleted", message: "The posting was permanently deleted.", tone: "success" }); },
   });
   const jobs = query.data?.items ?? [];
   return <div className="flex flex-col gap-6">

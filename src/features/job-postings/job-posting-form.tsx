@@ -10,10 +10,7 @@ import {
   FormFieldLabel,
   FormFieldMessage,
 } from "@/components/common/form-field";
-import type {
-  JobPosting,
-  JobPostingPayload,
-} from "./job-postings.api";
+import type { CreateJobPostingRequest, JobPosting } from "@/api/generated/types.gen";
 
 const optionalText = z.string().trim().max(200);
 const schema = z
@@ -117,7 +114,7 @@ function valuesFrom(posting?: JobPosting): Values {
   };
 }
 
-function payloadFrom(values: Values): JobPostingPayload {
+function payloadFrom(values: Values): CreateJobPostingRequest {
   const optional = (value: string) => value.trim() || undefined;
   return {
     title: values.title.trim(),
@@ -144,7 +141,7 @@ export function JobPostingForm({
   posting,
 }: {
   isSaving: boolean;
-  onSubmit: (payload: JobPostingPayload) => void;
+  onSubmit: (payload: CreateJobPostingRequest) => void;
   posting?: JobPosting;
 }) {
   const form = useForm<Values>({

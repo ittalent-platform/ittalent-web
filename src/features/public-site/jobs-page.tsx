@@ -1,26 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
+import { requestErrorMessage } from "@/api/request-error";
 import { ErrorState } from "@/components/common/error-state";
 import { EmptyState } from "@/components/common/empty-state";
 import { Pagination } from "@/components/ui/pagination";
-import {
-  listPublicJobPostings,
-  getApiErrorMessage,
-} from "@/features/job-postings/job-postings.api";
+import { usePublicJobPostings } from "@/features/job-postings/job-postings.queries";
 import { useListParams } from "@/hooks/use-list-params";
 
 export function JobsPage() {
   const { page, limit, search, set } = useListParams();
-  const query = useQuery({
-    queryKey: ["job-postings", "public", { page, limit, search }],
-    queryFn: () =>
-      listPublicJobPostings({
-        page,
-        limit,
-        search: search || undefined,
-        sort_by: "created_at",
-        sort_order: "desc",
-      }),
+  const query = usePublicJobPostings({
+    page,
+    limit,
+    search: search || undefined,
+    sort_by: "created_at",
+    sort_order: "desc",
   });
   return (
     <main className="mx-auto min-h-[60vh] max-w-6xl px-5 py-12">
@@ -38,7 +31,7 @@ export function JobsPage() {
       {query.isError ? (
         <div className="mt-6">
           <ErrorState
-            description={getApiErrorMessage(query.error)}
+            description={requestErrorMessage(query.error)}
             title="Could not load jobs"
           />
         </div>

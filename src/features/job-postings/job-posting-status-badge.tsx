@@ -1,8 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 
-import type { JobPostingStatus } from "./job-postings.api";
+import type { JobPosting } from "@/api/generated/types.gen";
 
-export function JobPostingStatusBadge({ status }: { status: JobPostingStatus }) {
+export function JobPostingStatusBadge({ status }: { status: JobPosting["status"] }) {
   const styles = {
     archived: "bg-muted text-muted-foreground",
     draft: "bg-(--status-warning-bg) text-(--status-warning-fg)",
