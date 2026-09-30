@@ -64,5 +64,5 @@ export const COUNTRY_OPTIONS = [
   "Other",
 ] as const;
 
-export type EnterpriseSortField = "name" | "email" | "status" | "createdAt";
+export type EnterpriseSortField = "id" | "name" | "email" | "status" | "createdAt";
 export type EnterpriseSortOrder = "asc" | "desc";

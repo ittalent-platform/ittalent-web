@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { FilterSelect } from "@/components/ui/filter-select";
 import { Button } from "@/components/ui/button";
 import { ListToolbar } from "@/components/common/list-toolbar";
-import { INDUSTRY_OPTIONS } from "./enterprises.constants";
+import { INDUSTRY_OPTIONS, COMPANY_SIZE_OPTIONS, CITY_OPTIONS } from "./enterprises.constants";
 
 export type EnterpriseStatusFilter = "all" | "active" | "pending" | "suspended" | "rejected" | "inactive";
 
@@ -13,6 +13,10 @@ type EnterprisesToolbarProps = {
   onStatusChange: (status: EnterpriseStatusFilter) => void;
   industry: string;
   onIndustryChange: (industry: string) => void;
+  size?: string;
+  onSizeChange?: (size: string) => void;
+  city?: string;
+  onCityChange?: (city: string) => void;
   onResetFilters: () => void;
 };
 
@@ -23,6 +27,10 @@ export function EnterprisesToolbar({
   onStatusChange,
   industry,
   onIndustryChange,
+  size = "all",
+  onSizeChange,
+  city = "all",
+  onCityChange,
   onResetFilters,
 }: EnterprisesToolbarProps) {
   const { t } = useTranslation();
@@ -30,7 +38,9 @@ export function EnterprisesToolbar({
   const hasActiveFilters =
     search.trim() !== "" ||
     status !== "all" ||
-    (industry !== "all" && industry !== "");
+    (industry !== "all" && industry !== "") ||
+    (size !== "all" && size !== "") ||
+    (city !== "all" && city !== "");
 
   return (
     <ListToolbar
@@ -68,6 +78,42 @@ export function EnterprisesToolbar({
           placeholder={`${t("adminEnterprises.toolbar.industry", "Industry")}: ${t("adminEnterprises.toolbar.allIndustries", "All")}`}
           value={industry || "all"}
         />
+
+        {onSizeChange ? (
+          <FilterSelect
+            onChange={onSizeChange}
+            options={[
+              {
+                label: `${t("adminEnterprises.toolbar.size", "Size")}: ${t("adminEnterprises.toolbar.allSizes", "All")}`,
+                value: "all",
+              },
+              ...COMPANY_SIZE_OPTIONS.map((opt) => ({
+                label: opt,
+                value: opt,
+              })),
+            ]}
+            placeholder={`${t("adminEnterprises.toolbar.size", "Size")}: ${t("adminEnterprises.toolbar.allSizes", "All")}`}
+            value={size || "all"}
+          />
+        ) : null}
+
+        {onCityChange ? (
+          <FilterSelect
+            onChange={onCityChange}
+            options={[
+              {
+                label: `${t("adminEnterprises.toolbar.city", "City")}: ${t("adminEnterprises.toolbar.allCities", "All")}`,
+                value: "all",
+              },
+              ...CITY_OPTIONS.map((opt) => ({
+                label: opt,
+                value: opt,
+              })),
+            ]}
+            placeholder={`${t("adminEnterprises.toolbar.city", "City")}: ${t("adminEnterprises.toolbar.allCities", "All")}`}
+            value={city || "all"}
+          />
+        ) : null}
 
         {hasActiveFilters ? (
           <Button

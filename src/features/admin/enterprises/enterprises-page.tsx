@@ -1,30 +1,27 @@
-import { useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { AdminPageHeader } from "@/components/common/admin-page-header";
-import { NumberedPagination } from "@/components/common/numbered-pagination";
+import { Pagination } from "@/components/ui/pagination";
 import { useListParams } from "@/hooks/use-list-params";
 import { useToast } from "@/components/toast/toast-provider";
+import { EnterprisesTable } from "./enterprises-table";
+import { EnterprisesToolbar, type EnterpriseStatusFilter } from "./enterprises-toolbar";
 import {
-  DEFAULT_PAGE_SIZE,
-  useDeleteEnterpriseMutation,
   useEnterprisesListQuery,
   useUpdateEnterpriseStatusMutation,
+  useDeleteEnterpriseMutation,
   type EnterpriseSummaryDto,
 } from "./enterprises.queries";
-import { EnterprisesTable } from "./enterprises-table";
 import {
-  EnterprisesToolbar,
-  type EnterpriseStatusFilter,
-} from "./enterprises-toolbar";
-import {
+  SuspendEnterpriseDialog,
   ActivateEnterpriseDialog,
   DeleteEnterpriseDialog,
-  SuspendEnterpriseDialog,
 } from "./enterprise-dialogs";
 import type { EnterpriseSortField, EnterpriseSortOrder } from "./enterprises.constants";
+
+const DEFAULT_PAGE_SIZE = 10;
 
 export function EnterprisesPage() {
   const { t } = useTranslation();
@@ -35,6 +32,8 @@ export function EnterprisesPage() {
 
   const [status, setStatus] = useState<EnterpriseStatusFilter>("all");
   const [industry, setIndustry] = useState<string>("all");
+  const [size, setSize] = useState<string>("all");
+  const [city, setCity] = useState<string>("all");
   const [sortBy, setSortBy] = useState<EnterpriseSortField>("createdAt");
   const [sortOrder, setSortOrder] = useState<EnterpriseSortOrder>("desc");
 
@@ -66,6 +65,8 @@ export function EnterprisesPage() {
     set("search", null);
     setStatus("all");
     setIndustry("all");
+    setSize("all");
+    setCity("all");
     set("page", "1");
   }
 
@@ -78,8 +79,19 @@ export function EnterprisesPage() {
     }
   }
 
+  const filteredItems = useMemo(() => {
+    let items = rawItems ?? [];
+    if (size !== "all") {
+      items = items.filter((item) => item.companySize === size);
+    }
+    if (city !== "all") {
+      items = items.filter((item) => item.location?.toLowerCase().includes(city.toLowerCase()));
+    }
+    return items;
+  }, [rawItems, size, city]);
+
   const sortedItems = useMemo(() => {
-    return [...(rawItems ?? [])].sort((a, b) => {
+    return [...filteredItems].sort((a, b) => {
       let aVal = (a as Record<string, unknown>)[sortBy] ?? "";
       let bVal = (b as Record<string, unknown>)[sortBy] ?? "";
       if (typeof aVal === "string") aVal = aVal.toLowerCase();
@@ -88,7 +100,7 @@ export function EnterprisesPage() {
       if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
-  }, [rawItems, sortBy, sortOrder]);
+  }, [filteredItems, sortBy, sortOrder]);
 
   async function handleConfirmSuspend(reason: string) {
     if (!targetItem) return;
@@ -157,20 +169,27 @@ export function EnterprisesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <AdminPageHeader
-        title={t("adminEnterprises.page.title", "Enterprise Profiles")}
-        description={t("adminEnterprises.page.subtitle", "Manage registered companies, compliance vetting, and account statuses")}
-        actions={
-          <Button asChild className="h-10 rounded-full font-semibold">
-            <Link to="/admin/enterprises/new">
-              <Plus className="size-4 mr-1.5" />
-              <span>{t("adminEnterprises.create", "Create enterprise")}</span>
-            </Link>
-          </Button>
-        }
-      />
+    <div className="space-y-5">
+      {/* Header matching design */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            {t("adminEnterprises.page.title", "Enterprise Profiles")}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {t("adminEnterprises.page.subtitleCount", {
+              count: total,
+              defaultValue: `${total} enterprises · deleted profiles are not listed`,
+            })}
+          </p>
+        </div>
+        <Button asChild className="h-11 px-5 rounded-full bg-brand hover:bg-brand/90 text-white font-semibold text-sm transition shadow-none cursor-pointer">
+          <Link to="/admin/enterprises/new">
+            <Plus className="size-4 mr-2" />
+            <span>{t("adminEnterprises.create", "Create enterprise")}</span>
+          </Link>
+        </Button>
+      </div>
 
       {/* Search and Filters Toolbar */}
       <EnterprisesToolbar
@@ -186,15 +205,25 @@ export function EnterprisesPage() {
           setIndustry(i);
           set("page", "1");
         }}
+        size={size}
+        onSizeChange={(sz) => {
+          setSize(sz);
+          set("page", "1");
+        }}
+        city={city}
+        onCityChange={(c) => {
+          setCity(c);
+          set("page", "1");
+        }}
         onResetFilters={handleResetFilters}
       />
 
-      {/* Enterprises Table */}
+      {/* Enterprises Table Card */}
       <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-2xs">
         <EnterprisesTable
           items={sortedItems}
           isLoading={listQuery.isLoading}
-          hasFilters={search !== "" || status !== "all" || industry !== "all"}
+          hasFilters={search !== "" || status !== "all" || industry !== "all" || size !== "all" || city !== "all"}
           onClearFilters={handleResetFilters}
           sortBy={sortBy}
           sortOrder={sortOrder}
@@ -212,25 +241,22 @@ export function EnterprisesPage() {
             setActionType("delete");
           }}
         />
-
-        {/* Pagination footer */}
-        {total > 0 ? (
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-5 py-3.5 bg-muted/20">
-            <span className="text-xs text-muted-foreground">
-              {t("pagination.showing", {
-                start: (page - 1) * limit + 1,
-                end: Math.min(page * limit, total),
-                total,
-              })}
-            </span>
-            <NumberedPagination
-              page={page}
-              totalPages={totalPages}
-              onPageChange={(newPage) => set("page", String(newPage))}
-            />
-          </div>
-        ) : null}
       </div>
+
+      {/* Pagination footer (outside table card, matching design) */}
+      {total > 0 ? (
+        <Pagination
+          limit={limit}
+          onLimitChange={(newLimit) => {
+            set("limit", String(newLimit));
+            set("page", "1");
+          }}
+          onPageChange={(newPage: number) => set("page", String(newPage))}
+          page={page}
+          total={total}
+          totalPages={totalPages}
+        />
+      ) : null}
 
       {/* Action Dialogs */}
       {actionType === "suspend" && targetItem && (

@@ -595,7 +595,8 @@
   "adminEnterprises": {
     "page": {
       "title": "Enterprise Profiles",
-      "subtitle": "Manage registered companies, compliance vetting, and account statuses"
+      "subtitle": "Manage registered companies, compliance vetting, and account statuses",
+      "subtitleCount": "{{count}} enterprises · deleted profiles are not listed"
     },
     "create": "Create enterprise",
     "searchPlaceholder": "Search by ID, name, or email...",
@@ -611,12 +612,19 @@
       "status": "Status",
       "allStatuses": "All statuses",
       "industry": "Industry",
-      "allIndustries": "All"
+      "allIndustries": "All",
+      "size": "Size",
+      "allSizes": "All",
+      "city": "City",
+      "allCities": "All"
     },
     "table": {
-      "company": "Company",
+      "id": "ID",
+      "company": "Enterprise",
       "email": "Corporate email",
       "phone": "Phone",
+      "industry": "Industry",
+      "size": "Size",
       "status": "Status",
       "created": "Created",
       "by": "by {{author}}",
@@ -628,7 +636,9 @@
       "activate": "Activate",
       "delete": "Delete",
       "emptyTitle": "No enterprise profiles yet",
-      "emptyDescription": "Create your first enterprise profile to manage company vetting and job postings."
+      "emptyDescription": "Create your first enterprise profile to manage company vetting and job postings.",
+      "noMatchesTitle": "No matching enterprises",
+      "noMatchesDescription": "No enterprise matches the current search or filters. Try adjusting your query."
     },
     "suspendDialog": {
       "title": "Suspend Enterprise Profile",

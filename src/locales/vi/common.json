@@ -588,7 +588,8 @@
   "adminEnterprises": {
     "page": {
       "title": "Hồ sơ doanh nghiệp",
-      "subtitle": "Quản lý các công ty đã đăng ký, thẩm định pháp lý và trạng thái tài khoản"
+      "subtitle": "Quản lý các công ty đã đăng ký, thẩm định pháp lý và trạng thái tài khoản",
+      "subtitleCount": "{{count}} doanh nghiệp · hồ sơ đã xóa không hiển thị"
     },
     "create": "Tạo doanh nghiệp",
     "searchPlaceholder": "Tìm theo ID, tên hoặc email...",
@@ -604,12 +605,19 @@
       "status": "Trạng thái",
       "allStatuses": "Tất cả trạng thái",
       "industry": "Ngành nghề",
-      "allIndustries": "Tất cả"
+      "allIndustries": "Tất cả",
+      "size": "Quy mô",
+      "allSizes": "Tất cả",
+      "city": "Thành phố",
+      "allCities": "Tất cả"
     },
     "table": {
+      "id": "Mã",
       "company": "Doanh nghiệp",
       "email": "Email doanh nghiệp",
       "phone": "Số điện thoại",
+      "industry": "Ngành nghề",
+      "size": "Quy mô",
       "status": "Trạng thái",
       "created": "Ngày tạo",
       "by": "bởi {{author}}",
@@ -621,7 +629,9 @@
       "activate": "Kích hoạt",
       "delete": "Xóa",
       "emptyTitle": "Chưa có hồ sơ doanh nghiệp",
-      "emptyDescription": "Tạo hồ sơ doanh nghiệp đầu tiên để quản lý thẩm định và đăng tuyển việc làm."
+      "emptyDescription": "Tạo hồ sơ doanh nghiệp đầu tiên để quản lý thẩm định và đăng tuyển việc làm.",
+      "noMatchesTitle": "Không tìm thấy doanh nghiệp",
+      "noMatchesDescription": "Không có doanh nghiệp nào phù hợp với bộ lọc tìm kiếm. Hãy thử điều chỉnh từ khóa."
     },
     "suspendDialog": {
       "title": "Đình chỉ hồ sơ doanh nghiệp",
