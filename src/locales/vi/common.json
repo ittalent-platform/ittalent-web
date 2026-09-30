@@ -235,6 +235,7 @@
     "home": "Trang chủ ITTalent",
     "main": "Điều hướng chính",
     "jobs": "Việc làm",
+    "companies": "Công ty",
     "notifications": "Thông báo",
     "notificationsUnread": "Thông báo, {{count}} chưa đọc",
     "accountMenu": "Menu tài khoản, {{name}}",
@@ -1029,6 +1030,34 @@
       "body": "Tạo hồ sơ ITTalent một lần, tải CV lên và ứng tuyển vào các vị trí IT trên khắp Việt Nam chỉ với vài cú nhấp.",
       "create": "Tạo hồ sơ của bạn",
       "browse": "Xem việc làm"
+    }
+  },
+  "documents": {
+    "title": "Tài liệu của tôi",
+    "subtitle": "Tải lên CV và thư xin việc. Tệp được nền tảng lưu trữ an toàn.",
+    "dropTitle": "Kéo và thả tài liệu vào đây",
+    "dropHint": "PDF, DOC, DOCX · tối đa {{size}} MB",
+    "typeLabel": "Loại tài liệu",
+    "typeCv": "CV",
+    "typeCoverLetter": "Thư xin việc",
+    "browse": "Chọn tệp",
+    "uploading": "Đang tải lên…",
+    "tabs": { "all": "Tất cả tài liệu", "cv": "CV", "cover_letter": "Thư xin việc" },
+    "columns": { "name": "Tài liệu", "type": "Loại", "uploaded": "Ngày tải lên" },
+    "view": "Xem",
+    "open": "Mở {{name}}",
+    "emptyTitle": "Chưa có tài liệu",
+    "emptyHint": "Tải lên CV hoặc thư xin việc để xem tại đây.",
+    "loadError": "Không thể tải tài liệu",
+    "invalidFile": "Tệp không hợp lệ",
+    "uploadedTitle": "Đã tải tài liệu lên",
+    "uploadedMessage": "{{name}} đã có trong tài liệu của bạn.",
+    "uploadFailedTitle": "Không thể tải tài liệu lên",
+    "uploadFailedMessage": "Không thể tải tài liệu lên.",
+    "errors": {
+      "format": "Chỉ hỗ trợ tệp PDF, DOC và DOCX (.pdf, .doc, .docx). Không thể tải lên \"{{name}}\".",
+      "empty": "\"{{name}}\" bị trống. Hãy chọn tệp có nội dung.",
+      "size": "\"{{name}}\" lớn hơn {{size}} MB. Hãy chọn tệp nhỏ hơn."
     }
   },
   "datePicker": {

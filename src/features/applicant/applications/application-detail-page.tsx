@@ -82,7 +82,7 @@ export function ApplicationDetailPage() {
         <div className="flex min-w-0 flex-col gap-5">
           <section className={`${CARD} flex flex-col gap-[18px] p-6`}>
             <div className="flex items-center gap-4">
-              <LogoTile name={application.job.companyName} size="lg" />
+              <LogoTile tone="tint" name={application.job.companyName} size="lg" />
               <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
                 <h1 className="itt-display m-0 text-2xl font-semibold leading-tight">{application.job.title}</h1>
                 <span className="text-[13.5px] text-foreground/80"><span className="font-semibold text-fg-link">{application.job.companyName}</span>{jobFacts(application.job) ? ` · ${jobFacts(application.job)}` : ""}</span>

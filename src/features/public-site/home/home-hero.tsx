@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
 
+import { MarketSelect } from "@/components/common/market-select";
 import { hasUnsafeSearchText } from "@/lib/search-validation";
 import { cn } from "@/lib/utils";
 
@@ -108,22 +109,15 @@ export function HomeHero() {
               />
             </label>
             <div className="hidden h-7 w-px bg-mkt-line md:block" />
-            <label className="flex h-12 grow items-center gap-2 px-3 text-mkt-muted md:grow-0">
-              <MapPin aria-hidden className="size-[18px] shrink-0" />
-              <span className="sr-only">{t("home.search.city")}</span>
-              <select
-                className="w-full border-0 bg-transparent text-[14.5px] text-mkt-ink outline-none md:w-[150px]"
-                onChange={(event) => setCity(event.target.value)}
-                value={city}
-              >
-                <option value="">{t("home.search.allCities")}</option>
-                {data?.cities.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <MarketSelect
+              allLabel={t("home.search.allCities")}
+              ariaLabel={t("home.search.city")}
+              className="grow border-0 bg-transparent px-3 shadow-none md:w-[200px] md:grow-0"
+              icon={<MapPin aria-hidden className="size-[18px]" />}
+              onChange={setCity}
+              options={(data?.cities ?? []).map((option) => ({ label: option, value: option }))}
+              value={city}
+            />
             <button
               className="flex h-12 items-center rounded-full bg-mkt-accent px-[26px] text-[14.5px] font-semibold text-white hover:bg-mkt-accent-hover disabled:opacity-60"
               disabled={Boolean(keywordError)}

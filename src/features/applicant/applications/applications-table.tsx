@@ -38,7 +38,7 @@ export function ApplicationsTable({ items, locale, onWithdraw, onSort, sortBy, s
               <TableCell><span className="itt-mono text-xs text-muted-foreground">{displayId}</span></TableCell>
               <TableCell>
                 <Link className="flex min-w-0 items-center gap-3 text-foreground" to={detailPath}>
-                  <LogoTile name={item.job.companyName} />
+                  <LogoTile tone="tint" name={item.job.companyName} />
                   <span className="flex min-w-0 flex-col gap-0.5">
                     <span className="truncate text-[13.5px] font-bold">{item.job.title}</span>
                     <span className="truncate text-[12.5px] text-muted-foreground">{jobFacts(item.job, true)}</span>

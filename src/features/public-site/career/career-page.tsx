@@ -671,7 +671,7 @@ export function CareerPage() {
       {/* Search + active filters */}
       <section
         aria-label="Search and filters"
-        className="relative z-[2] mx-4 -mt-[50px] flex max-w-[1344px] flex-col gap-4 rounded-[20px] border border-mkt-line bg-white p-5 shadow-[0_10px_24px_rgba(25,25,28,0.1)] md:mx-12 min-[1440px]:mx-auto min-[1440px]:w-[calc(100%-96px)]"
+        className="relative z-[2] mx-auto -mt-[50px] flex w-[calc(100%-2rem)] max-w-[1344px] flex-col gap-4 rounded-[20px] border border-mkt-line bg-white p-5 shadow-[0_10px_24px_rgba(25,25,28,0.1)] md:w-[calc(100%-6rem)]"
       >
         <form
           aria-label="Search jobs"

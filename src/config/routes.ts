@@ -4,7 +4,7 @@ export const RECRUITER_JOB_POSTINGS_PATH = "/recruiter/job-postings";
 
 /** Public job page and its apply flow (UC-BJOB-03); applications link here to view or apply again. */
 export function jobPath(jobId: string): string {
-  return `/jobs/${jobId}`;
+  return `/career/${jobId}`;
 }
 
 /** Admin user accounts list and detail. */

@@ -241,6 +241,7 @@
     "home": "ITTalent home",
     "main": "Main",
     "jobs": "Jobs",
+    "companies": "Companies",
     "notifications": "Notifications",
     "notificationsUnread": "Notifications, {{count}} unread",
     "accountMenu": "Account menu, {{name}}",
@@ -1041,6 +1042,34 @@
       "body": "Create your ITTalent profile once, upload your CV, and apply to IT roles across Vietnam in a couple of clicks.",
       "create": "Create your profile",
       "browse": "Browse jobs"
+    }
+  },
+  "documents": {
+    "title": "My documents",
+    "subtitle": "Upload CVs and cover letters. Files are stored securely by the platform.",
+    "dropTitle": "Drag and drop a document here",
+    "dropHint": "PDF, DOC, DOCX · maximum {{size}} MB",
+    "typeLabel": "Document type",
+    "typeCv": "CV",
+    "typeCoverLetter": "Cover letter",
+    "browse": "Browse files",
+    "uploading": "Uploading…",
+    "tabs": { "all": "All documents", "cv": "CVs", "cover_letter": "Cover letters" },
+    "columns": { "name": "Document", "type": "Type", "uploaded": "Uploaded" },
+    "view": "View",
+    "open": "Open {{name}}",
+    "emptyTitle": "No documents yet",
+    "emptyHint": "Upload a CV or cover letter to see it here.",
+    "loadError": "Could not load documents",
+    "invalidFile": "Invalid file",
+    "uploadedTitle": "Document uploaded",
+    "uploadedMessage": "{{name}} is now available in your documents.",
+    "uploadFailedTitle": "Could not upload document",
+    "uploadFailedMessage": "The document could not be uploaded.",
+    "errors": {
+      "format": "Only PDF, DOC and DOCX files are supported (.pdf, .doc, .docx). \"{{name}}\" can't be uploaded.",
+      "empty": "\"{{name}}\" is empty. Choose a file that has content.",
+      "size": "\"{{name}}\" is larger than {{size}} MB. Choose a smaller file."
     }
   },
   "datePicker": {

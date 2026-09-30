@@ -132,11 +132,6 @@ export const appRoutes = [
     element: <PublicLayout />,
     children: [
       { path: "/jobs", element: <JobsPage /> },
-      {
-        path: "/documents",
-        element: <ProtectedRoute requiredRole="user" />,
-        children: [{ index: true, element: <DocumentsPage /> }],
-      },
     ],
   },
   {
@@ -160,6 +155,7 @@ export const appRoutes = [
       {
         element: <CandidateLayout />,
         children: [
+          { path: "/documents", element: <DocumentsPage /> },
           { path: "/my-applications", element: <ApplicationsPage /> },
           { path: "/my-applications/:id", element: <ApplicationDetailPage /> },
         ],
