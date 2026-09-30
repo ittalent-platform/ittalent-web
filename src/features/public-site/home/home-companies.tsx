@@ -31,7 +31,7 @@ function CompanyCard({ company }: { company: HomeCompany }) {
         <div className="absolute bottom-0 right-6 h-[62px] w-[120px] rounded-t-[60px] bg-mkt-ink/10" />
         <div className="absolute bottom-0 right-11 h-[42px] w-20 rounded-t-[40px] bg-mkt-ink/10" />
       </div>
-      <div className="-mt-[30px] flex flex-col gap-3.5 px-[22px] pb-[22px]">
+      <div className="relative -mt-[30px] flex flex-col gap-3.5 px-[22px] pb-[22px]">
         <CompanyMark
           className="size-[60px] rounded-2xl border-4 border-white text-[17px]"
           name={company.name}
