@@ -4,8 +4,8 @@ import { AuthBrand } from "./auth-brand";
 export function AuthPageShell({ aside, children }: { aside: ReactNode; children: ReactNode }) {
   return (
     <div className="flex min-h-screen w-full bg-white">
-      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[480px_1fr] xl:grid-cols-[540px_1fr]">
-        <aside className="relative hidden flex-col overflow-hidden bg-primary px-14 py-11 text-white lg:flex">
+      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[560px_1fr]">
+        <aside className="relative hidden flex-col overflow-hidden bg-[var(--hero-candidate-bg)] px-14 py-11 text-white lg:flex">
           {/* Authentic Breathing Concentric Circles Background */}
           <svg
             aria-hidden="true"
@@ -34,7 +34,7 @@ export function AuthPageShell({ aside, children }: { aside: ReactNode; children:
         </aside>
 
         <main className="flex min-h-screen flex-col bg-white overflow-y-auto">
-          <div className="flex items-center bg-primary px-6 py-5 text-white lg:hidden">
+          <div className="flex items-center bg-[var(--hero-candidate-bg)] px-6 py-5 text-white lg:hidden">
             <AuthBrand />
           </div>
           <div className="flex flex-1 items-center justify-center w-full">
