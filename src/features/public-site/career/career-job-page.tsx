@@ -5,17 +5,15 @@ import {
   CalendarDays,
   CircleCheck,
   Clock,
-  Lock,
   MapPin,
   RefreshCw,
   TrendingUp,
   TriangleAlert,
   Users,
 } from "lucide-react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 
-import { useSession } from "@/auth/use-session";
 import { getErrorStatus } from "@/lib/api-errors";
 import {
   fetchEnterprise,
@@ -110,9 +108,7 @@ function PageShell({ children }: { children: ReactNode }) {
 }
 
 export function CareerJobPage() {
-  const navigate = useNavigate();
   const { slug } = useParams();
-  const { data: session } = useSession();
 
   const { data, error, isError, isLoading, refetch } = useQuery({
     queryKey: ["job", slug],
@@ -474,34 +470,12 @@ export function CareerJobPage() {
             ) : null}
 
             <div className="flex flex-col gap-2.5">
-              {session ? (
-                <ApplyButton
-                  companyName={companyName}
-                  deadline={job.expires_at}
-                  jobTitle={job.title}
-                  slug={slug!}
-                />
-              ) : (
-                <>
-                  <button
-                    className="flex h-[46px] items-center justify-center gap-2 rounded-full bg-mkt-accent text-[14.5px] font-semibold text-white hover:bg-mkt-accent-hover"
-                    onClick={() => navigate("/login")}
-                    type="button"
-                  >
-                    <Lock aria-hidden="true" className="size-4" />
-                    Sign in to apply
-                  </button>
-                  <Link
-                    className="flex h-[46px] items-center justify-center rounded-full border border-mkt-line-strong text-[14.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
-                    to="/register"
-                  >
-                    Create an account
-                  </Link>
-                  <p className="m-0 text-center text-[12.5px] leading-normal text-mkt-muted">
-                    You need to sign in to apply for this position.
-                  </p>
-                </>
-              )}
+              <ApplyButton
+                companyName={companyName}
+                deadline={job.expires_at}
+                jobTitle={job.title}
+                slug={slug!}
+              />
             </div>
           </section>
 
