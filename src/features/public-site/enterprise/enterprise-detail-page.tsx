@@ -71,7 +71,7 @@ const toJob = (dto: JobPostingResponse): Job => ({
   _id: dto.id,
   enterpriseId: dto.enterpriseId,
   title: dto.title,
-  slug: dto.slug || dto.id,
+  slug: dto.id,
   location: dto.location,
   employment_type: dto.employmentType,
   salary_min: dto.salaryMin,
@@ -162,13 +162,19 @@ export function EnterpriseDetailPage() {
     },
     enabled: !!id,
   });
-  const { data: jobs, isLoading: jobsLoading } = useQuery({
+  const {
+    data: jobs,
+    isLoading: jobsLoading,
+    isError: jobsError,
+    refetch: refetchJobs,
+  } = useQuery({
     queryKey: ["enterprise-jobs", id],
     queryFn: async () => {
       const result = await getApiV1JobPostings({ query: { enterprise_id: id!, limit: 100, page: 1, status: "published" } });
       if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
       const now = Date.now();
       return result.data.items
+        .filter((item) => item.enterpriseId === id)
         .filter((item) => !item.expiresAt || new Date(item.expiresAt).getTime() >= now)
         .map(toJob);
     },
@@ -438,6 +444,17 @@ export function EnterpriseDetailPage() {
                   key={i}
                 />
               ))
+            ) : jobsError ? (
+              <p className="border-t border-mkt-line-soft pt-5 text-[14px] text-mkt-danger">
+                Couldn't load open jobs.{" "}
+                <button
+                  className="font-semibold underline"
+                  onClick={() => refetchJobs()}
+                  type="button"
+                >
+                  Retry
+                </button>
+              </p>
             ) : shownJobs.length === 0 ? (
               <p className="border-t border-mkt-line-soft pt-5 text-[14px] text-mkt-muted">
                 No open jobs right now. Check back soon.

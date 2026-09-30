@@ -51,7 +51,7 @@ const toJob = (dto: JobPostingResponse): Job => ({
   _id: dto.id,
   enterpriseId: dto.enterpriseId,
   title: dto.title,
-  slug: dto.slug || dto.id,
+  slug: dto.id,
   location: dto.location,
   employment_type: dto.employmentType,
   salary_min: dto.salaryMin,
@@ -206,6 +206,7 @@ export function CareerJobPage() {
       if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
       const now = Date.now();
       const jobs = result.data.items
+        .filter((item) => item.enterpriseId === enterpriseId)
         .filter((item) => !item.expiresAt || new Date(item.expiresAt).getTime() >= now)
         .map(toJob);
       return jobs;

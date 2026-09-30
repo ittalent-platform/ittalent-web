@@ -65,7 +65,7 @@ const toJob = (dto: JobPostingResponse): Job => ({
   _id: dto.id,
   enterpriseId: dto.enterpriseId,
   title: dto.title,
-  slug: dto.slug || dto.id,
+  slug: dto.id,
   location: dto.location,
   employment_type: dto.employmentType,
   salary_min: dto.salaryMin,
