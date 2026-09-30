@@ -777,6 +777,11 @@
   --color-mkt-amber-fg: #8a4b06;
   --color-mkt-green-bg: #e8f5ee;
   --color-mkt-green-fg: #12764a;
+  --color-mkt-green-border: #bce0cc;
+  --color-mkt-blue-border: #c9d8f2;
+  --color-mkt-violet-bg: #efe9fb;
+  --color-mkt-violet-fg: #6941c6;
+  --color-mkt-violet-border: #d9ccf3;
 }
 
 /* The artwork box keeps the 560 x 520 proportions; ring sizes inside it are cqw. */
