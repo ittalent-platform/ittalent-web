@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -10,13 +10,16 @@ import { Input } from "@/components/ui/input";
 
 import { loginSchema, type LoginFormValues } from "./login.schema";
 import { forgotPasswordPath } from "./password-reset";
-import { getAuthErrorMessage } from "./auth-utils";
+import { getAuthErrorMessage, safeInternalPath } from "./auth-utils";
 import { PasswordField } from "./password-field";
 import { AuthBrand } from "./auth-brand";
 import { AuthPageShell } from "./auth-page-shell";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Set by the job page ("Sign in to apply") so the user lands back on the job after signing in.
+  const redirectTo = safeInternalPath(searchParams.get("redirect") ?? "/");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const form = useForm<LoginFormValues>({
@@ -42,10 +45,12 @@ export function LoginPage() {
       if (result.data.user.role === "admin") {
         navigate("/admin/users", { replace: true });
       } else {
-        navigate("/", { replace: true });
+        navigate(redirectTo, { replace: true });
       }
     } catch (error) {
-      setSubmitError(getAuthErrorMessage(error, "Unable to sign in right now."));
+      setSubmitError(
+        getAuthErrorMessage(error, "Unable to sign in right now."),
+      );
     }
   }
 
@@ -154,9 +159,7 @@ export function LoginPage() {
 
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 bg-(--border-faint)" />
-            <span className="text-xs text-(--fg-faint)">
-              New to ITTalent?
-            </span>
+            <span className="text-xs text-(--fg-faint)">New to ITTalent?</span>
             <div className="h-px flex-1 bg-(--border-faint)" />
           </div>
 
