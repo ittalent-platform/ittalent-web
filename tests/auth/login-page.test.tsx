@@ -16,6 +16,7 @@ describe("LoginPage", () => {
     expect(screen.getByLabelText(/email or username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /forgot password\?/i })).toHaveAttribute("href", "/forgot-password");
     expect(screen.getByRole("link", { name: /create an account/i })).toHaveAttribute("href", "/register");
   });
 

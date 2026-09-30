@@ -57,6 +57,9 @@
   --status-error-bg: oklch(0.965 0.025 25);
   --status-error-fg: oklch(0.48 0.18 27);
   --status-error-border: oklch(0.86 0.075 28);
+  --danger-fg: #b42318;
+  --danger-bg: #fbe9e7;
+  --danger-border: #efc3bd;
   --status-info-border: oklch(0.84 0.075 255);
   --status-disabled-fg: oklch(0.72 0.006 286);
   --application-submitted: oklch(0.4 0.01 286);

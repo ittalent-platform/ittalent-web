@@ -15,6 +15,21 @@ const RegisterPage = lazy(() =>
     default: m.RegisterPage,
   })),
 );
+const EmailVerificationPage = lazy(() =>
+  import("@/features/auth/email-verification-page").then((m) => ({
+    default: m.EmailVerificationPage,
+  })),
+);
+const ForgotPasswordPage = lazy(() =>
+  import("@/features/auth/forgot-password-page").then((m) => ({
+    default: m.ForgotPasswordPage,
+  })),
+);
+const ResetPasswordPage = lazy(() =>
+  import("@/features/auth/reset-password-page").then((m) => ({
+    default: m.ResetPasswordPage,
+  })),
+);
 const UsersPage = lazy(() =>
   import("@/features/admin/users/users-page").then((m) => ({
     default: m.UsersPage,
@@ -60,6 +75,9 @@ export const appRoutes = [
   },
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
+  { path: "/verify-email", element: <EmailVerificationPage /> },
+  { path: "/forgot-password", element: <ForgotPasswordPage /> },
+  { path: "/reset-password", element: <ResetPasswordPage /> },
   {
     path: "/admin",
     element: <ProtectedRoute requiredRole="admin" />,

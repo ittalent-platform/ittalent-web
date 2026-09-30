@@ -1,6 +1,11 @@
 import { getApiV1AuthMe } from "@/api/generated";
 import type { UserDto } from "@/api/generated/types.gen";
-import { getStoredTokens, setStoredTokens, type AuthTokens } from "@/api/client";
+import {
+  getStoredTokens,
+  setStoredTokens,
+  refreshAuthTokens,
+  type AuthTokens,
+} from "@/api/client";
 
 export async function getCurrentUser(): Promise<UserDto | null> {
   const tokens = getStoredTokens();
@@ -33,6 +38,7 @@ export const authClient = {
   getStoredTokens,
   setStoredTokens,
   getCurrentUser,
+  refreshToken: refreshAuthTokens,
   login: handleLoginSuccess,
   logout: handleLogout,
 };
