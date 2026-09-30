@@ -26,9 +26,13 @@ dist-ssr
 
 # Agents
 .codex
-AGENTS.md
 GEMINI.md
 CLAUDE.md
 
 # Generated docs
 docs/
+
+# Playwright
+e2e/.auth/
+playwright-report/
+test-results/

@@ -1,5 +1,5 @@
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
-import { useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState, type ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -16,6 +16,8 @@ type FilterSelectProps<T extends string> = {
   onChange: (value: T) => void
   options: FilterSelectOption<T>[]
   placeholder?: string
+  /** Custom trigger content, e.g. a muted "Status:" prefix before the emphasised value. */
+  renderTrigger?: (selectedLabel: string) => ReactNode
   searchable?: boolean
   size?: "md" | "sm"
   value: T
@@ -28,6 +30,7 @@ export function FilterSelect<T extends string>({
   onChange,
   options,
   placeholder = "All",
+  renderTrigger,
   searchable = false,
   size = "md",
   value,
@@ -130,7 +133,7 @@ export function FilterSelect<T extends string>({
           )}
           type="button"
         >
-          {selected?.label ?? placeholder}
+          {renderTrigger ? renderTrigger(selected?.label ?? placeholder) : (selected?.label ?? placeholder)}
           <span className="pb-px text-muted-foreground">▾</span>
         </button>
       </DropdownMenuPrimitive.Trigger>
