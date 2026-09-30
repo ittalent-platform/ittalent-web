@@ -31,13 +31,13 @@ describe("EmailVerificationPage", () => {
   });
 
   it.each([
-    ["stage=already-verified&code=EMAIL_ALREADY_VERIFIED", /Already verified/i],
-    ["stage=invalid&code=INVALID_VERIFICATION_TOKEN", /Invalid verification link/i],
+    ["stage=already-verified&code=EMAIL_ALREADY_VERIFIED", /Email already verified/i],
+    ["stage=invalid&code=INVALID_VERIFICATION_TOKEN", /This link isn.t valid/i],
     ["stage=retry-later&code=RATE_LIMITED", /Please try again later/i],
-    ["stage=expired", /Link expired/i],
+    ["stage=expired", /This link has expired/i],
     ["stage=success", /Email verified/i],
-    ["stage=registration&email=user@example.com", /Registration successful/i],
-    ["status=invalid&code=INVALID_VERIFICATION_TOKEN", /Invalid verification link/i],
+    ["stage=registration&email=user@example.com", /Check your email/i],
+    ["status=invalid&code=INVALID_VERIFICATION_TOKEN", /This link isn.t valid/i],
   ])("renders heading for %s", (query, heading) => {
     renderPage(query);
 
@@ -63,7 +63,7 @@ describe("EmailVerificationPage", () => {
     const user = userEvent.setup();
     renderPage("stage=registration&email=tester@example.com");
 
-    const resendButton = screen.getByRole("button", { name: /resend verification email/i });
+    const resendButton = screen.getByRole("button", { name: /^resend email$/i });
     await user.click(resendButton);
 
     expect(mockedResendEmail).toHaveBeenCalledWith({
@@ -90,10 +90,10 @@ describe("EmailVerificationPage", () => {
     const user = userEvent.setup();
     renderPage("stage=expired");
 
-    const input = screen.getByLabelText(/email address/i);
+    const input = screen.getByLabelText(/^email$/i);
     await user.type(input, "expired-user@example.com");
 
-    const resendButton = screen.getByRole("button", { name: /resend verification email/i });
+    const resendButton = screen.getByRole("button", { name: /send a new link/i });
     await user.click(resendButton);
 
     expect(mockedResendEmail).toHaveBeenCalledWith({
@@ -118,7 +118,7 @@ describe("EmailVerificationPage", () => {
     const user = userEvent.setup();
     renderPage("stage=registration&email=ratelimited@example.com");
 
-    const resendButton = screen.getByRole("button", { name: /resend verification email/i });
+    const resendButton = screen.getByRole("button", { name: /^resend email$/i });
     await user.click(resendButton);
 
     expect(

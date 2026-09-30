@@ -248,18 +248,19 @@
   },
   "auth": {
     "forgot": {
-      "backToSignIn": "← Back to sign in",
       "email": "Email",
       "emailPlaceholder": "you@example.com",
       "errorFallback": "Unable to send reset instructions right now.",
       "invalidEmail": "Email must be a valid email address.",
-      "sendFailed": "We couldn't send the email right now. Please try again later.",
-      "sentGeneric": "If an account exists for this email, reset instructions have been sent. Check your inbox.",
-      "submit": "Send reset instructions",
+      "sendFailed": "We couldn't send the email right now. Try again later.",
+      "submit": "Send reset link",
       "submitting": "Sending...",
-      "subtitle": "Enter your registered email and we'll send reset instructions. The link expires in 24 hours and can be used once.",
+      "subtitle": "Enter your email. We'll send a link that works once and expires in 24 hours.",
       "title": "Reset your password",
-      "tooMany": "Too many reset requests for this email. Please try again later."
+      "tooMany": "Too many reset requests for this email. Try again in 15 minutes.",
+      "backToSignInPlain": "Back to sign in",
+      "sentTitle": "Check your email",
+      "sentBody": "If an account exists for <strong>{{email}}</strong>, we sent reset instructions."
     },
     "hero": {
       "body": "Apply to IT jobs from verified companies and follow every application in one place.",
@@ -323,8 +324,8 @@
       "goToSignIn": "Go to sign in",
       "haveAccount": "Already have an account?",
       "mobile": "Mobile",
+      "mobileHint": "Optional · 10–15 digits",
       "mobilePlaceholder": "0901 234 567",
-      "optional": "Optional",
       "password": "Password",
       "passwordHint": "8–64 characters with upper case, lower case, a number and a special character.",
       "resend": "Resend email",
@@ -336,36 +337,32 @@
       "signInInstead": "Sign in instead",
       "submit": "Create account",
       "submitting": "Creating account...",
-      "subtitle": "Get started with ITTalent in seconds",
+      "subtitle": "Sign up as a candidate. We will email you a link to verify your address.",
       "terms": "I agree to the <terms>Terms of use</terms> and <privacy>Privacy policy</privacy>.",
-      "title": "Create an account",
+      "title": "Create your account",
       "username": "Username",
       "usernamePlaceholder": "e.g. alex_dev"
     },
     "reset": {
-      "backToSignIn": "← Back to sign in",
       "backToSignInPlain": "Back to sign in",
       "checkFailedBody": "We could not verify this reset link right now. Please try again.",
       "checkFailedTitle": "Unable to check reset link",
       "checking": "Checking reset link...",
-      "confirmPassword": "Confirm password",
+      "confirmPassword": "Confirm new password",
       "errorFallback": "Unable to reset your password right now.",
-      "expiredBody": "This reset link has expired or was already used. Request a new password reset link to continue.",
-      "expiredTitle": "Link expired",
-      "invalidBody": "This password reset link is not valid. Request a new link to continue.",
-      "invalidTitle": "Invalid reset link",
-      "missingBody": "This password reset link is missing a token or has expired. Request a new link to continue.",
       "newPassword": "New password",
-      "requestNewLink": "Request new link",
       "requestNewLinkShort": "Request a new link",
       "retry": "Retry",
       "signIn": "Sign in",
-      "submit": "Reset password",
+      "submit": "Save new password",
       "submitting": "Resetting...",
       "subtitle": "Choose a strong new password for your account. The reset link can be used once.",
-      "success": "Password reset successful.",
-      "successNote": "You can now sign in with your new password.",
-      "title": "Set a new password"
+      "title": "Set a new password",
+      "unusableTitle": "This reset link can't be used",
+      "unusableBody": "It has expired or was already used. Request a new one.",
+      "passwordHint": "8–64 characters with upper case, lower case, a number and a special character.",
+      "successTitle": "Password changed",
+      "successBody": "Your email is verified too. You were signed out on every device, so sign in with the new password."
     },
     "validation": {
       "confirmPasswordMatch": "Confirm password must match password",
@@ -391,31 +388,31 @@
     },
     "verify": {
       "alreadyVerified": {
-        "body": "No further action is needed — your email was verified earlier and your account remains active.",
-        "title": "Already verified"
+        "body": "No further action is needed.",
+        "title": "Email already verified"
       },
       "deliveryFailed": "We could not send the verification email. Please request a new verification email.",
-      "emailAddress": "Email address",
+      "emailAddress": "Email",
       "emailPlaceholder": "you@example.com",
       "emailRequired": "Enter the email address that should receive the verification link.",
       "expired": {
-        "body": "The 24-hour verification window has passed. Your account is now blocked-unverified.",
-        "note": "Resend limited to 3 per 24 hours.",
-        "title": "Link expired"
+        "body": "Verification links last 24 hours. Send a new link to the email on this account.",
+        "note": "Resend is limited to 3 times per 24 hours.",
+        "title": "This link has expired"
       },
       "goToSignIn": "Go to sign in",
-      "goToSignInArrow": "Go to sign in →",
       "invalid": {
-        "body": "This email verification link is not valid. Check that you opened the most recent email.",
-        "note": "Repeated invalid attempts are temporarily blocked (5 per 10 min).",
-        "title": "Invalid verification link"
+        "body": "Open the most recent email from ITTalent, or request a new link.",
+        "note": "Repeated invalid attempts are paused for 10 minutes.",
+        "title": "This link isn't valid"
       },
       "registration": {
-        "body": "Please check your email to verify your account. The verification link is single-use and expires in 24 hours.",
+        "body": "We sent a link to verify your email. The link works once and expires in 24 hours.",
         "note": "Resend is limited to 3 times per 24 hours.",
-        "title": "Registration successful"
+        "title": "Check your email",
+        "bodyWithEmail": "If <strong>{{email}}</strong> can be used, we sent a link to verify it. The link works once and expires in 24 hours."
       },
-      "resend": "Resend verification email",
+      "resend": "Resend email",
       "resendError": "We could not send the verification email. Please try again later.",
       "resendSuccess": "Verification email sent. Please check your inbox.",
       "retryLater": {
@@ -423,16 +420,17 @@
         "title": "Please try again later"
       },
       "sending": "Sending...",
-      "sentTo": "Sent to <strong>{{email}}</strong>",
       "signIn": "Sign in",
       "success": {
-        "body": "Your account is now active. You can sign in and start exploring.",
+        "body": "Your account is ready. Sign in to apply for jobs.",
         "title": "Email verified"
       },
       "verifying": {
         "body": "Please wait while we verify your email address...",
         "title": "Verifying your email"
-      }
+      },
+      "sendNewLink": "Send a new link",
+      "requestNewLink": "Request a new link"
     }
   },
   "footer": {

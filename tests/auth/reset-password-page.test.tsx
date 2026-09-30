@@ -52,14 +52,14 @@ describe("ResetPasswordPage", () => {
     renderPage();
 
     await user.type(
-      await screen.findByLabelText(/^new password$/i),
+      await screen.findByLabelText(/^new password/i),
       "Password123!",
     );
     await user.type(
-      screen.getByLabelText(/^confirm password$/i),
+      screen.getByLabelText(/^confirm new password/i),
       "Password123!",
     );
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
+    await user.click(screen.getByRole("button", { name: /save new password/i }));
 
     expect(mockedPostResetPassword).toHaveBeenCalledWith({
       body: {
@@ -69,7 +69,7 @@ describe("ResetPasswordPage", () => {
     });
 
     expect(
-      await screen.findByText(/Password reset successful/i),
+      await screen.findByText(/Password changed/i),
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /^sign in$/i })).toHaveAttribute(
       "href",
@@ -80,7 +80,7 @@ describe("ResetPasswordPage", () => {
   it("shows the invalid-link state when no token is provided", () => {
     renderPage("/reset-password");
 
-    expect(screen.getByText(/Invalid reset link/i)).toBeInTheDocument();
+    expect(screen.getByText(/reset link can.t be used/i)).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /request a new link/i }),
     ).toHaveAttribute("href", "/forgot-password");
@@ -94,9 +94,9 @@ describe("ResetPasswordPage", () => {
 
     renderPage();
 
-    expect(await screen.findByText(/Invalid reset link/i)).toBeInTheDocument();
+    expect(await screen.findByText(/reset link can.t be used/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /request new link/i }),
+      screen.getByRole("link", { name: /request a new link/i }),
     ).toHaveAttribute("href", "/forgot-password");
   });
 
@@ -108,7 +108,7 @@ describe("ResetPasswordPage", () => {
 
     renderPage();
 
-    expect(await screen.findByText(/Link expired/i)).toBeInTheDocument();
+    expect(await screen.findByText(/reset link can.t be used/i)).toBeInTheDocument();
   });
 
   it("shows expired state when the token becomes unavailable during submit", async () => {
@@ -124,16 +124,16 @@ describe("ResetPasswordPage", () => {
     renderPage();
 
     await user.type(
-      await screen.findByLabelText(/^new password$/i),
+      await screen.findByLabelText(/^new password/i),
       "Password123!",
     );
     await user.type(
-      screen.getByLabelText(/^confirm password$/i),
+      screen.getByLabelText(/^confirm new password/i),
       "Password123!",
     );
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
+    await user.click(screen.getByRole("button", { name: /save new password/i }));
 
-    expect(await screen.findByText(/Link expired/i)).toBeInTheDocument();
+    expect(await screen.findByText(/reset link can.t be used/i)).toBeInTheDocument();
   });
 
   it("shows retry state for server errors and retries the preflight check", async () => {
@@ -157,11 +157,11 @@ describe("ResetPasswordPage", () => {
     expect(
       await screen.findByText(/Unable to check reset link/i),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/Link expired/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/reset link can.t be used/i)).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /^retry$/i }));
 
-    expect(await screen.findByLabelText(/^new password$/i)).toBeInTheDocument();
+    expect(await screen.findByLabelText(/^new password/i)).toBeInTheDocument();
     expect(mockedGetResetPassword).toHaveBeenCalledTimes(2);
   });
 
@@ -173,14 +173,14 @@ describe("ResetPasswordPage", () => {
     expect(
       await screen.findByText(/Unable to check reset link/i),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/Link expired/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/reset link can.t be used/i)).not.toBeInTheDocument();
   });
 
   it("toggles password visibility", async () => {
     const user = userEvent.setup();
     renderPage();
 
-    const passwordInput = await screen.findByLabelText(/^new password$/i);
+    const passwordInput = await screen.findByLabelText(/^new password/i);
     expect(passwordInput).toHaveAttribute("type", "password");
 
     await user.click(
@@ -198,7 +198,7 @@ describe("ResetPasswordPage", () => {
     renderPage();
 
     await user.type(
-      await screen.findByLabelText(/^new password$/i),
+      await screen.findByLabelText(/^new password/i),
       "Password123!",
     );
 
@@ -229,14 +229,14 @@ describe("ResetPasswordPage", () => {
     renderPage();
 
     await user.type(
-      await screen.findByLabelText(/^new password$/i),
+      await screen.findByLabelText(/^new password/i),
       "Password123!",
     );
     await user.type(
-      screen.getByLabelText(/^confirm password$/i),
+      screen.getByLabelText(/^confirm new password/i),
       "Password123!",
     );
-    await user.click(screen.getByRole("button", { name: /reset password/i }));
+    await user.click(screen.getByRole("button", { name: /save new password/i }));
 
     expect(
       await screen.findByText(/Too many password reset attempts/i),

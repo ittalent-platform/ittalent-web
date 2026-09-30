@@ -33,7 +33,7 @@ describe("ForgotPasswordPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /send reset instructions/i }),
+      screen.getByRole("button", { name: /send reset link/i }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /back to sign in/i }),
@@ -45,7 +45,7 @@ describe("ForgotPasswordPage", () => {
     renderPage();
 
     const submitButton = screen.getByRole("button", {
-      name: /send reset instructions/i,
+      name: /send reset link/i,
     });
     await user.click(submitButton);
 
@@ -77,7 +77,7 @@ describe("ForgotPasswordPage", () => {
 
     await user.type(screen.getByLabelText(/^email$/i), "user@example.com");
     await user.click(
-      screen.getByRole("button", { name: /send reset instructions/i }),
+      screen.getByRole("button", { name: /send reset link/i }),
     );
 
     expect(mockedForgotPassword).toHaveBeenCalledWith({
@@ -86,7 +86,9 @@ describe("ForgotPasswordPage", () => {
       },
     });
 
-    expect(await screen.findByText("Reset email dispatched.")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /check your email/i })).toBeInTheDocument();
+    expect(screen.getByText("user@example.com")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /back to sign in/i })).toHaveAttribute("href", "/login");
   });
 
   it("handles rate limit 429 response gracefully", async () => {
@@ -105,7 +107,7 @@ describe("ForgotPasswordPage", () => {
       "rate-limited@example.com",
     );
     await user.click(
-      screen.getByRole("button", { name: /send reset instructions/i }),
+      screen.getByRole("button", { name: /send reset link/i }),
     );
 
     expect(
@@ -128,7 +130,7 @@ describe("ForgotPasswordPage", () => {
 
     await user.type(screen.getByLabelText(/^email$/i), "fail@example.com");
     await user.click(
-      screen.getByRole("button", { name: /send reset instructions/i }),
+      screen.getByRole("button", { name: /send reset link/i }),
     );
 
     expect(

@@ -1,324 +1,114 @@
 import { useState } from "react";
-import type { TFunction } from "i18next";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Mail } from "lucide-react";
 
 import { postApiV1AuthForgotPassword } from "@/api/generated";
+import { FormField } from "@/components/common/form-field";
+import { InlineBanner } from "@/components/common/inline-banner";
+import { StatusPanel } from "@/components/common/status-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthStatusCard } from "./auth-status-card";
-import {
-  forgotPasswordSchema,
-  type ForgotPasswordFormValues,
-} from "./forgot-password.schema";
+import { AuthCardPage, AuthFormHeader, AuthStatusCard } from "./auth-status-card";
+import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS } from "./auth-status.constants";
+import { forgotPasswordSchema, type ForgotPasswordFormValues } from "./forgot-password.schema";
 import { getAuthErrorMessage } from "./auth-utils";
 
-type ToastTone = "success" | "warning" | "error";
+const HTTP_TOO_MANY_REQUESTS = 429;
+const HTTP_SERVICE_UNAVAILABLE = 503;
 
-type ToastState = {
-  message: string;
-  note?: string;
-  tone: ToastTone;
-};
-
-function getToastTone(status?: number): ToastTone {
-  if (status === 429 || status === 503) {
-    return "warning";
-  }
-
-  return "error";
-}
-
-function getToastCopy(
-  t: TFunction,
-  tone: ToastTone,
-  status?: number,
-  fallbackMessage?: string,
-): ToastState {
-  if (tone === "success") {
-    return {
-      message:
-        fallbackMessage ??
-        t("auth.forgot.sentGeneric"),
-      tone,
-    };
-  }
-
-  if (status === 429) {
-    return {
-      message:
-        fallbackMessage ??
-        t("auth.forgot.tooMany"),
-      tone,
-    };
-  }
-
-  if (status === 503) {
-    return {
-      message:
-        fallbackMessage ??
-        t("auth.forgot.sendFailed"),
-      tone,
-    };
-  }
-
-  return {
-    message: fallbackMessage ?? t("auth.forgot.invalidEmail"),
-    tone,
-  };
-}
-
-function getToastStyles(tone: ToastTone) {
-  switch (tone) {
-    case "success":
-      return {
-        box: "bg-(--status-success-bg) border-(--status-success-border)",
-        icon: "text-(--status-success-fg)",
-        message: "text-(--status-success-fg)",
-        note: "text-(--fg-faint)",
-      };
-    case "warning":
-      return {
-        box: "bg-(--status-warning-bg) border-(--status-warning-border)",
-        icon: "text-(--status-warning-fg)",
-        message: "text-(--status-warning-fg)",
-        note: "text-(--fg-faint)",
-      };
-    case "error":
-    default:
-      return {
-        box: "bg-(--danger-bg) border-(--danger-border)",
-        icon: "text-(--danger-fg)",
-        message: "text-(--danger-fg)",
-        note: "text-(--fg-faint)",
-      };
-  }
-}
-
-function ToastIcon({ tone }: { tone: ToastTone }) {
-  switch (tone) {
-    case "success":
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M3.5 8.2 6.6 11 12.5 4.8"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-    case "warning":
-      return (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden="true"
-        >
-          <circle
-            cx="8"
-            cy="8"
-            r="6.25"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M8 4.5V8l2.3 1.4"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      );
-    case "error":
-    default:
-      return (
-        <span aria-hidden="true" className="text-[15px] font-bold leading-none">
-          !
-        </span>
-      );
-  }
-}
-
-function ToastCard({ toast }: { toast: ToastState }) {
-  const styles = getToastStyles(toast.tone);
-
-  return (
-    <div
-      className={`flex gap-2.5 rounded-[0.5rem] border px-3.5 py-3 ${styles.box}`}
-      aria-live="polite"
-      role="status"
-    >
-      <span className={`${styles.icon} mt-0.5 shrink-0`}>
-        <ToastIcon tone={toast.tone} />
-      </span>
-
-      <div>
-        <p className={`m-0 text-[13px] leading-[1.5] ${styles.message}`}>
-          {toast.message}
-        </p>
-        {toast.note ? (
-          <p className={`mt-1.5 text-[11.5px] leading-[1.45] ${styles.note}`}>
-            {toast.note}
-          </p>
-        ) : null}
-      </div>
-    </div>
-  );
-}
+type Banner = { message: string; tone: "error" | "warning" };
 
 export function ForgotPasswordPage() {
   const { t } = useTranslation();
-  const [toast, setToast] = useState<ToastState | null>(null);
+  const [banner, setBanner] = useState<Banner | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   const form = useForm<ForgotPasswordFormValues>({
-    defaultValues: {
-      email: "",
-    },
+    defaultValues: { email: "" },
     resolver: zodResolver(forgotPasswordSchema),
   });
 
   async function onSubmit(values: ForgotPasswordFormValues) {
-    setToast(null);
+    setBanner(null);
 
-    const response = await postApiV1AuthForgotPassword({
-      body: {
-        email: values.email,
-      },
-    });
+    const response = await postApiV1AuthForgotPassword({ body: { email: values.email } });
 
     if (response.error) {
       const status = response.response?.status;
-      const tone = getToastTone(status);
-      setToast(
-        getToastCopy(
-          t,
-          tone,
-          status,
-          getAuthErrorMessage(
-            response.error,
-            t("auth.forgot.errorFallback"),
-          ),
-        ),
-      );
+      const fallback =
+        status === HTTP_TOO_MANY_REQUESTS
+          ? t("auth.forgot.tooMany")
+          : status === HTTP_SERVICE_UNAVAILABLE
+            ? t("auth.forgot.sendFailed")
+            : t("auth.forgot.errorFallback");
+      setBanner({
+        message: getAuthErrorMessage(response.error, fallback),
+        // Throttled requests are the visitor's to fix (red); an unavailable mailer is ours (amber).
+        tone: status === HTTP_SERVICE_UNAVAILABLE ? "warning" : "error",
+      });
       return;
     }
 
-    setToast(
-      getToastCopy(
-        t,
-        "success",
-        response.response?.status,
-        response.data?.message ??
-          t("auth.forgot.sentGeneric"),
-      ),
-    );
-    form.reset({ email: values.email });
+    // The same confirmation for every address, so the page never reveals whether an account exists.
+    setSentTo(values.email);
   }
 
-  function onInvalid() {
-    setToast(null);
+  if (sentTo) {
+    return (
+      <AuthCardPage>
+        <AuthStatusCard>
+          <StatusPanel
+            actions={
+              <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant="outline">
+                <Link to="/login">{t("auth.forgot.backToSignInPlain")}</Link>
+              </Button>
+            }
+            description={
+              <Trans
+                components={{ strong: <strong className="font-semibold text-foreground" /> }}
+                i18nKey="auth.forgot.sentBody"
+                values={{ email: sentTo }}
+              />
+            }
+            icon={Mail}
+            title={t("auth.forgot.sentTitle")}
+            tone="success"
+          />
+        </AuthStatusCard>
+      </AuthCardPage>
+    );
   }
 
   return (
-    <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-      <AuthStatusCard>
-        <div className="flex size-[58px] items-center justify-center rounded-[14px] bg-(--status-peach-bg) text-(--status-peach-fg)">
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <circle
-              cx="8"
-              cy="16"
-              r="4.25"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <path
-              d="M11.5 12.5 20 4M16 8l3 3M13.5 10.5l2 2"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
+    <AuthCardPage>
+      <AuthStatusCard className="flex flex-col gap-4 px-7 py-[26px]">
+        <AuthFormHeader description={t("auth.forgot.subtitle")} title={t("auth.forgot.title")} />
 
-        <div className="mt-4">
-          <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[28px] font-semibold text-foreground">
-            {t("auth.forgot.title")}
-          </h1>
-          <p className="mt-2 text-[16px] leading-[1.6] text-muted-foreground">
-            {t("auth.forgot.subtitle")}
-          </p>
-        </div>
-
-        {toast ? (
-          <div className="mt-5">
-            <ToastCard toast={toast} />
-          </div>
-        ) : null}
-
-        <form
-          className="mt-7 flex flex-col gap-5"
-          onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-        >
-          <div>
-            <label
-              className="mb-2 block text-[15px] font-semibold text-foreground"
-              htmlFor="forgot-password-email"
-            >
-              {t("auth.forgot.email")}
-            </label>
-
+        <form className="flex flex-col gap-4" noValidate onSubmit={form.handleSubmit(onSubmit, () => setBanner(null))}>
+          <FormField error={form.formState.errors.email?.message} htmlFor="forgot-password-email" label={t("auth.forgot.email")}>
             <Input
+              aria-invalid={form.formState.errors.email ? true : undefined}
               id="forgot-password-email"
-              className="h-12 w-full rounded-[1rem] border border-(--border-muted) bg-white px-5 text-[16px] text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-4 focus:ring-primary/15"
               placeholder={t("auth.forgot.emailPlaceholder")}
               type="email"
               {...form.register("email")}
             />
+          </FormField>
 
-            {form.formState.errors.email ? (
-              <p className="mt-1.5 text-sm text-red-600">
-                {form.formState.errors.email.message}
-              </p>
-            ) : null}
-          </div>
+          {banner ? <InlineBanner tone={banner.tone}>{banner.message}</InlineBanner> : null}
 
-          <Button
-            className="h-12 w-full text-[16px] font-bold"
-            disabled={form.formState.isSubmitting}
-            shape="pill"
-            type="submit"
-          >
-            {form.formState.isSubmitting
-              ? t("auth.forgot.submitting")
-              : t("auth.forgot.submit")}
+          <Button className={AUTH_FULL_ACTION_CLASS} disabled={form.formState.isSubmitting} shape="xl" type="submit">
+            {form.formState.isSubmitting ? t("auth.forgot.submitting") : t("auth.forgot.submit")}
           </Button>
         </form>
 
-        <Link
-          className="mt-7 block text-center text-[15px] text-muted-foreground no-underline hover:text-foreground"
-          to="/login"
-        >
-          {t("auth.forgot.backToSignIn")}
+        <Link className="self-center text-[13.5px] font-semibold text-fg-link no-underline hover:underline" to="/login">
+          {t("auth.forgot.backToSignInPlain")}
         </Link>
       </AuthStatusCard>
-    </div>
+    </AuthCardPage>
   );
 }

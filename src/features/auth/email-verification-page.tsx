@@ -2,19 +2,15 @@ import { useEffect, useMemo, useState, type FormEvent, type MouseEvent } from "r
 import type { TFunction } from "i18next";
 import { Trans, useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
-import {
-  AlertTriangle,
-  CircleCheck,
-  CircleX,
-  Clock3,
-  Info,
-  Loader2,
-} from "lucide-react";
+import { AlertTriangle, Check, CircleX, Clock3, Info, Loader2, Mail, type LucideIcon } from "lucide-react";
 
 import { getApiV1AuthVerifyEmail, postApiV1AuthResendVerificationEmail } from "@/api/generated";
 import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/common/form-field";
+import { StatusPanel, type StatusPanelTone } from "@/components/common/status-panel";
 import { Input } from "@/components/ui/input";
-import { AuthStatusCard } from "./auth-status-card";
+import { AuthCardPage, AuthStatusCard } from "./auth-status-card";
+import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS, VERIFY_NEW_LINK_PATH } from "./auth-status.constants";
 import {
   emailVerificationPath,
   getEmailVerificationCallbackURL,
@@ -132,65 +128,32 @@ export function resolveVerificationMode(
   return "success";
 }
 
-function getModeCopy(mode: VerificationMode, t: TFunction) {
+type ModeCopy = {
+  body: string;
+  icon: LucideIcon;
+  iconClassName?: string;
+  note: string | null;
+  title: string;
+  tone: StatusPanelTone;
+};
+
+function getModeCopy(mode: VerificationMode, t: TFunction): ModeCopy {
   switch (mode) {
     case "verifying":
-      return {
-        badgeClassName: "bg-(--surface-4) text-foreground",
-        icon: <Loader2 className="size-7 animate-spin" strokeWidth={2.1} />,
-        title: t("auth.verify.verifying.title"),
-        body: t("auth.verify.verifying.body"),
-        note: null,
-      };
+      return { body: t("auth.verify.verifying.body"), icon: Loader2, iconClassName: "animate-spin", note: null, title: t("auth.verify.verifying.title"), tone: "neutral" };
     case "registration":
-      return {
-        badgeClassName: "bg-(--status-success-bg) text-(--status-success-fg)",
-        icon: <CircleCheck className="size-7" strokeWidth={2.1} />,
-        title: t("auth.verify.registration.title"),
-        body: t("auth.verify.registration.body"),
-        note: t("auth.verify.registration.note"),
-      };
+      return { body: t("auth.verify.registration.body"), icon: Mail, note: t("auth.verify.registration.note"), title: t("auth.verify.registration.title"), tone: "success" };
     case "already-verified":
-      return {
-        badgeClassName: "bg-(--status-info-bg) text-(--status-info-fg)",
-        icon: <Info className="size-7" strokeWidth={2.1} />,
-        title: t("auth.verify.alreadyVerified.title"),
-        body: t("auth.verify.alreadyVerified.body"),
-        note: null,
-      };
+      return { body: t("auth.verify.alreadyVerified.body"), icon: Info, note: null, title: t("auth.verify.alreadyVerified.title"), tone: "info" };
     case "invalid":
-      return {
-        badgeClassName: "bg-(--status-error-bg) text-(--status-error-fg)",
-        icon: <CircleX className="size-7" strokeWidth={2.1} />,
-        title: t("auth.verify.invalid.title"),
-        body: t("auth.verify.invalid.body"),
-        note: t("auth.verify.invalid.note"),
-      };
+      return { body: t("auth.verify.invalid.body"), icon: CircleX, note: t("auth.verify.invalid.note"), title: t("auth.verify.invalid.title"), tone: "danger" };
     case "expired":
-      return {
-        badgeClassName: "bg-(--status-warning-bg) text-(--status-warning-fg)",
-        icon: <Clock3 className="size-7" strokeWidth={2.1} />,
-        title: t("auth.verify.expired.title"),
-        body: t("auth.verify.expired.body"),
-        note: t("auth.verify.expired.note"),
-      };
+      return { body: t("auth.verify.expired.body"), icon: Clock3, note: t("auth.verify.expired.note"), title: t("auth.verify.expired.title"), tone: "warning" };
     case "retry-later":
-      return {
-        badgeClassName: "bg-(--status-warning-bg) text-(--status-warning-fg)",
-        icon: <AlertTriangle className="size-7" strokeWidth={2.1} />,
-        title: t("auth.verify.retryLater.title"),
-        body: t("auth.verify.retryLater.body"),
-        note: t("auth.verify.invalid.note"),
-      };
+      return { body: t("auth.verify.retryLater.body"), icon: AlertTriangle, note: t("auth.verify.invalid.note"), title: t("auth.verify.retryLater.title"), tone: "warning" };
     case "success":
     default:
-      return {
-        badgeClassName: "bg-(--status-success-bg) text-(--status-success-fg)",
-        icon: <CircleCheck className="size-7" strokeWidth={2.1} />,
-        title: t("auth.verify.success.title"),
-        body: t("auth.verify.success.body"),
-        note: null,
-      };
+      return { body: t("auth.verify.success.body"), icon: Check, note: null, title: t("auth.verify.success.title"), tone: "success" };
   }
 }
 
@@ -261,7 +224,6 @@ export function EmailVerificationPage() {
   }, [token, hasStage, searchParams, setSearchParams]);
 
   const copy = getModeCopy(mode, t);
-  const canResend = mode === "registration" || mode === "expired";
   const lockedEmail = mode === "registration" && emailFromQuery.length > 0;
   const buttonText =
     resendStatus === "loading" ? t("auth.verify.sending") : t("auth.verify.resend");
@@ -315,130 +277,95 @@ export function EmailVerificationPage() {
     setResendMessage(response.data?.message ?? t("auth.verify.resendSuccess"));
   }
 
+  const description =
+    mode === "registration" && emailFromQuery ? (
+      <Trans
+        components={{ strong: <strong className="font-semibold text-foreground" /> }}
+        i18nKey="auth.verify.registration.bodyWithEmail"
+        values={{ email: emailFromQuery }}
+      />
+    ) : (
+      copy.body
+    );
+  const resendFeedback = resendMessage ? (
+    <p
+      aria-live="polite"
+      className={`max-w-[400px] text-[13px] leading-[1.55] ${resendStatus === "error" ? "text-(--danger-fg)" : "text-(--status-success-fg)"}`}
+    >
+      {resendMessage}
+    </p>
+  ) : null;
+
+  // Expired link, no address known yet: the design's "Resend verification email" form.
+  if (mode === "expired" && !lockedEmail) {
+    return (
+      <AuthCardPage>
+        <AuthStatusCard>
+          <StatusPanel description={copy.body} icon={copy.icon} note={copy.note} title={copy.title} tone={copy.tone}>
+            <form className="mt-2 flex w-full flex-col gap-4 text-left" onSubmit={handleResend}>
+              <FormField htmlFor="verification-email" label={t("auth.verify.emailAddress")}>
+                <Input
+                  id="verification-email"
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder={t("auth.verify.emailPlaceholder")}
+                  type="email"
+                  value={email}
+                />
+              </FormField>
+              <Button className={AUTH_FULL_ACTION_CLASS} disabled={resendStatus === "loading"} shape="xl" type="submit">
+                {resendStatus === "loading" ? t("auth.verify.sending") : t("auth.verify.sendNewLink")}
+              </Button>
+            </form>
+            {resendFeedback}
+          </StatusPanel>
+        </AuthStatusCard>
+      </AuthCardPage>
+    );
+  }
+
+  const actions =
+    mode === "registration" ? (
+      <>
+        <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant="outline">
+          <Link to="/login">{t("auth.verify.goToSignIn")}</Link>
+        </Button>
+        <Button className={AUTH_ACTION_CLASS} disabled={resendStatus === "loading"} onClick={handleResend} shape="xl" type="button">
+          {buttonText}
+        </Button>
+      </>
+    ) : mode === "success" ? (
+      <Button asChild className={AUTH_ACTION_CLASS} shape="xl">
+        <Link to="/login">{t("auth.verify.signIn")}</Link>
+      </Button>
+    ) : mode === "already-verified" ? (
+      <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant="outline">
+        <Link to="/login">{t("auth.verify.goToSignIn")}</Link>
+      </Button>
+    ) : mode === "invalid" ? (
+      <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant="outline">
+        <Link to={VERIFY_NEW_LINK_PATH}>{t("auth.verify.requestNewLink")}</Link>
+      </Button>
+    ) : undefined;
+
   return (
-    <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-      <AuthStatusCard className="overflow-hidden rounded-[0.8rem] bg-white p-0">
-        <div className="flex flex-col items-center px-5 py-11 text-center sm:px-10 sm:py-12">
-          <div
-            className={`grid size-[60px] place-items-center rounded-full text-[26px] ${copy.badgeClassName}`}
-          >
-            {copy.icon}
-          </div>
-
-          <h1 className="mt-4 font-['Space_Grotesk',sans-serif] text-[26px] font-semibold text-foreground sm:text-[30px]">
-            {copy.title}
-          </h1>
-
-          <p className="mt-3 max-w-[380px] text-[14.5px] leading-[1.6] text-muted-foreground sm:text-[15px]">
-            {copy.body}
-          </p>
-
-          {mode === "registration" && emailFromQuery ? (
-            <div className="mt-4 rounded-[0.5rem] bg-(--surface-4) px-4 py-2 text-[13px] text-muted-foreground">
-              <Trans
-                components={{ strong: <strong className="text-foreground" /> }}
-                i18nKey="auth.verify.sentTo"
-                values={{ email: emailFromQuery }}
-              />
-            </div>
-          ) : null}
-
-          {copy.note ? (
-            <p className="mt-3 max-w-[380px] text-[12px] leading-[1.55] text-(--fg-faint)">
-              {copy.note}
-            </p>
-          ) : null}
-
+    <AuthCardPage>
+      <AuthStatusCard>
+        <StatusPanel
+          actions={actions}
+          description={description}
+          icon={copy.icon}
+          iconClassName={copy.iconClassName}
+          note={copy.note}
+          title={copy.title}
+          tone={copy.tone}
+        >
           {deliveryFailed ? (
-            <p className="mt-3 max-w-[380px] text-[13px] leading-[1.55] text-(--danger-fg)">
-              {t("auth.verify.deliveryFailed")}
-            </p>
+            <p className="max-w-[400px] text-[13px] leading-[1.55] text-(--danger-fg)">{t("auth.verify.deliveryFailed")}</p>
           ) : null}
-
-          {canResend ? (
-            lockedEmail ? (
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  className="flex h-11 items-center justify-center rounded-xl border-0 bg-primary px-6 text-[14.5px] font-semibold text-white no-underline transition hover:bg-primary/85"
-                  to="/login"
-                >
-                  {t("auth.verify.goToSignIn")}
-                </Link>
-
-                <Button
-                  className="h-11 px-6 text-[14.5px] font-semibold"
-                  disabled={resendStatus === "loading"}
-                  onClick={handleResend}
-                  type="button"
-                  variant="outline"
-                >
-                  {buttonText}
-                </Button>
-              </div>
-            ) : (
-              <form
-                className="mt-6 flex w-full max-w-[360px] flex-col gap-3 text-left"
-                onSubmit={handleResend}
-              >
-                <div>
-                  <label
-                    className="mb-1.5 block text-[13px] font-semibold text-foreground"
-                    htmlFor="verification-email"
-                  >
-                    {t("auth.verify.emailAddress")}
-                  </label>
-
-                  <Input
-                    id="verification-email"
-                    className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
-                    placeholder={t("auth.verify.emailPlaceholder")}
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                  />
-                </div>
-
-                <Button
-                  className="h-11 px-6 text-[14.5px] font-semibold"
-                  disabled={resendStatus === "loading"}
-                  type="submit"
-                  variant="outline"
-                >
-                  {buttonText}
-                </Button>
-              </form>
-            )
-          ) : null}
-
-          {mode === "success" ? (
-            <Link
-              className="mt-6 flex h-11 items-center justify-center rounded-xl border-0 bg-primary px-6 text-[14.5px] font-semibold text-white no-underline transition hover:bg-primary/85"
-              to="/login"
-            >
-              {t("auth.verify.signIn")}
-            </Link>
-          ) : null}
-
-          {mode === "already-verified" ? (
-            <Link
-              className="mt-5 text-[13.5px] font-semibold text-(--primary-600) no-underline hover:underline"
-              to="/login"
-            >
-              {t("auth.verify.goToSignInArrow")}
-            </Link>
-          ) : null}
-
-          {resendMessage ? (
-            <p
-              aria-live="polite"
-              className={`mt-4 max-w-[380px] text-[13px] leading-[1.55] ${resendStatus === "error" ? "text-(--danger-fg)" : "text-(--status-success-fg)"}`}
-            >
-              {resendMessage}
-            </p>
-          ) : null}
-        </div>
+          {resendFeedback}
+        </StatusPanel>
       </AuthStatusCard>
-    </div>
+    </AuthCardPage>
   );
 }
 
