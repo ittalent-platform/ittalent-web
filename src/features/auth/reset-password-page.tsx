@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -115,6 +116,7 @@ function PasswordRuleChips({
   confirmPassword: string;
   password: string;
 }) {
+  const { t } = useTranslation();
   const touched = password.length > 0 || confirmPassword.length > 0;
 
   return (
@@ -125,7 +127,7 @@ function PasswordRuleChips({
 
         return (
           <span
-            key={rule.label}
+            key={rule.id}
             className={[
               "rounded-full px-3 py-1.5 text-[13px] font-semibold transition-colors duration-200",
               active
@@ -135,7 +137,7 @@ function PasswordRuleChips({
                   : "bg-(--status-neutral-bg) text-(--status-neutral-fg)",
             ].join(" ")}
           >
-            {rule.label} {touched ? (rule.ok ? "✓" : "×") : ""}
+            {t(`auth.password.rule.${rule.id}`)} {touched ? (rule.ok ? "✓" : "×") : ""}
           </span>
         );
       })}
@@ -144,6 +146,7 @@ function PasswordRuleChips({
 }
 
 export function ResetPasswordPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token")?.trim() ?? "";
   const missingToken = token.length === 0;
@@ -246,7 +249,7 @@ export function ResetPasswordPage() {
       setFeedback({
         message: getAuthErrorMessage(
           response.error,
-          "Unable to reset your password right now.",
+          t("auth.reset.errorFallback"),
         ),
         tone: getStatusTone(status),
       });
@@ -254,8 +257,8 @@ export function ResetPasswordPage() {
     }
 
     setFeedback({
-      message: response.data?.message ?? "Password reset successful.",
-      note: "You can now sign in with your new password.",
+      message: response.data?.message ?? t("auth.reset.success"),
+      note: t("auth.reset.successNote"),
       tone: "success",
     });
   }
@@ -263,7 +266,7 @@ export function ResetPasswordPage() {
   if (missingToken) {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto flex size-11 items-center justify-center rounded-[10px] bg-(--danger-bg) text-(--danger-fg)">
             <span
               className="text-[15px] font-bold leading-none"
@@ -274,11 +277,10 @@ export function ResetPasswordPage() {
           </div>
 
           <h1 className="mt-4 font-['Space_Grotesk',sans-serif] text-[22px] font-semibold text-foreground">
-            Invalid reset link
+            {t("auth.reset.invalidTitle")}
           </h1>
           <p className="mt-1.5 text-[13.5px] leading-[1.55] text-muted-foreground">
-            This password reset link is missing a token or has expired. Request
-            a new link to continue.
+            {t("auth.reset.missingBody")}
           </p>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -286,17 +288,17 @@ export function ResetPasswordPage() {
               className="flex h-11 items-center justify-center rounded-xl border-0 bg-primary px-6 text-[14.5px] font-semibold text-white no-underline transition hover:bg-primary/85"
               to={forgotPasswordPath}
             >
-              Request a new link
+              {t("auth.reset.requestNewLinkShort")}
             </Link>
 
             <Link
               className="flex h-11 items-center justify-center rounded-xl border border-(--border-muted) bg-white px-6 text-[14.5px] font-semibold text-foreground no-underline transition hover:bg-(--surface-3)"
               to="/login"
             >
-              Back to sign in
+              {t("auth.reset.backToSignInPlain")}
             </Link>
           </div>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
@@ -304,12 +306,12 @@ export function ResetPasswordPage() {
   if (tokenStatus === "checking") {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto size-10 animate-pulse rounded-full bg-(--status-peach-bg)" />
           <p className="mt-4 text-[14px] font-semibold text-muted-foreground">
-            Checking reset link...
+            {t("auth.reset.checking")}
           </p>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
@@ -317,7 +319,7 @@ export function ResetPasswordPage() {
   if (tokenStatus === "expired") {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-(--status-warning-bg) text-(--status-warning-fg)">
             <svg
               width="30"
@@ -344,20 +346,19 @@ export function ResetPasswordPage() {
           </div>
 
           <h1 className="mt-6 font-['Space_Grotesk',sans-serif] text-[27px] font-semibold text-foreground">
-            Link expired
+            {t("auth.reset.expiredTitle")}
           </h1>
           <p className="mt-3 text-[15px] leading-[1.6] text-muted-foreground">
-            This reset link has expired or was already used. Request a new
-            password reset link to continue.
+            {t("auth.reset.expiredBody")}
           </p>
 
           <Link
             className="mt-7 flex h-12 items-center justify-center rounded-full border-0 bg-primary text-[16px] font-bold text-white no-underline transition hover:bg-primary/85"
             to={forgotPasswordPath}
           >
-            Request new link
+            {t("auth.reset.requestNewLink")}
           </Link>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
@@ -365,7 +366,7 @@ export function ResetPasswordPage() {
   if (tokenStatus === "invalid") {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-(--danger-bg) text-(--danger-fg)">
             <span
               className="text-[28px] font-bold leading-none"
@@ -375,19 +376,18 @@ export function ResetPasswordPage() {
             </span>
           </div>
           <h1 className="mt-6 font-['Space_Grotesk',sans-serif] text-[27px] font-semibold text-foreground">
-            Invalid reset link
+            {t("auth.reset.invalidTitle")}
           </h1>
           <p className="mt-3 text-[15px] leading-[1.6] text-muted-foreground">
-            This password reset link is not valid. Request a new link to
-            continue.
+            {t("auth.reset.invalidBody")}
           </p>
           <Link
             className="mt-7 flex h-12 items-center justify-center rounded-full border-0 bg-primary text-[16px] font-bold text-white no-underline transition hover:bg-primary/85"
             to={forgotPasswordPath}
           >
-            Request new link
+            {t("auth.reset.requestNewLink")}
           </Link>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
@@ -395,7 +395,7 @@ export function ResetPasswordPage() {
   if (tokenStatus === "error") {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-(--danger-bg) text-(--danger-fg)">
             <span
               className="text-[28px] font-bold leading-none"
@@ -406,10 +406,10 @@ export function ResetPasswordPage() {
           </div>
 
           <h1 className="mt-6 font-['Space_Grotesk',sans-serif] text-[27px] font-semibold text-foreground">
-            Unable to check reset link
+            {t("auth.reset.checkFailedTitle")}
           </h1>
           <p className="mt-3 text-[15px] leading-[1.6] text-muted-foreground">
-            We could not verify this reset link right now. Please try again.
+            {t("auth.reset.checkFailedBody")}
           </p>
 
           <Button
@@ -421,16 +421,16 @@ export function ResetPasswordPage() {
               setPreflightAttempt((attempt) => attempt + 1);
             }}
           >
-            Retry
+            {t("auth.reset.retry")}
           </Button>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-      <AuthStatusCard className="w-full max-w-[560px] rounded-[1.1rem] border border-black/15 bg-(--app-canvas) p-10 shadow-[0_28px_90px_rgba(25,25,28,0.14),0_10px_28px_rgba(25,25,28,0.08)] sm:p-12">
+      <AuthStatusCard>
         <div className="flex size-[52px] items-center justify-center rounded-[14px] bg-(--status-peach-bg) text-(--status-peach-fg)">
           <svg
             width="22"
@@ -457,11 +457,10 @@ export function ResetPasswordPage() {
 
         <div className="mt-4">
           <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[27px] font-semibold text-foreground">
-            Set a new password
+            {t("auth.reset.title")}
           </h1>
           <p className="mt-2 text-[15px] leading-[1.6] text-muted-foreground">
-            Choose a strong new password for your account. The reset link can be
-            used once.
+            {t("auth.reset.subtitle")}
           </p>
         </div>
 
@@ -496,7 +495,7 @@ export function ResetPasswordPage() {
               className="mt-5 flex h-12 items-center justify-center rounded-full border-0 bg-primary text-[16px] font-bold text-white no-underline transition hover:-translate-y-0.5 hover:bg-primary/85 hover:shadow-[0_14px_28px_rgba(242,71,12,0.24)]"
               to="/login"
             >
-              Sign in
+              {t("auth.reset.signIn")}
             </Link>
           </div>
         ) : (
@@ -509,14 +508,14 @@ export function ResetPasswordPage() {
                 <PasswordField
                   error={form.formState.errors.newPassword?.message}
                   id="reset-new-password"
-                  label="New password"
+                  label={t("auth.reset.newPassword")}
                   registration={form.register("newPassword")}
                 />
 
                 <PasswordField
                   error={form.formState.errors.confirmPassword?.message}
                   id="reset-confirm-password"
-                  label="Confirm password"
+                  label={t("auth.reset.confirmPassword")}
                   registration={form.register("confirmPassword")}
                 />
               </div>
@@ -533,8 +532,8 @@ export function ResetPasswordPage() {
                 type="submit"
               >
                 {form.formState.isSubmitting
-                  ? "Resetting..."
-                  : "Reset password"}
+                  ? t("auth.reset.submitting")
+                  : t("auth.reset.submit")}
               </Button>
             </form>
 
@@ -570,7 +569,7 @@ export function ResetPasswordPage() {
             className="no-underline transition hover:text-foreground"
             to="/login"
           >
-            ← Back to sign in
+            {t("auth.reset.backToSignIn")}
           </Link>
         </div>
       </AuthStatusCard>

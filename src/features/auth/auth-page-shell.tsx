@@ -1,17 +1,46 @@
 import type { ReactNode } from "react";
-import { AuthBrand } from "./auth-brand";
+import { BrandLogo } from "@/components/layout/brand-logo";
+import {
+  AUTH_ASIDE_WIDTH_CLASS,
+  HERO_RINGS,
+} from "./auth-hero.constants";
 
 export function AuthPageShell({ aside, children }: { aside: ReactNode; children: ReactNode }) {
   return (
-    <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) sm:px-6 sm:py-6 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-      <div className="flex min-h-screen w-full overflow-hidden bg-white shadow-none sm:min-h-0 sm:max-w-md sm:rounded-[0.8rem] sm:border sm:border-black/15 sm:shadow-[0_24px_80px_rgba(25,25,28,0.14),0_8px_24px_rgba(25,25,28,0.08)] lg:max-w-275">
-        <div className="grid min-h-screen w-full grid-cols-1 sm:min-h-0 lg:min-h-165 lg:grid-cols-[460px_1fr]">
-          <aside className="hidden flex-col justify-between bg-foreground px-11 py-12 text-white lg:flex">{aside}</aside>
-          <main className="flex min-h-screen flex-col bg-(--app-canvas) sm:min-h-0 lg:block">
-            <div className="flex items-center bg-foreground px-5 py-6 text-white sm:px-8 lg:hidden"><AuthBrand /></div>
+    <div className="flex min-h-screen w-full bg-white">
+      <div className={`grid min-h-screen w-full grid-cols-1 ${AUTH_ASIDE_WIDTH_CLASS}`}>
+        <aside className="relative hidden flex-col overflow-hidden bg-[var(--hero-candidate-bg)] px-14 py-11 text-white lg:flex">
+          <div aria-hidden="true" className="itt-hero-rings pointer-events-none absolute inset-x-0 bottom-0 select-none">
+            {HERO_RINGS.map((ring) => (
+              <span
+                className={`itt-ring absolute rounded-full ${ring.fillClass}`}
+                key={ring.id}
+                style={
+                  {
+                    animationDelay: `${ring.pulseDelaySeconds}s`,
+                    bottom: ring.bottom,
+                    height: ring.size,
+                    left: ring.left,
+                    width: ring.size,
+                  } /* dynamic: runtime value */
+                }
+              />
+            ))}
+          </div>
+
+          <div className="relative z-10 flex flex-col">
+            {aside}
+          </div>
+        </aside>
+
+        <main className="flex min-h-screen flex-col bg-white overflow-y-auto">
+          <div className="flex items-center bg-[var(--hero-candidate-bg)] px-6 py-5 text-white lg:hidden">
+            <BrandLogo tone="inverse" />
+          </div>
+          <div className="flex flex-1 items-center justify-center w-full">
             {children}
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   );

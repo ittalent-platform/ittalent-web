@@ -1,27 +1,36 @@
-import { PanelLeftClose, Users, BriefcaseBusiness, X } from "lucide-react";
-import { Link } from "react-router";
+import {
+  PanelLeftClose,
+  Users,
+  X,
+} from "lucide-react";
+import { BrandLogo } from "./brand-logo";
 
 import { UserMenu } from "./user-menu";
 import { SidebarNavList } from "./sidebar-nav-list";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
-const adminNavItems = [
-  { end: false, icon: Users, label: "Users", to: "/admin/users" },
-  {
-    end: false,
-    icon: BriefcaseBusiness,
-    label: "Job postings",
-    to: "/admin/job-postings",
-  },
-] as const;
+// const adminNavItems = [
+//   { end: false, icon: Users, label: "Users", to: "/admin/users" },
+//   {
+//     end: false,
+//     icon: BriefcaseBusiness,
+//     label: "Job postings",
+//     to: "/admin/job-postings",
+//   },
+// ] as const;
 
-const recruiterNavItems = [
-  {
-    end: false,
-    icon: BriefcaseBusiness,
-    label: "Job postings",
-    to: "/recruiter/job-postings",
-  },
+// const recruiterNavItems = [
+//   {
+//     end: false,
+//     icon: BriefcaseBusiness,
+//     label: "Job postings",
+//     to: "/recruiter/job-postings",
+//   },
+// ] as const;
+
+const navItems = [
+  { end: false, icon: Users, labelKey: "sidebar.users", to: "/admin/users" },
 ] as const;
 
 type SidebarProps = {
@@ -32,13 +41,15 @@ type SidebarProps = {
   onToggleCollapsed: () => void;
 };
 
-export function Sidebar({
-  actor,
-  collapsed,
-  mobileOpen,
-  onCloseMobile,
-  onToggleCollapsed,
-}: SidebarProps) {
+// export function Sidebar({
+//   actor,
+//   collapsed,
+//   mobileOpen,
+//   onCloseMobile,
+//   onToggleCollapsed,
+// }: SidebarProps) {
+export function Sidebar({ collapsed, mobileOpen, onCloseMobile, onToggleCollapsed }: SidebarProps) {
+  const { t } = useTranslation();
   return (
     <aside
       className={cn(
@@ -48,57 +59,31 @@ export function Sidebar({
         collapsed && "lg:items-center",
       )}
     >
-      <div
-        className={cn(
-          "flex items-center gap-2 px-2 pb-4 pt-1",
-          collapsed && "lg:px-0",
-        )}
-      >
-        <Link
-          className="flex min-w-0 items-center gap-2 no-underline text-white"
-          to="/"
-        >
-          <div className="relative h-7 w-7 overflow-hidden rounded-[7px] border-2 border-[var(--primary)]">
-            <div className="absolute inset-[4px] border border-[var(--primary)] opacity-50" />
-            <div className="absolute left-[-20%] top-1/2 h-[2px] w-[140%] -translate-y-1/2 rotate-45 bg-[var(--primary)]" />
-            <div className="absolute left-[-20%] top-1/2 h-[2px] w-[140%] -translate-y-1/2 -rotate-45 bg-[var(--primary)]" />
-          </div>
-          <span
-            className={cn(
-              "itt-display text-[13px] font-bold tracking-[0.05em]",
-              collapsed && "lg:hidden",
-            )}
-          >
-            ITTALENT
-          </span>
-        </Link>
+      <div className={cn("flex items-center gap-2 px-2 pb-4 pt-1", collapsed && "lg:px-0")}>
+        <BrandLogo tone="inverse" wordmarkClassName={cn("text-[13px]", collapsed && "lg:hidden")} />
         {!collapsed ? (
           <button
-            aria-label="Collapse sidebar"
+            aria-label={t("sidebar.collapse")}
             className="ml-auto hidden size-8 place-items-center rounded-md border border-white/10 text-white/60 transition hover:bg-white/5 hover:text-white lg:grid cursor-pointer"
             onClick={onToggleCollapsed}
-            title="Collapse sidebar"
+            title={t("sidebar.collapse")}
             type="button"
           >
             <PanelLeftClose className="size-4" />
           </button>
         ) : null}
         <button
-          aria-label="Close menu"
+          aria-label={t("sidebar.closeMenu")}
           className="ml-auto grid size-8 place-items-center rounded-md border border-white/10 text-white/60 transition hover:bg-white/5 hover:text-white lg:hidden cursor-pointer"
           onClick={onCloseMobile}
-          title="Close menu"
+          title={t("sidebar.closeMenu")}
           type="button"
         >
           <X className="size-4" />
         </button>
       </div>
 
-      <SidebarNavList
-        collapsed={collapsed}
-        items={actor === "admin" ? adminNavItems : recruiterNavItems}
-        onItemClick={onCloseMobile}
-      />
+      <SidebarNavList collapsed={collapsed} items={navItems.map(({ labelKey, ...item }) => ({ ...item, label: t(labelKey) }))} onItemClick={onCloseMobile} />
 
       <div
         className={cn(

@@ -1,5 +1,6 @@
 import { FilterSelect } from "@/components/ui/filter-select";
 import { ListToolbar } from "@/components/common/list-toolbar";
+import { useTranslation } from "react-i18next";
 
 type RoleFilter = "user" | "admin" | "all";
 type StatusFilter = "active" | "inactive" | "suspended" | "all";
@@ -21,33 +22,34 @@ export function UsersToolbar({
   search,
   status,
 }: UsersToolbarProps) {
+  const { t } = useTranslation();
   return (
     <ListToolbar
       onSearchChange={onSearchChange}
       search={search}
-      searchPlaceholder="Search by username or email..."
+      searchPlaceholder={t("adminUsers.toolbar.search")}
     >
       <div className="flex flex-wrap items-center gap-2">
         <FilterSelect
           onChange={(val) => onRoleChange(val as RoleFilter)}
           options={[
-            { label: "All Roles", value: "all" },
-            { label: "Admin", value: "admin" },
-            { label: "User", value: "user" },
+            { label: t("adminUsers.toolbar.allRoles"), value: "all" },
+            { label: t("adminUsers.role.admin"), value: "admin" },
+            { label: t("adminUsers.role.user"), value: "user" },
           ]}
-          placeholder="Role"
+          placeholder={t("adminUsers.toolbar.role")}
           value={role}
         />
 
         <FilterSelect
           onChange={(val) => onStatusChange(val as StatusFilter)}
           options={[
-            { label: "All Statuses", value: "all" },
-            { label: "Active", value: "active" },
-            { label: "Inactive", value: "inactive" },
-            { label: "Suspended", value: "suspended" },
+            { label: t("adminUsers.toolbar.allStatuses"), value: "all" },
+            { label: t("adminUsers.status.active"), value: "active" },
+            { label: t("adminUsers.status.inactive"), value: "inactive" },
+            { label: t("adminUsers.status.suspended"), value: "suspended" },
           ]}
-          placeholder="Status"
+          placeholder={t("adminUsers.toolbar.status")}
           value={status}
         />
       </div>

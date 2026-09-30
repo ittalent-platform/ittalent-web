@@ -1,13 +1,19 @@
 import { TriangleAlert, X } from "lucide-react";
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 import { cn } from "@/lib/utils";
 
 type InlineBannerAction = {
   label: string;
-  onClick: () => void;
+  /** Navigates instead of running `onClick`; rendered as a link. */
+  href?: string;
+  onClick?: () => void;
   disabled?: boolean;
 };
+
+const ACTION_CLASS =
+  "shrink-0 rounded-md text-sm font-semibold underline-offset-2 transition hover:underline disabled:pointer-events-none disabled:opacity-50";
 
 type InlineBannerProps = {
   children: ReactNode;
@@ -25,6 +31,7 @@ export function InlineBanner({
 
   return (
     <div
+      role={tone === "error" ? "alert" : "status"}
       className={cn(
         "flex items-start gap-3 rounded-lg border px-4 py-3 text-sm",
         tone === "error"
@@ -37,14 +44,15 @@ export function InlineBanner({
       <Icon className="mt-0.5 size-4 shrink-0" />
       <span className="flex-1">{children}</span>
       {action ? (
-        <button
-          className="shrink-0 rounded-md text-sm font-semibold underline-offset-2 transition hover:underline disabled:pointer-events-none disabled:opacity-50"
-          disabled={action.disabled}
-          onClick={action.onClick}
-          type="button"
-        >
-          {action.label}
-        </button>
+        action.href ? (
+          <Link className={ACTION_CLASS} to={action.href}>
+            {action.label}
+          </Link>
+        ) : (
+          <button className={ACTION_CLASS} disabled={action.disabled} onClick={action.onClick} type="button">
+            {action.label}
+          </button>
+        )
       ) : null}
     </div>
   );

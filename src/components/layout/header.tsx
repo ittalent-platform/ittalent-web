@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { BrandLogo } from "./brand-logo";
+import { useNavigate } from "react-router";
 import { Menu, Moon, Sun, X } from "lucide-react";
 
 import { useSession } from "@/auth/use-session";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export type HeaderProps = {
   dark?: boolean;
@@ -22,6 +24,7 @@ export function Header({
   onToggleTheme,
   theme = "light",
 }: HeaderProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -48,20 +51,7 @@ export function Header({
     >
       <div className="mx-auto flex h-[74px] max-w-[1320px] items-center justify-between px-6 lg:px-8">
         {/* Logo */}
-        <Link
-          className="flex items-center gap-3 no-underline text-inherit"
-          onClick={onHome}
-          to="/"
-        >
-          <div className="relative h-8 w-8 overflow-hidden rounded-[8px] border-2 border-[var(--primary)]">
-            <div className="absolute inset-[5px] border border-[var(--primary)] opacity-50" />
-            <div className="absolute left-[-20%] top-1/2 h-[2px] w-[140%] -translate-y-1/2 rotate-45 bg-[var(--primary)]" />
-            <div className="absolute left-[-20%] top-1/2 h-[2px] w-[140%] -translate-y-1/2 -rotate-45 bg-[var(--primary)]" />
-          </div>
-          <span className="font-['Space_Grotesk',sans-serif] text-[19px] font-bold tracking-[-0.02em]">
-            ITTALENT
-          </span>
-        </Link>
+        <BrandLogo onClick={onHome} />
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-8 md:flex">
@@ -70,28 +60,28 @@ export function Header({
             onClick={() => handleNavClick("home-services")}
             type="button"
           >
-            Services
+            {t("footer.services")}
           </button>
           <button
             className="cursor-pointer text-[14.5px] font-medium text-inherit/80 hover:text-inherit transition-colors"
             onClick={() => handleNavClick("home-process")}
             type="button"
           >
-            Process
+            {t("footer.process")}
           </button>
           <button
             className="cursor-pointer text-[14.5px] font-medium text-inherit/80 hover:text-inherit transition-colors"
             onClick={() => handleNavClick("home-whyus")}
             type="button"
           >
-            Why Us
+            {t("footer.whyUs")}
           </button>
           <button
             className="cursor-pointer text-[14.5px] font-medium text-inherit/80 hover:text-inherit transition-colors"
             onClick={() => handleNavClick("home-faq")}
             type="button"
           >
-            FAQ
+            {t("footer.faq")}
           </button>
         </nav>
 
@@ -99,7 +89,7 @@ export function Header({
         <div className="hidden items-center gap-3 md:flex">
           {onToggleTheme ? (
             <button
-              aria-label="Toggle theme"
+              aria-label={t("header.toggleTheme")}
               className="grid h-9 w-9 place-items-center rounded-full border border-inherit/15 text-inherit transition-colors hover:bg-inherit/10"
               onClick={onToggleTheme}
               type="button"
@@ -122,7 +112,7 @@ export function Header({
                 size="sm"
                 variant="ghost"
               >
-                Sign in
+                {t("header.signIn")}
               </Button>
               <Button
                 className="text-[14px] font-semibold"
@@ -130,7 +120,7 @@ export function Header({
                 shape="pill"
                 size="sm"
               >
-                Get Started
+                {t("header.getStarted")}
               </Button>
             </>
           )}
@@ -140,7 +130,7 @@ export function Header({
         <div className="flex items-center gap-2 md:hidden">
           {onToggleTheme ? (
             <button
-              aria-label="Toggle theme"
+              aria-label={t("header.toggleTheme")}
               className="grid h-9 w-9 place-items-center rounded-full border border-inherit/15 text-inherit"
               onClick={onToggleTheme}
               type="button"
@@ -153,7 +143,7 @@ export function Header({
             </button>
           ) : null}
           <button
-            aria-label="Toggle navigation menu"
+            aria-label={t("header.toggleMenu")}
             className="grid h-9 w-9 place-items-center rounded-lg border border-inherit/15 text-inherit"
             onClick={() => setMobileMenuOpen((open) => !open)}
             type="button"
@@ -176,28 +166,28 @@ export function Header({
               onClick={() => handleNavClick("home-services")}
               type="button"
             >
-              Services
+              {t("footer.services")}
             </button>
             <button
               className="text-left text-[16px] font-semibold"
               onClick={() => handleNavClick("home-process")}
               type="button"
             >
-              Process
+              {t("footer.process")}
             </button>
             <button
               className="text-left text-[16px] font-semibold"
               onClick={() => handleNavClick("home-whyus")}
               type="button"
             >
-              Why Us
+              {t("footer.whyUs")}
             </button>
             <button
               className="text-left text-[16px] font-semibold"
               onClick={() => handleNavClick("home-faq")}
               type="button"
             >
-              FAQ
+              {t("footer.faq")}
             </button>
           </nav>
 
@@ -214,7 +204,7 @@ export function Header({
                   }}
                   variant="outline"
                 >
-                  Sign in
+                  {t("header.signIn")}
                 </Button>
                 <Button
                   className="w-full text-sm font-semibold"
@@ -223,7 +213,7 @@ export function Header({
                     navigate("/register");
                   }}
                 >
-                  Get Started
+                  {t("header.getStarted")}
                 </Button>
               </>
             )}

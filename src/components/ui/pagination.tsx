@@ -15,6 +15,7 @@ export function PaginationControls({
   page: number;
   totalPages: number;
 }) {
+  const { t } = useTranslation();
   const [draft, setDraft] = useState<string | null>(null);
 
   function submitPage(value = draft) {
@@ -30,7 +31,7 @@ export function PaginationControls({
   return (
     <div className="flex items-center gap-2">
       <button
-        aria-label="Previous page"
+        aria-label={t("pagination.previous")}
         className="flex h-9 w-9 items-center justify-center rounded-md border border-(--border-strong) bg-card text-muted-foreground disabled:cursor-not-allowed disabled:text-muted-foreground/60"
         disabled={page <= 1}
         onClick={() => onPageChange(page - 1)}
@@ -41,7 +42,7 @@ export function PaginationControls({
 
       <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
         <input
-          aria-label="Page number"
+          aria-label={t("pagination.pageNumber")}
           className="h-9 w-12 rounded-md border border-(--border-strong) bg-card px-2 text-center font-semibold text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
           inputMode="numeric"
           max={totalPages}
@@ -57,11 +58,11 @@ export function PaginationControls({
           type="text"
           value={draft ?? String(page)}
         />
-        <span aria-label={`${totalPages} total pages`}>/ {totalPages}</span>
+        <span aria-label={t("pagination.totalPages", { count: totalPages })}>/ {totalPages}</span>
       </div>
 
       <button
-        aria-label="Next page"
+        aria-label={t("pagination.next")}
         className="flex h-9 w-9 items-center justify-center rounded-md border border-(--border-strong) bg-card text-muted-foreground disabled:cursor-not-allowed disabled:text-muted-foreground/60"
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}

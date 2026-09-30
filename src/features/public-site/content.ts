@@ -45,33 +45,25 @@ export const serviceCards = [
   {
     no: "01",
     icon: Code2,
-    title: "Website",
-    desc: "High-performance marketing sites, landing pages and corporate websites — built for conversion and speed.",
-    list: ["React, Next.js, Tailwind CSS", "SEO & speed optimized", "Pixel-perfect responsive UI"],
+    id: "website",
     tags: ["Next.js", "React", "Tailwind CSS", "SEO", "Responsive"],
   },
   {
     no: "02",
     icon: MonitorSmartphone,
-    title: "Application",
-    desc: "Robust and secure custom web platforms, e-commerce architectures, and enterprise portals.",
-    list: ["React, Node.js, PostgreSQL", "RESTful & GraphQL APIs", "Secure user authentication"],
+    id: "application",
     tags: ["Node.js", "Express", "GraphQL", "Postgres", "OAuth2"],
   },
   {
     no: "03",
     icon: Layers3,
-    title: "Cloud & DevOps",
-    desc: "Automated scaling, high-availability deployments, serverless functions, and continuous delivery.",
-    list: ["AWS, Docker, Kubernetes", "CI/CD pipeline setup", "Monitoring & logging"],
+    id: "cloud",
     tags: ["AWS", "Docker", "Kubernetes", "CI/CD", "Prometheus"],
   },
   {
     no: "04",
     icon: ShieldCheck,
-    title: "QA & Testing",
-    desc: "Comprehensive manual and automated software testing suites ensuring bug-free releases.",
-    list: ["Playwright, Cypress, Jest", "Integration & unit testing", "Continuous quality checks"],
+    id: "qa",
     tags: ["Playwright", "Cypress", "Jest", "TDD", "QA Automation"],
   },
 ];
@@ -79,27 +71,19 @@ export const serviceCards = [
 export const processSteps = [
   {
     no: "01/04",
-    title: "Strategy",
-    desc: "We get to know you and your brand. Goals, audience, competition. Out of that comes the roadmap everything else stands on.",
-    bullets: ["Stakeholder workshops", "Competitor gap analysis", "Tech feasibility study", "Project scope blueprint"],
+    id: "strategy",
   },
   {
     no: "02/04",
-    title: "Design",
-    desc: "Identity, interface, prototype. This is where the brand becomes visible — from logo to the last pixel of the site.",
-    bullets: ["Interactive Figma prototypes", "UX wireframing", "Design system mapping", "Responsive components"],
+    id: "design",
   },
   {
     no: "03/04",
-    title: "Build",
-    desc: "Engineering on a modern stack: Next.js, React, performance-first. Clean code that scales and still runs in five years.",
-    bullets: ["Type-safe React & Next.js", "REST & GraphQL APIs", "Automated QA coverage", "Optimized asset loading"],
+    id: "build",
   },
   {
     no: "04/04",
-    title: "Launch & Care",
-    desc: "Deployment, monitoring, continuous optimization. We stay on it — your brand grows, and we grow with it.",
-    bullets: ["CI/CD deployment", "AWS cloud scaling", "24/7 monitoring", "Monthly optimization"],
+    id: "launch",
   },
 ];
 
@@ -107,20 +91,16 @@ export const brands = ["Webflow", "Relume", "Stripe", "Vercel", "Slack", "Shopif
 
 export const faqItems = [
   {
-    q: "Who owns the software intellectual property (IP)?",
-    a: "You do. Under our standard Master Services Agreement (MSA), 100% of the intellectual property, code repositories, documentation, and cloud architecture assets are owned by and transferred to your business immediately upon invoice clearance.",
+    id: "ip",
   },
   {
-    q: "How does day-to-day communication work?",
-    a: "We integrate directly into your workflow with shared Slack or Teams channels, sprint demos, and Jira / Trello / Linear. Our developers and project managers communicate fluently in English.",
+    id: "communication",
   },
   {
-    q: "Can I scale the team up or down based on load?",
-    a: "Absolutely. We require only 30 days notice to scale your dedicated engineering team up or down depending on launch milestones and workload.",
+    id: "scale",
   },
   {
-    q: "What is your quality assurance and compliance policy?",
-    a: "We embed manual and automated QA into every squad, with CI/CD, linting, unit tests, end-to-end integration tests, and security-conscious delivery practices.",
+    id: "quality",
   },
 ];
 
