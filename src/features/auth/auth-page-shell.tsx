@@ -3,15 +3,44 @@ import { AuthBrand } from "./auth-brand";
 
 export function AuthPageShell({ aside, children }: { aside: ReactNode; children: ReactNode }) {
   return (
-    <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) sm:px-6 sm:py-6 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-      <div className="flex min-h-screen w-full overflow-hidden bg-white shadow-none sm:min-h-0 sm:max-w-md sm:rounded-[0.8rem] sm:border sm:border-black/15 sm:shadow-[0_24px_80px_rgba(25,25,28,0.14),0_8px_24px_rgba(25,25,28,0.08)] lg:max-w-275">
-        <div className="grid min-h-screen w-full grid-cols-1 sm:min-h-0 lg:min-h-165 lg:grid-cols-[460px_1fr]">
-          <aside className="hidden flex-col justify-between bg-foreground px-11 py-12 text-white lg:flex">{aside}</aside>
-          <main className="flex min-h-screen flex-col bg-(--app-canvas) sm:min-h-0 lg:block">
-            <div className="flex items-center bg-foreground px-5 py-6 text-white sm:px-8 lg:hidden"><AuthBrand /></div>
+    <div className="flex min-h-screen w-full bg-white">
+      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[560px_1fr]">
+        <aside className="relative hidden flex-col overflow-hidden bg-[var(--hero-candidate-bg)] px-14 py-11 text-white lg:flex">
+          {/* Authentic Breathing Concentric Circles Background */}
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-0 left-0 block select-none"
+            fill="none"
+            height="520"
+            viewBox="0 0 560 520"
+            width="560"
+          >
+            <g className="itt-breathe">
+              <path d="M-196 520 A476 476 0 0 1 756 520" stroke="#d4400b" strokeLinecap="butt" strokeWidth="57" />
+              <path d="M-140 520 A420 420 0 0 1 700 520" stroke="#dd4a13" strokeLinecap="butt" strokeWidth="57" />
+              <path d="M-84 520 A364 364 0 0 1 644 520" stroke="#e85a22" strokeLinecap="butt" strokeWidth="57" />
+              <path d="M-28 520 A308 308 0 0 1 588 520" stroke="#f37139" strokeLinecap="butt" strokeWidth="57" />
+              <path d="M28 520 A252 252 0 0 1 532 520" stroke="#fb8f5f" strokeLinecap="butt" strokeWidth="57" />
+              <path d="M84 520 A196 196 0 0 1 476 520" stroke="#ffb08c" strokeLinecap="butt" strokeWidth="57" />
+              <path d="M140 520 A140 140 0 0 1 420 520" stroke="#ffcdb5" strokeLinecap="butt" strokeWidth="57" />
+              <path d="M196 520 A84 84 0 0 1 364 520" stroke="#ffe4d7" strokeLinecap="butt" strokeWidth="57" />
+              <path d="M252 520 A28 28 0 0 1 308 520" stroke="#fff7f2" strokeLinecap="butt" strokeWidth="57" />
+            </g>
+          </svg>
+
+          <div className="relative z-10 flex flex-col">
+            {aside}
+          </div>
+        </aside>
+
+        <main className="flex min-h-screen flex-col bg-white overflow-y-auto">
+          <div className="flex items-center bg-[var(--hero-candidate-bg)] px-6 py-5 text-white lg:hidden">
+            <AuthBrand />
+          </div>
+          <div className="flex flex-1 items-center justify-center w-full">
             {children}
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   );

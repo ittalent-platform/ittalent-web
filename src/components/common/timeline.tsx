@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-export type TimelineTone = "info" | "neutral" | "orange" | "success" | "violet" | "warning";
+export type TimelineTone = "error" | "info" | "neutral" | "orange" | "success" | "violet" | "warning";
 
 export type TimelineEntry = {
   atIso: string;
@@ -17,6 +17,7 @@ export type TimelineEntry = {
 };
 
 const toneDotClass: Record<TimelineTone, string> = {
+  error: "bg-(--status-error-fg)",
   info: "bg-(--status-info-fg)",
   neutral: "bg-(--status-neutral-fg)",
   success: "bg-(--status-success-fg)",
@@ -28,6 +29,7 @@ const toneDotClass: Record<TimelineTone, string> = {
 const DEFAULT_MAX_VISIBLE = 5;
 
 function TimelineList({ entries, formatDate }: { entries: TimelineEntry[]; formatDate: (iso: string) => string }) {
+  const { t } = useTranslation();
   const [messageEntry, setMessageEntry] = useState<TimelineEntry | null>(null);
   return (
     <><ul className="flex flex-col">
@@ -40,10 +42,10 @@ function TimelineList({ entries, formatDate }: { entries: TimelineEntry[]; forma
             ) : null}
           </div>
           <div className="min-w-0">
-            <div className="flex min-w-0 items-start gap-2"><p className="line-clamp-2 min-w-0 flex-1 wrap-anywhere font-semibold text-foreground" title={entry.label}>{entry.label}</p>{entry.message ? <button aria-label={`View message for ${entry.label}`} className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMessageEntry(entry)} title="View message" type="button"><MessageSquareText className="size-4" /></button> : null}</div>
+            <div className="flex min-w-0 items-start gap-2"><p className="line-clamp-2 min-w-0 flex-1 wrap-anywhere text-[13.5px] font-semibold text-foreground" title={entry.label}>{entry.label}</p>{entry.message ? <button aria-label={t("timeline.viewMessageFor", { label: entry.label })} className="grid size-7 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => setMessageEntry(entry)} title={t("timeline.viewMessage")} type="button"><MessageSquareText className="size-4" /></button> : null}</div>
             <p className="wrap-anywhere text-[13px] text-muted-foreground">
               {formatDate(entry.atIso)}
-              {entry.by ? ` · by ${entry.by}` : null}
+              {entry.by ? ` · ${t("timeline.by", { name: entry.by })}` : null}
             </p>
           </div>
         </li>
@@ -68,7 +70,7 @@ export function Timeline({ entries, formatDate, maxVisible = DEFAULT_MAX_VISIBLE
 
   return (
     <>
-      <Card className="min-w-0 rounded-lg border-border bg-card shadow-none">
+      <Card className="min-w-0 rounded-2xl border-border bg-card shadow-none">
         <CardHeader className="flex-row items-center justify-between gap-2 p-5 pb-4">
           <p className="text-[11.5px] font-bold uppercase tracking-wider text-muted-foreground">{title}</p>
           <span className="itt-mono text-[11px] text-muted-foreground">{entries.length}</span>
