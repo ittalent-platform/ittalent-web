@@ -31,7 +31,9 @@ export function Header({
     if (onSectionNavigate) {
       onSectionNavigate(sectionId);
     } else {
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+      document
+        .getElementById(sectionId)
+        ?.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -91,6 +93,26 @@ export function Header({
           >
             FAQ
           </button>
+          <button
+            className="cursor-pointer text-[14.5px] font-medium text-inherit/80 hover:text-inherit transition-colors"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              navigate("/career");
+            }}
+            type="button"
+          >
+            Career
+          </button>
+          <button
+            className="cursor-pointer text-[14.5px] font-medium text-inherit/80 hover:text-inherit transition-colors"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              navigate("/enterprises");
+            }}
+            type="button"
+          >
+            Enterprises
+          </button>
         </nav>
 
         {/* Right Actions */}
@@ -102,7 +124,11 @@ export function Header({
               onClick={onToggleTheme}
               type="button"
             >
-              {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+              {theme === "dark" ? (
+                <Sun className="size-4" />
+              ) : (
+                <Moon className="size-4" />
+              )}
             </button>
           ) : null}
 
@@ -139,7 +165,11 @@ export function Header({
               onClick={onToggleTheme}
               type="button"
             >
-              {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+              {theme === "dark" ? (
+                <Sun className="size-4" />
+              ) : (
+                <Moon className="size-4" />
+              )}
             </button>
           ) : null}
           <button
@@ -148,7 +178,11 @@ export function Header({
             onClick={() => setMobileMenuOpen((open) => !open)}
             type="button"
           >
-            {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            {mobileMenuOpen ? (
+              <X className="size-5" />
+            ) : (
+              <Menu className="size-5" />
+            )}
           </button>
         </div>
       </div>
