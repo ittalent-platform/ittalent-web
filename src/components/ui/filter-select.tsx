@@ -59,7 +59,7 @@ export function FilterSelect<T extends string>({
       <div className="relative w-full">
         <div
           className={cn(
-            "inline-flex flex-[0_0_auto] cursor-text items-center gap-[7px] rounded-md border border-solid border-border bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none",
+            "inline-flex flex-[0_0_auto] cursor-text items-center gap-[7px] rounded-lg border border-solid border-border bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none",
             open && "border-primary ring-2 ring-primary/20",
             size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 px-[15px] py-px text-[13.5px]",
             className,
@@ -93,7 +93,7 @@ export function FilterSelect<T extends string>({
         {open ? (
           <div
             className={cn(
-              "absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-md border border-border bg-card py-0 shadow-lg",
+              "absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-border bg-card py-0 shadow-lg",
               contentClassName,
             )}
           >
@@ -130,7 +130,7 @@ export function FilterSelect<T extends string>({
       <DropdownMenuPrimitive.Trigger asChild>
         <button
           className={cn(
-            "inline-flex flex-[0_0_auto] cursor-pointer items-center gap-[7px] rounded-md border border-solid border-border bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20",
+            "inline-flex flex-[0_0_auto] cursor-pointer items-center gap-[7px] rounded-lg border border-solid border-border bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20",
             size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 px-[15px] py-px text-[13.5px]",
             className,
           )}
@@ -145,7 +145,7 @@ export function FilterSelect<T extends string>({
         <DropdownMenuPrimitive.Content
           align={align}
           className={cn(
-            "z-50 w-[var(--radix-dropdown-menu-trigger-width)] overflow-hidden rounded-md border border-border bg-card py-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            "z-50 w-[var(--radix-dropdown-menu-trigger-width)] overflow-hidden rounded-lg border border-border bg-card py-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
             size === "sm" ? "min-w-[4.5rem]" : "min-w-[8.5rem]",
             contentClassName,
           )}
@@ -218,7 +218,7 @@ export function FilterMultiSelect<T extends string>({
       <DropdownMenuPrimitive.Trigger asChild>
         <button
           className={cn(
-            "inline-flex flex-[0_0_auto] cursor-pointer items-center gap-[7px] rounded-md border border-solid border-(--border-strong) bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none data-[state=open]:border-primary",
+            "inline-flex flex-[0_0_auto] cursor-pointer items-center gap-[7px] rounded-lg border border-solid border-(--border-strong) bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none data-[state=open]:border-primary",
             size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 px-[15px] py-px text-[13.5px]",
             className,
           )}
@@ -233,7 +233,7 @@ export function FilterMultiSelect<T extends string>({
         <DropdownMenuPrimitive.Content
           align="start"
           className={cn(
-            "z-50 w-[var(--radix-dropdown-menu-trigger-width)] overflow-hidden rounded-md border border-border bg-card py-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            "z-50 w-[var(--radix-dropdown-menu-trigger-width)] overflow-hidden rounded-lg border border-border bg-card py-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
             size === "sm" ? "min-w-[4.5rem]" : "min-w-[8.5rem]",
             contentClassName,
           )}

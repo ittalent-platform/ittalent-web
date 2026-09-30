@@ -7,25 +7,33 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.9854 0.0013 286.3758);
-  --foreground: oklch(0.2147 0.0058 285.8986);
+  /* Neutrals follow DESIGN.md (warm, never blue-grey): canvas, ink, sand-readonly, slate-muted, line, line-strong. */
+  --background: #fafaf8;
+  --foreground: #19191c;
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2147 0.0058 285.8986);
+  --card-foreground: #19191c;
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2147 0.0058 285.8986);
+  --popover-foreground: #19191c;
   --primary: oklch(0.6404 0.2153 35.9003);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.9674 0.0013 286.3752);
-  --secondary-foreground: oklch(0.2147 0.0058 285.8986);
-  --muted: oklch(0.9674 0.0013 286.3752);
-  --muted-foreground: oklch(0.5501 0.0108 279.5311);
+  --secondary: #f6f5f1;
+  --secondary-foreground: #19191c;
+  --muted: #f6f5f1;
+  --muted-foreground: #64646b;
   --accent: oklch(0.9695 0.0161 64.6748);
   --accent-foreground: oklch(0.5912 0.1973 36.1768);
   --destructive: oklch(0.5306 0.1989 29.1314);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9316 0.0027 286.3477);
-  --input: oklch(0.9316 0.0027 286.3477);
+  --border: #e6e4df;
+  --input: #dedcd6;
   --ring: oklch(0.6404 0.2153 35.9003);
+  /* DESIGN.md tokens every area needs (tables, steppers, links); .candidate-root re-declares the same values. */
+  --fg-link: #b33305;
+  --line-muted: #efede8;
+  --line-dashed: #c9c7c1;
+  --surface-readonly: #f6f5f1;
+  --surface-subtle: #fbfaf8;
+  --slate-subtle: #737379;
   --chart-1: oklch(0.6404 0.2153 35.9003);
   --chart-2: oklch(0.8231 0.0995 30.7543);
   --chart-3: oklch(0.7336 0.1758 50.5517);
@@ -136,6 +144,12 @@
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.2393 0 0);
   --input: oklch(0.3523 0 0);
+  --fg-link: #f6c9b6;
+  --line-muted: #2e2e32;
+  --line-dashed: #4a4a50;
+  --surface-readonly: #26262a;
+  --surface-subtle: #222226;
+  --slate-subtle: #9a9a9f;
   --ring: oklch(0.6404 0.2153 35.9003);
   --chart-1: oklch(0.6404 0.2153 35.9003);
   --chart-2: oklch(0.8565 0.1745 94.9076);
@@ -269,18 +283,19 @@
 }
 
 .itt-root {
-  --bg: #fafafb;
+  --bg: #fafaf8;
   --surface: #ffffff;
-  --surface-2: #f4f4f5;
+  --surface-2: #f6f5f1;
   --surface-3: #ffffff;
   --fg: #19191c;
-  --fg-muted: #707178;
+  --fg-muted: #64646b;
   --fg-subtle: #8c8d94;
-  --fg-secondary: #44454a;
-  --border: #e8e8ea;
-  --border-strong: #dcdde0;
+  --fg-secondary: #4a4a50;
+  --border: #e6e4df;
+  --border-strong: #dedcd6;
   --primary: #f2470c;
   --primary-600: #d9400a;
+  --link-hover: #8f2904;
   --fg-link: #b33305;
   --brand: #f2470c;
   --primary-50: #fdf3ea;
