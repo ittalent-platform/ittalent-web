@@ -618,23 +618,14 @@
       "basicDescription": "Phần ứng viên thấy đầu tiên trên thẻ công việc.",
       "compensationDescription": "Tùy chọn. Để trống nếu không công khai mức lương.",
       "contentDescription": "Hiển thị nguyên văn trên trang công việc công khai.",
-      "railRequiredTitle": "Bắt buộc khi tạo",
-      "railRequired": [
-        "Tiêu đề",
-        "Địa điểm",
-        "Loại công việc",
-        "Mô tả",
-        "Yêu cầu",
-        "Quyền lợi",
-        "Hạn nộp"
-      ],
       "railSystemTitle": "Hệ thống tự đặt",
       "railSystemBody": "Trạng thái <strong>Đã đăng</strong> và mở đến hết hạn nộp, công ty của bạn, người tạo (bạn) và thời điểm tạo. Trạng thái không được chọn trong biểu mẫu này.",
       "railNotEditableTitle": "Không sửa tại đây",
       "railNotEditableBody": "Công ty và trạng thái do hệ thống đặt. Tin đóng vào cuối ngày hạn nộp và mở lại nếu bạn dời hạn nộp ra sau.",
       "railCurrentStatus": "Trạng thái hiện tại",
       "fixErrors": "Kiểm tra các trường được đánh dấu rồi thử lại."
-    }
+    },
+    "notSpecified": "Không chỉ định"
   },
   "adminLayout": {
     "openMenu": "Mở menu",
@@ -1059,5 +1050,12 @@
     "cta": {
       "title": "Cùng nhau xây dựng điều tuyệt vời"
     }
+  },
+  "datePicker": {
+    "placeholder": "dd/mm/yyyy",
+    "today": "Hôm nay",
+    "clear": "Xóa",
+    "previousMonth": "Tháng trước",
+    "nextMonth": "Tháng sau"
   }
 }

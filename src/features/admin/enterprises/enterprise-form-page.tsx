@@ -1186,30 +1186,6 @@ function EnterpriseFormContent({
           <aside className="sticky top-6 flex flex-col gap-4">
             {!isEditMode ? (
               <>
-                <section className="p-5 rounded-2xl border border-border bg-card flex flex-col gap-3">
-                  <span className="text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle uppercase">
-                    REQUIRED TO CREATE
-                  </span>
-                  <ul className="list-none m-0 p-0 flex flex-col gap-2.5">
-                    {[
-                      "Display name",
-                      "Tax code",
-                      "Corporate email",
-                      "Phone",
-                      "Company admin name + work email",
-                      "Industry",
-                      "Company size",
-                      "Street, city, country",
-                      "Offline vetting",
-                    ].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-[13.5px] text-foreground">
-                        <span className="size-1.5 rounded-full bg-brand shrink-0" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-
                 <section className="p-5 rounded-2xl border border-border bg-card flex flex-col gap-2">
                   <span className="text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle uppercase">
                     SET BY THE SYSTEM

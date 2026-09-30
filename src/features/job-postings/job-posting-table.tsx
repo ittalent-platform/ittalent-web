@@ -23,7 +23,6 @@ import {
   TableSkeletonRows,
 } from "@/components/ui/table";
 
-import { JobCompanyLogo } from "./job-company-logo";
 import { JobPostingStatusBadge } from "./job-posting-status-badge";
 import {
   SKELETON_ROW_COUNT,
@@ -156,13 +155,9 @@ export function JobPostingTable({
                 </TableCell>
                 <TableCell className={`${bodyCell} min-w-[190px]`}>
                   <Link
-                    className="group/link flex min-w-0 items-center gap-3 no-underline"
+                    className="group/link flex min-w-0 flex-col no-underline"
                     to={detailPath}
                   >
-                    <JobCompanyLogo
-                      logoUrl={row.enterprise.logoUrl}
-                      name={row.enterprise.name}
-                    />
                     <span className="flex min-w-0 flex-col">
                       <span className="truncate text-[13.5px] font-bold text-foreground transition group-hover/link:text-primary">
                         {row.title}

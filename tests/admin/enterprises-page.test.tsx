@@ -165,7 +165,7 @@ describe("Enterprise Profiles Feature Tests", () => {
     expect(screen.getByText("Suspend")).toBeInTheDocument();
   });
 
-  it("renders Create Enterprise form and checklist", () => {
+  it("renders Create Enterprise form with its system rail", () => {
     renderWithClient(
       <MemoryRouter initialEntries={["/admin/enterprises/new"]}>
         <Routes>
@@ -175,7 +175,8 @@ describe("Enterprise Profiles Feature Tests", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Create enterprise profile" })).toBeInTheDocument();
-    expect(screen.getByText("REQUIRED TO CREATE")).toBeInTheDocument();
+    expect(screen.queryByText("REQUIRED TO CREATE")).not.toBeInTheDocument();
+    expect(screen.getByText("SET BY THE SYSTEM")).toBeInTheDocument();
     expect(screen.getByText(/I confirm the legal and tax vetting was completed offline/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText("10–13 numeric digits")).toBeInTheDocument();
   });

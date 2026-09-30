@@ -61,7 +61,7 @@ export function FilterSelect<T extends string>({
           className={cn(
             "inline-flex flex-[0_0_auto] cursor-text items-center gap-[7px] rounded-lg border border-solid border-border bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none",
             open && "border-primary ring-2 ring-primary/20",
-            size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 px-[15px] py-px text-[13.5px]",
+            size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 pl-[15px] pr-[17px] py-px text-[13.5px]",
             className,
           )}
           onMouseDown={(event) => {
@@ -131,7 +131,7 @@ export function FilterSelect<T extends string>({
         <button
           className={cn(
             "inline-flex flex-[0_0_auto] cursor-pointer items-center gap-[7px] rounded-lg border border-solid border-border bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20",
-            size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 px-[15px] py-px text-[13.5px]",
+            size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 pl-[15px] pr-[17px] py-px text-[13.5px]",
             className,
           )}
           type="button"
@@ -219,7 +219,7 @@ export function FilterMultiSelect<T extends string>({
         <button
           className={cn(
             "inline-flex flex-[0_0_auto] cursor-pointer items-center gap-[7px] rounded-lg border border-solid border-(--border-strong) bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none data-[state=open]:border-primary",
-            size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 px-[15px] py-px text-[13.5px]",
+            size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 pl-[15px] pr-[17px] py-px text-[13.5px]",
             className,
           )}
           type="button"

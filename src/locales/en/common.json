@@ -627,23 +627,14 @@
       "basicDescription": "What candidates see first on the job card.",
       "compensationDescription": "Optional. Leave empty if the salary is not shared.",
       "contentDescription": "Shown as written on the public job page.",
-      "railRequiredTitle": "Required to create",
-      "railRequired": [
-        "Title",
-        "Location",
-        "Job type",
-        "Description",
-        "Requirements",
-        "Benefits",
-        "Deadline"
-      ],
       "railSystemTitle": "Set by the system",
       "railSystemBody": "Status <strong>Published</strong> and open until the deadline, your company, the creator (you) and the created time. Status is never chosen in this form.",
       "railNotEditableTitle": "Not editable here",
       "railNotEditableBody": "Company and status are set by the system. The job closes at the end of the deadline day and reopens if you move the deadline forward.",
       "railCurrentStatus": "Current status",
       "fixErrors": "Check the highlighted fields and try again."
-    }
+    },
+    "notSpecified": "Not specified"
   },
   "adminLayout": {
     "openMenu": "Open menu",
@@ -1069,5 +1060,12 @@
     "cta": {
       "title": "Let's build something great together"
     }
+  },
+  "datePicker": {
+    "placeholder": "dd/mm/yyyy",
+    "today": "Today",
+    "clear": "Clear",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
   }
 }

@@ -12,7 +12,6 @@ import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { JobCompanyLogo } from "./job-company-logo";
 import { JobPostingErrorState } from "./job-posting-error-state";
 import { jobPostingErrorMessage } from "./job-posting-errors";
 import { JobPostingStatusBadge } from "./job-posting-status-badge";
@@ -129,11 +128,6 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-4">
-          <JobCompanyLogo
-            logoUrl={posting.enterprise.logoUrl}
-            name={posting.enterprise.name}
-            size="xl"
-          />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
               <h1 className="itt-display truncate text-2xl font-semibold leading-tight text-foreground">

@@ -1,12 +1,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState, type ReactNode } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { FormFieldLabel } from "@/components/common/form-field";
 import { RailCard } from "@/components/common/rail-card";
@@ -187,9 +195,9 @@ function updatePayloadFrom(values: Values): UpdateJobPostingRequest {
   };
 }
 
+/** Radix Select cannot hold an empty value, so "clear" is a sentinel that maps back to "". */
+const NO_SELECTION = "__none__";
 const controlClass = "h-[46px] rounded-xl border-border";
-const selectClass =
-  "h-[46px] w-full rounded-xl border border-border bg-card px-3.5 text-[13.5px] text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 aria-invalid:border-destructive";
 const sectionClass =
   "flex flex-col gap-[18px] rounded-2xl border border-border bg-card p-6";
 
@@ -298,18 +306,43 @@ export function JobPostingForm({
     name: "employmentType" | "level",
     text: string,
     required: boolean,
-    children: ReactNode,
+    placeholder: string,
+    options: { label: string; value: string }[],
   ) => (
     <div className="flex min-w-0 flex-col gap-2">
       {label(name, text, required)}
-      <select
-        aria-invalid={errorOf(name) ? true : undefined}
-        className={selectClass}
-        id={name}
-        {...form.register(name)}
-      >
-        {children}
-      </select>
+      <Controller
+        control={form.control}
+        name={name}
+        render={({ field }) => (
+          <Select
+            onValueChange={(value) =>
+              field.onChange(value === NO_SELECTION ? "" : value)
+            }
+            value={field.value || undefined}
+          >
+            <SelectTrigger
+              aria-invalid={errorOf(name) ? true : undefined}
+              className={`${controlClass} aria-invalid:border-destructive`}
+              id={name}
+            >
+              <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              {required ? null : (
+                <SelectItem value={NO_SELECTION}>
+                  {t("jobPostings.notSpecified")}
+                </SelectItem>
+              )}
+              {options.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      />
       {errorOf(name) ? (
         <p
           className="text-[12.5px] leading-normal text-(--danger-fg)"
@@ -324,9 +357,6 @@ export function JobPostingForm({
     min: JOB_LIMITS.CONTENT_MIN,
     max: JOB_LIMITS.CONTENT_MAX,
   });
-  const requiredItems = t("jobPostings.form.railRequired", {
-    returnObjects: true,
-  }) as unknown as string[];
 
   return (
     <form
@@ -350,33 +380,27 @@ export function JobPostingForm({
                 "employmentType",
                 t("jobPostings.employmentType"),
                 true,
-                <>
-                  <option value="">
-                    {t("jobPostings.employmentTypePlaceholder")}
-                  </option>
-                  {JOB_EMPLOYMENT_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {t(`jobPostings.employmentTypes.${type}`)}
-                    </option>
-                  ))}
-                </>,
+                t("jobPostings.employmentTypePlaceholder"),
+                JOB_EMPLOYMENT_TYPES.map((type) => ({
+                  label: t(`jobPostings.employmentTypes.${type}`),
+                  value: type,
+                })),
               )}
               {select(
                 "level",
                 t("jobPostings.level"),
                 false,
-                <>
-                  <option value="">{t("jobPostings.level_placeholder")}</option>
-                  {JOB_LEVELS.map((level) => (
-                    <option key={level} value={level}>
-                      {level}
-                    </option>
-                  ))}
-                  {posting?.level &&
-                  !(JOB_LEVELS as readonly string[]).includes(posting.level) ? (
-                    <option value={posting.level}>{posting.level}</option>
-                  ) : null}
-                </>,
+                t("jobPostings.level_placeholder"),
+                [
+                  ...JOB_LEVELS.map((level) => ({
+                    label: level,
+                    value: level,
+                  })),
+                  ...(posting?.level &&
+                  !(JOB_LEVELS as readonly string[]).includes(posting.level)
+                    ? [{ label: posting.level, value: posting.level }]
+                    : []),
+                ],
               )}
             </div>
           </FormSection>
@@ -429,12 +453,30 @@ export function JobPostingForm({
             description={t("jobPostings.deadlineHint")}
             title={t("jobPostings.jobDetails")}
           >
-            <div className="max-w-xs">
-              {field("expiresAt", t("jobPostings.expiryDate"), {
-                min: posting ? undefined : today,
-                required: true,
-                type: "date",
-              })}
+            <div className="flex max-w-xs flex-col gap-2">
+              {label("expiresAt", t("jobPostings.expiryDate"), true)}
+              <Controller
+                control={form.control}
+                name="expiresAt"
+                render={({ field }) => (
+                  <DatePicker
+                    aria-invalid={errorOf("expiresAt") ? true : undefined}
+                    id="expiresAt"
+                    min={today}
+                    onChange={field.onChange}
+                    today={today}
+                    value={field.value}
+                  />
+                )}
+              />
+              {errorOf("expiresAt") ? (
+                <p
+                  className="text-[12.5px] leading-normal text-(--danger-fg)"
+                  role="alert"
+                >
+                  {errorOf("expiresAt")}
+                </p>
+              ) : null}
             </div>
           </FormSection>
 
@@ -485,19 +527,6 @@ export function JobPostingForm({
             </>
           ) : (
             <>
-              <RailCard title={t("jobPostings.form.railRequiredTitle")}>
-                <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-                  {requiredItems.map((item) => (
-                    <li
-                      className="flex items-center gap-2 text-[13.5px] text-foreground"
-                      key={item}
-                    >
-                      <span className="size-1.5 shrink-0 rounded-full bg-brand" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </RailCard>
               <RailCard title={t("jobPostings.form.railSystemTitle")}>
                 <p className="m-0 text-[13px] leading-relaxed text-foreground/70 dark:text-muted-foreground">
                   <Trans
