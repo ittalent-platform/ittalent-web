@@ -12,3 +12,14 @@ export function formatDeadline(value?: string): string {
   const [year, month, day] = toDeadlineDate(value).split("-");
   return `${day}/${month}/${year}`;
 }
+
+/** "2,000 – 3,500 VND", "From 2,000 VND", "Negotiable" or "—" when no salary was entered. */
+export function formatSalary(posting: { salaryMin?: number; salaryMax?: number; currency: string; salaryNegotiable: boolean }): string {
+  const { salaryMin, salaryMax, currency, salaryNegotiable } = posting;
+  if (salaryNegotiable) return "Negotiable";
+  const amount = (value: number) => value.toLocaleString("en-US");
+  if (salaryMin !== undefined && salaryMax !== undefined) return `${amount(salaryMin)} – ${amount(salaryMax)} ${currency}`;
+  if (salaryMin !== undefined) return `From ${amount(salaryMin)} ${currency}`;
+  if (salaryMax !== undefined) return `Up to ${amount(salaryMax)} ${currency}`;
+  return "—";
+}

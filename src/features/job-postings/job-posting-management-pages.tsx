@@ -22,7 +22,7 @@ import type {
   UpdateJobPostingRequest,
 } from "@/api/generated/types.gen";
 import { JobPostingForm } from "./job-posting-form";
-import { formatDeadline } from "./job-postings.format";
+import { formatDeadline, formatSalary } from "./job-postings.format";
 import { JobPostingStatusBadge } from "./job-posting-status-badge";
 import { useListParams } from "@/hooks/use-list-params";
 import { formatDate } from "@/lib/format";
@@ -258,6 +258,7 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
               value={posting.employmentType ?? "—"}
             />
             <DetailRow label="Level" value={posting.level ?? "—"} />
+            <DetailRow label="Salary" value={formatSalary(posting)} />
             <DetailRow label={t("jobPostings.status")} value={<JobPostingStatusBadge posting={posting} />} />
             <DetailRow label={t("jobPostings.deadline")} value={formatDeadline(posting.expiresAt)} />
             <DetailRow label={t("jobPostings.applications")} value={posting.applicationCount?.toString() ?? "—"} />
@@ -412,6 +413,11 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
                 key: "level",
                 header: "Level",
                 cell: (row: JobPosting) => row.level ?? "—",
+              },
+              {
+                key: "salary",
+                header: "Salary",
+                cell: (row: JobPosting) => formatSalary(row),
               },
               {
                 key: "applications",
