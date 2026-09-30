@@ -165,9 +165,12 @@ export function EnterpriseDetailPage() {
   const { data: jobs, isLoading: jobsLoading } = useQuery({
     queryKey: ["enterprise-jobs", id],
     queryFn: async () => {
-      const result = await getApiV1JobPostings({ query: { enterprise_id: id!, limit: 100, page: 1 } });
+      const result = await getApiV1JobPostings({ query: { enterprise_id: id!, limit: 100, page: 1, status: "published" } });
       if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      return result.data.items.map(toJob);
+      const now = Date.now();
+      return result.data.items
+        .filter((item) => !item.expiresAt || new Date(item.expiresAt).getTime() >= now)
+        .map(toJob);
     },
     enabled: !!id,
   });

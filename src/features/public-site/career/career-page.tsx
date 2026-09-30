@@ -81,11 +81,11 @@ const toJob = (dto: JobPostingResponse): Job => ({
 });
 
 async function loadAllPublicJobs(): Promise<Job[]> {
-  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100 } });
+  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100, status: "published" } });
   if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
   const pages = await Promise.all(
     Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
-      getApiV1JobPostings({ query: { page: index + 2, limit: 100 } }),
+      getApiV1JobPostings({ query: { page: index + 2, limit: 100, status: "published" } }),
     ),
   );
   return [first.data, ...pages.map((result) => {
@@ -400,7 +400,10 @@ export function CareerPage() {
   const { data, isError, isFetching, isLoading, refetch } = useQuery({
     queryKey: ["jobs", query],
     queryFn: async () => {
-      const all = await loadAllPublicJobs();
+      const now = Date.now();
+      const all = (await loadAllPublicJobs()).filter(
+        (job) => !job.expires_at || new Date(job.expires_at).getTime() >= now,
+      );
       const page = query.page ?? 1;
       const limit = query.limit ?? PAGE_SIZE;
       const term = query.search?.trim().toLowerCase();

@@ -76,11 +76,11 @@ async function loadAllEnterprises(): Promise<Enterprise[]> {
 }
 
 async function loadOpenJobCounts(): Promise<Record<string, number>> {
-  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100 } });
+  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100, status: "published" } });
   if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
   const pages = await Promise.all(
     Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
-      getApiV1JobPostings({ query: { page: index + 2, limit: 100 } }),
+      getApiV1JobPostings({ query: { page: index + 2, limit: 100, status: "published" } }),
     ),
   );
   const jobs = [first.data, ...pages.map((result) => {
@@ -88,7 +88,11 @@ async function loadOpenJobCounts(): Promise<Record<string, number>> {
     return result.data;
   })].flatMap((page) => page.items);
   const counts: Record<string, number> = {};
-  for (const job of jobs) counts[job.enterpriseId] = (counts[job.enterpriseId] ?? 0) + 1;
+  const now = Date.now();
+  for (const job of jobs) {
+    if (job.expiresAt && new Date(job.expiresAt).getTime() < now) continue;
+    counts[job.enterpriseId] = (counts[job.enterpriseId] ?? 0) + 1;
+  }
   return counts;
 }
 import { EnterpriseLogo } from "./enterprise-logo";

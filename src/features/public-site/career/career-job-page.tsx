@@ -202,9 +202,12 @@ export function CareerJobPage() {
   const { data: companyJobs } = useQuery({
     queryKey: ["enterprise-jobs", enterpriseId],
     queryFn: async () => {
-      const result = await getApiV1JobPostings({ query: { enterprise_id: enterpriseId!, limit: 100, page: 1 } });
+      const result = await getApiV1JobPostings({ query: { enterprise_id: enterpriseId!, limit: 100, page: 1, status: "published" } });
       if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      const jobs = result.data.items.map(toJob);
+      const now = Date.now();
+      const jobs = result.data.items
+        .filter((item) => !item.expiresAt || new Date(item.expiresAt).getTime() >= now)
+        .map(toJob);
       return jobs;
     },
     enabled: !!enterpriseId,
