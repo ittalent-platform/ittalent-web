@@ -41,9 +41,9 @@ export function UsersTable({ isLoading, items, onEdit, onSort, onSuspend, onView
     },
     {
       cell: (user) => (
-        <Link className="flex min-w-0 items-center gap-2.5 font-bold text-foreground no-underline hover:underline" to={adminUserPath(user.id)}>
-          <PersonAvatar tone="peach" className="size-9 text-[13px]" name={user.username} />
-          <span className="truncate">{user.username}</span>
+        <Link className="group flex min-w-0 items-center gap-2.5 font-bold text-foreground no-underline" to={adminUserPath(user.id)}>
+          <PersonAvatar tone="peach" className="size-9 text-[13px] no-underline" name={user.username} />
+          <span className="truncate transition-colors group-hover:text-(--link-hover)">{user.username}</span>
         </Link>
       ),
       header: t("adminUsers.table.name"),
@@ -62,7 +62,7 @@ export function UsersTable({ isLoading, items, onEdit, onSort, onSuspend, onView
             <DropdownMenuTrigger asChild>
               <button
                 aria-label={t("adminUsers.table.rowActions", { name: user.username })}
-                className="grid size-8 cursor-pointer place-items-center rounded-xl text-muted-foreground hover:bg-muted"
+                className="grid size-8 cursor-pointer place-items-center rounded-[10px] text-muted-foreground hover:bg-muted"
                 type="button"
               >
                 <MoreVertical aria-hidden className="size-4" />
