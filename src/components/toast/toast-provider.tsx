@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type PropsWithChildren } from "react";
+import { useTranslation } from "react-i18next";
 
 export type ToastTone = "success" | "warning" | "error";
 
@@ -41,19 +42,19 @@ function getToastStyles(tone: ToastTone) {
       return {
         body: "border-transparent bg-foreground shadow-[0_8px_20px_rgba(25,25,28,0.25)]",
         dismiss: "text-white/55 hover:text-white",
-        icon: "text-[#4ade80]",
+        icon: "text-(--status-toast-accent)",
         message: "text-white",
         note: "text-white/45",
-        title: "text-[#4ade80]",
+        title: "text-(--status-toast-accent)",
       };
     case "warning":
       return {
-        body: "border-[#f0d9ad] bg-(--status-warning-bg)",
-        dismiss: "text-[#b43709]/75 hover:text-[#b43709]",
-        icon: "text-[#b43709]",
-        message: "text-[#8a4b06]",
+        body: "border-(--status-warning-border) bg-(--status-warning-bg)",
+        dismiss: "text-(--status-warning-fg)/75 hover:text-(--status-warning-fg)",
+        icon: "text-(--status-warning-fg)",
+        message: "text-(--status-warning-fg)",
         note: "text-(--fg-faint)",
-        title: "text-[#b43709]",
+        title: "text-(--status-warning-fg)",
       };
     case "error":
     default:
@@ -61,7 +62,7 @@ function getToastStyles(tone: ToastTone) {
         body: "border-(--border-muted) bg-(--surface-4)",
         dismiss: "text-muted-foreground hover:text-foreground",
         icon: "text-muted-foreground",
-        message: "text-[#4a4a50]",
+        message: "text-(--status-neutral-fg)",
         note: "text-(--fg-faint)",
         title: "text-muted-foreground",
       };
@@ -97,7 +98,8 @@ function ToastIcon({ tone }: { tone: ToastTone }) {
 
 function ToastCard({ toast, onDismiss }: { onDismiss: (id: string) => void; toast: ToastItem }) {
   const styles = getToastStyles(toast.tone);
-  const dismissLabel = toast.dismissLabel ?? "Dismiss";
+  const { t } = useTranslation();
+  const dismissLabel = toast.dismissLabel ?? t("toast.dismiss");
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -153,9 +155,10 @@ function ToastCard({ toast, onDismiss }: { onDismiss: (id: string) => void; toas
 }
 
 function ToastViewport({ onDismiss, toasts }: { onDismiss: (id: string) => void; toasts: ToastItem[] }) {
+  const { t } = useTranslation();
   return (
     <div
-      aria-label="Toast notifications"
+      aria-label={t("toast.region")}
       className="pointer-events-none fixed bottom-4 right-4 z-[1200] flex w-[min(360px,calc(100vw-2rem))] flex-col gap-3"
     >
       {toasts.map((toast) => (

@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { postApiV1AuthLogin } from "@/api/generated";
 import { authClient } from "@/auth/auth-client";
+import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -12,9 +14,8 @@ import { loginSchema, type LoginFormValues } from "./login.schema";
 import { forgotPasswordPath } from "./password-reset";
 import { getAuthErrorMessage } from "./auth-utils";
 import { PasswordField } from "./password-field";
-import { AuthBrand } from "./auth-brand";
+import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
-import { AuthAlert } from "./auth-alert";
 
 interface SubmitAlertState {
   variant: "error" | "warning";
@@ -26,6 +27,7 @@ interface SubmitAlertState {
 }
 
 export function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const reason = searchParams.get("reason");
@@ -57,7 +59,7 @@ export function LoginPage() {
         navigate("/", { replace: true });
       }
     } catch (error) {
-      const rawMessage = getAuthErrorMessage(error, "Unable to sign in right now.");
+      const rawMessage = getAuthErrorMessage(error, t("auth.login.errorFallback"));
       const lower = rawMessage.toLowerCase();
 
       if (
@@ -68,7 +70,7 @@ export function LoginPage() {
       ) {
         setSubmitAlert({
           variant: "error",
-          message: "Email or password is incorrect.",
+          message: t("auth.login.invalidCredentials"),
         });
       } else if (
         lower.includes("too many") ||
@@ -77,19 +79,19 @@ export function LoginPage() {
       ) {
         setSubmitAlert({
           variant: "error",
-          message: "Too many sign-in attempts. Please try again in 15 minutes.",
+          message: t("auth.login.tooManyAttempts"),
         });
       } else if (lower.includes("suspend")) {
         setSubmitAlert({
           variant: "error",
-          message: "This account is suspended. Contact ITTalent support if you think this is a mistake.",
+          message: t("auth.login.suspended"),
         });
       } else if (lower.includes("verify") || lower.includes("verification")) {
         setSubmitAlert({
           variant: "warning",
-          message: "Verify your email to continue.",
+          message: t("auth.login.verifyEmail"),
           action: {
-            label: "Resend email",
+            label: t("auth.login.resendEmail"),
             href: "/verify-email",
           },
         });
@@ -104,69 +106,39 @@ export function LoginPage() {
 
   return (
     <AuthPageShell
-      aside={
-        <>
-          <AuthBrand />
-
-          <div className="mt-22 flex flex-col gap-4.5">
-            <h2 className="m-0 font-['Space_Grotesk',sans-serif] text-[46px] font-semibold leading-[1.06] tracking-[-0.015em]">
-              Where IT careers
-              <br />
-              take shape.
-            </h2>
-
-            <p className="m-0 max-w-[400px] text-[15.5px] leading-[1.6] text-white/90">
-              Apply to IT jobs from verified companies and follow every application in one place.
-            </p>
-
-            <div className="mt-1.5 text-sm">
-              <Link
-                className="font-semibold text-white underline underline-offset-4 decoration-white/50 hover:text-white"
-                to="/employer"
-              >
-                Hiring? Go to ITTalent for employers →
-              </Link>
-            </div>
-          </div>
-        </>
-      }
+      aside={<AuthHeroCopy />}
     >
       <div className="flex flex-1 h-full items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-12">
         <div className="flex w-full max-w-[420px] flex-col gap-[22px]">
           <div className="flex flex-col gap-2">
             <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[30px] font-semibold tracking-[-0.01em] text-foreground">
-              Welcome back
+              {t("auth.login.title")}
             </h1>
 
             <p className="m-0 text-[14.5px] leading-[1.55] text-muted-foreground">
-              Sign in to your ITTalent candidate account.
+              {t("auth.login.subtitle")}
             </p>
           </div>
 
           {submitAlert ? (
-            <AuthAlert
-              variant={submitAlert.variant}
+            <InlineBanner
               action={
-                submitAlert.action ? (
-                  <Link
-                    className="font-semibold underline underline-offset-2 hover:opacity-80"
-                    to={submitAlert.action.href}
-                  >
-                    {submitAlert.action.label}
-                  </Link>
-                ) : null
+                submitAlert.action
+                  ? { label: submitAlert.action.label, href: submitAlert.action.href }
+                  : undefined
               }
+              tone={submitAlert.variant}
             >
               {submitAlert.message}
-            </AuthAlert>
+            </InlineBanner>
           ) : reason === "session_expired" ? (
-            <AuthAlert variant="warning">
-              Your session has expired. Sign in again to continue.
-            </AuthAlert>
+            <InlineBanner tone="warning">
+              {t("auth.login.sessionExpired")}
+            </InlineBanner>
           ) : reason === "logged_out" ? (
-            <AuthAlert variant="info">
-              You&apos;ve been signed out.
-            </AuthAlert>
+            <InlineBanner tone="info">
+              {t("auth.login.loggedOut")}
+            </InlineBanner>
           ) : null}
 
           <form
@@ -178,13 +150,12 @@ export function LoginPage() {
                 className="mb-2 block text-[13.5px] font-semibold text-foreground"
                 htmlFor="login-identifier"
               >
-                Email or Username
+                {t("auth.login.identifierLabel")}
               </label>
 
               <Input
                 id="login-identifier"
-                className="h-[46px] w-full rounded-[12px] border border-(--border-muted) bg-white px-[15px] text-[14px] text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
-                placeholder="you@example.com or username"
+                placeholder={t("auth.login.identifierPlaceholder")}
                 type="text"
                 {...form.register("identifier")}
               />
@@ -199,13 +170,13 @@ export function LoginPage() {
             <div>
               <PasswordField
                 id="login-password"
-                label="Password"
+                label={t("auth.login.passwordLabel")}
                 labelExtra={
                   <Link
                     className="text-[13px] font-semibold text-(--primary-600) no-underline hover:underline"
                     to={forgotPasswordPath}
                   >
-                    Forgot password?
+                    {t("auth.login.forgotPassword")}
                   </Link>
                 }
                 registration={form.register("password")}
@@ -224,22 +195,19 @@ export function LoginPage() {
               shape="xl"
               type="submit"
             >
-              {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
+              {form.formState.isSubmitting ? t("auth.login.submitting") : t("auth.login.submit")}
             </Button>
           </form>
 
           <div className="flex items-center gap-3 text-[12.5px] text-(--fg-faint)">
             <div className="h-px flex-1 bg-(--border-faint)" />
-            <span>New to ITTalent?</span>
+            <span>{t("auth.login.newHere")}</span>
             <div className="h-px flex-1 bg-(--border-faint)" />
           </div>
 
-          <Link
-            className="flex h-11 w-full items-center justify-center rounded-[12px] border border-(--border-muted) bg-white text-[14px] font-semibold text-foreground no-underline transition hover:bg-[#f4f3ef]"
-            to="/register"
-          >
-            Create a candidate account
-          </Link>
+          <Button asChild className="h-11 w-full" variant="outline">
+            <Link to="/register">{t("auth.login.createAccount")}</Link>
+          </Button>
         </div>
       </div>
     </AuthPageShell>

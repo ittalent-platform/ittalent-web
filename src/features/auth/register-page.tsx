@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
@@ -15,10 +16,11 @@ import { registerSchema, type RegisterFormValues } from "./register.schema";
 import { getAuthErrorMessage } from "./auth-utils";
 import { getPasswordRules } from "./password-rules";
 import { PasswordField } from "./password-field";
-import { AuthBrand } from "./auth-brand";
+import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
 
 function PasswordRules({ password, confirmPassword }: { password: string; confirmPassword: string }) {
+  const { t } = useTranslation();
   const touched = password.length > 0 || confirmPassword.length > 0;
 
   return (
@@ -29,15 +31,15 @@ function PasswordRules({ password, confirmPassword }: { password: string; confir
 
         return (
           <span
-            key={rule.label}
+            key={rule.id}
             className={[
               "rounded-full px-2.5 py-1 text-[11.5px] font-medium transition-all duration-200",
-              active ? "scale-[1.02] bg-[#e6f5ee] text-(--status-success-fg)" : "",
+              active ? "scale-[1.02] bg-(--status-success-bg) text-(--status-success-fg)" : "",
               invalid ? "bg-(--danger-bg) text-(--danger-fg)" : "",
               !touched ? "bg-(--surface-4) text-muted-foreground" : "",
             ].join(" ")}
           >
-            {rule.label} {touched ? (rule.ok ? "✓" : "×") : ""}
+            {t(`auth.password.rule.${rule.id}`)} {touched ? (rule.ok ? "✓" : "×") : ""}
           </span>
         );
       })}
@@ -46,6 +48,7 @@ function PasswordRules({ password, confirmPassword }: { password: string; confir
 }
 
 export function RegisterPage() {
+  const { t } = useTranslation();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const [deliveryFailed, setDeliveryFailed] = useState(false);
@@ -90,7 +93,7 @@ export function RegisterPage() {
         setDeliveryFailed(true);
       }
     } catch (error) {
-      setSubmitError(getAuthErrorMessage(error, "Unable to create your account right now."));
+      setSubmitError(getAuthErrorMessage(error, t("auth.register.errorFallback")));
     }
   }
 
@@ -105,49 +108,24 @@ export function RegisterPage() {
       });
       setResendStatus("success");
       setDeliveryFailed(false);
-      setResendMessage("A new verification link has been sent to your email.");
+      setResendMessage(t("auth.register.resendSuccess"));
     } catch (error) {
       setResendStatus("error");
       setResendMessage(
-        getAuthErrorMessage(error, "We could not send the verification email. Please try again later.")
+        getAuthErrorMessage(error, t("auth.register.resendError"))
       );
     }
   }
 
   return (
     <AuthPageShell
-      aside={
-        <>
-          <AuthBrand />
-
-          <div className="mt-22 flex flex-col gap-4.5">
-            <h2 className="m-0 font-['Space_Grotesk',sans-serif] text-[46px] font-semibold leading-[1.06] tracking-[-0.015em]">
-              Where IT careers
-              <br />
-              take shape.
-            </h2>
-
-            <p className="m-0 max-w-[400px] text-[15.5px] leading-[1.6] text-white/90">
-              Apply to IT jobs from verified companies and follow every application in one place.
-            </p>
-
-            <div className="mt-1.5 text-sm">
-              <Link
-                className="font-semibold text-white underline underline-offset-4 decoration-white/50 hover:text-white"
-                to="/employer"
-              >
-                Hiring? Go to ITTalent for employers →
-              </Link>
-            </div>
-          </div>
-        </>
-      }
+      aside={<AuthHeroCopy />}
     >
       <div className="flex flex-1 h-full items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-12">
         <div className="flex w-full max-w-[460px] flex-col gap-5.5">
           {submittedEmail ? (
             <div className="flex flex-col gap-6">
-              <div className="flex size-12 items-center justify-center rounded-full bg-[#e8f5ee] text-[#12764a]">
+              <div className="flex size-12 items-center justify-center rounded-full bg-(--status-success-bg) text-(--status-success-fg)">
                 <svg
                   aria-hidden="true"
                   className="size-6"
@@ -165,16 +143,20 @@ export function RegisterPage() {
 
               <div>
                 <h1 className="mb-2 font-['Space_Grotesk',sans-serif] text-[26px] font-semibold text-foreground">
-                  Check your email
+                  {t("auth.register.checkEmailTitle")}
                 </h1>
                 <p className="m-0 text-sm leading-relaxed text-muted-foreground">
-                  If <strong className="font-semibold text-foreground">{submittedEmail}</strong> can be used, we sent a link to verify it. The link works once and expires in 24 hours.
+                  <Trans
+                    components={{ strong: <strong className="font-semibold text-foreground" /> }}
+                    i18nKey="auth.register.checkEmailBody"
+                    values={{ email: submittedEmail }}
+                  />
                 </p>
               </div>
 
               {deliveryFailed ? (
-                <div className="rounded-lg bg-[#fff8eb] p-3.5 text-xs text-[#945800]">
-                  Your account was created, but we couldn&apos;t send the verification email.
+                <div className="rounded-lg bg-(--status-warning-bg) p-3.5 text-xs text-(--status-warning-fg)">
+                  {t("auth.register.deliveryFailed")}
                 </div>
               ) : null}
 
@@ -182,7 +164,7 @@ export function RegisterPage() {
                 <div
                   className={`rounded-lg p-3.5 text-xs ${
                     resendStatus === "success"
-                      ? "bg-[#e8f5ee] text-[#12764a]"
+                      ? "bg-(--status-success-bg) text-(--status-success-fg)"
                       : "bg-(--danger-bg) text-(--danger-fg)"
                   }`}
                 >
@@ -198,7 +180,7 @@ export function RegisterPage() {
                     type="button"
                     variant="outline"
                   >
-                    Go to sign in
+                    {t("auth.register.goToSignIn")}
                   </Button>
                 </Link>
 
@@ -209,23 +191,23 @@ export function RegisterPage() {
                   shape="xl"
                   type="button"
                 >
-                  {resendStatus === "loading" ? "Sending..." : "Resend email"}
+                  {resendStatus === "loading" ? t("auth.register.resendSending") : t("auth.register.resend")}
                 </Button>
               </div>
 
               <p className="text-center text-xs text-muted-foreground sm:text-left">
-                Resend is limited to 3 times per 24 hours.
+                {t("auth.register.resendLimit")}
               </p>
             </div>
           ) : (
             <>
               <div>
                 <h1 className="mb-1.5 font-['Space_Grotesk',sans-serif] text-[26px] font-semibold text-foreground">
-                  Create an account
+                  {t("auth.register.title")}
                 </h1>
 
                 <p className="m-0 text-sm text-muted-foreground">
-                  Get started with ITTalent in seconds
+                  {t("auth.register.subtitle")}
                 </p>
               </div>
 
@@ -239,15 +221,14 @@ export function RegisterPage() {
                       className="text-[13px] font-semibold text-foreground"
                       htmlFor="register-full-name"
                     >
-                      Full name <span className="text-primary">*</span>
+                      {t("auth.register.fullName")} <span className="text-primary">*</span>
                     </label>
-                    <span className="text-xs text-muted-foreground">2–100 characters</span>
+                    <span className="text-xs text-muted-foreground">{t("auth.register.fullNameHint")}</span>
                   </div>
 
                   <Input
                     id="register-full-name"
-                    className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
-                    placeholder="Nguyen Van A"
+                    placeholder={t("auth.register.fullNamePlaceholder")}
                     type="text"
                     {...form.register("fullName")}
                   />
@@ -265,13 +246,12 @@ export function RegisterPage() {
                       className="mb-1.5 block text-[13px] font-semibold text-foreground"
                       htmlFor="register-username"
                     >
-                      Username <span className="text-primary">*</span>
+                      {t("auth.register.username")} <span className="text-primary">*</span>
                     </label>
 
                     <Input
                       id="register-username"
-                      className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
-                      placeholder="e.g. alex_dev"
+                    placeholder={t("auth.register.usernamePlaceholder")}
                       type="text"
                       {...form.register("username")}
                     />
@@ -289,15 +269,14 @@ export function RegisterPage() {
                         className="text-[13px] font-semibold text-foreground"
                         htmlFor="register-mobile"
                       >
-                        Mobile
+                        {t("auth.register.mobile")}
                       </label>
-                      <span className="text-xs text-muted-foreground">Optional</span>
+                      <span className="text-xs text-muted-foreground">{t("auth.register.optional")}</span>
                     </div>
 
                     <Input
                       id="register-mobile"
-                      className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
-                      placeholder="0901 234 567"
+                    placeholder={t("auth.register.mobilePlaceholder")}
                       type="tel"
                       {...form.register("mobile")}
                     />
@@ -315,13 +294,12 @@ export function RegisterPage() {
                     className="mb-1.5 block text-[13px] font-semibold text-foreground"
                     htmlFor="register-email"
                   >
-                    Email <span className="text-primary">*</span>
+                    {t("auth.register.email")} <span className="text-primary">*</span>
                   </label>
 
                   <Input
                     id="register-email"
-                    className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
-                    placeholder="you@example.com"
+                    placeholder={t("auth.register.emailPlaceholder")}
                     type="email"
                     {...form.register("email")}
                   />
@@ -337,7 +315,7 @@ export function RegisterPage() {
                   <div>
                     <PasswordField
                       id="register-password"
-                      label="Password"
+                      label={t("auth.register.password")}
                       labelExtra={<span className="text-primary">*</span>}
                       registration={form.register("password")}
                     />
@@ -352,7 +330,7 @@ export function RegisterPage() {
                   <div>
                     <PasswordField
                       id="register-confirm-password"
-                      label="Confirm password"
+                      label={t("auth.register.confirmPassword")}
                       labelExtra={<span className="text-primary">*</span>}
                       registration={form.register("confirmPassword")}
                     />
@@ -366,7 +344,7 @@ export function RegisterPage() {
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                  8–64 characters with upper case, lower case, a number and a special character.
+                  {t("auth.register.passwordHint")}
                 </p>
 
                 <PasswordRules
@@ -382,15 +360,14 @@ export function RegisterPage() {
                     {...form.register("termsAccepted")}
                   />
                   <label htmlFor="register-terms" className="text-xs leading-relaxed text-muted-foreground">
-                    I agree to the{" "}
-                    <Link to="/terms" className="font-medium text-primary hover:underline">
-                      Terms of use
-                    </Link>{" "}
-                    and{" "}
-                    <Link to="/privacy" className="font-medium text-primary hover:underline">
-                      Privacy policy
-                    </Link>
-                    . <span className="text-primary">*</span>
+                    <Trans
+                      components={{
+                        terms: <Link className="font-medium text-primary hover:underline" to="/terms" />,
+                        privacy: <Link className="font-medium text-primary hover:underline" to="/privacy" />,
+                      }}
+                      i18nKey="auth.register.terms"
+                    />{" "}
+                    <span className="text-primary">*</span>
                   </label>
                 </div>
                 {form.formState.errors.termsAccepted ? (
@@ -409,18 +386,18 @@ export function RegisterPage() {
                   shape="xl"
                   type="submit"
                 >
-                  {form.formState.isSubmitting ? "Creating account..." : "Create account"}
+                  {form.formState.isSubmitting ? t("auth.register.submitting") : t("auth.register.submit")}
                 </Button>
               </form>
 
               <p className="text-center text-sm text-muted-foreground">
-                Already have an account?{" "}
+                {t("auth.register.haveAccount")}{" "}
                 <Link
-                  aria-label="Sign in instead"
+                  aria-label={t("auth.register.signInInstead")}
                   className="font-medium text-primary hover:underline"
                   to="/login"
                 >
-                  Sign in
+                  {t("auth.register.signIn")}
                 </Link>
               </p>
             </>

@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ export function PasswordField({
   labelExtra?: ReactNode;
   registration: UseFormRegisterReturn;
 }) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   return (
     <div className={className}>
@@ -38,16 +40,16 @@ export function PasswordField({
       <div className="relative">
         <Input
           className={cn(
-            "h-[46px] rounded-[12px] border-(--border-muted) px-[15px] pr-12 text-[14px] outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15",
+            "pr-12",
             inputClassName,
           )}
           id={id}
-          placeholder="••••••••"
+          placeholder={t("auth.password.placeholder")}
           type={visible ? "text" : "password"}
           {...registration}
         />
         <Button
-          aria-label={`${visible ? "Hide" : "Show"} ${label.toLowerCase()}`}
+          aria-label={t(visible ? "auth.password.hide" : "auth.password.show", { label: label.toLowerCase() })}
           className="absolute right-1 top-1/2 -translate-y-1/2"
           onClick={() => setVisible((value) => !value)}
           size="icon"

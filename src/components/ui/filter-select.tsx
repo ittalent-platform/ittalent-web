@@ -1,5 +1,6 @@
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import { useMemo, useRef, useState, type ReactNode } from "react"
+import { useTranslation } from "react-i18next"
 
 import { cn } from "@/lib/utils"
 
@@ -29,12 +30,14 @@ export function FilterSelect<T extends string>({
   contentClassName,
   onChange,
   options,
-  placeholder = "All",
+  placeholder,
   renderTrigger,
   searchable = false,
   size = "md",
   value,
 }: FilterSelectProps<T>) {
+  const { t } = useTranslation()
+  const placeholderLabel = placeholder ?? t("filterSelect.all")
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -81,7 +84,7 @@ export function FilterSelect<T extends string>({
               setQuery("")
               setOpen(true)
             }}
-            placeholder={selected ? undefined : placeholder}
+            placeholder={selected ? undefined : placeholderLabel}
             value={open ? query : selected?.label ?? ""}
           />
           <span className="pb-px text-muted-foreground">▾</span>
@@ -114,7 +117,7 @@ export function FilterSelect<T extends string>({
               </button>
             ))}
             {visibleOptions.length === 0 ? (
-              <div className="px-3.5 py-3 text-[13.5px] text-muted-foreground">No results</div>
+              <div className="px-3.5 py-3 text-[13.5px] text-muted-foreground">{t("filterSelect.noResults")}</div>
             ) : null}
           </div>
         ) : null}
@@ -133,7 +136,7 @@ export function FilterSelect<T extends string>({
           )}
           type="button"
         >
-          {renderTrigger ? renderTrigger(selected?.label ?? placeholder) : (selected?.label ?? placeholder)}
+          {renderTrigger ? renderTrigger(selected?.label ?? placeholderLabel) : (selected?.label ?? placeholderLabel)}
           <span className="pb-px text-muted-foreground">▾</span>
         </button>
       </DropdownMenuPrimitive.Trigger>
@@ -166,7 +169,7 @@ export function FilterSelect<T extends string>({
             </DropdownMenuPrimitive.Item>
           ))}
           {visibleOptions.length === 0 ? (
-            <div className="px-3.5 py-3 text-[13.5px] text-muted-foreground">No results</div>
+            <div className="px-3.5 py-3 text-[13.5px] text-muted-foreground">{t("filterSelect.noResults")}</div>
           ) : null}
         </DropdownMenuPrimitive.Content>
       </DropdownMenuPrimitive.Portal>
@@ -187,21 +190,24 @@ type FilterMultiSelectProps<T extends string> = {
 }
 
 export function FilterMultiSelect<T extends string>({
-  allLabel = "All",
-  baseLabel = "Filter",
+  allLabel,
+  baseLabel,
   className,
   contentClassName,
   onChange,
   options,
-  placeholder = "All",
+  placeholder,
   size = "md",
   values,
 }: FilterMultiSelectProps<T>) {
+  const { t } = useTranslation()
+  const placeholderLabel = placeholder ?? t("filterSelect.all")
+  const baseLabelText = baseLabel ?? t("filterSelect.filter")
   const label = values.length === 0
-    ? placeholder
+    ? placeholderLabel
     : values.length === 1
-      ? options.find((option) => option.value === values[0])?.label ?? placeholder
-      : `${baseLabel} (${values.length})`
+      ? options.find((option) => option.value === values[0])?.label ?? placeholderLabel
+      : `${baseLabelText} (${values.length})`
 
   function toggle(value: T) {
     onChange(values.includes(value) ? values.filter((item) => item !== value) : [...values, value])
@@ -245,7 +251,7 @@ export function FilterMultiSelect<T extends string>({
               onChange([])
             }}
           >
-            {allLabel}
+            {allLabel ?? t("filterSelect.all")}
           </DropdownMenuPrimitive.Item>
           {options.map((option) => (
             <DropdownMenuPrimitive.Item
