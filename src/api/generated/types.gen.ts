@@ -267,6 +267,7 @@ export type JobPostingListQuery = {
     location?: string;
     employment_type?: string;
     level?: string;
+    enterprise_id?: string;
     sort_by?: 'created_at' | 'title' | 'expires_at';
     sort_order?: 'asc' | 'desc';
     page?: number;
@@ -346,7 +347,12 @@ export type EnterpriseListResponse = {
         companySize: string | null;
         companyType: string | null;
         techStack?: Array<string>;
+        openRoleCount?: number;
         status: string;
+        email?: string | null;
+        phone?: string | null;
+        createdAt?: string | null;
+        creatorAccountId?: string | null;
     }>;
     page: number;
     limit: number;
@@ -981,6 +987,7 @@ export type GetApiV1JobPostingsData = {
         location?: string;
         employment_type?: string;
         level?: string;
+        enterprise_id?: string;
         sort_by?: 'created_at' | 'title' | 'expires_at';
         sort_order?: 'asc' | 'desc';
         page?: number;
@@ -1036,6 +1043,35 @@ export type PostApiV1JobPostingsResponses = {
 
 export type PostApiV1JobPostingsResponse = PostApiV1JobPostingsResponses[keyof PostApiV1JobPostingsResponses];
 
+export type GetApiV1JobPostingsByIdPublicData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}/public';
+};
+
+export type GetApiV1JobPostingsByIdPublicErrors = {
+    /**
+     * Invalid job posting ID
+     */
+    400: unknown;
+    /**
+     * Job posting not found, not published, or no longer open
+     */
+    404: unknown;
+};
+
+export type GetApiV1JobPostingsByIdPublicResponses = {
+    /**
+     * Job posting
+     */
+    200: JobPosting;
+};
+
+export type GetApiV1JobPostingsByIdPublicResponse = GetApiV1JobPostingsByIdPublicResponses[keyof GetApiV1JobPostingsByIdPublicResponses];
+
 export type GetApiV1RecruiterJobPostingsData = {
     body?: never;
     path?: never;
@@ -1044,6 +1080,7 @@ export type GetApiV1RecruiterJobPostingsData = {
         location?: string;
         employment_type?: string;
         level?: string;
+        enterprise_id?: string;
         sort_by?: 'created_at' | 'title' | 'expires_at';
         sort_order?: 'asc' | 'desc';
         page?: number;
@@ -1084,6 +1121,7 @@ export type GetApiV1AdminJobPostingsData = {
         location?: string;
         employment_type?: string;
         level?: string;
+        enterprise_id?: string;
         sort_by?: 'created_at' | 'title' | 'expires_at';
         sort_order?: 'asc' | 'desc';
         page?: number;

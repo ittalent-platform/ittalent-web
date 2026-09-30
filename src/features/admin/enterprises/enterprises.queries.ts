@@ -15,12 +15,8 @@ import type {
   UpdateEnterpriseStatusDto,
 } from "@/api/generated/types.gen";
 
-export type EnterpriseSummaryDto = EnterpriseListResponse["items"][number] & {
-  email?: string;
-  phone?: string;
-  createdAt?: string;
-  creatorAccountId?: string;
-};
+// email, phone, createdAt and creatorAccountId are part of the list contract now.
+export type EnterpriseSummaryDto = EnterpriseListResponse["items"][number];
 
 export type EnterpriseListParams = {
   enabled?: boolean;

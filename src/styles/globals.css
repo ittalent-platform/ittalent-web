@@ -743,6 +743,42 @@
   max-width: none;
 }
 
+/* Public marketplace (Jobs / Companies) palette */
+@theme {
+  --color-mkt-canvas: #fafaf8;
+  --color-mkt-ink: #19191c;
+  --color-mkt-ink-2: #4a4a50;
+  --color-mkt-muted: #64646b;
+  --color-mkt-subtle: #737379;
+  --color-mkt-label: #6f6f76;
+  --color-mkt-line: #e6e4df;
+  --color-mkt-line-strong: #dedcd6;
+  --color-mkt-line-soft: #efede8;
+  --color-mkt-chip: #f1efea;
+  --color-mkt-check: #c2c2c6;
+  --color-mkt-accent: #d73c03;
+  --color-mkt-accent-hover: #b33305;
+  --color-mkt-accent-dark: #8f2904;
+  --color-mkt-brand: #f2470c;
+  --color-mkt-accent-tint: #fef3ee;
+  --color-mkt-accent-border: #f0b4a0;
+  --color-mkt-accent-soft: #fde8e0;
+  --color-mkt-blue-bg: #e4ecfb;
+  --color-mkt-blue-fg: #2a55a8;
+  --color-mkt-danger: #b42318;
+  --color-mkt-danger-bg: #fbe9e7;
+  --color-mkt-field-error: #d92d20;
+  --color-mkt-on-dark: #c9cacf;
+  --color-mkt-on-dark-muted: #9a9a9f;
+  --color-mkt-on-dark-soft: #e7e7ea;
+  --color-mkt-on-dark-nav: #d8d8dc;
+  --color-mkt-amber-bg: #fcf3e3;
+  --color-mkt-amber-border: #f0d9ad;
+  --color-mkt-amber-fg: #8a4b06;
+  --color-mkt-green-bg: #e8f5ee;
+  --color-mkt-green-fg: #12764a;
+}
+
 /* The artwork box keeps the 560 x 520 proportions; ring sizes inside it are cqw. */
 .itt-hero-rings {
   aspect-ratio: 560 / 520;

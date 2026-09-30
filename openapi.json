@@ -1007,6 +1007,10 @@
             "minLength": 1,
             "maxLength": 100
           },
+          "enterprise_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
           "sort_by": {
             "type": "string",
             "enum": [
@@ -1325,8 +1329,28 @@
                   },
                   "default": []
                 },
+                "openRoleCount": {
+                  "type": "number",
+                  "default": 0
+                },
                 "status": {
                   "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "phone": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "creatorAccountId": {
+                  "type": "string",
+                  "nullable": true
                 }
               },
               "required": [
@@ -3394,6 +3418,15 @@
           {
             "schema": {
               "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterprise_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
               "enum": [
                 "created_at",
                 "title",
@@ -3500,6 +3533,44 @@
         }
       }
     },
+    "/api/v1/job-postings/{id}/public": {
+      "get": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Get a published, still-open job posting (public)",
+        "description": "Not found for drafts, archived or expired postings, postings being deleted and postings of enterprises that are not Active.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid job posting ID"
+          },
+          "404": {
+            "description": "Job posting not found, not published, or no longer open"
+          }
+        }
+      }
+    },
     "/api/v1/recruiter/job-postings": {
       "get": {
         "tags": [
@@ -3550,6 +3621,15 @@
             },
             "required": false,
             "name": "level",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterprise_id",
             "in": "query"
           },
           {
@@ -3674,6 +3754,15 @@
             },
             "required": false,
             "name": "level",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterprise_id",
             "in": "query"
           },
           {
