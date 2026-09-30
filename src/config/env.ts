@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const publicEnvSchema = z.object({
-  VITE_API_URL: z.string().url().default("http://localhost:3000"),
+  VITE_API_URL: z.string().url().default("http://localhost:3001"),
   VITE_APP_NAME: z.string().min(1).default("iTalent"),
 });
 

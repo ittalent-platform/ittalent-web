@@ -39,13 +39,17 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.6404 0.2153 35.9003);
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "Instrument Sans", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Instrument Sans", sans-serif;
   --font-serif: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   --status-success-bg: oklch(0.9585 0.0166 162.7494);
   --status-success-fg: oklch(0.5009 0.1115 157.848);
   --status-warning-bg: oklch(0.9669 0.0232 82.1219);
   --status-warning-fg: oklch(0.5553 0.1455 48.9975);
+  --status-warning-border: #f0d9ad;
+  --status-success-border: #bce0cc;
+  --status-toast-accent: #4ade80;
   --status-blocked-bg: oklch(0.944 0.0248 301.0696);
   --status-blocked-fg: oklch(0.498 0.1953 291.5008);
   --status-neutral-bg: oklch(0.9523 0.007 88.6434);
@@ -64,18 +68,24 @@
   --status-disabled-fg: oklch(0.72 0.006 286);
   --application-submitted: oklch(0.4 0.01 286);
   --application-submitted-bg: oklch(0.955 0.006 90);
-  --application-review: oklch(0.48 0.16 255);
-  --application-review-bg: oklch(0.96 0.025 255);
-  --application-interview: oklch(0.49 0.19 294);
-  --application-interview-bg: oklch(0.96 0.025 294);
-  --application-offered: oklch(0.52 0.17 42);
-  --application-offered-bg: oklch(0.97 0.025 42);
-  --application-hired: oklch(0.5 0.13 160);
-  --application-hired-bg: oklch(0.96 0.025 160);
-  --application-rejected: oklch(0.54 0.19 28);
-  --application-rejected-bg: oklch(0.97 0.025 28);
-  --application-withdrawn: oklch(0.52 0.14 65);
-  --application-withdrawn-bg: oklch(0.97 0.025 65);
+  --application-review: var(--status-info-fg);
+  --application-review-bg: var(--status-info-bg);
+  --application-interview: var(--status-blocked-fg);
+  --application-interview-bg: var(--status-blocked-bg);
+  --application-offered: var(--status-warning-fg);
+  --application-offered-bg: var(--status-warning-bg);
+  --application-hired: var(--status-success-fg);
+  --application-hired-bg: var(--status-success-bg);
+  --application-rejected: var(--status-error-fg);
+  --application-rejected-bg: var(--status-error-bg);
+  --application-withdrawn: var(--muted-foreground);
+  --application-withdrawn-bg: var(--muted);
+  --primary-border: #f0b4a0;
+  --z-overlay: 40;
+  --z-header: 300;
+  --z-dialog: 500;
+  --header-height: 74px;
+  --overlay: rgba(17, 17, 20, 0.5);
   --app-canvas: oklch(0.982 0.004 95);
   --radius: 0.75rem;
   --shadow-x: 0;
@@ -191,6 +201,19 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* DESIGN.md tokens exposed as utilities (bg-canvas, text-fg-link, ...). */
+  --color-canvas: var(--app-canvas);
+  --color-fg-link: var(--fg-link);
+  --color-line-muted: var(--line-muted);
+  --color-line-dashed: var(--line-dashed);
+  --color-surface-readonly: var(--surface-readonly);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-slate-subtle: var(--slate-subtle);
+  --color-destructive-solid: var(--destructive-solid);
+  --color-destructive-border: var(--destructive-border);
+  --color-notification: var(--notification-badge);
+  --color-brand: var(--brand);
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
@@ -238,11 +261,23 @@
   --border-strong: #dcdde0;
   --primary: #f2470c;
   --primary-600: #d9400a;
+  --fg-link: #b33305;
+  --brand: #f2470c;
   --primary-50: #fdf3ea;
   --primary-100: #fbe4d3;
   --primary-300: #efa370;
   --ph: rgba(0, 0, 0, 0.055);
   --hero-bg: #19191c;
+  --hero-candidate-bg: #cf3a05;
+  --hero-ring-1: #d4400b;
+  --hero-ring-2: #dd4a13;
+  --hero-ring-3: #e85a22;
+  --hero-ring-4: #f37139;
+  --hero-ring-5: #fb8f5f;
+  --hero-ring-6: #ffb08c;
+  --hero-ring-7: #ffcdb5;
+  --hero-ring-8: #ffe4d7;
+  --hero-ring-9: #fff7f2;
   --hero-fg: #ffffff;
   --sidebar-surface: #111114;
   --sidebar-fg-muted: rgba(255, 255, 255, 0.6);
@@ -254,8 +289,15 @@
   --fg-faint: #9a9a9f;
   --danger-fg: #b42318;
   --danger-bg: #fbe9e7;
+  --danger-border: #f2c4bc;
+  --warning-fg: #8a4b06;
+  --warning-bg: #fcf3e3;
+  --warning-border: #f4d89e;
+  --info-fg: #2a55a8;
+  --info-bg: #e4ecfb;
+  --info-border: #c7d6f3;
   --field-error: #d92d20;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
 .itt-root.dark {
@@ -271,13 +313,214 @@
   --border-strong: #44454a;
   --primary: #f2470c;
   --primary-600: #eb8342;
+  --fg-link: #f6c9b6;
+  --brand: #f2470c;
   --primary-50: rgba(242, 71, 12, 0.12);
   --primary-100: rgba(242, 71, 12, 0.18);
   --primary-300: #eb8342;
   --ph: rgba(255, 255, 255, 0.06);
   --hero-bg: #0e0e10;
+  --hero-candidate-bg: #cf3a05;
+  --hero-ring-1: #d4400b;
+  --hero-ring-2: #dd4a13;
+  --hero-ring-3: #e85a22;
+  --hero-ring-4: #f37139;
+  --hero-ring-5: #fb8f5f;
+  --hero-ring-6: #ffb08c;
+  --hero-ring-7: #ffcdb5;
+  --hero-ring-8: #ffe4d7;
+  --hero-ring-9: #fff7f2;
   --hero-fg: #ffffff;
   --app-canvas: #19191c;
+  --danger-fg: #f87171;
+  --danger-bg: rgba(180, 35, 24, 0.18);
+  --danger-border: rgba(242, 196, 188, 0.25);
+  --warning-fg: #fcd34d;
+  --warning-bg: rgba(138, 75, 6, 0.22);
+  --warning-border: rgba(244, 216, 158, 0.25);
+  --info-fg: #93c5fd;
+  --info-bg: rgba(42, 85, 168, 0.2);
+  --info-border: rgba(199, 214, 243, 0.25);
+}
+
+/* Candidate workspace tokens come from ittalent-design-system.html. Scope to the
+   applicant shell so marketing and admin screens keep their existing identity. */
+.candidate-root {
+  --app-canvas: #fafaf8;
+  --background: #ffffff;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --foreground: #19191c;
+  --muted: #f1efea;
+  --muted-foreground: #64646b;
+  --border: #e6e4df;
+  --border-strong: #dedcd6;
+  --primary: #f2470c;
+  --primary-foreground: #ffffff;
+  --status-neutral-bg: #f1efea;
+  --status-neutral-fg: #4a4a50;
+  --status-info-bg: #e4ecfb;
+  --status-info-fg: #2a55a8;
+  --status-blocked-bg: #efe9fb;
+  --status-blocked-fg: #6941c6;
+  --status-warning-bg: #fcf3e3;
+  --status-warning-fg: #b45309;
+  --status-warning-border: #f0d9ad;
+  --status-success-border: #bce0cc;
+  --status-toast-accent: #4ade80;
+  --status-success-bg: #e8f5ee;
+  --status-success-fg: #12764a;
+  --status-error-bg: #fbe9e7;
+  --status-error-fg: #b42318;
+  --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  /* Ember CTA: the darker #d73c03 fill keeps white 14px/600 labels above 4.5:1 (DESIGN.md "Ember-Is-Not-Text"). */
+  --primary: #d73c03;
+  --brand: #f2470c;
+  --fg-link: #b33305;
+  --line-muted: #efede8;
+  --line-dashed: #c9c7c1;
+  --surface-readonly: #f6f5f1;
+  --surface-subtle: #fbfaf8;
+  --slate-subtle: #737379;
+  --destructive: #b42318;
+  --destructive-solid: #c62a1c;
+  --destructive-border: #f2c4bc;
+  --notification-badge: #d92d20;
+  --overlay: rgba(25, 25, 28, 0.55);
+  /* Company logo tile palette: a company gets one by hashing its name (see logo-tile.tsx). */
+  --logo-1: #1c6b3f;
+  --logo-2: #2a55a8;
+  --logo-3: #8a4b06;
+  --logo-4: #f2470c;
+  --logo-5: #b42318;
+  --logo-6: #6941c6;
+}
+
+.candidate-root.dark {
+  --fg-link: #f6c9b6;
+  --line-muted: #2e2e32;
+  --line-dashed: #4a4a50;
+  --surface-readonly: #26262a;
+  --surface-subtle: #222226;
+  --slate-subtle: #9a9a9f;
+  --destructive: #f4a399;
+  --destructive-solid: #c62a1c;
+  --destructive-border: #5a2a25;
+  --app-canvas: #19191c;
+  --background: #19191c;
+  --card: #222226;
+  --popover: #222226;
+  --foreground: #f4f2ee;
+  --muted: #2e2e32;
+  --muted-foreground: #9a9a9f;
+  --border: #2e2e32;
+  --border-strong: #3a3a40;
+  --status-neutral-bg: #2e2e32;
+  --status-neutral-fg: #c2c2c6;
+  --status-info-bg: #1a2540;
+  --status-info-fg: #93b2ee;
+  --status-blocked-bg: #2a2140;
+  --status-blocked-fg: #b9a2f0;
+  --status-warning-bg: #33260f;
+  --status-warning-fg: #f3b562;
+  --status-warning-border: #5a4420;
+  --status-success-border: #24503a;
+  --status-toast-accent: #4ade80;
+  --status-success-bg: #16301f;
+  --status-success-fg: #6fd39b;
+  --status-error-bg: #3a1a17;
+  --status-error-fg: #f4a399;
+  --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+/* Candidate workspace tokens come from ittalent-design-system.html. Scope to the
+   applicant shell so marketing and admin screens keep their existing identity. */
+.candidate-root {
+  --app-canvas: #fafaf8;
+  --background: #ffffff;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --foreground: #19191c;
+  --muted: #f1efea;
+  --muted-foreground: #64646b;
+  --border: #e6e4df;
+  --border-strong: #dedcd6;
+  --primary: #f2470c;
+  --primary-foreground: #ffffff;
+  --status-neutral-bg: #f1efea;
+  --status-neutral-fg: #4a4a50;
+  --status-info-bg: #e4ecfb;
+  --status-info-fg: #2a55a8;
+  --status-blocked-bg: #efe9fb;
+  --status-blocked-fg: #6941c6;
+  --status-warning-bg: #fcf3e3;
+  --status-warning-fg: #b45309;
+  --status-warning-border: #f0d9ad;
+  --status-success-border: #bce0cc;
+  --status-toast-accent: #4ade80;
+  --status-success-bg: #e8f5ee;
+  --status-success-fg: #12764a;
+  --status-error-bg: #fbe9e7;
+  --status-error-fg: #b42318;
+  --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  /* Ember CTA: the darker #d73c03 fill keeps white 14px/600 labels above 4.5:1 (DESIGN.md "Ember-Is-Not-Text"). */
+  --primary: #d73c03;
+  --brand: #f2470c;
+  --fg-link: #b33305;
+  --line-muted: #efede8;
+  --line-dashed: #c9c7c1;
+  --surface-readonly: #f6f5f1;
+  --surface-subtle: #fbfaf8;
+  --slate-subtle: #737379;
+  --destructive: #b42318;
+  --destructive-solid: #c62a1c;
+  --destructive-border: #f2c4bc;
+  --notification-badge: #d92d20;
+  --overlay: rgba(25, 25, 28, 0.55);
+  /* Company logo tile palette: a company gets one by hashing its name (see logo-tile.tsx). */
+  --logo-1: #1c6b3f;
+  --logo-2: #2a55a8;
+  --logo-3: #8a4b06;
+  --logo-4: #f2470c;
+  --logo-5: #b42318;
+  --logo-6: #6941c6;
+}
+
+.candidate-root.dark {
+  --fg-link: #f6c9b6;
+  --line-muted: #2e2e32;
+  --line-dashed: #4a4a50;
+  --surface-readonly: #26262a;
+  --surface-subtle: #222226;
+  --slate-subtle: #9a9a9f;
+  --destructive: #f4a399;
+  --destructive-solid: #c62a1c;
+  --destructive-border: #5a2a25;
+  --app-canvas: #19191c;
+  --background: #19191c;
+  --card: #222226;
+  --popover: #222226;
+  --foreground: #f4f2ee;
+  --muted: #2e2e32;
+  --muted-foreground: #9a9a9f;
+  --border: #2e2e32;
+  --border-strong: #3a3a40;
+  --status-neutral-bg: #2e2e32;
+  --status-neutral-fg: #c2c2c6;
+  --status-info-bg: #1a2540;
+  --status-info-fg: #93b2ee;
+  --status-blocked-bg: #2a2140;
+  --status-blocked-fg: #b9a2f0;
+  --status-warning-bg: #33260f;
+  --status-warning-fg: #f3b562;
+  --status-warning-border: #5a4420;
+  --status-success-border: #24503a;
+  --status-toast-accent: #4ade80;
+  --status-success-bg: #16301f;
+  --status-success-fg: #6fd39b;
+  --status-error-bg: #3a1a17;
+  --status-error-fg: #f4a399;
+  --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
 @keyframes itt-pulse {
@@ -462,4 +705,32 @@
 
 .news-markdown-editor .news-body {
   max-width: none;
+}
+
+/* The artwork box keeps the 560 x 520 proportions; ring sizes inside it are cqw. */
+.itt-hero-rings {
+  aspect-ratio: 560 / 520;
+  container-type: inline-size;
+}
+
+/* Each ring of the auth hero swells outward in turn (transform only, so it stays on the compositor). */
+@keyframes itt-ring-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+.itt-ring {
+  animation: itt-ring-pulse 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itt-ring {
+    animation: none;
+  }
 }

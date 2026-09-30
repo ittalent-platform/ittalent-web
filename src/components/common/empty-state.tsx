@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 type EmptyStateAction = {
   label: string;
   onClick: () => void;
+  /** "outline" for a quiet secondary CTA such as "Clear filters"; defaults to the Ember primary. */
+  variant?: "default" | "outline";
 };
 
 type EmptyStateProps = {
@@ -54,6 +56,7 @@ export function EmptyState({
               className="h-11 px-7 text-[15px] font-semibold"
               onClick={action.onClick}
               shape="pill"
+              variant={action.variant ?? "default"}
             >
               {action.label}
             </Button>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import { cn } from "@/lib/utils";
@@ -7,7 +8,10 @@ import { Button } from "@/components/ui/button";
 
 import { brands, faqItems, processSteps, serviceCards } from "./content";
 
+const asList = (value: unknown): string[] => (Array.isArray(value) ? (value as string[]) : []);
+
 export function LandingPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
 
@@ -127,21 +131,21 @@ export function LandingPage() {
         <div className="relative mx-auto w-full max-w-[1320px]">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[rgba(242,71,12,.45)] bg-[rgba(242,71,12,.14)] px-[17px] py-[7px]">
             <span className="h-[9px] w-[9px] animate-[itt-pulse_2s_infinite] rounded-full bg-primary" />
-            <span className="itt-mono text-[11.5px] font-bold uppercase tracking-[0.14em] text-[var(--primary-300)]">Enterprise Engineering Partner</span>
+            <span className="itt-mono text-[11.5px] font-bold uppercase tracking-[0.14em] text-[var(--primary-300)]">{t("landing.hero.badge")}</span>
           </div>
           <h1 className="itt-display max-w-[900px] text-[64px] font-bold uppercase leading-[1.02] tracking-[-0.035em] xl:text-[76px]">
-            <span className="italic text-[var(--primary)]">Reliable</span> software outsourcing, committed to <span className="italic text-[var(--primary)]">on-time</span> delivery
+            <Trans components={{ accent: <span className="italic text-[var(--primary)]" /> }} i18nKey="landing.hero.title" />
           </h1>
-          <p className="mt-6 max-w-[620px] text-[19px] leading-[1.6] text-[#B4B5BB]">
-            ITTalent provides specialized engineering teams in Web, Mobile, Cloud, and QA. We turn your vision into high-quality software with complete cost transparency and a firm commitment to project deadlines.
+          <p className="mt-6 max-w-[620px] text-[19px] leading-[1.6] text-(--fg-faint)">
+            {t("landing.hero.subtitle")}
           </p>
           <div className="mt-[42px] flex flex-wrap gap-4">
             <Button className="group h-[60px] gap-[10px] px-10 text-[17px] font-bold" onClick={() => navigate("/register")} shape="pill" type="button">
-              <span>Start a Project</span>
+              <span>{t("landing.startProject")}</span>
               <ArrowRight className="size-5 transition-transform duration-300 ease-out group-hover:translate-x-1" />
             </Button>
-            <Button className="h-[60px] border-2 border-[#44454A] bg-transparent px-10 text-[17px] font-bold text-[#D4D5DA] hover:bg-white/5 hover:text-white" onClick={() => scrollToSection("home-services")} shape="pill" type="button" variant="outline">
-              Explore Services
+            <Button className="h-[60px] border-2 border-(--border-muted) bg-transparent px-10 text-[17px] font-bold text-(--hero-fg)/85 hover:bg-white/5 hover:text-white" onClick={() => scrollToSection("home-services")} shape="pill" type="button" variant="outline">
+              {t("landing.hero.explore")}
             </Button>
           </div>
         </div>
@@ -152,9 +156,9 @@ export function LandingPage() {
           <div className="sticky top-0 flex items-center h-screen overflow-hidden">
             <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 gap-14 px-8 align-middle lg:grid-cols-[0.85fr_1.15fr]">
               <div>
-                <div className="itt-mono mb-4 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[var(--primary)]">Capabilities</div>
-                <h2 className="mb-5 text-[52px] font-bold uppercase leading-[1.02] tracking-[-0.03em]">Core<br />services</h2>
-                <p className="mb-8 max-w-[360px] text-[16px] leading-[1.6] text-[var(--fg-muted)]">Discover the technology solutions that bring your vision to life with optimized deliverables and complete transparent tracking.</p>
+                <div className="itt-mono mb-4 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[var(--primary)]">{t("landing.services.eyebrow")}</div>
+                <h2 className="mb-5 text-[52px] font-bold uppercase leading-[1.02] tracking-[-0.03em]"><Trans components={{ br: <br /> }} i18nKey="landing.services.title" /></h2>
+                <p className="mb-8 max-w-[360px] text-[16px] leading-[1.6] text-[var(--fg-muted)]">{t("landing.services.subtitle")}</p>
                 <div className="flex gap-[9px]">
                   {serviceCards.map((card, index) => (
                     <span
@@ -181,10 +185,10 @@ export function LandingPage() {
                         </div>
                         <span className="itt-display text-[42px] font-bold tracking-[-0.02em] text-[var(--border-strong)]">{card.no}</span>
                       </div>
-                      <h3 className="itt-display mb-[14px] text-[28px] font-bold uppercase tracking-[-0.01em]">{card.title}</h3>
-                      <p className="mb-6 max-w-[460px] text-[15px] leading-[1.6] text-[var(--fg-muted)]">{card.desc}</p>
+                      <h3 className="itt-display mb-[14px] text-[28px] font-bold uppercase tracking-[-0.01em]">{t(`landing.services.cards.${card.id}.title`)}</h3>
+                      <p className="mb-6 max-w-[460px] text-[15px] leading-[1.6] text-[var(--fg-muted)]">{t(`landing.services.cards.${card.id}.desc`)}</p>
                       <ul className="mb-auto flex flex-col gap-[11px]">
-                        {card.list.map((item) => (
+                        {asList(t(`landing.services.cards.${card.id}.items`, { returnObjects: true })).map((item) => (
                           <li key={item} className="flex items-center gap-[11px] text-[14px] text-[var(--fg-muted)]">
                             <span className="h-[7px] w-[7px] flex-shrink-0 rounded-full bg-[var(--primary)]" />
                             {item}
@@ -209,19 +213,19 @@ export function LandingPage() {
         <div id="proc-track" className="relative h-[340vh]">
           <div className="sticky top-0 flex flex-col justify-center h-screen overflow-hidden">
             <div id="proc-center" className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center will-change-[transform,opacity]">
-              <div className="itt-mono mb-4 animate-[itt-pulse_2.4s_infinite] text-[12px] font-bold uppercase tracking-[0.2em] text-primary">Roadmap</div>
-              <h2 className="text-[82px] font-bold uppercase leading-[0.95] tracking-[-0.03em]">Process</h2>
-              <h3 className="mt-3 text-[56px] font-semibold uppercase leading-none tracking-[0.02em] text-[var(--fg-muted)]">— How we work —</h3>
-              <p className="mt-5 text-[19px] text-[var(--fg-muted)]">From <span className="italic">briefing</span> to <span className="italic">launch</span>.</p>
+              <div className="itt-mono mb-4 animate-[itt-pulse_2.4s_infinite] text-[12px] font-bold uppercase tracking-[0.2em] text-primary">{t("landing.process.eyebrow")}</div>
+              <h2 className="text-[82px] font-bold uppercase leading-[0.95] tracking-[-0.03em]">{t("landing.process.title")}</h2>
+              <h3 className="mt-3 text-[56px] font-semibold uppercase leading-none tracking-[0.02em] text-[var(--fg-muted)]">{t("landing.process.centerSubtitle")}</h3>
+              <p className="mt-5 text-[19px] text-[var(--fg-muted)]"><Trans components={{ em: <span className="italic" /> }} i18nKey="landing.process.tagline" /></p>
             </div>
 
             <div id="proc-left" className="mx-auto mb-16 flex w-full max-w-[1320px] items-end justify-between gap-6 px-8 opacity-0">
               <div className="flex items-center gap-[14px]">
-                <h2 className="itt-display text-[40px] font-bold uppercase tracking-[-0.02em]">Process</h2>
+                <h2 className="itt-display text-[40px] font-bold uppercase tracking-[-0.02em]">{t("landing.process.title")}</h2>
                 <span className="h-[26px] w-px bg-(--border-strong)" />
-                <h3 className="itt-display text-[19px] font-semibold uppercase tracking-[0.02em] text-[var(--fg-muted)]">How we work</h3>
+                <h3 className="itt-display text-[19px] font-semibold uppercase tracking-[0.02em] text-[var(--fg-muted)]">{t("landing.process.subtitle")}</h3>
               </div>
-              <span className="itt-mono text-[12px] font-semibold uppercase tracking-[0.1em] text-[var(--fg-subtle)]">4-Stage Engineering Cycle</span>
+              <span className="itt-mono text-[12px] font-semibold uppercase tracking-[0.1em] text-[var(--fg-subtle)]">{t("landing.process.cycle")}</span>
             </div>
 
             <div id="proc-cards" className="w-full overflow-hidden pb-[46px] pt-[22px] opacity-0 will-change-[transform,opacity]">
@@ -237,12 +241,12 @@ export function LandingPage() {
                       </div>
                       <div className="flex flex-1 flex-col p-10">
                         <div className="mb-[14px] flex items-start justify-between gap-4">
-                          <h3 className="itt-display text-[32px] font-bold uppercase tracking-[-0.01em]">{step.title}</h3>
+                          <h3 className="itt-display text-[32px] font-bold uppercase tracking-[-0.01em]">{t(`landing.process.steps.${step.id}.title`)}</h3>
                           <span className="itt-display flex-shrink-0 text-[40px] font-bold text-[var(--border-strong)]">{step.no}</span>
                         </div>
-                        <p className="mb-[26px] max-w-[420px] text-[15px] leading-[1.65] text-[var(--fg-muted)]">{step.desc}</p>
+                        <p className="mb-[26px] max-w-[420px] text-[15px] leading-[1.65] text-[var(--fg-muted)]">{t(`landing.process.steps.${step.id}.desc`)}</p>
                         <ul className="mt-auto grid grid-cols-2 gap-3">
-                          {step.bullets.map((bullet) => (
+                          {asList(t(`landing.process.steps.${step.id}.bullets`, { returnObjects: true })).map((bullet) => (
                             <li key={bullet} className="flex items-center gap-[9px] text-[13px] text-[var(--fg-muted)]">
                               <span className="h-[6px] w-[6px] flex-shrink-0 rounded-full bg-[var(--primary)]" />
                               <span className="truncate">{bullet}</span>
@@ -262,22 +266,22 @@ export function LandingPage() {
       <section id="home-whyus" className="bg-[var(--bg)] px-8 py-24">
         <div className="mx-auto max-w-[1080px]">
           <div className="mx-auto mb-14 max-w-[600px] text-center">
-            <h2 className="itt-display mb-4 text-[40px] font-bold uppercase leading-[1.05] tracking-[-0.025em]">Superior. Innovative. Reliable.</h2>
-            <p className="text-[15px] leading-[1.6] text-[var(--fg-muted)]">We operate with complete cost transparency, high alignment metrics, and dedicated, highly vetted IT professionals.</p>
+            <h2 className="itt-display mb-4 text-[40px] font-bold uppercase leading-[1.05] tracking-[-0.025em]">{t("landing.whyUs.title")}</h2>
+            <p className="text-[15px] leading-[1.6] text-[var(--fg-muted)]">{t("landing.whyUs.subtitle")}</p>
           </div>
 
           <div className="mb-[72px] grid grid-cols-1 gap-[18px] md:grid-cols-12 md:auto-rows-[104px]">
-            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[30px] text-center md:col-span-4 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-2 text-[60px] font-bold tracking-[-0.03em]">5+</div><div className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--fg-muted)]">Years of experience</div></div>
-            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[22px] text-center md:col-span-3 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-[5px] text-[30px] font-bold">30+</div><div className="text-[11px] font-bold uppercase tracking-[0.05em] text-[var(--fg-muted)]">Global Clients</div></div>
-            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[30px] text-center md:col-span-5 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-2 text-[60px] font-bold tracking-[-0.03em]">100+</div><div className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--fg-muted)]">Engineers &amp; Experts</div></div>
-            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[22px] text-center md:col-span-3 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-[5px] text-[30px] font-bold">98%</div><div className="text-[11px] font-bold uppercase tracking-[0.05em] text-[var(--fg-muted)]">Client Retention</div></div>
-            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[26px] text-center md:col-span-3 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-[6px] text-[52px] font-bold tracking-[-0.03em]">50+</div><div className="text-[12px] font-bold uppercase tracking-[0.05em] text-[var(--fg-muted)]">Successful Projects</div></div>
-            <div className="relative overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[26px] text-center md:col-span-6 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="pointer-events-none absolute left-1/2 top-1/2 h-[140px] w-[140px] -translate-x-1/2 -translate-y-1/2 border border-[var(--fg-muted)]"><div className="absolute left-[-20%] top-1/2 h-px w-[140%] -translate-y-1/2 rotate-45 bg-[var(--fg-muted)]" /><div className="absolute left-[-20%] top-1/2 h-px w-[140%] -translate-y-1/2 -rotate-45 bg-[var(--fg-muted)]" /></div><h3 className="itt-display relative z-10 text-[18px] font-bold uppercase tracking-[0.04em]">Dedicated Team, Agile Mindset</h3></div>
-            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[26px] text-center md:col-span-3 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-[6px] text-[52px] font-bold tracking-[-0.03em]">10+</div><div className="text-[12px] font-bold uppercase tracking-[0.05em] text-[var(--fg-muted)]">Industries</div></div>
+            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[30px] text-center md:col-span-4 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-2 text-[60px] font-bold tracking-[-0.03em]">5+</div><div className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--fg-muted)]">{t("landing.whyUs.stats.experience")}</div></div>
+            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[22px] text-center md:col-span-3 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-[5px] text-[30px] font-bold">30+</div><div className="text-[11px] font-bold uppercase tracking-[0.05em] text-[var(--fg-muted)]">{t("landing.whyUs.stats.clients")}</div></div>
+            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[30px] text-center md:col-span-5 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-2 text-[60px] font-bold tracking-[-0.03em]">100+</div><div className="text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--fg-muted)]">{t("landing.whyUs.stats.engineers")}</div></div>
+            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[22px] text-center md:col-span-3 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-[5px] text-[30px] font-bold">98%</div><div className="text-[11px] font-bold uppercase tracking-[0.05em] text-[var(--fg-muted)]">{t("landing.whyUs.stats.retention")}</div></div>
+            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[26px] text-center md:col-span-3 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-[6px] text-[52px] font-bold tracking-[-0.03em]">50+</div><div className="text-[12px] font-bold uppercase tracking-[0.05em] text-[var(--fg-muted)]">{t("landing.whyUs.stats.projects")}</div></div>
+            <div className="relative overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[26px] text-center md:col-span-6 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="pointer-events-none absolute left-1/2 top-1/2 h-[140px] w-[140px] -translate-x-1/2 -translate-y-1/2 border border-[var(--fg-muted)]"><div className="absolute left-[-20%] top-1/2 h-px w-[140%] -translate-y-1/2 rotate-45 bg-[var(--fg-muted)]" /><div className="absolute left-[-20%] top-1/2 h-px w-[140%] -translate-y-1/2 -rotate-45 bg-[var(--fg-muted)]" /></div><h3 className="itt-display relative z-10 text-[18px] font-bold uppercase tracking-[0.04em]">{t("landing.whyUs.dedicated")}</h3></div>
+            <div className="rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-[26px] text-center md:col-span-3 md:row-span-2 md:flex md:flex-col md:items-center md:justify-center"><div className="itt-display mb-[6px] text-[52px] font-bold tracking-[-0.03em]">10+</div><div className="text-[12px] font-bold uppercase tracking-[0.05em] text-[var(--fg-muted)]">{t("landing.whyUs.stats.industries")}</div></div>
           </div>
 
           <div>
-            <p className="itt-mono mb-[26px] text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--fg-subtle)]">Trusted By</p>
+            <p className="itt-mono mb-[26px] text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--fg-subtle)]">{t("landing.whyUs.trustedBy")}</p>
             <div className="overflow-hidden border-y border-[var(--border)] py-7">
               <div className="flex items-center itt-marquee w-max gap-14">
                 {[...brands, ...brands].map((brand, index) => (
@@ -298,20 +302,20 @@ export function LandingPage() {
       <section id="home-faq" className="bg-[var(--surface-2)] px-8 py-24">
         <div className="mx-auto max-w-[840px]">
           <div className="mx-auto mb-14 max-w-[620px] text-center">
-            <div className="itt-mono mb-3 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[var(--primary)]">Information</div>
-            <h2 className="mb-4 text-[46px] font-bold uppercase leading-[1.03] tracking-[-0.03em]">Frequently Asked Questions</h2>
-            <p className="text-[15px] leading-7 text-[var(--fg-muted)]">Everything you need to know about working with ITTalent's specialized outsourced teams.</p>
+            <div className="itt-mono mb-3 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[var(--primary)]">{t("landing.faq.eyebrow")}</div>
+            <h2 className="mb-4 text-[46px] font-bold uppercase leading-[1.03] tracking-[-0.03em]">{t("landing.faq.title")}</h2>
+            <p className="text-[15px] leading-7 text-[var(--fg-muted)]">{t("landing.faq.subtitle")}</p>
           </div>
           <div className="flex flex-col gap-4">
             {faqItems.map((item, index) => {
               const open = faqOpen === index;
               return (
-                <div key={item.q} className="overflow-hidden rounded-[18px] border border-[var(--border)] bg-[var(--surface)]">
+                <div key={item.id} className="overflow-hidden rounded-[18px] border border-[var(--border)] bg-[var(--surface)]">
                   <Button className="h-auto w-full justify-between gap-4 px-6 py-5 text-left" onClick={() => setFaqOpen(open ? null : index)} type="button" variant="ghost">
-                    <span className="text-[18px] font-semibold tracking-[-0.01em]">{item.q}</span>
+                    <span className="text-[18px] font-semibold tracking-[-0.01em]">{t(`landing.faq.items.${item.id}.q`)}</span>
                     <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-[var(--border)] text-[var(--fg-muted)]">{open ? "−" : "+"}</span>
                   </Button>
-                  {open ? <div className="border-t border-[var(--border)] px-6 py-5 text-[14.5px] leading-7 text-[var(--fg-muted)]">{item.a}</div> : null}
+                  {open ? <div className="border-t border-[var(--border)] px-6 py-5 text-[14.5px] leading-7 text-[var(--fg-muted)]">{t(`landing.faq.items.${item.id}.a`)}</div> : null}
                 </div>
               );
             })}
@@ -321,9 +325,9 @@ export function LandingPage() {
 
       <section className="bg-[var(--surface)] px-8 py-[120px]">
         <div className="mx-auto max-w-[820px] text-center">
-          <h2 className="mb-10 text-[60px] font-bold uppercase leading-[1.02] tracking-[-0.02em]">Let's build something great together</h2>
+          <h2 className="mb-10 text-[60px] font-bold uppercase leading-[1.02] tracking-[-0.02em]">{t("landing.cta.title")}</h2>
           <Button className="group h-[60px] px-11 text-[17px] font-bold" onClick={() => navigate("/register")} shape="pill" type="button">
-            Start a Project
+            {t("landing.startProject")}
           </Button>
         </div>
       </section>

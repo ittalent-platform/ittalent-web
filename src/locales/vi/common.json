@@ -26,7 +26,11 @@
     "rows": "Số dòng:",
     "page": "Trang",
     "previous": "Trang trước",
-    "next": "Trang sau"
+    "next": "Trang sau",
+    "label": "Phân trang",
+    "pageN": "Trang {{page}}",
+    "pageNumber": "Số trang",
+    "totalPages_other": "Tổng {{count}} trang"
   },
   "errorState": {
     "defaultTitle": "Đã có lỗi xảy ra",
@@ -37,9 +41,637 @@
     "clearSearch": "Xoá tìm kiếm"
   },
   "timeline": {
-    "viewAll": "Xem tất cả {{count}}"
+    "viewAll": "Xem tất cả {{count}}",
+    "by": "bởi {{name}}",
+    "viewMessage": "Xem tin nhắn",
+    "viewMessageFor": "Xem tin nhắn của {{label}}"
+  },
+  "applications": {
+    "title": "Đơn ứng tuyển của tôi",
+    "browse": "Tìm việc làm",
+    "subtitle_other": "{{count}} đơn ứng tuyển",
+    "search": "Tìm theo tên vị trí hoặc công ty…",
+    "filter": {
+      "status": "Trạng thái:",
+      "submitted": "Ngày nộp:",
+      "all": "Tất cả",
+      "any": "Bất kỳ",
+      "selected_other": "Đã chọn {{count}}",
+      "stage": "Giai đoạn:",
+      "job": "Vị trí",
+      "clearJob": "Bỏ lọc vị trí",
+      "from": "Từ",
+      "to": "Đến",
+      "statusCaption": "Trạng thái",
+      "appliesRightAway": "Áp dụng ngay",
+      "inProgress": "Đang xử lý",
+      "closed": "Đã đóng",
+      "selectAll": "Chọn tất cả"
+    },
+    "range": {
+      "any": "Mọi lúc",
+      "7d": "7 ngày qua",
+      "30d": "30 ngày qua",
+      "90d": "90 ngày qua",
+      "custom": "Tùy chọn"
+    },
+    "view": {
+      "table": "Bảng",
+      "board": "Bảng Kanban"
+    },
+    "columns": {
+      "reference": "Mã",
+      "job": "Vị trí",
+      "submitted": "Ngày nộp",
+      "updated": "Cập nhật",
+      "documents": "Tài liệu",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "status": {
+      "submitted": "Đã nộp",
+      "under_review": "Đang xem xét",
+      "interviewing": "Phỏng vấn",
+      "offered": "Đã nhận offer",
+      "hired": "Đã trúng tuyển",
+      "rejected": "Bị từ chối",
+      "withdrawn": "Đã rút đơn"
+    },
+    "attachment": {
+      "cv": "CV",
+      "cover_letter": "Thư xin việc"
+    },
+    "attachmentShort": {
+      "cv": "CV",
+      "cover_letter": "TXV"
+    },
+    "actor": {
+      "candidate": "Bạn",
+      "company": "Công ty",
+      "system": "Hệ thống"
+    },
+    "noDocuments": "Chưa có tài liệu",
+    "viewDetail": "Xem chi tiết",
+    "rowActions": "Thao tác cho {{id}}",
+    "noApplications": "Chưa có đơn ứng tuyển",
+    "noApplicationsDescription": "Khi bạn ứng tuyển một vị trí, đơn sẽ hiển thị ở đây để bạn theo dõi trạng thái.",
+    "noMatches": "Không có đơn phù hợp",
+    "noMatchesDescription": "Kiểm tra lại từ khóa hoặc thử bộ lọc khác.",
+    "clearFilters": "Xóa bộ lọc",
+    "loadErrorTitle": "Không tải được đơn ứng tuyển.",
+    "loadErrorHint": "Kiểm tra kết nối mạng. Dữ liệu không bị thay đổi.",
+    "board": {
+      "columns": "Các cột trạng thái đơn ứng tuyển",
+      "selectionBar": "Các đơn đã chọn",
+      "selected": "Đã chọn {{count}}",
+      "clear": "Bỏ chọn",
+      "withdraw": "Rút đơn",
+      "select": "Chọn {{id}}",
+      "dragHint": "Kéo sang cột Đã rút đơn để rút đơn",
+      "dropToWithdraw": "Thả vào đây để rút đơn",
+      "companyOnly": "Chỉ công ty",
+      "emptyColumn": "Không có đơn",
+      "hint": "Khi đơn ở trạng thái Đã nộp hoặc Đang xem xét, bạn có thể rút đơn: kéo thẻ sang cột Đã rút đơn, hoặc tick chọn rồi bấm Rút đơn. Công ty chuyển đơn qua các giai đoạn còn lại nên các cột đó không nhận thả thẻ.",
+      "withdrawTarget": "Vùng thả để rút đơn"
+    },
+    "withdraw": "Rút đơn ứng tuyển",
+    "withdrawMany_other": "Rút {{count}} đơn ứng tuyển",
+    "withdrawTitle": "Rút đơn ứng tuyển này?",
+    "withdrawTitleMany_other": "Rút {{count}} đơn ứng tuyển?",
+    "withdrawDescriptionOne": "Thao tác này đóng đơn ứng tuyển của bạn. Khi vị trí vẫn còn mở, bạn có thể ứng tuyển lại một lần nữa bằng đơn mới.",
+    "withdrawDescriptionMany": "Thao tác này đóng các đơn ứng tuyển đã chọn. Khi vị trí vẫn còn mở, bạn có thể ứng tuyển lại một lần nữa bằng đơn mới.",
+    "withdrawFinal": "Sau đó bạn không thể ứng tuyển lại vị trí này.",
+    "withdrawRule": "Chỉ rút được khi đơn ở trạng thái Đã nộp hoặc Đang xem xét. Sau này bạn có thể ứng tuyển lại bằng đơn mới.",
+    "reasonOptional": "Lý do (không bắt buộc)",
+    "reasonPlaceholder": "Cho công ty biết lý do, nếu bạn muốn",
+    "reasonHint": "Tối đa {{max}} ký tự. Công ty có thể xem lý do này.",
+    "keepApplication": "Giữ đơn",
+    "keepApplications": "Giữ các đơn",
+    "withdrawFailed": "Rút đơn thất bại. Dữ liệu không bị thay đổi. Vui lòng thử lại.",
+    "withdrawConflict": "Công ty đã chuyển đơn sang giai đoạn khác khi bạn đang thao tác nên không thể rút đơn. Dữ liệu không bị thay đổi.",
+    "toast": {
+      "withdrawnTitle": "Đã rút đơn",
+      "withdrawnOne": "{{id}} đã được rút.",
+      "withdrawnMany": "Đã rút {{count}} đơn ứng tuyển."
+    },
+    "back": "Quay lại đơn ứng tuyển của tôi",
+    "breadcrumb": "Đường dẫn",
+    "notFound": "Không tìm thấy đơn ứng tuyển",
+    "notFoundDescription": "Đơn có thể không tồn tại hoặc bạn không có quyền truy cập.",
+    "progress": "Tiến trình ứng tuyển",
+    "detailsTitle": "Chi tiết đơn ứng tuyển",
+    "reference": "Mã đơn",
+    "submitted": "Ngày nộp",
+    "lastUpdate": "Cập nhật gần nhất",
+    "documents": "Tài liệu",
+    "jobDetails": "Thông tin vị trí",
+    "jobSnapshotDescription": "Được lưu lại tại thời điểm bạn ứng tuyển. Tin tuyển dụng hiện tại có thể đã thay đổi.",
+    "withdrawnOn": "Bạn đã rút đơn này vào {{date}}",
+    "withdrawnReason": "Lý do của bạn: {{reason}}",
+    "nextStep": "Bước tiếp theo",
+    "next": {
+      "submitted": "Đang chờ công ty xem xét đơn của bạn.",
+      "under_review": "Công ty đang xem xét đơn của bạn. Hiện chưa cần làm gì.",
+      "interviewing": "Công ty đang sắp xếp buổi phỏng vấn. Hãy theo dõi email để biết chi tiết.",
+      "offered": "Bạn đã nhận offer. Công ty sẽ liên hệ qua email với thông tin chi tiết.",
+      "hired": "Bạn đã trúng tuyển. Chúc mừng!",
+      "rejected": "Lần này bạn chưa được chọn. Bạn có thể tiếp tục ứng tuyển các vị trí khác.",
+      "withdrawn": "Bạn đã rút đơn ứng tuyển này."
+    },
+    "history": {
+      "title": "Lịch sử trạng thái",
+      "submitted": "Đã nộp",
+      "under_review": "Chuyển sang Đang xem xét",
+      "interviewing": "Chuyển sang Phỏng vấn",
+      "offered": "Chuyển sang Đã nhận offer",
+      "hired": "Chuyển sang Đã trúng tuyển",
+      "rejected": "Chuyển sang Bị từ chối",
+      "withdrawn": "Đã rút đơn",
+      "submittedAgain": "Đã nộp · ứng tuyển lại"
+    },
+    "historyError": "Không tải được lịch sử trạng thái.",
+    "noHistory": "Chưa có sự kiện trạng thái",
+    "stage": {
+      "screening": "Sàng lọc",
+      "interview": "Phỏng vấn",
+      "offer": "Đề nghị",
+      "hired": "Trúng tuyển",
+      "rejected": "Từ chối"
+    },
+    "stageLabel": "Giai đoạn xét duyệt",
+    "errors": {
+      "keywordBlank": "Nhập từ khóa. Chỉ có khoảng trắng là không hợp lệ.",
+      "keywordTooLong": "Từ khóa tối đa {{max}} ký tự.",
+      "rangeContradictory": "Ngày bắt đầu không được sau ngày kết thúc.",
+      "filterUnsupported": "Một bộ lọc trong liên kết này không được hỗ trợ.",
+      "invalidTitle": "Tiêu chí tìm kiếm không hợp lệ.",
+      "invalidHint": "Sửa bộ lọc đang báo lỗi hoặc xóa bộ lọc. Chưa có tìm kiếm nào được thực hiện."
+    },
+    "reapply": {
+      "second": "Đơn thứ 2",
+      "secondTitle": "Đây là đơn thứ hai của bạn cho vị trí này",
+      "earlierWithdrawn": "Đơn trước đã được rút vào {{date}}.",
+      "openEarlier": "Xem {{id}}",
+      "appliedAgainTitle": "Bạn đã ứng tuyển lại vào {{date}}",
+      "openLater": "Xem {{id}}",
+      "reappliedAs": "Đã ứng tuyển lại: {{id}}"
+    },
+    "applyAgain": "Ứng tuyển lại",
+    "applyAgainRule": "Vị trí vẫn còn mở. Bạn có thể ứng tuyển lại một lần bằng đơn mới; đơn này giữ nguyên như hiện tại.",
+    "viewJob": "Xem tin tuyển dụng",
+    "invalidLink": "Liên kết không hợp lệ",
+    "invalidLinkDescription": "Địa chỉ đơn ứng tuyển bị sai. Hãy quay lại danh sách và mở đơn từ đó.",
+    "withdrawPartial": "Đã rút {{done}} đơn, {{failed}} đơn giữ nguyên.",
+    "withdrawDescriptionReapplied": "Thao tác này đóng đơn ứng tuyển của bạn. Đây đã là đơn thứ hai cho vị trí này nên bạn sẽ không thể ứng tuyển lại.",
+    "acrossCompanies_other": "tại {{count}} công ty"
   },
   "loadingScreen": {
     "message": "Đang tải phiên đăng nhập và dữ liệu ứng dụng."
+  },
+  "brand": {
+    "wordmark": "ITTALENT"
+  },
+  "nav": {
+    "home": "Trang chủ ITTalent",
+    "main": "Điều hướng chính",
+    "jobs": "Việc làm",
+    "notifications": "Thông báo",
+    "notificationsUnread": "Thông báo, {{count}} chưa đọc",
+    "accountMenu": "Menu tài khoản, {{name}}",
+    "signingOut": "Đang đăng xuất..."
+  },
+  "auth": {
+    "forgot": {
+      "email": "Email",
+      "emailPlaceholder": "ban@example.com",
+      "errorFallback": "Hiện chưa thể gửi hướng dẫn đặt lại mật khẩu.",
+      "invalidEmail": "Email phải là địa chỉ email hợp lệ.",
+      "sendFailed": "Hiện chúng tôi chưa gửi được email. Hãy thử lại sau.",
+      "submit": "Gửi liên kết đặt lại",
+      "submitting": "Đang gửi...",
+      "subtitle": "Nhập email của bạn. Chúng tôi sẽ gửi một liên kết dùng được một lần và hết hạn sau 24 giờ.",
+      "title": "Đặt lại mật khẩu",
+      "tooMany": "Quá nhiều yêu cầu đặt lại cho email này. Hãy thử lại sau 15 phút.",
+      "backToSignInPlain": "Quay lại đăng nhập",
+      "sentTitle": "Kiểm tra email của bạn",
+      "sentBody": "Nếu tồn tại tài khoản cho <strong>{{email}}</strong>, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu.",
+      "sentNote": "Liên kết dùng được một lần và hết hạn sau 24 giờ. Chưa thấy email sau vài phút? Hãy kiểm tra Spam hoặc Quảng cáo.",
+      "wrongEmail": "Sai email?",
+      "useDifferentEmail": "Dùng email khác"
+    },
+    "hero": {
+      "body": "Ứng tuyển việc làm IT từ các công ty đã xác minh và theo dõi mọi đơn ứng tuyển tại một nơi.",
+      "employers": "Bạn đang tuyển dụng? Đến ITTalent dành cho nhà tuyển dụng →",
+      "title1": "Nơi sự nghiệp IT",
+      "title2": "thành hình."
+    },
+    "login": {
+      "createAccount": "Tạo tài khoản ứng viên",
+      "errorFallback": "Hiện chưa thể đăng nhập.",
+      "forgotPassword": "Quên mật khẩu?",
+      "identifierLabel": "Email hoặc tên đăng nhập",
+      "identifierPlaceholder": "ban@example.com hoặc tên đăng nhập",
+      "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+      "loggedOut": "Bạn đã đăng xuất.",
+      "newHere": "Bạn mới đến ITTalent?",
+      "passwordLabel": "Mật khẩu",
+      "resendEmail": "Gửi lại email",
+      "sessionExpired": "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để tiếp tục.",
+      "submit": "Đăng nhập",
+      "submitting": "Đang đăng nhập...",
+      "subtitle": "Đăng nhập tài khoản ứng viên ITTalent của bạn.",
+      "suspended": "Tài khoản này đã bị tạm khoá. Hãy liên hệ bộ phận hỗ trợ ITTalent nếu bạn cho rằng đây là nhầm lẫn.",
+      "title": "Chào mừng bạn quay lại",
+      "tooManyAttempts": "Bạn đã đăng nhập sai quá nhiều lần. Vui lòng thử lại sau 15 phút.",
+      "verifyEmail": "Hãy xác minh email để tiếp tục."
+    },
+    "logout": {
+      "dismiss": "Đóng",
+      "expiredMessage": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+      "expiredTitle": "Phiên đã hết hạn",
+      "failureMessage": "Đã xảy ra lỗi khi đăng xuất. Vui lòng thử lại.",
+      "failureTitle": "Đăng xuất thất bại (có thể thử lại an toàn)",
+      "successMessage": "Bạn đã đăng xuất.",
+      "successTitle": "Đã đăng xuất — về trang công khai"
+    },
+    "password": {
+      "hide": "Ẩn {{label}}",
+      "placeholder": "••••••••",
+      "rule": {
+        "length": "8–64 ký tự",
+        "lowercase": "Chữ thường",
+        "match": "Khớp",
+        "number": "Số",
+        "special": "!@#$%^&*",
+        "uppercase": "Chữ hoa"
+      },
+      "show": "Hiện {{label}}"
+    },
+    "register": {
+      "confirmPassword": "Xác nhận mật khẩu",
+      "email": "Email",
+      "emailPlaceholder": "ban@example.com",
+      "errorFallback": "Hiện chưa thể tạo tài khoản.",
+      "fullName": "Họ và tên",
+      "fullNameHint": "2–100 ký tự",
+      "fullNamePlaceholder": "Nguyễn Văn A",
+      "haveAccount": "Bạn đã có tài khoản?",
+      "mobile": "Số điện thoại",
+      "mobileHint": "Không bắt buộc · 10–15 chữ số",
+      "mobilePlaceholder": "0901 234 567",
+      "password": "Mật khẩu",
+      "passwordHint": "8–64 ký tự, gồm chữ hoa, chữ thường, chữ số và ký tự đặc biệt.",
+      "signIn": "Đăng nhập",
+      "signInInstead": "Đăng nhập",
+      "submit": "Tạo tài khoản",
+      "submitting": "Đang tạo tài khoản...",
+      "subtitle": "Đăng ký với vai trò ứng viên. Chúng tôi sẽ gửi email kèm liên kết để xác minh địa chỉ của bạn.",
+      "terms": "Tôi đồng ý với <terms>Điều khoản sử dụng</terms> và <privacy>Chính sách quyền riêng tư</privacy>.",
+      "title": "Tạo tài khoản của bạn",
+      "username": "Tên đăng nhập",
+      "usernamePlaceholder": "ví dụ: alex_dev"
+    },
+    "reset": {
+      "backToSignInPlain": "Quay lại đăng nhập",
+      "checkFailedBody": "Hiện chưa thể xác minh liên kết đặt lại này. Vui lòng thử lại.",
+      "checkFailedTitle": "Không thể kiểm tra liên kết đặt lại",
+      "checking": "Đang kiểm tra liên kết đặt lại...",
+      "confirmPassword": "Xác nhận mật khẩu mới",
+      "errorFallback": "Hiện chưa thể đặt lại mật khẩu.",
+      "newPassword": "Mật khẩu mới",
+      "requestNewLinkShort": "Yêu cầu liên kết mới",
+      "retry": "Thử lại",
+      "signIn": "Đăng nhập",
+      "submit": "Lưu mật khẩu mới",
+      "submitting": "Đang đặt lại...",
+      "subtitle": "Chọn mật khẩu mới đủ mạnh cho tài khoản của bạn. Liên kết đặt lại chỉ dùng được một lần.",
+      "title": "Đặt mật khẩu mới",
+      "unusableTitle": "Không thể dùng liên kết đặt lại này",
+      "unusableBody": "Liên kết đã hết hạn hoặc đã được dùng. Hãy yêu cầu liên kết mới.",
+      "passwordHint": "8–64 ký tự gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
+      "successTitle": "Đã đổi mật khẩu",
+      "successBody": "Email của bạn cũng đã được xác minh. Bạn đã bị đăng xuất khỏi mọi thiết bị, hãy đăng nhập bằng mật khẩu mới."
+    },
+    "validation": {
+      "confirmPasswordMatch": "Xác nhận mật khẩu phải trùng với mật khẩu",
+      "confirmPasswordRequired": "Vui lòng xác nhận mật khẩu",
+      "emailInvalid": "Nhập địa chỉ email hợp lệ",
+      "emailRequired": "Vui lòng nhập email",
+      "fullNameMax": "Họ tên không được vượt quá 100 ký tự",
+      "fullNameMin": "Họ tên phải có ít nhất 2 ký tự",
+      "identifierRequired": "Vui lòng nhập email hoặc tên đăng nhập",
+      "mobileDigits": "Số điện thoại phải gồm 10–15 chữ số",
+      "passwordLowercase": "Mật khẩu phải có chữ thường",
+      "passwordMin": "Mật khẩu phải có ít nhất 8 ký tự",
+      "passwordNumber": "Mật khẩu phải có chữ số",
+      "passwordRequired": "Vui lòng nhập mật khẩu",
+      "passwordSpecial": "Mật khẩu phải có ký tự đặc biệt",
+      "passwordStrength": "Mật khẩu phải dài 8–64 ký tự và gồm chữ hoa, chữ thường, số và ký tự đặc biệt",
+      "passwordUppercase": "Mật khẩu phải có chữ hoa",
+      "passwordsDoNotMatch": "Mật khẩu không khớp",
+      "termsRequired": "Bạn cần đồng ý Điều khoản sử dụng và Chính sách quyền riêng tư",
+      "usernameChars": "Tên đăng nhập chỉ gồm chữ cái, chữ số và dấu gạch dưới",
+      "usernameMax": "Tên đăng nhập không được vượt quá 30 ký tự",
+      "usernameMin": "Tên đăng nhập phải có ít nhất 3 ký tự"
+    },
+    "verify": {
+      "alreadyVerified": {
+        "body": "Email của tài khoản này đã được xác minh. Không cần làm gì thêm. Hãy đăng nhập để tiếp tục.",
+        "title": "Email đã được xác minh",
+        "forgot": "Quên mật khẩu?",
+        "reset": "Đặt lại"
+      },
+      "emailAddress": "Email",
+      "emailPlaceholder": "ban@example.com",
+      "emailRequired": "Nhập địa chỉ email sẽ nhận liên kết xác minh.",
+      "expired": {
+        "body": "Liên kết xác minh có hiệu lực 24 giờ. Chúng tôi có thể gửi liên kết mới tới email của tài khoản này.",
+        "note": "Liên kết mới sẽ thay thế mọi liên kết trước đó. Bạn có thể gửi lại tối đa 3 lần trong 24 giờ.",
+        "title": "Liên kết đã hết hạn"
+      },
+      "goToSignIn": "Đến trang đăng nhập",
+      "invalid": {
+        "body": "Liên kết có thể chưa đầy đủ, đã được dùng hoặc đã bị thay bằng liên kết mới hơn. Hãy mở email mới nhất từ ITTalent hoặc yêu cầu liên kết mới.",
+        "note": "Bạn chép liên kết bằng tay? Hãy chắc chắn đã chép đầy đủ. Sau nhiều lần không hợp lệ, việc kiểm tra sẽ tạm dừng 10 phút.",
+        "title": "Liên kết không hợp lệ"
+      },
+      "resend": "Gửi lại email",
+      "resendError": "Chúng tôi không gửi được email xác minh. Vui lòng thử lại sau.",
+      "retryLater": {
+        "body": "Có quá nhiều lần xác minh trong thời gian ngắn. Vui lòng đợi trước khi thử lại.",
+        "title": "Vui lòng thử lại sau",
+        "note": "Các lần thử không hợp lệ liên tiếp sẽ bị tạm dừng 10 phút."
+      },
+      "sending": "Đang gửi...",
+      "signIn": "Đăng nhập",
+      "success": {
+        "body": "Tài khoản của bạn đã sẵn sàng. Đăng nhập để hoàn thiện hồ sơ và ứng tuyển.",
+        "title": "Email đã được xác minh",
+        "note": "Vì lý do bảo mật, chúng tôi không tự động đăng nhập cho bạn từ liên kết trong email."
+      },
+      "verifying": {
+        "body": "Vui lòng đợi trong khi chúng tôi xác minh địa chỉ email của bạn...",
+        "title": "Đang xác minh email của bạn"
+      },
+      "sendNewLink": "Gửi liên kết mới",
+      "requestNewLink": "Yêu cầu liên kết mới",
+      "checkEmail": {
+        "title": "Kiểm tra email của bạn",
+        "body": "Nếu có thể dùng <strong>{{email}}</strong>, chúng tôi đã gửi cho địa chỉ đó một liên kết để xác minh tài khoản của bạn.",
+        "bodyNoEmail": "Chúng tôi đã gửi cho bạn một liên kết để xác minh tài khoản.",
+        "step1": "Mở email từ <strong>ITTalent</strong>. Email có thể mất một phút để đến.",
+        "step2": "Chọn <strong>Xác minh email</strong>. Liên kết chỉ dùng được một lần và hết hạn sau 24 giờ.",
+        "step3": "Quay lại và đăng nhập để bắt đầu ứng tuyển.",
+        "note": "Không thấy email? Hãy kiểm tra Spam hoặc Promotions. Bạn có thể gửi lại tối đa 3 lần trong 24 giờ, mỗi lần cách nhau một phút.",
+        "wrongEmail": "Sai email?",
+        "signUpAgain": "Đăng ký lại",
+        "deliveryFailed": "Tài khoản đã được tạo, nhưng chúng tôi không gửi được email xác minh."
+      },
+      "resendAgainIn": "Gửi lại sau {{time}}",
+      "resendLimitReached": "Đã hết lượt gửi lại",
+      "resendSent": "Đã gửi liên kết mới. Các liên kết trong email trước không còn hiệu lực.",
+      "resendLimited": "Bạn đã yêu cầu 3 liên kết trong 24 giờ. Hãy dùng email mới nhất hoặc thử lại vào ngày mai.",
+      "sendAgain": "Gửi lại",
+      "backToSignIn": "Quay lại đăng nhập",
+      "sentResult": {
+        "body": "Nếu <strong>{{email}}</strong> thuộc một tài khoản cần xác minh, một liên kết mới đang được gửi tới. Các liên kết trong email trước không còn hiệu lực.",
+        "note": "Vài phút vẫn chưa thấy? Hãy kiểm tra Spam hoặc chắc rằng email được nhập đúng.",
+        "differentEmail": "Dùng email khác"
+      },
+      "form": {
+        "title": "Gửi lại email xác minh",
+        "description": "Nhập email bạn đã dùng để đăng ký. Nếu nó thuộc một tài khoản cần xác minh, chúng tôi sẽ gửi liên kết mới.",
+        "submit": "Gửi liên kết"
+      }
+    }
+  },
+  "footer": {
+    "tagline": "Ứng dụng web, nền tảng di động, môi trường QA tự động và giải pháp đám mây có khả năng mở rộng, được xây dựng chuyên nghiệp cho các doanh nghiệp hàng đầu quốc tế.",
+    "contact": "Liên hệ",
+    "address": "600 Nguyễn Văn Cừ, Cần Thơ, Việt Nam",
+    "navigation": "Điều hướng",
+    "services": "Dịch vụ",
+    "process": "Quy trình",
+    "whyUs": "Vì sao chọn chúng tôi",
+    "faq": "Câu hỏi thường gặp",
+    "signIn": "Đăng nhập",
+    "createAccount": "Tạo tài khoản",
+    "copyright": "Bản quyền © {{year}} ITTalent Platform. Bảo lưu mọi quyền.",
+    "backToTop": "Lên đầu trang ↑"
+  },
+  "header": {
+    "toggleTheme": "Đổi giao diện sáng/tối",
+    "toggleMenu": "Bật/tắt menu điều hướng",
+    "signIn": "Đăng nhập",
+    "getStarted": "Bắt đầu"
+  },
+  "sidebar": {
+    "users": "Người dùng",
+    "enterprises": "Hồ sơ doanh nghiệp",
+    "collapse": "Thu gọn thanh bên",
+    "closeMenu": "Đóng menu"
+  },
+  "adminLayout": {
+    "openMenu": "Mở menu",
+    "expandSidebar": "Mở rộng thanh bên",
+    "collapseSidebar": "Thu gọn thanh bên"
+  },
+  "filterSelect": {
+    "all": "Tất cả",
+    "filter": "Bộ lọc",
+    "noResults": "Không có kết quả"
+  },
+  "toast": {
+    "dismiss": "Đóng",
+    "region": "Thông báo"
+  },
+  "adminUsers": {
+    "page": {
+      "title": "Người dùng",
+      "description": "Xem và kiểm tra các tài khoản người dùng đã đăng ký cùng quyền hạn trong hệ thống."
+    },
+    "role": {
+      "admin": "Quản trị viên",
+      "user": "Người dùng"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "inactive": "Không hoạt động",
+      "suspended": "Bị đình chỉ"
+    },
+    "toolbar": {
+      "search": "Tìm theo tên người dùng hoặc email...",
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "allRoles": "Tất cả vai trò",
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "table": {
+      "id": "Mã",
+      "user": "Người dùng",
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "created": "Ngày tạo",
+      "actions": "Thao tác",
+      "viewDetails": "Xem chi tiết của {{name}}",
+      "view": "Xem",
+      "empty": "Không tìm thấy người dùng nào."
+    },
+    "detail": {
+      "back": "Quay lại danh sách người dùng",
+      "notFoundTitle": "Không tìm thấy người dùng",
+      "notFoundDescription": "Không thể tải hồ sơ người dùng được yêu cầu.",
+      "idLabel": "Mã: {{id}}",
+      "account": "Thông tin tài khoản",
+      "username": "Tên người dùng",
+      "email": "Địa chỉ email",
+      "fullId": "Mã đầy đủ",
+      "permissions": "Quyền hạn & vòng đời",
+      "assignedRole": "Vai trò được gán",
+      "accountStatus": "Trạng thái tài khoản",
+      "memberSince": "Tham gia từ"
+    }
+  },
+  "landing": {
+    "startProject": "Bắt đầu dự án",
+    "hero": {
+      "badge": "Đối tác kỹ thuật cho doanh nghiệp",
+      "title": "Gia công phần mềm <accent>đáng tin cậy</accent>, cam kết giao hàng <accent>đúng hạn</accent>",
+      "subtitle": "ITTalent cung cấp các đội kỹ sư chuyên trách về Web, Mobile, Cloud và QA. Chúng tôi biến tầm nhìn của bạn thành phần mềm chất lượng cao, minh bạch chi phí và cam kết chắc chắn về tiến độ dự án.",
+      "explore": "Khám phá dịch vụ"
+    },
+    "services": {
+      "eyebrow": "Năng lực",
+      "title": "Dịch vụ<br/>cốt lõi",
+      "subtitle": "Khám phá các giải pháp công nghệ hiện thực hoá tầm nhìn của bạn, với sản phẩm bàn giao được tối ưu và theo dõi hoàn toàn minh bạch.",
+      "cards": {
+        "website": {
+          "title": "Website",
+          "desc": "Website hiệu năng cao: trang marketing, landing page và website doanh nghiệp, tối ưu cho chuyển đổi và tốc độ.",
+          "items": [
+            "React, Next.js, Tailwind CSS",
+            "Tối ưu SEO và tốc độ",
+            "Giao diện responsive chuẩn từng điểm ảnh"
+          ]
+        },
+        "application": {
+          "title": "Ứng dụng",
+          "desc": "Nền tảng web tuỳ chỉnh mạnh mẽ và an toàn, kiến trúc thương mại điện tử và cổng thông tin doanh nghiệp.",
+          "items": [
+            "React, Node.js, PostgreSQL",
+            "API RESTful và GraphQL",
+            "Xác thực người dùng an toàn"
+          ]
+        },
+        "cloud": {
+          "title": "Cloud & DevOps",
+          "desc": "Tự động mở rộng, triển khai sẵn sàng cao, hàm serverless và phân phối liên tục.",
+          "items": [
+            "AWS, Docker, Kubernetes",
+            "Thiết lập pipeline CI/CD",
+            "Giám sát và ghi log"
+          ]
+        },
+        "qa": {
+          "title": "QA & Kiểm thử",
+          "desc": "Bộ kiểm thử thủ công và tự động toàn diện, đảm bảo bản phát hành không lỗi.",
+          "items": [
+            "Playwright, Cypress, Jest",
+            "Kiểm thử tích hợp và đơn vị",
+            "Kiểm tra chất lượng liên tục"
+          ]
+        }
+      }
+    },
+    "process": {
+      "eyebrow": "Lộ trình",
+      "title": "Quy trình",
+      "centerSubtitle": "— Cách chúng tôi làm việc —",
+      "tagline": "Từ <em>tiếp nhận yêu cầu</em> đến <em>ra mắt</em>.",
+      "subtitle": "Cách chúng tôi làm việc",
+      "cycle": "Chu trình kỹ thuật 4 giai đoạn",
+      "steps": {
+        "strategy": {
+          "title": "Chiến lược",
+          "desc": "Chúng tôi tìm hiểu bạn và thương hiệu của bạn: mục tiêu, khách hàng, đối thủ. Từ đó hình thành lộ trình cho mọi bước tiếp theo.",
+          "bullets": [
+            "Workshop với các bên liên quan",
+            "Phân tích khoảng trống đối thủ",
+            "Nghiên cứu khả thi công nghệ",
+            "Bản thiết kế phạm vi dự án"
+          ]
+        },
+        "design": {
+          "title": "Thiết kế",
+          "desc": "Nhận diện, giao diện, nguyên mẫu. Thương hiệu hiện hình ở đây, từ logo đến từng điểm ảnh cuối của website.",
+          "bullets": [
+            "Nguyên mẫu Figma tương tác",
+            "Wireframe trải nghiệm người dùng",
+            "Xây dựng design system",
+            "Thành phần responsive"
+          ]
+        },
+        "build": {
+          "title": "Xây dựng",
+          "desc": "Phát triển trên stack hiện đại: Next.js, React, ưu tiên hiệu năng. Mã sạch, mở rộng được và vẫn chạy tốt sau năm năm.",
+          "bullets": [
+            "React & Next.js an toàn kiểu",
+            "API REST và GraphQL",
+            "Độ phủ QA tự động",
+            "Tối ưu tải tài nguyên"
+          ]
+        },
+        "launch": {
+          "title": "Ra mắt & Đồng hành",
+          "desc": "Triển khai, giám sát, tối ưu liên tục. Chúng tôi ở lại cùng bạn: thương hiệu lớn lên, chúng tôi lớn lên cùng.",
+          "bullets": [
+            "Triển khai CI/CD",
+            "Mở rộng đám mây AWS",
+            "Giám sát 24/7",
+            "Tối ưu hằng tháng"
+          ]
+        }
+      }
+    },
+    "whyUs": {
+      "title": "Vượt trội. Đổi mới. Đáng tin cậy.",
+      "subtitle": "Chúng tôi vận hành với chi phí hoàn toàn minh bạch, chỉ số đồng thuận cao và các chuyên gia CNTT tận tâm, được sàng lọc kỹ.",
+      "stats": {
+        "experience": "Năm kinh nghiệm",
+        "clients": "Khách hàng toàn cầu",
+        "engineers": "Kỹ sư & chuyên gia",
+        "retention": "Tỷ lệ giữ chân khách hàng",
+        "projects": "Dự án thành công",
+        "industries": "Ngành nghề"
+      },
+      "dedicated": "Đội ngũ chuyên trách, tư duy linh hoạt",
+      "trustedBy": "Được tin tưởng bởi"
+    },
+    "faq": {
+      "eyebrow": "Thông tin",
+      "title": "Câu hỏi thường gặp",
+      "subtitle": "Mọi điều bạn cần biết khi làm việc với các đội gia công chuyên trách của ITTalent.",
+      "items": {
+        "ip": {
+          "q": "Ai sở hữu quyền sở hữu trí tuệ (IP) của phần mềm?",
+          "a": "Bạn sở hữu. Theo Hợp đồng dịch vụ khung (MSA) tiêu chuẩn của chúng tôi, 100% quyền sở hữu trí tuệ, kho mã nguồn, tài liệu và tài sản kiến trúc đám mây được chuyển cho doanh nghiệp của bạn ngay khi hoá đơn được thanh toán."
+        },
+        "communication": {
+          "q": "Giao tiếp hằng ngày diễn ra như thế nào?",
+          "a": "Chúng tôi hoà vào quy trình của bạn qua kênh Slack hoặc Teams dùng chung, buổi demo sprint và Jira / Trello / Linear. Lập trình viên và quản lý dự án của chúng tôi giao tiếp tiếng Anh trôi chảy."
+        },
+        "scale": {
+          "q": "Tôi có thể tăng hoặc giảm quy mô đội theo khối lượng công việc không?",
+          "a": "Hoàn toàn được. Chúng tôi chỉ cần báo trước 30 ngày để tăng hoặc giảm đội kỹ sư chuyên trách theo cột mốc ra mắt và khối lượng công việc."
+        },
+        "quality": {
+          "q": "Chính sách đảm bảo chất lượng và tuân thủ của bạn là gì?",
+          "a": "Chúng tôi tích hợp QA thủ công và tự động vào từng nhóm, cùng CI/CD, linting, kiểm thử đơn vị, kiểm thử tích hợp end-to-end và quy trình bàn giao chú trọng bảo mật."
+        }
+      }
+    },
+    "cta": {
+      "title": "Cùng nhau xây dựng điều tuyệt vời"
+    }
   }
 }

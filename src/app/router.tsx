@@ -4,6 +4,7 @@ import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
 import { ProtectedRoute } from "@/auth/protected-route";
 import { AppLayout } from "@/components/layout/admin-layout";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { CandidateLayout } from "@/components/layout/candidate-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
 import { LandingPage } from "@/features/public-site/landing-page";
 
@@ -35,6 +36,14 @@ const EnterpriseFormPage = lazy(() =>
     default: m.EnterpriseFormPage,
   })),
 );
+const ApplicationsPage = lazy(() =>
+  import("@/features/applicant/applications/applications-page").then((m) => ({ default: m.ApplicationsPage })),
+);
+const ApplicationDetailPage = lazy(() =>
+  import("@/features/applicant/applications/application-detail-page").then((m) => ({
+    default: m.ApplicationDetailPage,
+  })),
+);
 
 export const appRoutes = [
   {
@@ -48,6 +57,13 @@ export const appRoutes = [
   { path: "/verify-email", element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
+  {
+    element: <ProtectedRoute requiredRole="user" />,
+    children: [{ element: <CandidateLayout />, children: [
+      { path: "/my-applications", element: <ApplicationsPage /> },
+      { path: "/my-applications/:id", element: <ApplicationDetailPage /> },
+    ] }],
+  },
   {
     path: "/admin",
     element: <ProtectedRoute requiredRole="admin" />,

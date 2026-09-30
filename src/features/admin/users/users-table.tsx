@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { userDisplayId } from "@/lib/display-id";
 import { formatDate } from "@/lib/format";
 import { RoleBadge, StatusBadge } from "./user-badges";
+import { useTranslation } from "react-i18next";
 
 type UsersTableProps = {
   isLoading: boolean;
@@ -14,6 +15,7 @@ type UsersTableProps = {
 };
 
 export function UsersTable({ isLoading, items, onView }: UsersTableProps) {
+  const { t } = useTranslation();
   const columns: DataTableColumn<UserDto>[] = [
     {
       cell: (user) => (
@@ -22,7 +24,7 @@ export function UsersTable({ isLoading, items, onView }: UsersTableProps) {
         </span>
       ),
       className: "w-[90px]",
-      header: "ID",
+      header: t("adminUsers.table.id"),
       key: "id",
     },
     {
@@ -39,19 +41,19 @@ export function UsersTable({ isLoading, items, onView }: UsersTableProps) {
           </div>
         </div>
       ),
-      header: "User",
+      header: t("adminUsers.table.user"),
       key: "user",
     },
     {
       cell: (user) => <RoleBadge role={user.role} />,
       className: "w-[110px]",
-      header: "Role",
+      header: t("adminUsers.table.role"),
       key: "role",
     },
     {
       cell: (user) => <StatusBadge status={user.status} />,
       className: "w-[120px]",
-      header: "Status",
+      header: t("adminUsers.table.status"),
       key: "status",
     },
     {
@@ -61,25 +63,25 @@ export function UsersTable({ isLoading, items, onView }: UsersTableProps) {
         </span>
       ),
       className: "w-[130px]",
-      header: "Created",
+      header: t("adminUsers.table.created"),
       key: "createdAt",
     },
     {
       cell: (user) => (
         <div className="flex justify-end">
           <Button
-            aria-label={`View details for ${user.username}`}
+            aria-label={t("adminUsers.table.viewDetails", { name: user.username })}
             onClick={() => onView(user)}
             size="sm"
             variant="ghost"
           >
             <Eye className="size-4" />
-            <span className="hidden sm:inline">View</span>
+            <span className="hidden sm:inline">{t("adminUsers.table.view")}</span>
           </Button>
         </div>
       ),
       className: "w-[90px] text-right",
-      header: "Actions",
+      header: t("adminUsers.table.actions"),
       key: "actions",
     },
   ];
@@ -87,7 +89,7 @@ export function UsersTable({ isLoading, items, onView }: UsersTableProps) {
   return (
     <DataTable<UserDto>
       columns={columns}
-      emptyState={<p className="text-sm text-muted-foreground py-8 text-center">No users found.</p>}
+      emptyState={<p className="text-sm text-muted-foreground py-8 text-center">{t("adminUsers.table.empty")}</p>}
       isLoading={isLoading}
       rowKey={(user) => user.id}
       rows={items}
