@@ -18,12 +18,75 @@ import { useQuery } from "@tanstack/react-query";
 import { useSession } from "@/auth/use-session";
 import { getErrorStatus } from "@/lib/api-errors";
 import {
-  fetchEnterprise,
-  fetchEnterpriseJobs,
-} from "@/features/public-site/enterprise/enterprise.api";
+  getApiV1EnterprisesByEnterpriseId,
+  getApiV1JobPostings,
+  getApiV1JobPostingsByIdPublic,
+  type EnterpriseDetailDto,
+  type JobPostingResponse,
+} from "@/api/generated";
 
 import { ApplyButton } from "./apply-button";
-import { fetchJob, type Job } from "./career.api";
+
+type Job = {
+  _id: string;
+  enterpriseId?: string;
+  title: string;
+  slug: string;
+  location?: string;
+  employment_type?: string;
+  salary_min?: number;
+  salary_max?: number;
+  currency?: string;
+  level?: string;
+  aboutTheRole?: string;
+  description?: string;
+  requirements?: string;
+  benefits?: string;
+  openings?: number;
+  expires_at?: string;
+  createdAt?: string;
+};
+
+const toJob = (dto: JobPostingResponse): Job => ({
+  _id: dto.id,
+  enterpriseId: dto.enterpriseId,
+  title: dto.title,
+  slug: dto.slug || dto.id,
+  location: dto.location,
+  employment_type: dto.employmentType,
+  salary_min: dto.salaryMin,
+  salary_max: dto.salaryMax,
+  currency: dto.currency,
+  level: dto.level,
+  description: dto.description,
+  requirements: dto.requirements,
+  benefits: dto.benefits,
+  openings: dto.openings,
+  expires_at: dto.expiresAt,
+  createdAt: dto.createdAt,
+});
+
+type Enterprise = {
+  id: string;
+  name: string;
+  logoUrl?: string;
+  industry?: string;
+  location?: string;
+  shortDescription?: string;
+  description?: string;
+  website?: string;
+};
+
+const toEnterprise = (dto: EnterpriseDetailDto): Enterprise => ({
+  id: dto.id,
+  name: dto.name,
+  logoUrl: dto.logoUrl ?? undefined,
+  industry: dto.industry ?? undefined,
+  location: [dto.address.city, dto.address.country].filter(Boolean).join(", ") || undefined,
+  shortDescription: dto.shortDescription ?? undefined,
+  description: dto.description ?? undefined,
+  website: dto.website ?? undefined,
+});
 import {
   companyInitials,
   EMPLOYMENT_LABELS,
@@ -116,7 +179,11 @@ export function CareerJobPage() {
 
   const { data, error, isError, isLoading, refetch } = useQuery({
     queryKey: ["job", slug],
-    queryFn: () => fetchJob(slug!),
+    queryFn: async () => {
+      const result = await getApiV1JobPostingsByIdPublic({ path: { id: slug! } });
+      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
+      return toJob(result.data);
+    },
     enabled: !!slug,
   });
   const job: Job | undefined = data;
@@ -124,13 +191,22 @@ export function CareerJobPage() {
   const enterpriseId = job?.enterpriseId;
   const { data: company } = useQuery({
     queryKey: ["enterprise", enterpriseId],
-    queryFn: () => fetchEnterprise(enterpriseId!),
+    queryFn: async () => {
+      const result = await getApiV1EnterprisesByEnterpriseId({ path: { enterpriseId: enterpriseId! } });
+      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
+      return toEnterprise(result.data);
+    },
     enabled: !!enterpriseId,
     staleTime: 60_000,
   });
   const { data: companyJobs } = useQuery({
     queryKey: ["enterprise-jobs", enterpriseId],
-    queryFn: () => fetchEnterpriseJobs(enterpriseId!),
+    queryFn: async () => {
+      const result = await getApiV1JobPostings({ query: { enterprise_id: enterpriseId!, limit: 100, page: 1 } });
+      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
+      const jobs = result.data.items.map(toJob);
+      return jobs;
+    },
     enabled: !!enterpriseId,
     staleTime: 60_000,
   });

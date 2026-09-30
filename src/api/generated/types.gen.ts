@@ -785,6 +785,7 @@ export type GetApiV1JobPostingsData = {
         location?: string;
         employment_type?: string;
         level?: string;
+        enterprise_id?: string;
         sort_by?: 'created_at' | 'title' | 'expires_at';
         sort_order?: 'asc' | 'desc';
         page?: number;
@@ -801,6 +802,31 @@ export type GetApiV1JobPostingsResponses = {
 };
 
 export type GetApiV1JobPostingsResponse = GetApiV1JobPostingsResponses[keyof GetApiV1JobPostingsResponses];
+
+export type GetApiV1JobPostingsByIdPublicData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}/public';
+};
+
+export type GetApiV1JobPostingsByIdPublicErrors = {
+    /**
+     * Job posting not found, not published, or expired
+     */
+    404: unknown;
+};
+
+export type GetApiV1JobPostingsByIdPublicResponses = {
+    /**
+     * Job posting
+     */
+    200: JobPostingResponse;
+};
+
+export type GetApiV1JobPostingsByIdPublicResponse = GetApiV1JobPostingsByIdPublicResponses[keyof GetApiV1JobPostingsByIdPublicResponses];
 
 export type PostApiV1JobPostingsData = {
     body?: never;

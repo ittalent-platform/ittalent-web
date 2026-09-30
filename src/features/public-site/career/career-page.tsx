@@ -17,15 +17,96 @@ import {
   hasUnsafeSearchText,
   INVALID_SEARCH_MESSAGE,
 } from "@/lib/search-validation";
-import { fetchEnterpriseDirectory } from "@/features/public-site/enterprise/enterprise.api";
-
 import {
-  fetchJobs,
-  type Job,
-  type JobListQuery,
-  type JobSort,
-  type PostedWithin,
-} from "./career.api";
+  getApiV1Enterprises,
+  getApiV1JobPostings,
+  type JobPostingResponse,
+} from "@/api/generated";
+
+type Job = {
+  _id: string;
+  enterpriseId?: string;
+  title: string;
+  slug: string;
+  location?: string;
+  employment_type?: string;
+  salary_min?: number;
+  salary_max?: number;
+  currency?: string;
+  level?: string;
+  description?: string;
+  requirements?: string;
+  benefits?: string;
+  openings?: number;
+  expires_at?: string;
+  createdAt?: string;
+};
+
+type JobSort = "newest" | "oldest" | "salary_high" | "salary_low";
+type PostedWithin = "24h" | "7d" | "30d";
+type JobListQuery = {
+  employment_type?: string[];
+  level?: string[];
+  limit?: number;
+  location?: string;
+  enterpriseId?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  includeNegotiable?: boolean;
+  postedWithin?: PostedWithin;
+  page?: number;
+  search?: string;
+  sort?: JobSort;
+};
+
+type EnterpriseSummary = { id: string; name: string };
+
+const toJob = (dto: JobPostingResponse): Job => ({
+  _id: dto.id,
+  enterpriseId: dto.enterpriseId,
+  title: dto.title,
+  slug: dto.slug || dto.id,
+  location: dto.location,
+  employment_type: dto.employmentType,
+  salary_min: dto.salaryMin,
+  salary_max: dto.salaryMax,
+  currency: dto.currency,
+  level: dto.level,
+  description: dto.description,
+  requirements: dto.requirements,
+  benefits: dto.benefits,
+  openings: dto.openings,
+  expires_at: dto.expiresAt,
+  createdAt: dto.createdAt,
+});
+
+async function loadAllPublicJobs(): Promise<Job[]> {
+  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100 } });
+  if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
+  const pages = await Promise.all(
+    Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
+      getApiV1JobPostings({ query: { page: index + 2, limit: 100 } }),
+    ),
+  );
+  return [first.data, ...pages.map((result) => {
+    if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
+    return result.data;
+  })].flatMap((page) => page.items).map(toJob);
+}
+
+async function loadAllEnterprises(): Promise<EnterpriseSummary[]> {
+  const first = await getApiV1Enterprises({ query: { page: 1, limit: 100, status: "active" } });
+  if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
+  const pages = await Promise.all(
+    Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
+      getApiV1Enterprises({ query: { page: index + 2, limit: 100, status: "active" } }),
+    ),
+  );
+  return [first.data, ...pages.map((result) => {
+    if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
+    return result.data;
+  })].flatMap((page) => page.items).map((item) => ({ id: item.id, name: item.name }));
+}
 import { StateCard } from "./state-card";
 import {
   companyInitials,
@@ -54,6 +135,12 @@ const POSTED_OPTIONS: { value: PostedWithin | ""; label: string }[] = [
   { value: "7d", label: "Last 7 days" },
   { value: "30d", label: "Last 30 days" },
 ];
+
+const POSTED_WITHIN_MS: Record<PostedWithin, number> = {
+  "24h": 24 * 60 * 60 * 1000,
+  "7d": 7 * 24 * 60 * 60 * 1000,
+  "30d": 30 * 24 * 60 * 60 * 1000,
+};
 
 const TYPE_OPTIONS = ["full-time", "part-time", "contractor", "intern"];
 const LEVEL_OPTIONS = ["intern", "junior", "mid", "senior", "lead"];
@@ -312,12 +399,63 @@ export function CareerPage() {
 
   const { data, isError, isFetching, isLoading, refetch } = useQuery({
     queryKey: ["jobs", query],
-    queryFn: () => fetchJobs(query),
+    queryFn: async () => {
+      const all = await loadAllPublicJobs();
+      const page = query.page ?? 1;
+      const limit = query.limit ?? PAGE_SIZE;
+      const term = query.search?.trim().toLowerCase();
+      const postedSince = query.postedWithin
+        ? Date.now() - POSTED_WITHIN_MS[query.postedWithin]
+        : undefined;
+      const filtered = all.filter((job) => {
+        if (query.employment_type?.length && !query.employment_type.includes(job.employment_type ?? "")) return false;
+        if (query.level?.length && !query.level.some((level) => level.toLowerCase() === (job.level ?? "").toLowerCase())) return false;
+        if (query.location && job.location !== query.location) return false;
+        if (query.enterpriseId && job.enterpriseId !== query.enterpriseId) return false;
+        if (postedSince !== undefined && new Date(job.createdAt ?? 0).getTime() < postedSince) return false;
+        const low = job.salary_min && job.salary_min > 0 ? job.salary_min : undefined;
+        const high = job.salary_max && job.salary_max > 0 ? job.salary_max : undefined;
+        if (query.salaryMin !== undefined || query.salaryMax !== undefined) {
+          if (!low && !high) return query.includeNegotiable ?? true;
+          if (job.currency && job.currency !== "VND") return true;
+          const top = high ?? low!;
+          const bottom = low ?? high!;
+          if (query.salaryMin !== undefined && top < query.salaryMin * 1_000_000) return false;
+          if (query.salaryMax !== undefined && bottom > query.salaryMax * 1_000_000) return false;
+        }
+        if (term) {
+          const haystack = [job.title, job.location, job.level, job.employment_type].join(" ").toLowerCase();
+          if (!haystack.includes(term)) return false;
+        }
+        return true;
+      });
+      const time = (job: Job) => new Date(job.createdAt ?? 0).getTime();
+      const topSalary = (job: Job) => Math.max(job.salary_max ?? 0, job.salary_min ?? 0);
+      const sorted = [...filtered].sort((a, b) => {
+        switch (query.sort ?? "newest") {
+          case "oldest": return time(a) - time(b);
+          case "salary_high": return topSalary(b) - topSalary(a) || time(b) - time(a);
+          case "salary_low": return (topSalary(a) || Number.POSITIVE_INFINITY) - (topSalary(b) || Number.POSITIVE_INFINITY) || time(b) - time(a);
+          default: return time(b) - time(a);
+        }
+      });
+      const totalPages = Math.max(Math.ceil(sorted.length / limit), 1);
+      const countBy = (pick: (job: Job) => string | undefined) => {
+        const counts = new Map<string, number>();
+        for (const job of all) { const value = pick(job); if (value) counts.set(value, (counts.get(value) ?? 0) + 1); }
+        return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
+      };
+      return {
+        data: sorted.slice((page - 1) * limit, page * limit),
+        filters: { employmentTypes: countBy((job) => job.employment_type), locations: countBy((job) => job.location), enterprises: countBy((job) => job.enterpriseId) },
+        limit, page, total: sorted.length, totalPages,
+      };
+    },
     placeholderData: (previous) => previous,
   });
   const { data: enterprises } = useQuery({
     queryKey: ["enterprise-directory"],
-    queryFn: fetchEnterpriseDirectory,
+    queryFn: loadAllEnterprises,
     staleTime: 60_000,
   });
 

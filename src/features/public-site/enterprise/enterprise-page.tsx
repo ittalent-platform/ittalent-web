@@ -24,12 +24,73 @@ import {
 import { StateCard } from "@/features/public-site/career/state-card";
 
 import {
-  fetchEnterpriseDirectory,
-  fetchEnterpriseDirectoryPage,
-  type Enterprise,
-  type EnterpriseDirectoryQuery,
-  type EnterpriseSort,
-} from "./enterprise.api";
+  getApiV1Enterprises,
+  getApiV1JobPostings,
+  type EnterpriseListResponse,
+} from "@/api/generated";
+
+type Enterprise = {
+  id: string;
+  name: string;
+  logoUrl?: string;
+  industry?: string;
+  location?: string;
+  shortDescription?: string;
+  description?: string;
+  website?: string;
+};
+
+type EnterpriseDirectoryQuery = {
+  keyword?: string;
+  industry?: string;
+  location?: string;
+  hiringOnly?: boolean;
+  sort?: EnterpriseSort;
+  page?: number;
+  limit?: number;
+};
+
+type EnterpriseSort = "most_jobs" | "name";
+
+const toEnterprise = (item: EnterpriseListResponse["items"][number]): Enterprise => ({
+  id: item.id,
+  name: item.name,
+  logoUrl: item.logoUrl ?? undefined,
+  industry: item.industry ?? undefined,
+  location: item.location ?? undefined,
+  shortDescription: item.shortDescription ?? undefined,
+});
+
+async function loadAllEnterprises(): Promise<Enterprise[]> {
+  const first = await getApiV1Enterprises({ query: { page: 1, limit: 100, status: "active" } });
+  if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
+  const pages = await Promise.all(
+    Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
+      getApiV1Enterprises({ query: { page: index + 2, limit: 100, status: "active" } }),
+    ),
+  );
+  return [first.data, ...pages.map((result) => {
+    if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
+    return result.data;
+  })].flatMap((page) => page.items).map(toEnterprise);
+}
+
+async function loadOpenJobCounts(): Promise<Record<string, number>> {
+  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100 } });
+  if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
+  const pages = await Promise.all(
+    Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
+      getApiV1JobPostings({ query: { page: index + 2, limit: 100 } }),
+    ),
+  );
+  const jobs = [first.data, ...pages.map((result) => {
+    if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
+    return result.data;
+  })].flatMap((page) => page.items);
+  const counts: Record<string, number> = {};
+  for (const job of jobs) counts[job.enterpriseId] = (counts[job.enterpriseId] ?? 0) + 1;
+  return counts;
+}
 import { EnterpriseLogo } from "./enterprise-logo";
 
 const PAGE_SIZE = 12;
@@ -150,12 +211,39 @@ export function EnterprisePage() {
 
   const { data, isError, isFetching, isLoading, refetch } = useQuery({
     queryKey: ["enterprise-directory-page", query],
-    queryFn: () => fetchEnterpriseDirectoryPage(query),
+    queryFn: async () => {
+      const [all, roleCounts] = await Promise.all([loadAllEnterprises(), loadOpenJobCounts()]);
+      const term = query.keyword?.trim().toLowerCase();
+      const limit = query.limit ?? PAGE_SIZE;
+      const filtered = all.filter((item) => {
+        if (query.industry && item.industry !== query.industry) return false;
+        if (query.location && item.location !== query.location) return false;
+        if (query.hiringOnly && !(roleCounts[item.id] ?? 0)) return false;
+        if (term && !item.name.toLowerCase().includes(term)) return false;
+        return true;
+      });
+      const sorted = [...filtered].sort((a, b) => query.sort === "name"
+        ? a.name.localeCompare(b.name)
+        : (roleCounts[b.id] ?? 0) - (roleCounts[a.id] ?? 0) || a.name.localeCompare(b.name));
+      const totalPages = Math.max(Math.ceil(sorted.length / limit), 1);
+      const page = Math.min(Math.max(query.page ?? 1, 1), totalPages);
+      const count = (pick: (item: Enterprise) => string | undefined) => {
+        const counts = new Map<string, number>();
+        for (const item of all) { const value = pick(item); if (value) counts.set(value, (counts.get(value) ?? 0) + 1); }
+        return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
+      };
+      return {
+        data: sorted.slice((page - 1) * limit, page * limit),
+        roleCounts,
+        filters: { industries: count((item) => item.industry), locations: count((item) => item.location) },
+        limit, page, total: sorted.length, totalPages,
+      };
+    },
     placeholderData: (previous) => previous,
   });
   const { data: directory } = useQuery({
     queryKey: ["enterprise-directory"],
-    queryFn: fetchEnterpriseDirectory,
+    queryFn: loadAllEnterprises,
     staleTime: 60_000,
   });
 

@@ -2664,6 +2664,15 @@
           {
             "schema": {
               "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterprise_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
               "enum": [
                 "created_at",
                 "title",
@@ -3776,6 +3785,40 @@
           },
           "403": {
             "description": "Forbidden: insufficient permissions"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/public": {
+      "get": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Get a published, still-open job posting (public)",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPostingResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job posting not found, not published, or expired"
           }
         }
       }

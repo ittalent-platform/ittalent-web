@@ -22,8 +22,65 @@ import {
 } from "@/features/public-site/career/career-format";
 import { StateCard } from "@/features/public-site/career/state-card";
 
-import { fetchEnterprise, fetchEnterpriseJobs } from "./enterprise.api";
+import {
+  getApiV1EnterprisesByEnterpriseId,
+  getApiV1JobPostings,
+  type EnterpriseDetailDto,
+  type JobPostingResponse,
+} from "@/api/generated";
 import { EnterpriseLogo } from "./enterprise-logo";
+
+type Enterprise = {
+  id: string;
+  name: string;
+  logoUrl?: string;
+  industry?: string;
+  location?: string;
+  shortDescription?: string;
+  description?: string;
+  website?: string;
+};
+
+type Job = {
+  _id: string;
+  enterpriseId?: string;
+  title: string;
+  slug: string;
+  location?: string;
+  employment_type?: string;
+  salary_min?: number;
+  salary_max?: number;
+  currency?: string;
+  level?: string;
+  expires_at?: string;
+  createdAt?: string;
+};
+
+const toEnterprise = (dto: EnterpriseDetailDto): Enterprise => ({
+  id: dto.id,
+  name: dto.name,
+  logoUrl: dto.logoUrl ?? undefined,
+  industry: dto.industry ?? undefined,
+  location: [dto.address.city, dto.address.country].filter(Boolean).join(", ") || undefined,
+  shortDescription: dto.shortDescription ?? undefined,
+  description: dto.description ?? undefined,
+  website: dto.website ?? undefined,
+});
+
+const toJob = (dto: JobPostingResponse): Job => ({
+  _id: dto.id,
+  enterpriseId: dto.enterpriseId,
+  title: dto.title,
+  slug: dto.slug || dto.id,
+  location: dto.location,
+  employment_type: dto.employmentType,
+  salary_min: dto.salaryMin,
+  salary_max: dto.salaryMax,
+  currency: dto.currency,
+  level: dto.level,
+  expires_at: dto.expiresAt,
+  createdAt: dto.createdAt,
+});
 
 const JOBS_SHOWN = 6;
 
@@ -98,12 +155,20 @@ export function EnterpriseDetailPage() {
     refetch,
   } = useQuery({
     queryKey: ["enterprise", id],
-    queryFn: () => fetchEnterprise(id!),
+    queryFn: async () => {
+      const result = await getApiV1EnterprisesByEnterpriseId({ path: { enterpriseId: id! } });
+      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
+      return toEnterprise(result.data);
+    },
     enabled: !!id,
   });
   const { data: jobs, isLoading: jobsLoading } = useQuery({
     queryKey: ["enterprise-jobs", id],
-    queryFn: () => fetchEnterpriseJobs(id!),
+    queryFn: async () => {
+      const result = await getApiV1JobPostings({ query: { enterprise_id: id!, limit: 100, page: 1 } });
+      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
+      return result.data.items.map(toJob);
+    },
     enabled: !!id,
   });
 
