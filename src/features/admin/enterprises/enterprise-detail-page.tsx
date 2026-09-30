@@ -84,6 +84,12 @@ export function AdminEnterpriseDetailPage() {
   }
 
   const isActive = enterprise.status?.toLowerCase() === "active";
+  const extraJobCounts = enterprise as {
+    draftJobsCount?: number;
+    closedJobsCount?: number;
+  };
+  const draftJobsCount = extraJobCounts.draftJobsCount ?? 0;
+  const closedJobsCount = extraJobCounts.closedJobsCount ?? 0;
   const address = enterprise.address as {
     street?: string;
     district?: string;
@@ -460,11 +466,11 @@ export function AdminEnterpriseDetailPage() {
                 <span className="text-[12.5px] text-muted-foreground">Open</span>
               </div>
               <div className="flex-1 p-3.5 rounded-xl border border-border bg-card flex flex-col gap-0.5">
-                <span className="text-xl font-bold text-foreground">{(enterprise as Record<string, unknown>).draftJobsCount ?? 0}</span>
+                <span className="text-xl font-bold text-foreground">{draftJobsCount}</span>
                 <span className="text-[12.5px] text-muted-foreground">Draft</span>
               </div>
               <div className="flex-1 p-3.5 rounded-xl border border-border bg-card flex flex-col gap-0.5">
-                <span className="text-xl font-bold text-foreground">{(enterprise as Record<string, unknown>).closedJobsCount ?? 0}</span>
+                <span className="text-xl font-bold text-foreground">{closedJobsCount}</span>
                 <span className="text-[12.5px] text-muted-foreground">Closed</span>
               </div>
             </div>
