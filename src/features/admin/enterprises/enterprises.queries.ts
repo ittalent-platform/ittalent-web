@@ -15,7 +15,12 @@ import type {
   UpdateEnterpriseStatusDto,
 } from "@/api/generated/types.gen";
 
-export type EnterpriseSummaryDto = EnterpriseListResponse["items"][number];
+export type EnterpriseSummaryDto = EnterpriseListResponse["items"][number] & {
+  email?: string;
+  phone?: string;
+  createdAt?: string;
+  creatorAccountId?: string;
+};
 
 export type EnterpriseListParams = {
   enabled?: boolean;

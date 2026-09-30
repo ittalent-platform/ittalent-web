@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router";
-import { Plus, CheckCircle2 } from "lucide-react";
-import { Pagination } from "@/components/ui/pagination";
+import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { AdminPageHeader } from "@/components/common/admin-page-header";
+import { NumberedPagination } from "@/components/common/numbered-pagination";
 import { useListParams } from "@/hooks/use-list-params";
+import { useToast } from "@/components/toast/toast-provider";
 import {
   DEFAULT_PAGE_SIZE,
   useDeleteEnterpriseMutation,
@@ -13,7 +17,6 @@ import {
 import { EnterprisesTable } from "./enterprises-table";
 import {
   EnterprisesToolbar,
-  type EnterpriseSizeFilter,
   type EnterpriseStatusFilter,
 } from "./enterprises-toolbar";
 import {
@@ -21,30 +24,23 @@ import {
   DeleteEnterpriseDialog,
   SuspendEnterpriseDialog,
 } from "./enterprise-dialogs";
-import { useToast } from "@/components/toast/toast-provider";
-
-function useSafeToast() {
-  try {
-    return useToast();
-  } catch {
-    return null;
-  }
-}
+import type { EnterpriseSortField, EnterpriseSortOrder } from "./enterprises.constants";
 
 export function EnterprisesPage() {
+  const { t } = useTranslation();
+  const toast = useToast();
   const { page, limit, search, set } = useListParams({
     defaultLimit: DEFAULT_PAGE_SIZE,
   });
 
   const [status, setStatus] = useState<EnterpriseStatusFilter>("all");
   const [industry, setIndustry] = useState<string>("all");
-  const [companySize, setCompanySize] = useState<EnterpriseSizeFilter>("all");
-  const [city, setCity] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<EnterpriseSortField>("createdAt");
+  const [sortOrder, setSortOrder] = useState<EnterpriseSortOrder>("desc");
 
   // Dialog states
   const [targetItem, setTargetItem] = useState<EnterpriseSummaryDto | null>(null);
   const [actionType, setActionType] = useState<"suspend" | "activate" | "delete" | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const listQuery = useEnterprisesListQuery({
     limit,
@@ -52,23 +48,14 @@ export function EnterprisesPage() {
     ...(search ? { keyword: search } : {}),
     ...(status !== "all" ? { status } : {}),
     ...(industry !== "all" ? { industry } : {}),
-    ...(companySize !== "all" ? { company_size: companySize } : {}),
-    ...(city !== "all" ? { location: city } : {}),
   });
 
   const updateStatusMutation = useUpdateEnterpriseStatusMutation(targetItem?.id ?? "");
   const deleteMutation = useDeleteEnterpriseMutation(targetItem?.id ?? "");
 
-  const items = listQuery.data?.items ?? [];
+  const rawItems = listQuery.data?.items;
   const total = listQuery.data?.total ?? 0;
   const totalPages = listQuery.data?.totalPages ?? Math.max(1, Math.ceil(total / limit));
-
-  function showToast(msg: string) {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage((cur) => (cur === msg ? null : cur));
-    }, 4500);
-  }
 
   function handleSearchChange(val: string) {
     set("search", val || null);
@@ -79,12 +66,29 @@ export function EnterprisesPage() {
     set("search", null);
     setStatus("all");
     setIndustry("all");
-    setCompanySize("all");
-    setCity("all");
     set("page", "1");
   }
 
-  const toast = useSafeToast();
+  function handleSort(field: EnterpriseSortField) {
+    if (sortBy === field) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+  }
+
+  const sortedItems = useMemo(() => {
+    return [...(rawItems ?? [])].sort((a, b) => {
+      let aVal = (a as Record<string, unknown>)[sortBy] ?? "";
+      let bVal = (b as Record<string, unknown>)[sortBy] ?? "";
+      if (typeof aVal === "string") aVal = aVal.toLowerCase();
+      if (typeof bVal === "string") bVal = bVal.toLowerCase();
+      if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [rawItems, sortBy, sortOrder]);
 
   async function handleConfirmSuspend(reason: string) {
     if (!targetItem) return;
@@ -93,23 +97,19 @@ export function EnterprisesPage() {
         status: "suspended",
         reason,
       });
-      showToast(`${targetItem.name} has been suspended`);
-      toast?.showToast({
+      toast.showToast({
         tone: "warning",
         title: "Enterprise suspended",
         message: `${targetItem.name} has been suspended and hidden from public view.`,
       });
-      setTargetItem(null);
       setActionType(null);
-    } catch (err: unknown) {
-      const errorObj = err as { data?: { message?: string }; message?: string };
-      const msg = errorObj?.data?.message || errorObj?.message || "Failed to suspend enterprise";
-      toast?.showToast({
+      setTargetItem(null);
+    } catch {
+      toast.showToast({
         tone: "error",
         title: "Suspension failed",
-        message: msg,
+        message: "Could not suspend enterprise. Please try again.",
       });
-      throw err;
     }
   }
 
@@ -118,25 +118,21 @@ export function EnterprisesPage() {
     try {
       await updateStatusMutation.mutateAsync({
         status: "active",
-        reason: reason || "Enterprise activated by administrator",
+        reason,
       });
-      showToast(`${targetItem.name} activated · Now public`);
-      toast?.showToast({
+      toast.showToast({
         tone: "success",
         title: "Enterprise activated",
         message: `${targetItem.name} is now active and published.`,
       });
-      setTargetItem(null);
       setActionType(null);
-    } catch (err: unknown) {
-      const errorObj = err as { data?: { message?: string }; message?: string };
-      const msg = errorObj?.data?.message || errorObj?.message || "Failed to activate enterprise";
-      toast?.showToast({
+      setTargetItem(null);
+    } catch {
+      toast.showToast({
         tone: "error",
         title: "Activation failed",
-        message: msg,
+        message: "Could not activate enterprise. Please try again.",
       });
-      throw err;
     }
   }
 
@@ -144,58 +140,37 @@ export function EnterprisesPage() {
     if (!targetItem) return;
     try {
       await deleteMutation.mutateAsync();
-      showToast(`${targetItem.name} deleted`);
-      toast?.showToast({
-        tone: "error",
+      toast.showToast({
+        tone: "success",
         title: "Enterprise deleted",
-        message: `${targetItem.name} has been soft-deleted.`,
+        message: `${targetItem.name} was successfully removed.`,
       });
-      setTargetItem(null);
       setActionType(null);
-    } catch (err: unknown) {
-      const errorObj = err as { data?: { message?: string }; message?: string };
-      const msg = errorObj?.data?.message || errorObj?.message || "Failed to delete enterprise";
-      toast?.showToast({
+      setTargetItem(null);
+    } catch {
+      toast.showToast({
         tone: "error",
         title: "Deletion failed",
-        message: msg,
+        message: "Could not delete enterprise. Please try again.",
       });
-      throw err;
     }
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Toast Notification Banner */}
-      {toastMessage && (
-        <div
-          role="status"
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[#19191c] text-white text-sm shadow-2xl animate-in fade-in slide-in-from-bottom-3"
-        >
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-['Space_Grotesk'] text-2xl font-bold tracking-tight text-[#19191c]">
-            Enterprise Profiles
-          </h1>
-          <p className="text-sm text-[#64646b]">
-            {total} {total === 1 ? "enterprise" : "enterprises"} · deleted profiles are not listed
-          </p>
-        </div>
-
-        <Link
-          to="/admin/enterprises/new"
-          className="inline-flex items-center gap-2 h-11 px-5 rounded-full bg-[#f2470c] hover:bg-[#d93d07] text-white text-sm font-semibold shadow-sm transition cursor-pointer select-none"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Create enterprise</span>
-        </Link>
-      </div>
+      <AdminPageHeader
+        title={t("adminEnterprises.page.title", "Enterprise Profiles")}
+        description={t("adminEnterprises.page.subtitle", "Manage registered companies, compliance vetting, and account statuses")}
+        actions={
+          <Button asChild className="h-10 rounded-full font-semibold">
+            <Link to="/admin/enterprises/new">
+              <Plus className="size-4 mr-1.5" />
+              <span>{t("adminEnterprises.create", "Create enterprise")}</span>
+            </Link>
+          </Button>
+        }
+      />
 
       {/* Search and Filters Toolbar */}
       <EnterprisesToolbar
@@ -211,94 +186,86 @@ export function EnterprisesPage() {
           setIndustry(i);
           set("page", "1");
         }}
-        companySize={companySize}
-        onCompanySizeChange={(cs) => {
-          setCompanySize(cs);
-          set("page", "1");
-        }}
-        city={city}
-        onCityChange={(c) => {
-          setCity(c);
-          set("page", "1");
-        }}
         onResetFilters={handleResetFilters}
       />
 
-      {/* Directory Table */}
-      <EnterprisesTable
-        items={items}
-        isLoading={listQuery.isLoading}
-        hasFilters={
-          search.trim() !== "" ||
-          status !== "all" ||
-          industry !== "all" ||
-          companySize !== "all" ||
-          city !== "all"
-        }
-        onClearFilters={handleResetFilters}
-        onSuspend={(item) => {
-          setTargetItem(item);
-          setActionType("suspend");
-        }}
-        onActivate={(item) => {
-          setTargetItem(item);
-          setActionType("activate");
-        }}
-        onDelete={(item) => {
-          setTargetItem(item);
-          setActionType("delete");
-        }}
-      />
-
-      {/* Pagination */}
-      {total > 0 ? (
-        <Pagination
-          limit={limit}
-          onLimitChange={(newLimit) => {
-            set("limit", String(newLimit));
-            set("page", "1");
+      {/* Enterprises Table */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-2xs">
+        <EnterprisesTable
+          items={sortedItems}
+          isLoading={listQuery.isLoading}
+          hasFilters={search !== "" || status !== "all" || industry !== "all"}
+          onClearFilters={handleResetFilters}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
+          onSuspend={(item) => {
+            setTargetItem(item);
+            setActionType("suspend");
           }}
-          onPageChange={(newPage) => set("page", String(newPage))}
-          page={page}
-          total={total}
-          totalPages={totalPages}
+          onActivate={(item) => {
+            setTargetItem(item);
+            setActionType("activate");
+          }}
+          onDelete={(item) => {
+            setTargetItem(item);
+            setActionType("delete");
+          }}
         />
-      ) : null}
+
+        {/* Pagination footer */}
+        {total > 0 ? (
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-5 py-3.5 bg-muted/20">
+            <span className="text-xs text-muted-foreground">
+              {t("pagination.showing", {
+                start: (page - 1) * limit + 1,
+                end: Math.min(page * limit, total),
+                total,
+              })}
+            </span>
+            <NumberedPagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={(newPage) => set("page", String(newPage))}
+            />
+          </div>
+        ) : null}
+      </div>
 
       {/* Action Dialogs */}
-      {targetItem && actionType === "suspend" && (
+      {actionType === "suspend" && targetItem && (
         <SuspendEnterpriseDialog
           isOpen={true}
+          enterpriseName={targetItem.name}
           onClose={() => {
-            setTargetItem(null);
             setActionType(null);
+            setTargetItem(null);
           }}
           onConfirm={handleConfirmSuspend}
-          enterpriseName={targetItem.name}
         />
       )}
 
-      {targetItem && actionType === "activate" && (
+      {actionType === "activate" && targetItem && (
         <ActivateEnterpriseDialog
           isOpen={true}
+          enterpriseName={targetItem.name}
           onClose={() => {
-            setTargetItem(null);
             setActionType(null);
+            setTargetItem(null);
           }}
           onConfirm={handleConfirmActivate}
-          enterpriseName={targetItem.name}
         />
       )}
 
-      {targetItem && actionType === "delete" && (
+      {actionType === "delete" && targetItem && (
         <DeleteEnterpriseDialog
           isOpen={true}
+          enterpriseName={targetItem.name}
           onClose={() => {
-            setTargetItem(null);
             setActionType(null);
+            setTargetItem(null);
           }}
           onConfirm={handleConfirmDelete}
-          enterpriseName={targetItem.name}
         />
       )}
     </div>

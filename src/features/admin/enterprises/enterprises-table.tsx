@@ -1,19 +1,30 @@
 import { Link, useNavigate } from "react-router";
 import { Building2, Eye, MoreVertical, Pencil, Search, Trash2, Ban, Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
-  EnterpriseAvatar,
-  EnterpriseStatusBadge,
-  formatEnterpriseId,
-} from "./enterprise-badges";
+  SortableHeaderButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableHeaderRow,
+  TableRow,
+  TableSkeletonRows,
+} from "@/components/ui/table";
+import { EmptyState } from "@/components/common/empty-state";
+import { SearchEmptyState } from "@/components/common/search-empty-state";
+import { LogoTile } from "@/components/common/logo-tile";
+import { EnterpriseStatusBadge } from "./enterprise-badges";
+import { formatEnterpriseDateTime } from "./enterprises.formatters";
 import type { EnterpriseSummaryDto } from "./enterprises.queries";
+import type { EnterpriseSortField, EnterpriseSortOrder } from "./enterprises.constants";
 
 type EnterprisesTableProps = {
   items: EnterpriseSummaryDto[];
@@ -23,6 +34,9 @@ type EnterprisesTableProps = {
   onSuspend: (item: EnterpriseSummaryDto) => void;
   onActivate: (item: EnterpriseSummaryDto) => void;
   onDelete: (item: EnterpriseSummaryDto) => void;
+  sortBy?: EnterpriseSortField;
+  sortOrder?: EnterpriseSortOrder;
+  onSort?: (field: EnterpriseSortField) => void;
 };
 
 export function EnterprisesTable({
@@ -33,223 +47,239 @@ export function EnterprisesTable({
   onSuspend,
   onActivate,
   onDelete,
+  sortBy,
+  sortOrder,
+  onSort,
 }: EnterprisesTableProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl bg-white border border-[#e6e4df] overflow-hidden">
-        <div className="divide-y divide-[#efede8]">
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <div key={idx} className="flex items-center gap-4 px-6 py-4">
-              <Skeleton className="w-16 h-4 rounded" />
-              <Skeleton className="w-9 h-9 rounded-xl" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="w-48 h-4 rounded" />
-                <Skeleton className="w-32 h-3 rounded" />
-              </div>
-              <Skeleton className="w-28 h-4 rounded" />
-              <Skeleton className="w-20 h-6 rounded-full" />
-              <Skeleton className="w-8 h-8 rounded-lg" />
-            </div>
-          ))}
-        </div>
-      </div>
+      <Table className="min-w-[900px]">
+        <TableHead>
+          <TableHeaderRow>
+            <TableHeaderCell>{t("adminEnterprises.table.company")}</TableHeaderCell>
+            <TableHeaderCell>{t("adminEnterprises.table.email")}</TableHeaderCell>
+            <TableHeaderCell>{t("adminEnterprises.table.phone")}</TableHeaderCell>
+            <TableHeaderCell>{t("adminEnterprises.table.status")}</TableHeaderCell>
+            <TableHeaderCell>{t("adminEnterprises.table.created")}</TableHeaderCell>
+            <TableHeaderCell className="w-12 text-right">
+              <span className="sr-only">{t("adminEnterprises.table.actions")}</span>
+            </TableHeaderCell>
+          </TableHeaderRow>
+        </TableHead>
+        <TableBody>
+          <TableSkeletonRows columns={6} rows={5} />
+        </TableBody>
+      </Table>
     );
   }
 
   if (items.length === 0) {
     if (hasFilters) {
       return (
-        <div className="rounded-2xl bg-white border border-[#e6e4df] p-12 flex flex-col items-center justify-center text-center gap-3">
-          <span className="w-14 h-14 rounded-full bg-[#f1efea] text-[#8a8a91] flex items-center justify-center mb-1">
-            <Search className="w-6 h-6" />
-          </span>
-          <h3 className="font-['Space_Grotesk'] text-lg font-semibold text-[#19191c]">
-            No matching enterprises
-          </h3>
-          <p className="text-sm text-[#64646b] max-w-sm leading-relaxed">
-            No enterprises match your active filters or keyword search. Try another search term or reset filters.
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClearFilters}
-            className="mt-2 h-10 px-5 rounded-xl border-[#e6e4df] text-sm font-semibold hover:bg-muted/40"
-          >
-            Clear filters
-          </Button>
-        </div>
+        <SearchEmptyState
+          icon={Search}
+          title={t("state.noResults", "No matching results found")}
+          description={t("adminEnterprises.table.emptyDescription", "No enterprises match your active filters or keyword search.")}
+          onClear={onClearFilters}
+        />
       );
     }
 
     return (
-      <div className="rounded-2xl bg-white border border-[#e6e4df] p-12 flex flex-col items-center justify-center text-center gap-3">
-        <span className="w-14 h-14 rounded-full bg-[#f1efea] text-[#8a8a91] flex items-center justify-center mb-1">
-          <Building2 className="w-6 h-6" />
-        </span>
-        <h3 className="font-['Space_Grotesk'] text-lg font-semibold text-[#19191c]">
-          No enterprise profiles yet
-        </h3>
-        <p className="text-sm text-[#64646b] max-w-sm leading-relaxed">
-          Create a profile for each company that passed offline legal and business vetting.
-        </p>
-        <Button
-          type="button"
-          onClick={() => navigate("/admin/enterprises/new")}
-          className="mt-2 h-11 px-6 rounded-full bg-[#f2470c] hover:bg-[#d93d07] text-white text-sm font-semibold shadow-sm"
-        >
-          Create enterprise
-        </Button>
-      </div>
+      <EmptyState
+        icon={Building2}
+        title={t("adminEnterprises.table.emptyTitle", "No enterprise profiles yet")}
+        description={t("adminEnterprises.table.emptyDescription", "Create your first enterprise profile to manage company vetting and job postings.")}
+        action={{
+          label: t("adminEnterprises.create", "Create enterprise"),
+          onClick: () => navigate("/admin/enterprises/new"),
+        }}
+      />
     );
   }
 
   return (
-    <div className="rounded-2xl bg-white border border-[#e6e4df] overflow-x-auto shadow-2xs">
-      <table className="w-full text-left text-[13.5px] border-collapse min-w-[980px]">
-        <thead className="bg-[#f6f5f1] border-b border-[#e6e4df] text-[11.5px] font-bold tracking-wider text-[#6f6f76] uppercase select-none">
-          <tr>
-            <th className="py-3.5 px-5 whitespace-nowrap">ID</th>
-            <th className="py-3.5 px-5 whitespace-nowrap">Enterprise</th>
-            <th className="py-3.5 px-5 whitespace-nowrap">Industry</th>
-            <th className="py-3.5 px-5 whitespace-nowrap">Size</th>
-            <th className="py-3.5 px-5 whitespace-nowrap">Location</th>
-            <th className="py-3.5 px-5 whitespace-nowrap">Status</th>
-            <th className="py-3.5 px-4 w-12 text-right"></th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-[#efede8] text-[#19191c]">
-          {items.map((ent) => {
-            const formattedId = formatEnterpriseId(ent.id);
-            const isActive = ent.status?.toLowerCase() === "active";
+    <Table className="min-w-[900px]">
+      <TableHead>
+        <TableHeaderRow>
+          {/* Company */}
+          <TableHeaderCell>
+            {onSort ? (
+              <SortableHeaderButton
+                active={sortBy === "name"}
+                direction={sortBy === "name" ? sortOrder ?? null : null}
+                label={t("adminEnterprises.table.company")}
+                onClick={() => onSort("name")}
+              />
+            ) : (
+              t("adminEnterprises.table.company")
+            )}
+          </TableHeaderCell>
 
-            return (
-              <tr
-                key={ent.id}
-                className="hover:bg-[#fafaf8] transition-colors group"
-              >
-                {/* ID */}
-                <td className="py-4 px-5 align-middle">
-                  <Link
-                    to={`/admin/enterprises/${ent.id}`}
-                    className="font-mono text-xs font-semibold text-[#64646b] hover:text-[#f2470c] transition"
-                  >
-                    {formattedId}
-                  </Link>
-                </td>
+          {/* Corporate email */}
+          <TableHeaderCell>
+            {onSort ? (
+              <SortableHeaderButton
+                active={sortBy === "email"}
+                direction={sortBy === "email" ? sortOrder ?? null : null}
+                label={t("adminEnterprises.table.email")}
+                onClick={() => onSort("email")}
+              />
+            ) : (
+              t("adminEnterprises.table.email")
+            )}
+          </TableHeaderCell>
 
-                {/* Enterprise Name & City */}
-                <td className="py-4 px-5 align-middle">
-                  <Link
-                    to={`/admin/enterprises/${ent.id}`}
-                    className="flex items-center gap-3 no-underline group/link"
-                  >
-                    <EnterpriseAvatar
-                      name={ent.name}
-                      logoUrl={ent.logoUrl}
-                      size="md"
-                    />
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-bold text-[14px] text-[#19191c] group-hover/link:text-[#f2470c] transition truncate">
-                        {ent.name}
-                      </span>
-                      {ent.shortDescription ? (
-                        <span className="text-xs text-[#64646b] truncate max-w-[280px]">
-                          {ent.shortDescription}
-                        </span>
-                      ) : null}
-                    </div>
-                  </Link>
-                </td>
+          {/* Phone */}
+          <TableHeaderCell>{t("adminEnterprises.table.phone")}</TableHeaderCell>
 
-                {/* Industry */}
-                <td className="py-4 px-5 align-middle whitespace-nowrap text-sm">
-                  {ent.industry ?? "—"}
-                </td>
+          {/* Status */}
+          <TableHeaderCell>
+            {onSort ? (
+              <SortableHeaderButton
+                active={sortBy === "status"}
+                direction={sortBy === "status" ? sortOrder ?? null : null}
+                label={t("adminEnterprises.table.status")}
+                onClick={() => onSort("status")}
+              />
+            ) : (
+              t("adminEnterprises.table.status")
+            )}
+          </TableHeaderCell>
 
-                {/* Size */}
-                <td className="py-4 px-5 align-middle whitespace-nowrap text-sm text-[#4a4a50]">
-                  {ent.companySize ?? "—"}
-                </td>
+          {/* Created */}
+          <TableHeaderCell>
+            {onSort ? (
+              <SortableHeaderButton
+                active={sortBy === "createdAt"}
+                direction={sortBy === "createdAt" ? sortOrder ?? null : null}
+                label={t("adminEnterprises.table.created")}
+                onClick={() => onSort("createdAt")}
+              />
+            ) : (
+              t("adminEnterprises.table.created")
+            )}
+          </TableHeaderCell>
 
-                {/* Location */}
-                <td className="py-4 px-5 align-middle whitespace-nowrap text-sm text-[#4a4a50]">
-                  {ent.location ?? "—"}
-                </td>
+          {/* Actions */}
+          <TableHeaderCell className="w-12 text-right">
+            <span className="sr-only">{t("adminEnterprises.table.actions")}</span>
+          </TableHeaderCell>
+        </TableHeaderRow>
+      </TableHead>
+      <TableBody>
+        {items.map((ent) => {
+          const detailPath = `/admin/enterprises/${ent.id}`;
+          const isActive = ent.status?.toLowerCase() === "active";
 
-                {/* Status */}
-                <td className="py-4 px-5 align-middle whitespace-nowrap">
-                  <EnterpriseStatusBadge status={ent.status} />
-                </td>
+          return (
+            <TableRow key={ent.id} className="hover:bg-muted/50 transition-colors">
+              {/* Company Column: LogoTile + Name + City underneath */}
+              <TableCell>
+                <Link to={detailPath} className="flex min-w-0 items-center gap-3 no-underline group/link">
+                  <LogoTile name={ent.name} size="md" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-[13.5px] text-foreground group-hover/link:text-primary transition truncate">
+                      {ent.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground truncate">
+                      {ent.location || "—"}
+                    </span>
+                  </div>
+                </Link>
+              </TableCell>
 
-                {/* Actions Dropdown */}
-                <td className="py-4 px-4 align-middle text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label={`Actions for ${ent.name}`}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64646b] hover:text-[#19191c] hover:bg-black/5 transition cursor-pointer"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="w-48 rounded-xl bg-white border border-[#e6e4df] shadow-xl text-sm"
+              {/* Corporate email */}
+              <TableCell className="text-xs text-foreground/80 font-mono">
+                {ent.email || "—"}
+              </TableCell>
+
+              {/* Phone */}
+              <TableCell className="text-xs text-foreground/80">
+                {ent.phone || "—"}
+              </TableCell>
+
+              {/* Status */}
+              <TableCell>
+                <EnterpriseStatusBadge status={ent.status} />
+              </TableCell>
+
+              {/* Created (date + "by ...") */}
+              <TableCell>
+                <div className="flex flex-col text-xs text-foreground/80">
+                  <span>{formatEnterpriseDateTime(ent.createdAt)}</span>
+                  <span className="text-muted-foreground">
+                    {t("adminEnterprises.table.by", { author: ent.creatorAccountId || "admin" })}
+                  </span>
+                </div>
+              </TableCell>
+
+              {/* Actions Dropdown */}
+              <TableCell className="text-right">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label={`Actions for ${ent.name}`}
+                      className="size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
                     >
-                      <DropdownMenuItem
-                        onClick={() => navigate(`/admin/enterprises/${ent.id}`)}
-                        className="flex items-center gap-2.5 px-3 py-2 cursor-pointer"
-                      >
-                        <Eye className="w-4 h-4 text-[#64646b]" />
-                        <span>View detail</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => navigate(`/admin/enterprises/${ent.id}/edit`)}
-                        className="flex items-center gap-2.5 px-3 py-2 cursor-pointer"
-                      >
-                        <Pencil className="w-4 h-4 text-[#64646b]" />
-                        <span>Edit profile</span>
-                      </DropdownMenuItem>
+                      <MoreVertical className="size-4" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44 text-sm">
+                    <DropdownMenuItem
+                      onClick={() => navigate(detailPath)}
+                      className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+                    >
+                      <Eye className="size-4 text-muted-foreground" />
+                      <span>{t("adminEnterprises.table.view", "View")}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => navigate(`/admin/enterprises/${ent.id}/edit`)}
+                      className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+                    >
+                      <Pencil className="size-4 text-muted-foreground" />
+                      <span>{t("adminEnterprises.table.edit", "Edit")}</span>
+                    </DropdownMenuItem>
 
-                      {isActive ? (
-                        <DropdownMenuItem
-                          onClick={() => onSuspend(ent)}
-                          variant="destructive"
-                          className="flex items-center gap-2.5 px-3 py-2 cursor-pointer"
-                        >
-                          <Ban className="w-4 h-4" />
-                          <span>Suspend</span>
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem
-                          onClick={() => onActivate(ent)}
-                          variant="success"
-                          className="flex items-center gap-2.5 px-3 py-2 cursor-pointer"
-                        >
-                          <Check className="w-4 h-4" />
-                          <span>Activate</span>
-                        </DropdownMenuItem>
-                      )}
-
+                    {isActive ? (
                       <DropdownMenuItem
-                        onClick={() => onDelete(ent)}
+                        onClick={() => onSuspend(ent)}
                         variant="destructive"
-                        className="flex items-center gap-2.5 px-3 py-2 cursor-pointer"
+                        className="flex items-center gap-2 px-3 py-2 cursor-pointer"
                       >
-                        <Trash2 className="w-4 h-4" />
-                        <span>Delete</span>
+                        <Ban className="size-4" />
+                        <span>{t("adminEnterprises.table.suspend", "Suspend")}</span>
                       </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                    ) : (
+                      <DropdownMenuItem
+                        onClick={() => onActivate(ent)}
+                        variant="default"
+                        className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+                      >
+                        <Check className="size-4 text-(--status-success-fg)" />
+                        <span>{t("adminEnterprises.table.activate", "Activate")}</span>
+                      </DropdownMenuItem>
+                    )}
+
+                    <DropdownMenuItem
+                      onClick={() => onDelete(ent)}
+                      variant="destructive"
+                      className="flex items-center gap-2 px-3 py-2 cursor-pointer"
+                    >
+                      <Trash2 className="size-4" />
+                      <span>{t("adminEnterprises.table.delete", "Delete")}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }

@@ -1,731 +1,460 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
-import {
-  Ban,
-  Check,
-  CheckCircle2,
-  ChevronLeft,
-  ExternalLink,
-  Globe,
-  Mail,
-  MapPin,
-  Pencil,
-  Phone,
-  Trash2,
-} from "lucide-react";
+import { Link, useParams } from "react-router";
+import { ArrowLeft, Ban, Check, ExternalLink, Globe, Mail, MapPin, Pencil, Phone } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Breadcrumb } from "@/components/common/breadcrumb";
+import { DetailRow } from "@/components/common/detail-row";
+import { RailCard } from "@/components/common/rail-card";
+import { ErrorState } from "@/components/common/error-state";
+import { useToast } from "@/components/toast/toast-provider";
 import {
-  CompanyTypeBadge,
   EnterpriseAvatar,
   EnterpriseStatusBadge,
-  formatEnterpriseId,
+  CompanyTypeBadge,
 } from "./enterprise-badges";
+import { formatEnterpriseDateTime, formatTaxCode } from "./enterprises.formatters";
 import {
-  ActivateEnterpriseDialog,
-  DeleteEnterpriseDialog,
-  SuspendEnterpriseDialog,
-} from "./enterprise-dialogs";
-import {
-  useDeleteEnterpriseMutation,
   useEnterpriseDetailQuery,
   useUpdateEnterpriseStatusMutation,
 } from "./enterprises.queries";
-import { useToast } from "@/components/toast/toast-provider";
-
-function useSafeToast() {
-  try {
-    return useToast();
-  } catch {
-    return null;
-  }
-}
+import {
+  ActivateEnterpriseDialog,
+  SuspendEnterpriseDialog,
+} from "./enterprise-dialogs";
 
 export function AdminEnterpriseDetailPage() {
-  const { enterpriseId } = useParams<{ enterpriseId: string }>();
-  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { enterpriseId = "" } = useParams<{ enterpriseId: string }>();
+  const toast = useToast();
 
-  const [actionType, setActionType] = useState<"suspend" | "activate" | "delete" | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isSuspendOpen, setIsSuspendOpen] = useState(false);
+  const [isActivateOpen, setIsActivateOpen] = useState(false);
 
   const detailQuery = useEnterpriseDetailQuery(enterpriseId);
-  const updateStatusMutation = useUpdateEnterpriseStatusMutation(enterpriseId ?? "");
-  const deleteMutation = useDeleteEnterpriseMutation(enterpriseId ?? "");
+  const updateStatusMutation = useUpdateEnterpriseStatusMutation(enterpriseId);
 
-  const ent = detailQuery.data;
+  const enterprise = detailQuery.data;
 
-  function showToast(msg: string) {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage((cur) => (cur === msg ? null : cur));
-    }, 4500);
+  if (detailQuery.isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-6 w-48 rounded" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Skeleton className="size-16 rounded-2xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-64 rounded" />
+              <Skeleton className="h-4 w-32 rounded" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-24 rounded-lg" />
+            <Skeleton className="h-10 w-28 rounded-lg" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8 space-y-6">
+            <Skeleton className="h-64 w-full rounded-2xl" />
+            <Skeleton className="h-48 w-full rounded-2xl" />
+          </div>
+          <div className="lg:col-span-4 space-y-6">
+            <Skeleton className="h-48 w-full rounded-2xl" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  const toast = useSafeToast();
+  if (detailQuery.isError || !enterprise) {
+    return (
+      <ErrorState
+        title={t("adminEnterprises.detail.notFoundTitle", "Enterprise not found")}
+        description={t(
+          "adminEnterprises.detail.notFoundDescription",
+          "The requested enterprise profile could not be loaded or was removed.",
+        )}
+      />
+    );
+  }
+
+  const isActive = enterprise.status?.toLowerCase() === "active";
+  const address = enterprise.address as {
+    street?: string;
+    district?: string;
+    city?: string;
+    postal_code?: string;
+    postalCode?: string;
+    country?: string;
+  } | undefined;
+  const postalCode = address?.postal_code || address?.postalCode;
 
   async function handleConfirmSuspend(reason: string) {
-    if (!enterpriseId) return;
     try {
       await updateStatusMutation.mutateAsync({
         status: "suspended",
         reason,
       });
-      showToast("Enterprise profile suspended");
-      toast?.showToast({
+      toast.showToast({
         tone: "warning",
         title: "Enterprise suspended",
-        message: `${ent?.name || "Enterprise"} has been suspended and hidden from public view.`,
+        message: `${enterprise?.name} has been suspended.`,
       });
-      setActionType(null);
-    } catch (err: unknown) {
-      const errorObj = err as { data?: { message?: string }; message?: string };
-      const msg = errorObj?.data?.message || errorObj?.message || "Failed to suspend enterprise";
-      toast?.showToast({
+      setIsSuspendOpen(false);
+    } catch {
+      toast.showToast({
         tone: "error",
         title: "Suspension failed",
-        message: msg,
+        message: "Could not suspend enterprise. Please try again.",
       });
-      throw err;
     }
   }
 
   async function handleConfirmActivate(reason?: string) {
-    if (!enterpriseId) return;
     try {
       await updateStatusMutation.mutateAsync({
         status: "active",
-        reason: reason || "Enterprise activated by administrator",
+        reason,
       });
-      showToast("Enterprise profile activated · Now public");
-      toast?.showToast({
+      toast.showToast({
         tone: "success",
         title: "Enterprise activated",
-        message: `${ent?.name || "Enterprise"} is now active and public.`,
+        message: `${enterprise?.name} is now active.`,
       });
-      setActionType(null);
-    } catch (err: unknown) {
-      const errorObj = err as { data?: { message?: string }; message?: string };
-      const msg = errorObj?.data?.message || errorObj?.message || "Failed to activate enterprise";
-      toast?.showToast({
+      setIsActivateOpen(false);
+    } catch {
+      toast.showToast({
         tone: "error",
         title: "Activation failed",
-        message: msg,
+        message: "Could not activate enterprise. Please try again.",
       });
-      throw err;
     }
   }
-
-  async function handleConfirmDelete() {
-    if (!enterpriseId) return;
-    try {
-      await deleteMutation.mutateAsync();
-      showToast("Enterprise profile deleted");
-      toast?.showToast({
-        tone: "error",
-        title: "Enterprise deleted",
-        message: `${ent?.name || "Enterprise"} has been soft-deleted.`,
-      });
-      setActionType(null);
-      navigate("/admin/enterprises");
-    } catch (err: unknown) {
-      const errorObj = err as { data?: { message?: string }; message?: string };
-      const msg = errorObj?.data?.message || errorObj?.message || "Failed to delete enterprise";
-      toast?.showToast({
-        tone: "error",
-        title: "Deletion failed",
-        message: msg,
-      });
-      throw err;
-    }
-  }
-
-  if (detailQuery.isLoading) {
-    return (
-      <div className="flex flex-col gap-6">
-        <Skeleton className="w-48 h-6 rounded" />
-        <div className="flex items-center gap-4">
-          <Skeleton className="w-14 h-14 rounded-2xl" />
-          <div className="space-y-2">
-            <Skeleton className="w-64 h-7 rounded" />
-            <Skeleton className="w-40 h-4 rounded" />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-          <Skeleton className="h-96 rounded-2xl" />
-          <Skeleton className="h-96 rounded-2xl" />
-        </div>
-      </div>
-    );
-  }
-
-  if (detailQuery.isError || !ent) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 text-center gap-4 bg-white rounded-2xl border border-[#e6e4df]">
-        <h2 className="text-xl font-bold font-['Space_Grotesk'] text-[#19191c]">
-          Enterprise not found
-        </h2>
-        <p className="text-sm text-[#64646b]">
-          The requested enterprise profile could not be found or you may not have access to view it.
-        </p>
-        <Button
-          variant="outline"
-          onClick={() => navigate("/admin/enterprises")}
-          className="rounded-xl border-[#e6e4df]"
-        >
-          <ChevronLeft className="w-4 h-4 mr-1" /> Back to Enterprise Profiles
-        </Button>
-      </div>
-    );
-  }
-
-  const formattedId = formatEnterpriseId(ent.id);
-  const isActive = ent.status?.toLowerCase() === "active";
-
-  const locationString = ent.address
-    ? `${ent.address.city}${ent.address.country ? `, ${ent.address.country}` : ""}`
-    : null;
 
   return (
-    <div className="flex flex-col gap-6 pb-12">
-      {/* Toast Notification Banner */}
-      {toastMessage && (
-        <div
-          role="status"
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[#19191c] text-white text-sm shadow-2xl animate-in fade-in slide-in-from-bottom-3"
-        >
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
+    <div className="space-y-6">
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-[#64646b]">
-        <Link
-          to="/admin/enterprises"
-          className="hover:text-[#19191c] transition flex items-center gap-1"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-          Enterprise Profiles
-        </Link>
-        <span aria-hidden="true" className="text-muted-foreground/50">/</span>
-        <span className="font-mono font-semibold text-[#19191c]">{formattedId}</span>
-      </nav>
+      <Breadcrumb
+        ariaLabel={t("adminEnterprises.page.title", "Enterprise Profiles")}
+        items={[
+          { label: t("adminEnterprises.page.title", "Enterprise Profiles"), to: "/admin/enterprises" },
+          { label: enterprise.name, mono: false },
+        ]}
+      />
 
-      {/* Header bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-[#e6e4df] shadow-2xs">
+      {/* Flat Header: Title + Status + Action buttons (Edit & Suspend only, NO delete button) */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
         <div className="flex items-center gap-4 min-w-0">
-          <EnterpriseAvatar name={ent.name} logoUrl={ent.logoUrl} size="lg" />
-          <div className="flex flex-col gap-1.5 min-w-0">
+          <EnterpriseAvatar
+            name={enterprise.name}
+            logoUrl={enterprise.logoUrl}
+            size="xl"
+          />
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="font-['Space_Grotesk'] text-2xl font-bold text-[#19191c] truncate">
-                {ent.name}
+              <h1 className="itt-display text-2xl font-bold tracking-tight text-foreground truncate">
+                {enterprise.name}
               </h1>
-              <EnterpriseStatusBadge status={ent.status} />
-              {ent.companyType ? <CompanyTypeBadge type={ent.companyType} /> : null}
+              <EnterpriseStatusBadge status={enterprise.status} />
+              <CompanyTypeBadge type={enterprise.companyType} />
             </div>
-            <span className="text-xs text-[#64646b] flex flex-wrap items-center gap-2">
-              <span>{ent.email}</span>
-              <span>·</span>
-              <span>{ent.industry}</span>
-              {locationString && (
-                <>
-                  <span>·</span>
-                  <span>{locationString}</span>
-                </>
-              )}
-            </span>
+            {enterprise.shortDescription ? (
+              <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
+                {enterprise.shortDescription}
+              </p>
+            ) : null}
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          <Link
-            to={`/admin/enterprises/${ent.id}/edit`}
-            className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-[#e6e4df] bg-white hover:bg-muted/40 text-sm font-semibold text-[#19191c] transition"
-          >
-            <Pencil className="w-4 h-4 text-[#64646b]" />
-            <span>Edit</span>
-          </Link>
+        {/* Header Actions: Back, Edit, and Suspend/Activate */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button asChild variant="outline" size="sm" className="h-9 px-3 gap-1.5 border-border">
+            <Link to="/admin/enterprises">
+              <ArrowLeft className="size-4" />
+              <span>{t("adminEnterprises.detail.back", "Back to enterprises")}</span>
+            </Link>
+          </Button>
+
+          <Button asChild variant="outline" size="sm" className="h-9 px-3.5 gap-1.5 border-border">
+            <Link to={`/admin/enterprises/${enterprise.id}/edit`}>
+              <Pencil className="size-4 text-muted-foreground" />
+              <span>{t("adminEnterprises.detail.edit", "Edit")}</span>
+            </Link>
+          </Button>
 
           {isActive ? (
             <Button
               type="button"
-              onClick={() => setActionType("suspend")}
-              className="h-10 px-4 rounded-xl bg-[#c62a1c] hover:bg-[#b02215] text-white text-sm font-semibold gap-2 shadow-xs"
+              variant="destructive"
+              size="sm"
+              onClick={() => setIsSuspendOpen(true)}
+              className="h-9 px-3.5 gap-1.5 shadow-xs"
             >
-              <Ban className="w-4 h-4" />
-              <span>Suspend</span>
+              <Ban className="size-4" />
+              <span>{t("adminEnterprises.detail.suspend", "Suspend")}</span>
             </Button>
           ) : (
             <Button
               type="button"
-              onClick={() => setActionType("activate")}
-              className="h-10 px-4 rounded-xl bg-[#12764a] hover:bg-[#0f603c] text-white text-sm font-semibold gap-2 shadow-xs"
+              size="sm"
+              onClick={() => setIsActivateOpen(true)}
+              className="h-9 px-3.5 gap-1.5 bg-(--status-success-fg) hover:bg-(--status-success-fg)/90 text-white shadow-xs"
             >
-              <Check className="w-4 h-4" />
-              <span>Activate</span>
+              <Check className="size-4" />
+              <span>{t("adminEnterprises.detail.activate", "Activate")}</span>
             </Button>
           )}
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setActionType("delete")}
-            className="h-10 px-3 rounded-xl border-[#e6e4df] text-[#b42318] hover:bg-rose-50"
-            title="Delete enterprise"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
         </div>
       </div>
 
-      {/* Main 2-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-6 items-start">
-        {/* Left Column */}
-        <div className="flex flex-col gap-6">
-          {/* Legal Identity Card */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-5">
-            <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-              Legal identity
+      {/* Main Content Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column (8 cols): Overview, Contact & Address, Tech Stack & Benefits */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Overview Card */}
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-2xs">
+            <h2 className="text-base font-bold text-foreground mb-4">
+              {t("adminEnterprises.detail.overview", "Company Overview")}
             </h2>
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-[13.5px]">
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Display name</dt>
-                <dd className="font-semibold text-[#19191c]">{ent.name}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Legal name</dt>
-                <dd className="font-semibold text-[#19191c]">{ent.legalName ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Tax code</dt>
-                <dd className="font-mono font-semibold text-[#19191c] text-sm">
-                  {ent.taxCode ?? "—"}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Registration number</dt>
-                <dd className="font-semibold text-[#19191c]">{ent.registrationNumber ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Founded year</dt>
-                <dd className="font-semibold text-[#19191c]">{ent.foundedYear ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Enterprise ID</dt>
-                <dd className="font-mono font-semibold text-[#19191c] text-xs">
-                  {formattedId} <span className="text-[#64646b] font-normal">({ent.id})</span>
-                </dd>
-              </div>
-            </dl>
+            <div className="space-y-0.5">
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.legalName", "Legal name")}
+                value={enterprise.legalName || "—"}
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.taxCode", "Tax code")}
+                value={
+                  <span className="font-mono font-semibold">
+                    {formatTaxCode(enterprise.taxCode)}
+                  </span>
+                }
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.registrationNumber", "Business registration")}
+                value={enterprise.registrationNumber || "—"}
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.industry", "Industry")}
+                value={enterprise.industry || "—"}
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.companyType", "Company type")}
+                value={enterprise.companyType || "—"}
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.companySize", "Company size")}
+                value={enterprise.companySize || "—"}
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.foundedYear", "Founded year")}
+                value={enterprise.foundedYear ? String(enterprise.foundedYear) : "—"}
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.activeJobs", "Active jobs")}
+                value={enterprise.activeJobsCount}
+              />
+              {enterprise.description ? (
+                <DetailRow
+                  layout="grid"
+                  label="Description"
+                  value={
+                    <p className="whitespace-pre-line text-sm text-foreground/90 leading-relaxed">
+                      {enterprise.description}
+                    </p>
+                  }
+                />
+              ) : null}
+            </div>
           </section>
 
-          {/* Contact Card */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-5">
-            <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-              Contact
+          {/* Contact & Location Card */}
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-2xs">
+            <h2 className="text-base font-bold text-foreground mb-4">
+              {t("adminEnterprises.detail.contact", "Contact & Location")}
             </h2>
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-[13.5px]">
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Corporate email</dt>
-                <dd className="font-semibold text-[#19191c] flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-[#64646b]" />
-                  <a href={`mailto:${ent.email}`} className="text-primary hover:underline">
-                    {ent.email}
-                  </a>
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Phone</dt>
-                <dd className="font-semibold text-[#19191c] flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-[#64646b]" />
-                  <span>{ent.phone}</span>
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Website</dt>
-                <dd className="font-semibold text-[#19191c]">
-                  {ent.website ? (
+            <div className="space-y-0.5">
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.website", "Website")}
+                value={
+                  enterprise.website ? (
                     <a
-                      href={ent.website.startsWith("http") ? ent.website : `https://${ent.website}`}
+                      href={enterprise.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary hover:underline inline-flex items-center gap-1"
+                      className="inline-flex items-center gap-1.5 text-primary hover:underline font-medium"
                     >
-                      <Globe className="w-3.5 h-3.5" />
-                      <span>{ent.website.replace(/^https?:\/\//, "")}</span>
-                      <ExternalLink className="w-3 h-3 text-[#64646b]" />
+                      <Globe className="size-3.5" />
+                      <span>{enterprise.website}</span>
+                      <ExternalLink className="size-3" />
                     </a>
                   ) : (
                     "—"
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Social links</dt>
-                <dd className="font-semibold text-xs flex flex-wrap gap-2 text-primary">
-                  {ent.socialLinks?.linkedin && (
-                    <a
-                      href={ent.socialLinks.linkedin}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      LinkedIn
-                    </a>
-                  )}
-                  {ent.socialLinks?.facebook && (
-                    <a
-                      href={ent.socialLinks.facebook}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      Facebook
-                    </a>
-                  )}
-                  {ent.socialLinks?.github && (
-                    <a
-                      href={ent.socialLinks.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      GitHub
-                    </a>
-                  )}
-                  {ent.socialLinks?.twitter && (
-                    <a
-                      href={ent.socialLinks.twitter}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:underline"
-                    >
-                      Twitter
-                    </a>
-                  )}
-                  {!ent.socialLinks || Object.values(ent.socialLinks).every((v) => !v) ? "—" : null}
-                </dd>
-              </div>
-            </dl>
-          </section>
-
-          {/* Business Card */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-5">
-            <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-              Business
-            </h2>
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-[13.5px]">
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Industry</dt>
-                <dd className="font-semibold text-[#19191c]">{ent.industry}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Company size</dt>
-                <dd className="font-semibold text-[#19191c]">{ent.companySize} employees</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Company type</dt>
-                <dd className="font-semibold text-[#19191c]">{ent.companyType ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-[#64646b] font-medium mb-1">Working days</dt>
-                <dd className="font-semibold text-[#19191c]">{ent.workingDays ?? "Mon – Fri"}</dd>
-              </div>
-              {ent.subIndustries && ent.subIndustries.length > 0 && (
-                <div className="sm:col-span-2">
-                  <dt className="text-xs text-[#64646b] font-medium mb-2">Sub-industries</dt>
-                  <dd className="flex flex-wrap gap-1.5">
-                    {ent.subIndustries.map((sub, i) => (
-                      <span
-                        key={i}
-                        className="px-2.5 py-1 rounded-lg bg-[#f1efea] text-[#4a4a50] text-xs font-semibold"
-                      >
-                        {sub}
-                      </span>
-                    ))}
-                  </dd>
-                </div>
-              )}
-            </dl>
-          </section>
-
-          {/* Addresses Card */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-4">
-            <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-              Addresses
-            </h2>
-            {/* Headquarters */}
-            {ent.address && (
-              <div className="flex items-start gap-3 p-3.5 rounded-xl border border-[#efede8] bg-[#fafaf8]">
-                <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <div className="flex flex-col gap-1 text-[13.5px]">
-                  <span className="font-bold text-[#19191c]">Headquarters</span>
-                  <span className="text-[#4a4a50] leading-relaxed">
-                    {ent.address.street}
-                    {ent.address.district ? `, ${ent.address.district}` : ""}
-                    <br />
-                    {ent.address.city}, {ent.address.country}
-                    {ent.address.postal_code ? ` · ${ent.address.postal_code}` : ""}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Branches */}
-            {ent.branches &&
-              ent.branches.map((b, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-start gap-3 p-3.5 rounded-xl border border-[#efede8] bg-[#fafaf8]"
-                >
-                  <MapPin className="w-4 h-4 text-[#64646b] shrink-0 mt-0.5" />
-                  <div className="flex flex-col gap-1 text-[13.5px]">
-                    <span className="font-bold text-[#19191c]">Branch {idx + 1}</span>
-                    <span className="text-[#4a4a50] leading-relaxed">
-                      {b.street}
-                      {b.district ? `, ${b.district}` : ""}
-                      <br />
-                      {b.city}, {b.country}
-                      {b.postal_code ? ` · ${b.postal_code}` : ""}
+                  )
+                }
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.email", "Corporate email")}
+                value={
+                  <div className="inline-flex items-center gap-1.5">
+                    <Mail className="size-3.5 text-muted-foreground" />
+                    <span className="font-mono text-xs">{enterprise.email}</span>
+                  </div>
+                }
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.phone", "Phone")}
+                value={
+                  <div className="inline-flex items-center gap-1.5">
+                    <Phone className="size-3.5 text-muted-foreground" />
+                    <span>{enterprise.phone}</span>
+                  </div>
+                }
+              />
+              <DetailRow
+                layout="grid"
+                label={t("adminEnterprises.detail.address", "Address")}
+                value={
+                  <div className="flex items-start gap-1.5">
+                    <MapPin className="size-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                    <span>
+                      {[
+                        address?.street,
+                        address?.district,
+                        address?.city,
+                        postalCode ? `Postal: ${postalCode}` : null,
+                        address?.country,
+                      ]
+                        .filter(Boolean)
+                        .join(", ") || "—"}
                     </span>
                   </div>
-                </div>
-              ))}
+                }
+              />
+            </div>
           </section>
 
-          {/* Public Profile Card */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-5">
-            <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-              Public profile
+          {/* Tech Stack & Benefits Card */}
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-2xs">
+            <h2 className="text-base font-bold text-foreground mb-4">
+              {t("adminEnterprises.detail.techStack", "Tech Stack & Benefits")}
             </h2>
-
-            {/* Cover Banner */}
-            <div className="relative h-32 rounded-xl overflow-hidden bg-gradient-to-r from-[#19191c] via-[#3a2a24] to-[#f2470c]">
-              {ent.coverUrl && (
-                <img
-                  src={ent.coverUrl}
-                  alt="Cover"
-                  className="w-full h-full object-cover"
-                />
-              )}
-              <div className="absolute left-4 -bottom-4 p-1 rounded-2xl bg-white shadow-md">
-                <EnterpriseAvatar name={ent.name} logoUrl={ent.logoUrl} size="lg" />
-              </div>
-            </div>
-
-            <div className="h-2" />
-
-            {/* Descriptions */}
-            {ent.shortDescription && (
+            <div className="space-y-4">
               <div>
-                <span className="text-xs text-[#64646b] font-medium block mb-1">
-                  Short description
-                </span>
-                <p className="font-medium text-[#19191c] text-sm leading-relaxed">
-                  {ent.shortDescription}
-                </p>
-              </div>
-            )}
-
-            {ent.description && (
-              <div>
-                <span className="text-xs text-[#64646b] font-medium block mb-1">
-                  About the company
-                </span>
-                <p className="text-[#4a4a50] text-sm leading-relaxed whitespace-pre-line">
-                  {ent.description}
-                </p>
-              </div>
-            )}
-
-            {ent.cultureSummary && (
-              <div>
-                <span className="text-xs text-[#64646b] font-medium block mb-1">Culture</span>
-                <p className="text-[#4a4a50] text-sm leading-relaxed">{ent.cultureSummary}</p>
-              </div>
-            )}
-
-            {/* Benefits & Tech Stack */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              {ent.benefits && ent.benefits.length > 0 && (
-                <div>
-                  <span className="text-xs text-[#64646b] font-medium block mb-2">Benefits</span>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                  Tech Stack
+                </h3>
+                {enterprise.techStack && enterprise.techStack.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {ent.benefits.map((b, i) => (
-                      <span
-                        key={i}
-                        className="px-2.5 py-1 rounded-lg bg-[#f1efea] text-[#4a4a50] text-xs font-semibold"
-                      >
-                        {b}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {ent.techStack && ent.techStack.length > 0 && (
-                <div>
-                  <span className="text-xs text-[#64646b] font-medium block mb-2">Tech stack</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {ent.techStack.map((tech, i) => (
-                      <span
-                        key={i}
-                        className="px-2.5 py-1 rounded-lg bg-[#f1efea] text-[#4a4a50] text-xs font-semibold"
+                    {enterprise.techStack.map((tech) => (
+                      <Badge
+                        key={tech}
+                        variant="neutral"
+                        className="bg-secondary text-secondary-foreground text-xs px-2.5 py-1 rounded-md"
                       >
                         {tech}
-                      </span>
+                      </Badge>
                     ))}
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* Media Gallery */}
-            {ent.mediaGallery && ent.mediaGallery.length > 0 && (
-              <div className="pt-2">
-                <span className="text-xs text-[#64646b] font-medium block mb-2">
-                  Media gallery · {ent.mediaGallery.length}
-                </span>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {ent.mediaGallery.map((imgUrl, i) => (
-                    <a
-                      key={i}
-                      href={imgUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block h-24 rounded-xl overflow-hidden border border-[#e6e4df] hover:opacity-90 transition"
-                    >
-                      <img
-                        src={imgUrl}
-                        alt={`Gallery ${i}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </a>
-                  ))}
-                </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {t("adminEnterprises.detail.noTechStack", "No tech stack specified")}
+                  </p>
+                )}
               </div>
-            )}
+
+              <div className="border-t border-border pt-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                  Benefits & Perks
+                </h3>
+                {enterprise.benefits && enterprise.benefits.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {enterprise.benefits.map((benefit) => (
+                      <Badge
+                        key={benefit}
+                        variant="neutral"
+                        className="border border-border text-foreground text-xs px-2.5 py-1 rounded-md"
+                      >
+                        {benefit}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {t("adminEnterprises.detail.noBenefits", "No benefits specified")}
+                  </p>
+                )}
+              </div>
+            </div>
           </section>
         </div>
 
-        {/* Right Sidebar Column */}
-        <div className="flex flex-col gap-6 sticky top-6">
-          {/* Status Card */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-4">
-            <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">Status</h2>
-            <div className="flex items-center gap-2.5">
-              <EnterpriseStatusBadge status={ent.status} />
-              <span className="text-xs text-[#64646b]">
-                Updated {new Date(ent.updatedAt).toLocaleDateString()}
-              </span>
+        {/* Right Column (4 cols): Metadata Rail Card */}
+        <div className="lg:col-span-4 space-y-6">
+          <RailCard title={t("adminEnterprises.detail.metadata", "Profile Metadata")}>
+            <div className="space-y-1">
+              <DetailRow
+                layout="split"
+                label={t("adminEnterprises.table.status", "Status")}
+                value={<EnterpriseStatusBadge status={enterprise.status} />}
+              />
+              <DetailRow
+                layout="split"
+                label={t("adminEnterprises.detail.createdAt", "Created at")}
+                value={formatEnterpriseDateTime(enterprise.createdAt)}
+              />
+              <DetailRow
+                layout="split"
+                label={t("adminEnterprises.detail.createdBy", "Created by")}
+                value={<span className="font-mono text-xs">{enterprise.creatorAccountId || "admin"}</span>}
+              />
+              <DetailRow
+                layout="split"
+                label={t("adminEnterprises.detail.updatedAt", "Last updated")}
+                value={formatEnterpriseDateTime(enterprise.updatedAt)}
+              />
+              {enterprise.statusReason ? (
+                <DetailRow
+                  layout="split"
+                  label="Status reason"
+                  value={<span className="text-xs text-destructive">{enterprise.statusReason}</span>}
+                />
+              ) : null}
             </div>
-
-            {ent.statusReason && (
-              <div className="p-3 rounded-xl bg-[#fafaf8] border border-[#efede8] text-xs text-[#4a4a50] leading-relaxed">
-                <strong>Status Reason:</strong> {ent.statusReason}
-              </div>
-            )}
-
-            <p className="text-xs text-[#64646b] leading-relaxed">
-              Active enterprises are displayed on the public site and can post recruitment jobs.
-              Suspending immediately hides the profile and job postings.
-            </p>
-          </section>
-
-          {/* Company Admin Card */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-4">
-            <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-              Account Owner
-            </h2>
-            <div className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-full bg-[#e4ecfb] text-[#2a55a8] font-bold text-sm flex items-center justify-center">
-                AC
-              </span>
-              <div className="flex flex-col min-w-0">
-                <span className="text-xs text-[#64646b]">Creator Account ID</span>
-                <span className="font-mono text-xs font-semibold text-[#19191c] truncate">
-                  {ent.creatorAccountId}
-                </span>
-              </div>
-            </div>
-          </section>
-
-          {/* Job Postings Summary Card */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-4">
-            <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-              Job postings
-            </h2>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-3 rounded-xl border border-[#e6e4df] bg-[#fafaf8]">
-                <span className="block text-xl font-bold font-['Space_Grotesk'] text-[#19191c]">
-                  {ent.activeJobsCount ?? 0}
-                </span>
-                <span className="text-xs text-[#64646b]">Active</span>
-              </div>
-              <div className="p-3 rounded-xl border border-[#e6e4df] bg-[#fafaf8]">
-                <span className="block text-xl font-bold font-['Space_Grotesk'] text-[#19191c]">
-                  0
-                </span>
-                <span className="text-xs text-[#64646b]">Draft</span>
-              </div>
-              <div className="p-3 rounded-xl border border-[#e6e4df] bg-[#fafaf8]">
-                <span className="block text-xl font-bold font-['Space_Grotesk'] text-[#19191c]">
-                  0
-                </span>
-                <span className="text-xs text-[#64646b]">Closed</span>
-              </div>
-            </div>
-          </section>
-
-          {/* Record Metadata Card */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-3 text-xs">
-            <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c] mb-1">
-              Record
-            </h2>
-            <div className="flex justify-between items-center py-1 border-b border-[#efede8]">
-              <span className="text-[#64646b]">Created date</span>
-              <span className="font-semibold text-[#19191c]">
-                {new Date(ent.createdAt).toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <span className="text-[#64646b]">Last updated</span>
-              <span className="font-semibold text-[#19191c]">
-                {new Date(ent.updatedAt).toLocaleString()}
-              </span>
-            </div>
-          </section>
+          </RailCard>
         </div>
       </div>
 
-      {/* Action Dialogs */}
-      {actionType === "suspend" && (
+      {/* Suspend and Activate Dialogs */}
+      {isSuspendOpen && (
         <SuspendEnterpriseDialog
           isOpen={true}
-          onClose={() => setActionType(null)}
+          enterpriseName={enterprise.name}
+          activeJobsCount={enterprise.activeJobsCount}
+          onClose={() => setIsSuspendOpen(false)}
           onConfirm={handleConfirmSuspend}
-          enterpriseName={ent.name}
-          activeJobsCount={ent.activeJobsCount}
         />
       )}
 
-      {actionType === "activate" && (
+      {isActivateOpen && (
         <ActivateEnterpriseDialog
           isOpen={true}
-          onClose={() => setActionType(null)}
+          enterpriseName={enterprise.name}
+          previousReason={enterprise.statusReason}
+          onClose={() => setIsActivateOpen(false)}
           onConfirm={handleConfirmActivate}
-          enterpriseName={ent.name}
-          previousReason={ent.statusReason}
-        />
-      )}
-
-      {actionType === "delete" && (
-        <DeleteEnterpriseDialog
-          isOpen={true}
-          onClose={() => setActionType(null)}
-          onConfirm={handleConfirmDelete}
-          enterpriseName={ent.name}
         />
       )}
     </div>

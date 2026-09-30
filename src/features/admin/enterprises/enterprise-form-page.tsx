@@ -2,76 +2,34 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import {
   AlertCircle,
-  CheckCircle2,
-  ChevronLeft,
+  ArrowLeft,
   Lock,
   Plus,
-  Trash2,
   X,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type {
   CreateEnterpriseDto,
   UpdateEnterpriseDto,
 } from "@/api/generated/types.gen";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Breadcrumb } from "@/components/common/breadcrumb";
+import { useToast } from "@/components/toast/toast-provider";
 import {
-  EnterpriseStatusBadge,
-  formatEnterpriseId,
-} from "./enterprise-badges";
+  COMPANY_SIZE_OPTIONS,
+  COMPANY_TYPE_OPTIONS,
+  INDUSTRY_OPTIONS,
+  CITY_OPTIONS,
+  COUNTRY_OPTIONS,
+} from "./enterprises.constants";
 import {
   useCreateEnterpriseMutation,
   useEnterpriseDetailQuery,
   useUpdateEnterpriseMutation,
 } from "./enterprises.queries";
-import { useToast } from "@/components/toast/toast-provider";
-
-function useSafeToast() {
-  try {
-    return useToast();
-  } catch {
-    return null;
-  }
-}
-
-const COMPANY_SIZES = [
-  "1-10",
-  "11-50",
-  "51-200",
-  "201-500",
-  "501-1000",
-  "1000+",
-] as const;
-
-const COMPANY_TYPES = [
-  "Product",
-  "Outsourcing",
-  "IT Service",
-  "Consulting",
-  "Agency",
-  "Hybrid",
-  "Other",
-] as const;
-
-const POPULAR_INDUSTRIES = [
-  "Information Technology",
-  "Fintech",
-  "Cloud & DevOps",
-  "Data & AI",
-  "Software",
-  "IT Services",
-  "Consulting",
-  "E-Commerce",
-  "Telecommunications",
-];
-
-const POPULAR_CITIES = [
-  "Hanoi",
-  "Ho Chi Minh",
-  "Da Nang",
-  "Can Tho",
-  "Hai Phong",
-];
 
 type TagInputProps = {
   label: string;
@@ -100,49 +58,73 @@ function TagInput({ label, tags, onChange, placeholder = "Type and press Enter" 
     onChange(tags.filter((t) => t !== tagToRemove));
   }
 
+  function addCurrent() {
+    const val = inputValue.trim().replace(/^,+|,+$/g, "");
+    if (val && !tags.includes(val)) {
+      onChange([...tags, val]);
+      setInputValue("");
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-[13.5px] font-semibold text-[#19191c]">{label}</span>
-      <div className="min-h-[46px] p-2 rounded-xl border border-[#dedcd6] bg-white flex flex-wrap items-center gap-1.5 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition">
+      <label className="text-sm font-semibold text-foreground">{label}</label>
+      <div className="flex flex-wrap items-center gap-2 p-2 rounded-xl border border-input bg-card min-h-12 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#f1efea] text-[#4a4a50] text-xs font-semibold"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-secondary text-secondary-foreground border border-border"
           >
             <span>{tag}</span>
             <button
               type="button"
               onClick={() => removeTag(tag)}
-              className="text-[#64646b] hover:text-[#19191c] p-0.5 rounded cursor-pointer"
+              className="text-muted-foreground hover:text-foreground cursor-pointer"
+              aria-label={`Remove ${tag}`}
             >
-              <X className="w-3 h-3" />
+              <X className="size-3" />
             </button>
           </span>
         ))}
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={tags.length === 0 ? placeholder : ""}
-          className="flex-1 min-w-[120px] text-sm text-[#19191c] outline-none bg-transparent placeholder:text-[#64646b] px-1"
-        />
+        <div className="flex items-center gap-1 flex-1 min-w-[140px]">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={tags.length === 0 ? placeholder : "Add another..."}
+            className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none py-1 px-1"
+          />
+          {inputValue.trim() && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={addCurrent}
+              className="h-7 px-2 text-xs"
+            >
+              <Plus className="size-3 mr-1" />
+              Add
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
 export function EnterpriseFormPage() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const toast = useToast();
   const { enterpriseId } = useParams<{ enterpriseId?: string }>();
   const isEditMode = Boolean(enterpriseId);
-  const navigate = useNavigate();
-  const toast = useSafeToast();
+  const detailQuery = useEnterpriseDetailQuery(isEditMode ? enterpriseId : undefined);
 
-  const detailQuery = useEnterpriseDetailQuery(enterpriseId);
   const createMutation = useCreateEnterpriseMutation();
-  const updateMutation = useUpdateEnterpriseMutation(enterpriseId ?? "");
+  const updateMutation = useUpdateEnterpriseMutation(enterpriseId || "");
 
-  // Form State
+  // Form states - Empty placeholders on Create as requested
   const [name, setName] = useState("");
   const [legalName, setLegalName] = useState("");
   const [taxCode, setTaxCode] = useState("");
@@ -151,34 +133,18 @@ export function EnterpriseFormPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [website, setWebsite] = useState("");
-  const [industry, setIndustry] = useState("Information Technology");
-  const [companyType, setCompanyType] = useState<string>("Product");
-  const [subIndustries, setSubIndustries] = useState<string[]>([]);
-  const [companySize, setCompanySize] = useState<(typeof COMPANY_SIZES)[number]>("51-200");
+  const [industry, setIndustry] = useState("");
+  const [companyType, setCompanyType] = useState("");
+  const [companySize, setCompanySize] = useState("");
   const [street, setStreet] = useState("");
   const [district, setDistrict] = useState("");
-  const [city, setCity] = useState("Hanoi");
-  const [stateProvince, setStateProvince] = useState("");
-  const [country, setCountry] = useState("Vietnam");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [branches, setBranches] = useState<
-    Array<{ street: string; district?: string; city: string; country: string }>
-  >([]);
-
-  // Public Profile State
-  const [logoUrl, setLogoUrl] = useState("");
-  const [coverUrl, setCoverUrl] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [description, setDescription] = useState("");
-  const [cultureSummary, setCultureSummary] = useState("");
-  const [workingDays, setWorkingDays] = useState("Mon – Fri");
   const [benefits, setBenefits] = useState<string[]>([]);
   const [techStack, setTechStack] = useState<string[]>([]);
-  const [linkedin, setLinkedin] = useState("");
-  const [facebook, setFacebook] = useState("");
-  const [github, setGithub] = useState("");
-  const [twitter, setTwitter] = useState("");
-  const [mediaGallery, setMediaGallery] = useState<string[]>([]);
 
   // Confirmation checkbox (Create mode)
   const [confirmedVetting, setConfirmedVetting] = useState(false);
@@ -201,170 +167,99 @@ export function EnterpriseFormPage() {
       setEmail(data.email || "");
       setPhone(data.phone || "");
       setWebsite(data.website || "");
-      setIndustry(data.industry || "Information Technology");
-      setCompanyType(data.companyType || "Product");
-      setSubIndustries(data.subIndustries || []);
-      if (data.companySize && (COMPANY_SIZES as readonly string[]).includes(data.companySize)) {
-        setCompanySize(data.companySize as (typeof COMPANY_SIZES)[number]);
-      }
+      setIndustry(data.industry || "");
+      setCompanyType(data.companyType || "");
+      setCompanySize(data.companySize || "");
       if (data.address) {
         setStreet(data.address.street || "");
         setDistrict(data.address.district || "");
-        setCity(data.address.city || "Hanoi");
-        setStateProvince(data.address.state_province || "");
-        setCountry(data.address.country || "Vietnam");
-        setPostalCode(data.address.postal_code || "");
+        setCity(data.address.city || "");
+        setCountry(data.address.country || "");
+        const addr = data.address as { postal_code?: string; postalCode?: string };
+        setPostalCode(addr.postal_code || addr.postalCode || "");
       }
-      if (data.branches) {
-        setBranches(
-          data.branches.map((b) => ({
-            street: b.street,
-            district: b.district,
-            city: b.city,
-            country: b.country,
-          })),
-        );
-      }
-      setLogoUrl(data.logoUrl || "");
-      setCoverUrl(data.coverUrl || "");
       setShortDescription(data.shortDescription || "");
       setDescription(data.description || "");
-      setCultureSummary(data.cultureSummary || "");
-      setWorkingDays(data.workingDays || "Mon – Fri");
       setBenefits(data.benefits || []);
       setTechStack(data.techStack || []);
-      if (data.socialLinks) {
-        setLinkedin(data.socialLinks.linkedin || "");
-        setFacebook(data.socialLinks.facebook || "");
-        setGithub(data.socialLinks.github || "");
-        setTwitter(data.socialLinks.twitter || "");
-      }
-      if (data.mediaGallery) {
-        setMediaGallery(data.mediaGallery);
-      }
     }
   }, [isEditMode, detailQuery.data]);
 
-  // Validation checks
-  const isNameValid = name.trim().length >= 2;
-  const isTaxCodeValid = /^\d{10,13}$/.test(taxCode.trim());
-  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const isPhoneValid = /^[0-9+() -]{8,20}$/.test(phone.trim());
-  const isStreetValid = street.trim().length >= 1;
-  const isCityValid = city.trim().length >= 1;
-  const isCountryValid = country.trim().length >= 1;
+  // Validation
+  function validateForm(): boolean {
+    const errors: Record<string, string> = {};
 
-  function addBranch() {
-    setBranches([
-      ...branches,
-      { street: "", district: "", city: "Ho Chi Minh", country: "Vietnam" },
-    ]);
-  }
+    if (!name.trim() || name.trim().length < 2) {
+      errors.name = "Company name must be at least 2 characters";
+    }
 
-  function removeBranch(index: number) {
-    setBranches(branches.filter((_, i) => i !== index));
-  }
+    if (!isEditMode) {
+      if (!taxCode.trim() || !/^\d{10,13}$/.test(taxCode.trim())) {
+        errors.taxCode = "Tax code must be 10 to 13 numeric digits";
+      }
+    }
 
-  function updateBranch(
-    index: number,
-    field: "street" | "district" | "city" | "country",
-    val: string,
-  ) {
-    const updated = [...branches];
-    updated[index] = { ...updated[index], [field]: val };
-    setBranches(updated);
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      errors.email = "Valid corporate email is required";
+    }
+
+    if (!phone.trim()) {
+      errors.phone = "Corporate phone is required";
+    }
+
+    if (!street.trim()) {
+      errors.street = "Street address is required";
+    }
+
+    if (!isEditMode && !confirmedVetting) {
+      errors.confirmedVetting = "You must confirm offline legal and tax vetting before creating";
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrorMessage(null);
-    setFieldErrors({});
 
-    const newErrors: Record<string, string> = {};
-    if (!isNameValid) newErrors.name = "Company name must be at least 2 characters";
-    if (!isEditMode && !isTaxCodeValid) newErrors.tax_code = "Tax code must be 10 to 13 numeric digits";
-    if (!isEmailValid) newErrors.email = "Please enter a valid corporate email address";
-    if (!isPhoneValid) newErrors.phone = "Phone number must be 8 to 20 digits";
-    if (!isStreetValid) newErrors.street = "Street address is required";
-    if (!isCityValid) newErrors.city = "City is required";
-    if (!isCountryValid) newErrors.country = "Country is required";
-    if (!isEditMode && !confirmedVetting) {
-      newErrors.vetting = "You must confirm offline legal and tax vetting before creating.";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setFieldErrors(newErrors);
-      const validationSummary = "Please resolve the highlighted validation errors.";
-      setErrorMessage(validationSummary);
-      toast?.showToast({
-        tone: "error",
-        title: "Validation error",
-        message: validationSummary,
-        note: Object.values(newErrors)[0],
-      });
+    if (!validateForm()) {
+      setErrorMessage("Please resolve the highlighted validation errors before proceeding.");
       return;
     }
 
     setIsSubmitting(true);
-
     try {
-      const social_links = {
-        ...(linkedin.trim() ? { linkedin: linkedin.trim() } : {}),
-        ...(facebook.trim() ? { facebook: facebook.trim() } : {}),
-        ...(github.trim() ? { github: github.trim() } : {}),
-        ...(twitter.trim() ? { twitter: twitter.trim() } : {}),
-      };
-
-      const addressPayload = {
-        street: street.trim(),
-        district: district.trim() || undefined,
-        city: city.trim(),
-        state_province: stateProvince.trim() || undefined,
-        country: country.trim(),
-        postal_code: postalCode.trim() || undefined,
-      };
-
-      const validBranches = branches
-        .filter((b) => b.street.trim() && b.city.trim())
-        .map((b) => ({
-          street: b.street.trim(),
-          district: b.district?.trim() || undefined,
-          city: b.city.trim(),
-          country: b.country.trim() || "Vietnam",
-        }));
-
       if (isEditMode) {
         const payload: UpdateEnterpriseDto = {
           name: name.trim(),
           legal_name: legalName.trim() || undefined,
           registration_number: registrationNumber.trim() || undefined,
-          email: email.trim().toLowerCase(),
+          email: email.trim(),
           phone: phone.trim(),
           website: website.trim() || undefined,
-          industry: industry.trim(),
-          company_type: companyType as UpdateEnterpriseDto["company_type"],
-          sub_industries: subIndustries.length > 0 ? subIndustries : undefined,
-          company_size: companySize,
-          founded_year: foundedYear ? Number(foundedYear) : undefined,
-          address: addressPayload,
-          branches: validBranches.length > 0 ? validBranches : undefined,
-          logo_url: logoUrl.trim() || undefined,
-          cover_url: coverUrl.trim() || undefined,
+          industry: industry.trim() || undefined,
+          company_size: (companySize as UpdateEnterpriseDto["company_size"]) || undefined,
+          company_type: (companyType.trim() as UpdateEnterpriseDto["company_type"]) || undefined,
+          founded_year: typeof foundedYear === "number" ? foundedYear : undefined,
+          address: {
+            street: street.trim(),
+            district: district.trim() || undefined,
+            city: city.trim() || "Ho Chi Minh",
+            country: country.trim() || "Vietnam",
+            postal_code: postalCode.trim() || undefined,
+          },
           short_description: shortDescription.trim() || undefined,
           description: description.trim() || undefined,
-          culture_summary: cultureSummary.trim() || undefined,
-          working_days: workingDays.trim() || undefined,
           benefits: benefits.length > 0 ? benefits : undefined,
           tech_stack: techStack.length > 0 ? techStack : undefined,
-          social_links: Object.keys(social_links).length > 0 ? social_links : undefined,
-          media_gallery: mediaGallery.length > 0 ? mediaGallery : undefined,
         };
 
         await updateMutation.mutateAsync(payload);
-        toast?.showToast({
+        toast.showToast({
           tone: "success",
           title: "Profile updated",
-          message: `Enterprise details have been successfully updated.`,
+          message: `${name} details were saved successfully.`,
         });
         navigate(`/admin/enterprises/${enterpriseId}`);
       } else {
@@ -373,77 +268,41 @@ export function EnterpriseFormPage() {
           legal_name: legalName.trim() || undefined,
           tax_code: taxCode.trim(),
           registration_number: registrationNumber.trim() || undefined,
-          email: email.trim().toLowerCase(),
+          email: email.trim(),
           phone: phone.trim(),
           website: website.trim() || undefined,
-          industry: industry.trim(),
-          company_type: companyType as CreateEnterpriseDto["company_type"],
-          sub_industries: subIndustries.length > 0 ? subIndustries : undefined,
-          company_size: companySize,
-          founded_year: foundedYear ? Number(foundedYear) : undefined,
-          address: addressPayload,
-          branches: validBranches.length > 0 ? validBranches : undefined,
-          logo_url: logoUrl.trim() || undefined,
-          cover_url: coverUrl.trim() || undefined,
+          industry: industry.trim() || "Software & IT Services",
+          company_size: (companySize as CreateEnterpriseDto["company_size"]) || "51-200",
+          company_type: (companyType.trim() as CreateEnterpriseDto["company_type"]) || "Product",
+          founded_year: typeof foundedYear === "number" ? foundedYear : undefined,
+          address: {
+            street: street.trim(),
+            district: district.trim() || undefined,
+            city: city.trim() || "Ho Chi Minh",
+            country: country.trim() || "Vietnam",
+            postal_code: postalCode.trim() || undefined,
+          },
           short_description: shortDescription.trim() || undefined,
           description: description.trim() || undefined,
-          culture_summary: cultureSummary.trim() || undefined,
-          working_days: workingDays.trim() || undefined,
           benefits: benefits.length > 0 ? benefits : undefined,
           tech_stack: techStack.length > 0 ? techStack : undefined,
-          social_links: Object.keys(social_links).length > 0 ? social_links : undefined,
-          media_gallery: mediaGallery.length > 0 ? mediaGallery : undefined,
         };
 
-        const res = (await createMutation.mutateAsync(payload)) as { id?: string };
-        toast?.showToast({
+        const created = await createMutation.mutateAsync(payload);
+        toast.showToast({
           tone: "success",
           title: "Enterprise created",
-          message: `Enterprise profile "${name.trim()}" created successfully.`,
+          message: `${name} was successfully registered.`,
         });
-        if (res?.id) {
-          navigate(`/admin/enterprises/${res.id}`);
-        } else {
-          navigate("/admin/enterprises");
-        }
+        navigate(created?.id ? `/admin/enterprises/${created.id}` : "/admin/enterprises");
       }
     } catch (err: unknown) {
-      const errorObj = err as { status?: number; statusCode?: number; data?: { message?: string }; message?: string };
-      const status = errorObj?.status ?? errorObj?.statusCode;
-      const responseData = errorObj?.data ?? errorObj;
-      const message = responseData?.message || errorObj?.message || "An unexpected error occurred.";
-
-      if (status === 409) {
-        let conflictMsg = message;
-        if (message.toLowerCase().includes("tax") || message.toLowerCase().includes("tax_code")) {
-          conflictMsg = "This tax code already belongs to another registered enterprise.";
-          setFieldErrors({
-            tax_code: conflictMsg,
-          });
-        } else if (message.toLowerCase().includes("email")) {
-          conflictMsg = "This corporate email address is already in use by another enterprise.";
-          setFieldErrors({
-            email: conflictMsg,
-          });
-        } else if (message.toLowerCase().includes("own") || message.toLowerCase().includes("account")) {
-          conflictMsg = "This account already owns an enterprise profile. Limit is 1 enterprise per user.";
-          setErrorMessage(conflictMsg);
-        } else {
-          setErrorMessage(message);
-        }
-        toast?.showToast({
-          tone: "error",
-          title: "Conflict error (409)",
-          message: conflictMsg,
-        });
-      } else {
-        setErrorMessage(message);
-        toast?.showToast({
-          tone: "error",
-          title: "Submission failed",
-          message: message,
-        });
-      }
+      const errObj = err as { data?: { message?: string }; message?: string } | null;
+      setErrorMessage(
+        errObj?.data?.message ||
+          errObj?.message ||
+          (err instanceof Error ? err.message : "Failed to save enterprise profile"),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -451,794 +310,495 @@ export function EnterpriseFormPage() {
 
   if (isEditMode && detailQuery.isLoading) {
     return (
-      <div className="flex flex-col gap-6">
-        <Skeleton className="w-48 h-6 rounded" />
-        <Skeleton className="w-96 h-8 rounded" />
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-          <Skeleton className="h-[600px] rounded-2xl" />
-          <Skeleton className="h-64 rounded-2xl" />
-        </div>
+      <div className="space-y-6 max-w-4xl mx-auto">
+        <Skeleton className="h-6 w-48 rounded" />
+        <Skeleton className="h-10 w-72 rounded" />
+        <Skeleton className="h-64 w-full rounded-2xl" />
+        <Skeleton className="h-64 w-full rounded-2xl" />
       </div>
     );
   }
 
-  const currentEnt = detailQuery.data;
-
   return (
-    <div className="flex flex-col gap-6 pb-16">
+    <div className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-[#64646b]">
-        <Link
-          to="/admin/enterprises"
-          className="hover:text-[#19191c] transition flex items-center gap-1"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-          Enterprise Profiles
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span className="font-mono font-semibold text-[#19191c]">
-          {isEditMode ? `${formatEnterpriseId(enterpriseId)} / Edit` : "New"}
-        </span>
-      </nav>
+      <Breadcrumb
+        ariaLabel={t("adminEnterprises.page.title", "Enterprise Profiles")}
+        items={[
+          { label: t("adminEnterprises.page.title", "Enterprise Profiles"), to: "/admin/enterprises" },
+          {
+            label: isEditMode
+              ? t("adminEnterprises.form.editTitle", "Edit enterprise profile")
+              : t("adminEnterprises.form.createTitle", "Create enterprise profile"),
+          },
+        ]}
+      />
 
-      {/* Page Title */}
-      <div className="flex flex-col gap-1">
-        <h1 className="font-['Space_Grotesk'] text-2xl font-bold tracking-tight text-[#19191c]">
-          {isEditMode ? "Edit enterprise profile" : "Create enterprise profile"}
-        </h1>
-        <p className="text-sm text-[#64646b]">
-          {isEditMode
-            ? "Changes are recorded in the audit history. Fields marked * are required."
-            : "For a company that passed offline legal and tax vetting. Fields marked * are required."}
-        </p>
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
+        <div className="space-y-1">
+          <h1 className="itt-display text-2xl font-bold tracking-tight text-foreground">
+            {isEditMode
+              ? t("adminEnterprises.form.editTitle", "Edit enterprise profile")
+              : t("adminEnterprises.form.createTitle", "Create enterprise profile")}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {isEditMode
+              ? t("adminEnterprises.form.editSubtitle", "Update company profile and recruitment details")
+              : t("adminEnterprises.form.createSubtitle", "Register a new verified enterprise to post tech jobs on ITTalent")}
+          </p>
+        </div>
+
+        <Button asChild variant="outline" size="sm" className="h-9 px-3 gap-1.5 border-border">
+          <Link to="/admin/enterprises">
+            <ArrowLeft className="size-4" />
+            <span>{t("actions.cancel", "Cancel")}</span>
+          </Link>
+        </Button>
       </div>
 
-      {/* Conflict / General Error Banner */}
+      {/* Error alert banner */}
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-[#fbe9e7] border border-[#f2c4bc] text-sm text-[#b42318] flex items-center gap-2.5 shadow-2xs">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <span>{errorMessage}</span>
+        <div className="flex items-start gap-3 p-4 rounded-xl border border-(--danger-border) bg-(--danger-bg) text-(--danger-fg) text-sm animate-in fade-in">
+          <AlertCircle className="size-5 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-semibold">
+              Please resolve the highlighted validation errors before proceeding.
+            </p>
+            <p className="text-xs mt-1 text-(--danger-fg)/90">{errorMessage}</p>
+          </div>
         </div>
       )}
 
-      {/* Main Grid: Form (left) & Summary Card (right) */}
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-6 items-start">
-        {/* Form Sections */}
-        <div className="flex flex-col gap-6">
-          {/* Section 1: Legal Identity */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-5">
-            <div>
-              <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-                Legal identity
-              </h2>
-              <span className="text-xs text-[#64646b]">
-                Must match company documentation checked during vetting.
-              </span>
-            </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Section 1: Basic Information */}
+        <section className="rounded-2xl border border-border bg-card p-6 shadow-2xs space-y-4">
+          <h2 className="text-base font-bold text-foreground">
+            {t("adminEnterprises.form.basicInfo", "Basic Information")}
+          </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Display name */}
-              <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">
-                  Display name <span className="text-[#d92d20]">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Nova Fintech, FPT Software"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    if (fieldErrors.name) setFieldErrors({ ...fieldErrors, name: "" });
-                  }}
-                  className={`h-11 px-3.5 rounded-xl border bg-white text-sm outline-none transition focus:ring-2 focus:ring-primary/20 ${
-                    fieldErrors.name ? "border-[#d92d20] focus:border-[#d92d20]" : "border-[#dedcd6] focus:border-primary"
-                  }`}
-                />
-                <span className="text-xs text-[#64646b]">Shown on the public marketplace · 2–150 characters</span>
-                {fieldErrors.name && <span className="text-xs text-[#b42318] font-medium">{fieldErrors.name}</span>}
-              </div>
-
-              {/* Legal name */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Legal name</label>
-                <input
-                  type="text"
-                  placeholder="Công ty Cổ phần ..."
-                  value={legalName}
-                  onChange={(e) => setLegalName(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-                <span className="text-xs text-[#64646b]">Optional · Official legal entity name</span>
-              </div>
-
-              {/* Tax Code */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">
-                  Tax code <span className="text-[#d92d20]">*</span>
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    disabled={isEditMode}
-                    placeholder="10–13 numeric digits"
-                    value={taxCode}
-                    onChange={(e) => {
-                      setTaxCode(e.target.value);
-                      if (fieldErrors.tax_code) setFieldErrors({ ...fieldErrors, tax_code: "" });
-                    }}
-                    className={`h-11 px-3.5 w-full rounded-xl border text-sm font-mono outline-none transition ${
-                      isEditMode
-                        ? "bg-[#f6f5f1] text-[#4a4a50] cursor-not-allowed border-[#dedcd6]"
-                        : fieldErrors.tax_code
-                          ? "border-[#d92d20] bg-white focus:ring-2 focus:ring-rose-200"
-                          : "border-[#dedcd6] bg-white focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    }`}
-                  />
-                  {isEditMode && (
-                    <Lock className="w-4 h-4 text-[#64646b] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  )}
-                </div>
-                <span className="text-xs text-[#64646b]">
-                  {isEditMode ? "Locked after creation · 10–13 digits" : "10–13 numeric digits · must be unique"}
-                </span>
-                {fieldErrors.tax_code && (
-                  <span className="text-xs text-[#b42318] font-medium">{fieldErrors.tax_code}</span>
-                )}
-              </div>
-
-              {/* Registration Number */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Registration number</label>
-                <input
-                  type="text"
-                  placeholder="Optional certificate number"
-                  value={registrationNumber}
-                  onChange={(e) => setRegistrationNumber(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-
-              {/* Founded Year */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Founded year</label>
-                <input
-                  type="number"
-                  placeholder="e.g. 2016"
-                  min={1900}
-                  max={new Date().getFullYear()}
-                  value={foundedYear}
-                  onChange={(e) => setFoundedYear(e.target.value === "" ? "" : Number(e.target.value))}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* Section 2: Contact */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-5">
-            <div>
-              <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">Contact</h2>
-              <span className="text-xs text-[#64646b]">
-                The corporate email and tax code must be unique across the platform.
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Email */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">
-                  Corporate email <span className="text-[#d92d20]">*</span>
-                </label>
-                <input
-                  type="email"
-                  placeholder="hr@company.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (fieldErrors.email) setFieldErrors({ ...fieldErrors, email: "" });
-                  }}
-                  className={`h-11 px-3.5 rounded-xl border bg-white text-sm outline-none transition focus:ring-2 focus:ring-primary/20 ${
-                    fieldErrors.email ? "border-[#d92d20] focus:border-[#d92d20]" : "border-[#dedcd6] focus:border-primary"
-                  }`}
-                />
-                <span className="text-xs text-[#64646b]">Must be unique · stored in lowercase</span>
-                {fieldErrors.email && (
-                  <span className="text-xs text-[#b42318] font-medium">{fieldErrors.email}</span>
-                )}
-              </div>
-
-              {/* Phone */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">
-                  Phone <span className="text-[#d92d20]">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="028 3822 1100"
-                  value={phone}
-                  onChange={(e) => {
-                    setPhone(e.target.value);
-                    if (fieldErrors.phone) setFieldErrors({ ...fieldErrors, phone: "" });
-                  }}
-                  className={`h-11 px-3.5 rounded-xl border bg-white text-sm outline-none transition focus:ring-2 focus:ring-primary/20 ${
-                    fieldErrors.phone ? "border-[#d92d20] focus:border-[#d92d20]" : "border-[#dedcd6] focus:border-primary"
-                  }`}
-                />
-                <span className="text-xs text-[#64646b]">8–20 digits</span>
-                {fieldErrors.phone && (
-                  <span className="text-xs text-[#b42318] font-medium">{fieldErrors.phone}</span>
-                )}
-              </div>
-
-              {/* Website */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Website</label>
-                <input
-                  type="url"
-                  placeholder="https://company.com"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* Section 3: Business Details */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-5">
-            <div>
-              <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">Business</h2>
-              <span className="text-xs text-[#64646b]">
-                Used for search and taxonomy filters in the directory.
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Industry */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">
-                  Industry <span className="text-[#d92d20]">*</span>
-                </label>
-                <input
-                  list="industry-list"
-                  type="text"
-                  value={industry}
-                  onChange={(e) => setIndustry(e.target.value)}
-                  placeholder="Select or enter industry"
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-                <datalist id="industry-list">
-                  {POPULAR_INDUSTRIES.map((ind) => (
-                    <option key={ind} value={ind} />
-                  ))}
-                </datalist>
-              </div>
-
-              {/* Company Type */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Company type</label>
-                <select
-                  value={companyType}
-                  onChange={(e) => setCompanyType(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                >
-                  {COMPANY_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Sub-industries tags */}
-            <TagInput
-              label="Sub-industries"
-              tags={subIndustries}
-              onChange={setSubIndustries}
-              placeholder="e.g. Payments, Digital Banking, AI, Big Data (Type & press Enter)"
-            />
-
-            {/* Company Size Pills */}
-            <div className="flex flex-col gap-2">
-              <span className="text-[13.5px] font-semibold text-[#19191c]">
-                Company size <span className="text-[#d92d20]">*</span>
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {COMPANY_SIZES.map((size) => {
-                  const isSelected = companySize === size;
-                  return (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => setCompanySize(size)}
-                      className={`h-10 px-4 rounded-xl text-sm font-semibold border transition cursor-pointer select-none ${
-                        isSelected
-                          ? "bg-[#19191c] text-white border-[#19191c]"
-                          : "bg-white text-[#64646b] border-[#dedcd6] hover:bg-[#fafaf8]"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          {/* Section 4: Headquarters & Branches */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-5">
-            <div>
-              <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-                Headquarters address
-              </h2>
-              <span className="text-xs text-[#64646b]">Street, city and country are mandatory.</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">
-                  Street address <span className="text-[#d92d20]">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Number, street name, ward"
-                  value={street}
-                  onChange={(e) => {
-                    setStreet(e.target.value);
-                    if (fieldErrors.street) setFieldErrors({ ...fieldErrors, street: "" });
-                  }}
-                  className={`h-11 px-3.5 rounded-xl border bg-white text-sm outline-none transition focus:ring-2 focus:ring-primary/20 ${
-                    fieldErrors.street ? "border-[#d92d20] focus:border-[#d92d20]" : "border-[#dedcd6] focus:border-primary"
-                  }`}
-                />
-                {fieldErrors.street && <span className="text-xs text-[#b42318] font-medium">{fieldErrors.street}</span>}
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">District</label>
-                <input
-                  type="text"
-                  placeholder="Optional district"
-                  value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">
-                  City <span className="text-[#d92d20]">*</span>
-                </label>
-                <input
-                  list="city-list"
-                  type="text"
-                  placeholder="Select city"
-                  value={city}
-                  onChange={(e) => {
-                    setCity(e.target.value);
-                    if (fieldErrors.city) setFieldErrors({ ...fieldErrors, city: "" });
-                  }}
-                  className={`h-11 px-3.5 rounded-xl border bg-white text-sm outline-none transition focus:ring-2 focus:ring-primary/20 ${
-                    fieldErrors.city ? "border-[#d92d20] focus:border-[#d92d20]" : "border-[#dedcd6] focus:border-primary"
-                  }`}
-                />
-                <datalist id="city-list">
-                  {POPULAR_CITIES.map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-                {fieldErrors.city && <span className="text-xs text-[#b42318] font-medium">{fieldErrors.city}</span>}
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">State / Province</label>
-                <input
-                  type="text"
-                  placeholder="Optional state"
-                  value={stateProvince}
-                  onChange={(e) => setStateProvince(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">
-                  Country <span className="text-[#d92d20]">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={country}
-                  onChange={(e) => {
-                    setCountry(e.target.value);
-                    if (fieldErrors.country) setFieldErrors({ ...fieldErrors, country: "" });
-                  }}
-                  className={`h-11 px-3.5 rounded-xl border bg-white text-sm outline-none transition focus:ring-2 focus:ring-primary/20 ${
-                    fieldErrors.country ? "border-[#d92d20] focus:border-[#d92d20]" : "border-[#dedcd6] focus:border-primary"
-                  }`}
-                />
-                {fieldErrors.country && <span className="text-xs text-[#b42318] font-medium">{fieldErrors.country}</span>}
-              </div>
-            </div>
-
-            {/* Branches List */}
-            {branches.length > 0 && (
-              <div className="flex flex-col gap-3 pt-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#6f6f76]">
-                  Branches
-                </span>
-                {branches.map((b, idx) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl border border-[#efede8] bg-[#fafaf8] flex flex-col gap-3"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#19191c]">Branch {idx + 1}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeBranch(idx)}
-                        className="text-xs text-[#b42318] hover:underline flex items-center gap-1 cursor-pointer"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" /> Remove
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <input
-                        type="text"
-                        placeholder="Street"
-                        value={b.street}
-                        onChange={(e) => updateBranch(idx, "street", e.target.value)}
-                        className="h-10 px-3 rounded-lg border border-[#dedcd6] bg-white text-sm"
-                      />
-                      <input
-                        type="text"
-                        placeholder="District"
-                        value={b.district || ""}
-                        onChange={(e) => updateBranch(idx, "district", e.target.value)}
-                        className="h-10 px-3 rounded-lg border border-[#dedcd6] bg-white text-sm"
-                      />
-                      <input
-                        type="text"
-                        placeholder="City"
-                        value={b.city}
-                        onChange={(e) => updateBranch(idx, "city", e.target.value)}
-                        className="h-10 px-3 rounded-lg border border-[#dedcd6] bg-white text-sm"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addBranch}
-                className="h-10 px-4 rounded-xl border-[#e6e4df] text-sm font-semibold gap-1.5"
-              >
-                <Plus className="w-4 h-4" /> Add branch
-              </Button>
-            </div>
-          </section>
-
-          {/* Section 5: Public Profile */}
-          <section className="p-6 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-5">
-            <div>
-              <h2 className="font-['Space_Grotesk'] text-base font-bold text-[#19191c]">
-                Public profile
-              </h2>
-              <span className="text-xs text-[#64646b]">
-                Optional information shown on the public company marketplace page.
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Logo URL</label>
-                <input
-                  type="url"
-                  placeholder="https://cdn.example.com/logo.png"
-                  value={logoUrl}
-                  onChange={(e) => setLogoUrl(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Cover image URL</label>
-                <input
-                  type="url"
-                  placeholder="https://cdn.example.com/cover.jpg"
-                  value={coverUrl}
-                  onChange={(e) => setCoverUrl(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[13.5px] font-semibold text-[#19191c]">Short description</label>
-              <input
-                type="text"
-                placeholder="One line summary for company directory cards"
-                maxLength={160}
-                value={shortDescription}
-                onChange={(e) => setShortDescription(e.target.value)}
-                className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-              />
-              <span className="text-xs text-[#64646b]">Up to 160 characters</span>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[13.5px] font-semibold text-[#19191c]">Description</label>
-              <textarea
-                rows={4}
-                placeholder="Detailed information about the enterprise, products, mission and engineering culture..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="p-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition resize-y"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Culture summary</label>
-                <textarea
-                  rows={2}
-                  placeholder="e.g. Small autonomous squads, continuous learning, demos"
-                  value={cultureSummary}
-                  onChange={(e) => setCultureSummary(e.target.value)}
-                  className="p-3 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition resize-y"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Working days & hours</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Monday – Friday (8:30 – 17:30)"
-                  value={workingDays}
-                  onChange={(e) => setWorkingDays(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-            </div>
-
-            {/* Benefits & Tech Stack tags */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <TagInput
-                label="Benefits"
-                tags={benefits}
-                onChange={setBenefits}
-                placeholder="e.g. 13th-month salary, Premium healthcare (Type & Enter)"
-              />
-              <TagInput
-                label="Tech stack"
-                tags={techStack}
-                onChange={setTechStack}
-                placeholder="e.g. React, TypeScript, Node.js, Go, AWS (Type & Enter)"
-              />
-            </div>
-
-            {/* Social Links */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">LinkedIn URL</label>
-                <input
-                  type="url"
-                  placeholder="https://linkedin.com/company/..."
-                  value={linkedin}
-                  onChange={(e) => setLinkedin(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">Facebook URL</label>
-                <input
-                  type="url"
-                  placeholder="https://facebook.com/..."
-                  value={facebook}
-                  onChange={(e) => setFacebook(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">GitHub URL</label>
-                <input
-                  type="url"
-                  placeholder="https://github.com/..."
-                  value={github}
-                  onChange={(e) => setGithub(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13.5px] font-semibold text-[#19191c]">X (Twitter) URL</label>
-                <input
-                  type="url"
-                  placeholder="https://twitter.com/..."
-                  value={twitter}
-                  onChange={(e) => setTwitter(e.target.value)}
-                  className="h-11 px-3.5 rounded-xl border border-[#dedcd6] bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-                />
-              </div>
-            </div>
-
-            {/* Media Gallery Tag / URLs */}
-            <TagInput
-              label="Media gallery URLs"
-              tags={mediaGallery}
-              onChange={setMediaGallery}
-              placeholder="Paste photo URL and press Enter"
-            />
-          </section>
-
-          {/* Offline Vetting Confirmation (Create mode only) */}
-          {!isEditMode && (
-            <div className="flex flex-col gap-1.5">
-              <section
-                onClick={() => {
-                  setConfirmedVetting(!confirmedVetting);
-                  if (fieldErrors.vetting) setFieldErrors({ ...fieldErrors, vetting: "" });
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="company-name" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.nameLabel", "Company Name")} <span className="text-destructive">*</span>
+              </label>
+              <Input
+                id="company-name"
+                placeholder="e.g. Nova Fintech, CloudBridge Solutions"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: "" }));
                 }}
-                className={`p-5 rounded-2xl border flex items-start gap-3.5 cursor-pointer transition select-none ${
-                  fieldErrors.vetting
-                    ? "bg-[#fff5f5] border-[#f2c4bc]"
-                    : confirmedVetting
-                      ? "bg-[#fef3ee] border-[#f0b4a0]"
-                      : "bg-white border-[#dedcd6] hover:bg-[#fafaf8]"
-                }`}
+                className={fieldErrors.name ? "border-destructive focus-visible:ring-destructive/20" : ""}
+              />
+              {fieldErrors.name && (
+                <p className="text-xs text-destructive font-medium">{fieldErrors.name}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="legal-name" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.legalNameLabel", "Legal Entity Name")}
+              </label>
+              <Input
+                id="legal-name"
+                placeholder="e.g. CÔNG TY CỔ PHẦN CÔNG NGHỆ NOVA FINTECH"
+                value={legalName}
+                onChange={(e) => setLegalName(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="industry-select" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.industryLabel", "Industry")}
+              </label>
+              <select
+                id="industry-select"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               >
+                <option value="">{t("adminEnterprises.form.selectIndustry", "Select industry...")}</option>
+                {INDUSTRY_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="company-type-select" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.typeLabel", "Company Type")}
+              </label>
+              <select
+                id="company-type-select"
+                value={companyType}
+                onChange={(e) => setCompanyType(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              >
+                <option value="">{t("adminEnterprises.form.selectType", "Select company type...")}</option>
+                {COMPANY_TYPE_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="company-size-select" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.sizeLabel", "Company Size")}
+              </label>
+              <select
+                id="company-size-select"
+                value={companySize}
+                onChange={(e) => setCompanySize(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              >
+                <option value="">{t("adminEnterprises.form.selectSize", "Select company size...")}</option>
+                {COMPANY_SIZE_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt} employees
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="founded-year" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.foundedYearLabel", "Founded Year")}
+              </label>
+              <Input
+                id="founded-year"
+                type="number"
+                min={1950}
+                max={2030}
+                placeholder="e.g. 2018"
+                value={foundedYear}
+                onChange={(e) => setFoundedYear(e.target.value ? parseInt(e.target.value, 10) : "")}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Section 2: Legal & Tax Identity */}
+        <section className="rounded-2xl border border-border bg-card p-6 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-foreground">
+              {t("adminEnterprises.form.legalTax", "Legal & Tax Identity")}
+            </h2>
+            {isEditMode ? (
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                NOT EDITABLE HERE
+              </span>
+            ) : (
+              <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                REQUIRED TO CREATE
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="tax-code" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.taxCodeLabel", "Tax Code")} {!isEditMode && <span className="text-destructive">*</span>}
+              </label>
+              <div className="relative">
+                <Input
+                  id="tax-code"
+                  placeholder="10–13 numeric digits"
+                  value={taxCode}
+                  disabled={isEditMode}
+                  onChange={(e) => {
+                    setTaxCode(e.target.value);
+                    if (fieldErrors.taxCode) setFieldErrors((prev) => ({ ...prev, taxCode: "" }));
+                  }}
+                  className={`font-mono ${isEditMode ? "bg-muted cursor-not-allowed" : ""} ${
+                    fieldErrors.taxCode ? "border-destructive focus-visible:ring-destructive/20" : ""
+                  }`}
+                />
+                {isEditMode && (
+                  <Lock className="size-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {isEditMode ? "Locked after creation · 10–13 digits" : "10–13 numeric digits (e.g. 0312345678)"}
+              </p>
+              {fieldErrors.taxCode && (
+                <p className="text-xs text-destructive font-medium">{fieldErrors.taxCode}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="reg-number" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.regNumberLabel", "Registration Number")}
+              </label>
+              <Input
+                id="reg-number"
+                placeholder="e.g. 0312345678-001"
+                value={registrationNumber}
+                onChange={(e) => setRegistrationNumber(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {!isEditMode && (
+            <div className="pt-2">
+              <label className="flex items-start gap-3 p-3.5 rounded-xl border border-border bg-muted/40 cursor-pointer hover:bg-muted/60 transition">
                 <input
                   type="checkbox"
                   checked={confirmedVetting}
                   onChange={(e) => {
                     setConfirmedVetting(e.target.checked);
-                    if (fieldErrors.vetting) setFieldErrors({ ...fieldErrors, vetting: "" });
+                    if (fieldErrors.confirmedVetting) setFieldErrors((prev) => ({ ...prev, confirmedVetting: "" }));
                   }}
-                  className="w-5 h-5 rounded-md mt-0.5 accent-[#b33305] cursor-pointer"
+                  className="size-4 mt-0.5 rounded text-primary focus:ring-primary/20 cursor-pointer"
                 />
-                <div className="flex flex-col gap-1 text-[13.5px]">
-                  <span className="font-bold text-[#19191c]">
-                    I confirm the legal and tax vetting was completed offline{" "}
-                    <span className="text-[#d92d20]">*</span>
-                  </span>
-                  <span className="text-xs text-[#4a4a50] leading-relaxed">
-                    The enterprise is created as <strong>Active</strong> and becomes visible in the
-                    directory immediately.
-                  </span>
+                <div className="text-xs space-y-0.5">
+                  <p className="font-semibold text-foreground">
+                    I confirm the legal and tax vetting was completed offline
+                  </p>
+                  <p className="text-muted-foreground">
+                    Admin verifies physical license, tax office standing, and primary representative credentials before creating profile.
+                  </p>
                 </div>
-              </section>
-              {fieldErrors.vetting && (
-                <span className="text-xs text-[#b42318] font-medium px-2">{fieldErrors.vetting}</span>
+              </label>
+              {fieldErrors.confirmedVetting && (
+                <p className="text-xs text-destructive font-medium mt-1.5">{fieldErrors.confirmedVetting}</p>
               )}
             </div>
           )}
+        </section>
 
-          {/* Action Buttons Bar */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#e6e4df]">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate(isEditMode ? `/admin/enterprises/${enterpriseId}` : "/admin/enterprises")}
-              className="h-11 px-6 rounded-xl border-[#e6e4df] text-sm font-semibold"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="h-11 px-7 rounded-xl bg-[#f2470c] hover:bg-[#d93d07] text-white text-sm font-semibold shadow-xs disabled:opacity-50 cursor-pointer"
-            >
-              {isSubmitting
-                ? isEditMode
-                  ? "Saving..."
-                  : "Creating..."
-                : isEditMode
-                  ? "Save changes"
-                  : "Create enterprise"}
-            </Button>
+        {/* Section 3: Contact & Location */}
+        <section className="rounded-2xl border border-border bg-card p-6 shadow-2xs space-y-4">
+          <h2 className="text-base font-bold text-foreground">
+            {t("adminEnterprises.form.contactLocation", "Contact & Location")}
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.emailLabel", "Corporate Email")} <span className="text-destructive">*</span>
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="contact@company.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: "" }));
+                }}
+                className={fieldErrors.email ? "border-destructive focus-visible:ring-destructive/20" : ""}
+              />
+              {fieldErrors.email && (
+                <p className="text-xs text-destructive font-medium">{fieldErrors.email}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="phone" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.phoneLabel", "Phone Number")} <span className="text-destructive">*</span>
+              </label>
+              <Input
+                id="phone"
+                placeholder="e.g. +84 28 3822 1100"
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: "" }));
+                }}
+                className={fieldErrors.phone ? "border-destructive focus-visible:ring-destructive/20" : ""}
+              />
+              {fieldErrors.phone && (
+                <p className="text-xs text-destructive font-medium">{fieldErrors.phone}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="website" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.websiteLabel", "Website URL")}
+              </label>
+              <Input
+                id="website"
+                type="url"
+                placeholder="https://company.com"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+              />
+            </div>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="street" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.streetLabel", "Street Address")} <span className="text-destructive">*</span>
+              </label>
+              <Input
+                id="street"
+                placeholder="e.g. 12 Ton Dan, Ward 13"
+                value={street}
+                onChange={(e) => {
+                  setStreet(e.target.value);
+                  if (fieldErrors.street) setFieldErrors((prev) => ({ ...prev, street: "" }));
+                }}
+                className={fieldErrors.street ? "border-destructive focus-visible:ring-destructive/20" : ""}
+              />
+              {fieldErrors.street && (
+                <p className="text-xs text-destructive font-medium">{fieldErrors.street}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="district" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.districtLabel", "District")}
+              </label>
+              <Input
+                id="district"
+                placeholder="e.g. District 4"
+                value={district}
+                onChange={(e) => setDistrict(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label htmlFor="city-select" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.cityLabel", "City")}
+              </label>
+              <select
+                id="city-select"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              >
+                <option value="">{t("adminEnterprises.form.selectCity", "Select city...")}</option>
+                {CITY_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="postal-code" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.postalCodeLabel", "Postal Code")}
+              </label>
+              <Input
+                id="postal-code"
+                placeholder="e.g. 700000"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="country-select" className="text-sm font-semibold text-foreground">
+                {t("adminEnterprises.form.countryLabel", "Country")}
+              </label>
+              <select
+                id="country-select"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border border-input bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              >
+                <option value="">{t("adminEnterprises.form.selectCountry", "Select country...")}</option>
+                {COUNTRY_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 4: Description & Tagline */}
+        <section className="rounded-2xl border border-border bg-card p-6 shadow-2xs space-y-4">
+          <h2 className="text-base font-bold text-foreground">
+            {t("adminEnterprises.detail.overview", "Company Overview")}
+          </h2>
+
+          <div className="space-y-1.5">
+            <label htmlFor="short-desc" className="text-sm font-semibold text-foreground">
+              {t("adminEnterprises.form.shortDescriptionLabel", "Short Tagline")}
+            </label>
+            <Input
+              id="short-desc"
+              placeholder="e.g. Leading payment gateway and digital banking platform"
+              value={shortDescription}
+              onChange={(e) => setShortDescription(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="full-desc" className="text-sm font-semibold text-foreground">
+              {t("adminEnterprises.form.descriptionLabel", "Company Description")}
+            </label>
+            <Textarea
+              id="full-desc"
+              rows={4}
+              placeholder="Tell candidates about company mission, core products, and vision..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="rounded-xl border-input p-3 text-sm focus-visible:ring-primary/20"
+            />
+          </div>
+        </section>
+
+        {/* Section 5: Tech Stack & Benefits */}
+        <section className="rounded-2xl border border-border bg-card p-6 shadow-2xs space-y-4">
+          <h2 className="text-base font-bold text-foreground">
+            {t("adminEnterprises.form.techBenefits", "Tech Stack & Benefits")}
+          </h2>
+
+          <TagInput
+            label={t("adminEnterprises.form.techStackLabel", "Tech Stack")}
+            placeholder={t("adminEnterprises.form.techStackPlaceholder", "Add a technology (e.g. React, Node.js, Go)...")}
+            tags={techStack}
+            onChange={setTechStack}
+          />
+
+          <TagInput
+            label={t("adminEnterprises.form.benefitsLabel", "Benefits & Perks")}
+            placeholder={t("adminEnterprises.form.benefitsPlaceholder", "Add a perk (e.g. 13th month salary, Remote work)...")}
+            tags={benefits}
+            onChange={setBenefits}
+          />
+        </section>
+
+        {/* Footer Actions */}
+        <div className="flex items-center justify-end gap-3 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate("/admin/enterprises")}
+            disabled={isSubmitting}
+            className="h-10 px-5 rounded-full border-border font-semibold"
+          >
+            {t("adminEnterprises.form.cancel", "Cancel")}
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="h-10 px-6 rounded-full font-semibold shadow-sm"
+          >
+            {isSubmitting
+              ? "Saving..."
+              : isEditMode
+                ? t("adminEnterprises.form.save", "Save changes")
+                : t("adminEnterprises.form.create", "Create enterprise")}
+          </Button>
         </div>
-
-        {/* Right Column: Guidance & System rules */}
-        <aside className="flex flex-col gap-5 sticky top-6">
-          {!isEditMode ? (
-            <>
-              {/* Required checklist */}
-              <section className="p-5 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-3">
-                <span className="text-[11.5px] font-bold uppercase tracking-wider text-[#6f6f76]">
-                  REQUIRED TO CREATE
-                </span>
-                <ul className="flex flex-col gap-2.5 text-[13px] text-[#4a4a50]">
-                  <li className="flex items-center gap-2.5">
-                    {isNameValid ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    ) : (
-                      <span className="w-2 h-2 rounded-full bg-[#d73c03] shrink-0" />
-                    )}
-                    <span>Display name</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    {isTaxCodeValid ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    ) : (
-                      <span className="w-2 h-2 rounded-full bg-[#d73c03] shrink-0" />
-                    )}
-                    <span>Tax code (10–13 digits)</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    {isEmailValid ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    ) : (
-                      <span className="w-2 h-2 rounded-full bg-[#d73c03] shrink-0" />
-                    )}
-                    <span>Corporate email</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    {isPhoneValid ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    ) : (
-                      <span className="w-2 h-2 rounded-full bg-[#d73c03] shrink-0" />
-                    )}
-                    <span>Phone</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    {isStreetValid && isCityValid && isCountryValid ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    ) : (
-                      <span className="w-2 h-2 rounded-full bg-[#d73c03] shrink-0" />
-                    )}
-                    <span>Headquarters address</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    {confirmedVetting ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    ) : (
-                      <span className="w-2 h-2 rounded-full bg-[#d73c03] shrink-0" />
-                    )}
-                    <span>Offline vetting confirmation</span>
-                  </li>
-                </ul>
-              </section>
-
-              {/* Set by system card */}
-              <section className="p-5 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-2.5 text-xs text-[#4a4a50] leading-relaxed">
-                <span className="font-bold uppercase tracking-wider text-[#6f6f76]">
-                  SET BY THE SYSTEM
-                </span>
-                <p>
-                  Status <strong>Active</strong>, creator ID, created time and enterprise ID are
-                  assigned automatically by the platform.
-                </p>
-              </section>
-            </>
-          ) : (
-            <>
-              {/* Not editable here */}
-              <section className="p-5 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex flex-col gap-2.5 text-xs text-[#4a4a50] leading-relaxed">
-                <span className="font-bold uppercase tracking-wider text-[#6f6f76]">
-                  NOT EDITABLE HERE
-                </span>
-                <p>
-                  <strong className="text-[#19191c]">Tax code</strong> is permanently locked after
-                  creation to maintain compliance and invoice integrity.
-                </p>
-                <p>
-                  <strong className="text-[#19191c]">Status</strong> transitions are controlled via
-                  Suspend or Activate actions on the detail page.
-                </p>
-              </section>
-
-              {/* Current status card */}
-              <section className="p-5 rounded-2xl bg-white border border-[#e6e4df] shadow-2xs flex items-center justify-between">
-                <span className="text-xs text-[#64646b] font-medium">Current status</span>
-                <EnterpriseStatusBadge status={currentEnt?.status} />
-              </section>
-            </>
-          )}
-        </aside>
       </form>
     </div>
   );

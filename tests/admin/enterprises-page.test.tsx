@@ -43,6 +43,10 @@ describe("Enterprise Profiles Feature Tests", () => {
             status: "active",
             shortDescription: "Payments and digital banking solutions",
             logoUrl: null,
+            email: "contact@novafintech.vn",
+            phone: "+84 28 3822 1100",
+            createdAt: "2026-09-28T08:55:00.000Z",
+            creatorAccountId: "admin_1",
           },
           {
             id: "67900124c8097df77a6e0011",
@@ -53,6 +57,10 @@ describe("Enterprise Profiles Feature Tests", () => {
             status: "suspended",
             shortDescription: "Cloud migration and DevOps automation",
             logoUrl: null,
+            email: "ops@cloudbridge.io",
+            phone: "+84 236 123 4567",
+            createdAt: "2026-09-20T10:00:00.000Z",
+            creatorAccountId: "recruiter_2",
           },
         ],
         limit: 10,
@@ -72,6 +80,13 @@ describe("Enterprise Profiles Feature Tests", () => {
     expect(screen.getByRole("heading", { name: "Enterprise Profiles" })).toBeInTheDocument();
     expect(screen.getByText("Nova Fintech")).toBeInTheDocument();
     expect(screen.getByText("CloudBridge")).toBeInTheDocument();
+    expect(screen.getByText("Ho Chi Minh, Vietnam")).toBeInTheDocument();
+    expect(screen.getByText("contact@novafintech.vn")).toBeInTheDocument();
+    expect(screen.getByText("+84 28 3822 1100")).toBeInTheDocument();
+    expect(screen.getByText(/28 Sept 2026/)).toBeInTheDocument();
+    expect(screen.getByText(/by admin_1/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Corporate email/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Company/i })).toBeInTheDocument();
     expect(screen.getByText("Create enterprise")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Search by ID, name, or email...")).toBeInTheDocument();
   });
@@ -143,7 +158,7 @@ describe("Enterprise Profiles Feature Tests", () => {
 
     expect(screen.getByRole("heading", { name: "Nova Fintech" })).toBeInTheDocument();
     expect(screen.getByText("Công ty Cổ phần Nova Fintech")).toBeInTheDocument();
-    expect(screen.getByText("0312345678")).toBeInTheDocument();
+    expect(screen.getByText("0312 345 678")).toBeInTheDocument();
     expect(screen.getAllByText("hr@novafintech.vn").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("028 3822 1100")).toBeInTheDocument();
     expect(screen.getByText(/12 Ton Dan/i)).toBeInTheDocument();
