@@ -124,7 +124,7 @@ export function RegisterPage() {
       }
     >
       <div className="flex flex-1 h-full items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-12">
-        <div className="flex w-full max-w-100 flex-col gap-5.5">
+        <div className="flex w-full max-w-[460px] flex-col gap-5.5">
           <div>
             <h1 className="mb-1.5 font-['Space_Grotesk',sans-serif] text-[26px] font-semibold text-foreground">
               Create an account
@@ -140,11 +140,88 @@ export function RegisterPage() {
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <div>
+              <div className="mb-1.5 flex items-baseline justify-between">
+                <label
+                  className="text-[13px] font-semibold text-foreground"
+                  htmlFor="register-full-name"
+                >
+                  Full name <span className="text-primary">*</span>
+                </label>
+                <span className="text-xs text-muted-foreground">2–100 characters</span>
+              </div>
+
+              <Input
+                id="register-full-name"
+                className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
+                placeholder="Nguyen Van A"
+                type="text"
+                {...form.register("fullName")}
+              />
+
+              {form.formState.errors.fullName ? (
+                <p className="mt-1.5 text-sm text-destructive">
+                  {form.formState.errors.fullName.message}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+              <div>
+                <label
+                  className="mb-1.5 block text-[13px] font-semibold text-foreground"
+                  htmlFor="register-username"
+                >
+                  Username <span className="text-primary">*</span>
+                </label>
+
+                <Input
+                  id="register-username"
+                  className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
+                  placeholder="e.g. alex_dev"
+                  type="text"
+                  {...form.register("username")}
+                />
+
+                {form.formState.errors.username ? (
+                  <p className="mt-1.5 text-sm text-destructive">
+                    {form.formState.errors.username.message}
+                  </p>
+                ) : null}
+              </div>
+
+              <div>
+                <div className="mb-1.5 flex items-baseline justify-between">
+                  <label
+                    className="text-[13px] font-semibold text-foreground"
+                    htmlFor="register-mobile"
+                  >
+                    Mobile
+                  </label>
+                  <span className="text-xs text-muted-foreground">Optional</span>
+                </div>
+
+                <Input
+                  id="register-mobile"
+                  className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
+                  placeholder="0901 234 567"
+                  type="tel"
+                  {...form.register("mobile")}
+                />
+
+                {form.formState.errors.mobile ? (
+                  <p className="mt-1.5 text-sm text-destructive">
+                    {form.formState.errors.mobile.message}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+
+            <div>
               <label
                 className="mb-1.5 block text-[13px] font-semibold text-foreground"
                 htmlFor="register-email"
               >
-                Email
+                Email <span className="text-primary">*</span>
               </label>
 
               <Input
@@ -162,61 +239,71 @@ export function RegisterPage() {
               ) : null}
             </div>
 
-            <div>
-              <label
-                className="mb-1.5 block text-[13px] font-semibold text-foreground"
-                htmlFor="register-username"
-              >
-                Username
-              </label>
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+              <div>
+                <PasswordField
+                  id="register-password"
+                  label="Password"
+                  labelExtra={<span className="text-primary">*</span>}
+                  registration={form.register("password")}
+                />
 
-              <Input
-                id="register-username"
-                className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
-                placeholder="e.g. alex_dev"
-                type="text"
-                {...form.register("username")}
-              />
+                {form.formState.errors.password ? (
+                  <p className="mt-1.5 text-sm text-destructive">
+                    {form.formState.errors.password.message}
+                  </p>
+                ) : null}
+              </div>
 
-              {form.formState.errors.username ? (
-                <p className="mt-1.5 text-sm text-destructive">
-                  {form.formState.errors.username.message}
-                </p>
-              ) : null}
+              <div>
+                <PasswordField
+                  id="register-confirm-password"
+                  label="Confirm password"
+                  labelExtra={<span className="text-primary">*</span>}
+                  registration={form.register("confirmPassword")}
+                />
+
+                {form.formState.errors.confirmPassword ? (
+                  <p className="mt-1.5 text-sm text-destructive">
+                    {form.formState.errors.confirmPassword.message}
+                  </p>
+                ) : null}
+              </div>
             </div>
 
-            <div>
-              <PasswordField
-                id="register-password"
-                label="Password"
-                registration={form.register("password")}
-              />
-
-              {form.formState.errors.password ? (
-                <p className="mt-1.5 text-sm text-destructive">
-                  {form.formState.errors.password.message}
-                </p>
-              ) : null}
-            </div>
-
-            <div>
-              <PasswordField
-                id="register-confirm-password"
-                label="Confirm password"
-                registration={form.register("confirmPassword")}
-              />
-
-              {form.formState.errors.confirmPassword ? (
-                <p className="mt-1.5 text-sm text-destructive">
-                  {form.formState.errors.confirmPassword.message}
-                </p>
-              ) : null}
-            </div>
+            <p className="text-xs text-muted-foreground">
+              8–64 characters with upper case, lower case, a number and a special character.
+            </p>
 
             <PasswordRules
               confirmPassword={confirmPassword ?? ""}
               password={password ?? ""}
             />
+
+            <div className="flex items-start gap-2.5 pt-1">
+              <input
+                id="register-terms"
+                type="checkbox"
+                className="mt-0.5 size-4 rounded border-gray-300 accent-primary focus:ring-primary"
+                {...form.register("termsAccepted")}
+              />
+              <label htmlFor="register-terms" className="text-xs leading-relaxed text-muted-foreground">
+                I agree to the{" "}
+                <Link to="/terms" className="font-medium text-primary hover:underline">
+                  Terms of use
+                </Link>{" "}
+                and{" "}
+                <Link to="/privacy" className="font-medium text-primary hover:underline">
+                  Privacy policy
+                </Link>
+                . <span className="text-primary">*</span>
+              </label>
+            </div>
+            {form.formState.errors.termsAccepted ? (
+              <p className="-mt-2 text-sm text-destructive">
+                {form.formState.errors.termsAccepted.message}
+              </p>
+            ) : null}
 
             {submitError ? (
               <p className="text-sm text-destructive">{submitError}</p>
@@ -225,26 +312,23 @@ export function RegisterPage() {
             <Button
               className="h-11.5 w-full text-[14.5px] font-semibold"
               disabled={form.formState.isSubmitting}
+              shape="xl"
               type="submit"
             >
               {form.formState.isSubmitting ? "Creating account..." : "Create account"}
             </Button>
           </form>
 
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-(--border-faint)" />
-            <span className="text-xs text-(--fg-faint)">
-              Already have an account?
-            </span>
-            <div className="h-px flex-1 bg-(--border-faint)" />
-          </div>
-
-          <Link
-            className="flex h-11 items-center justify-center rounded-full border border-(--border-muted) bg-white text-sm font-semibold text-foreground no-underline transition hover:bg-[#f4f3ef]"
-            to="/login"
-          >
-            Sign in instead
-          </Link>
+          <p className="text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link
+              aria-label="Sign in instead"
+              className="font-medium text-primary hover:underline"
+              to="/login"
+            >
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </AuthPageShell>
