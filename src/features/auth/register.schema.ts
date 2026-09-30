@@ -6,9 +6,7 @@ export const registerSchema = z
       .string()
       .trim()
       .min(2, "Full name must be at least 2 characters")
-      .max(100, "Full name cannot exceed 100 characters")
-      .optional()
-      .or(z.literal("")),
+      .max(100, "Full name cannot exceed 100 characters"),
     email: z.string().email("Invalid email address").trim().toLowerCase(),
     username: z
       .string()
@@ -25,7 +23,9 @@ export const registerSchema = z
       .or(z.literal("")),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
-    termsAccepted: z.boolean(),
+    termsAccepted: z
+      .boolean()
+      .refine((val) => val === true, "You must agree to the Terms of use and Privacy policy"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
