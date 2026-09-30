@@ -3,6 +3,8 @@ import { getApiV1UsersById } from "@/api/generated";
 import { client } from "@/api/client";
 import type { UserDto } from "@/api/generated/types.gen";
 
+import type { UserSortField, UserSortOrder } from "./users.constants";
+
 export type UsersListParams = {
   enabled?: boolean;
   limit?: number;
@@ -10,6 +12,9 @@ export type UsersListParams = {
   role?: "user" | "admin";
   search?: string;
   status?: "active" | "inactive" | "suspended";
+  emailVerified?: boolean;
+  sortBy?: UserSortField;
+  sortOrder?: UserSortOrder;
 };
 
 export const usersKeys = {
@@ -38,6 +43,9 @@ export function useUsersListQuery(params: UsersListParams) {
             page: queryParams.page,
             ...(queryParams.search ? { search: queryParams.search } : {}),
             ...(queryParams.role ? { role: queryParams.role } : {}),
+            ...(queryParams.emailVerified !== undefined ? { emailVerified: String(queryParams.emailVerified) } : {}),
+            ...(queryParams.sortBy ? { sortBy: queryParams.sortBy } : {}),
+            ...(queryParams.sortOrder ? { sortOrder: queryParams.sortOrder } : {}),
             ...(queryParams.status ? { status: queryParams.status } : {}),
           },
         });

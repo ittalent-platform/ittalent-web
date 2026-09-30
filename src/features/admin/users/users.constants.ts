@@ -1,8 +1,19 @@
 export const USER_ROLE_FILTERS = ["admin", "user"] as const;
 export const USER_STATUS_FILTERS = ["active", "inactive", "suspended"] as const;
 
+export const USER_EMAIL_FILTERS = ["verified", "unverified"] as const;
+
 export type UserRoleFilter = (typeof USER_ROLE_FILTERS)[number] | "all";
 export type UserStatusFilter = (typeof USER_STATUS_FILTERS)[number] | "all";
+export type UserEmailFilter = (typeof USER_EMAIL_FILTERS)[number] | "all";
+
+/** Columns the users API can sort by, and the table column that drives each one. */
+export const USER_SORT_FIELDS = ["createdAt", "id", "username", "email"] as const;
+export type UserSortField = (typeof USER_SORT_FIELDS)[number];
+export type UserSortOrder = "asc" | "desc";
+export const USER_DEFAULT_SORT: { sortBy: UserSortField; sortOrder: UserSortOrder } = { sortBy: "createdAt", sortOrder: "desc" };
+export const USER_SORT_FIELD_BY_COLUMN: Record<string, UserSortField> = { createdAt: "createdAt", email: "email", id: "id", name: "username" };
+export const USER_SORT_PARAM = { sortBy: "sortBy", sortOrder: "sortOrder" } as const;
 
 export const ALL_FILTER = "all";
 

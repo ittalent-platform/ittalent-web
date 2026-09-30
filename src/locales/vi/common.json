@@ -494,13 +494,18 @@
       "admin": "Quản trị viên",
       "user": "Ứng viên"
     },
+    "emailStatus": {
+      "verified": "Đã xác minh",
+      "unverified": "Chưa xác minh"
+    },
     "status": {
       "active": "Đang hoạt động",
       "inactive": "Không hoạt động",
       "suspended": "Đã tạm khóa"
     },
     "toolbar": {
-      "search": "Tìm theo ID, tên hoặc email…",
+      "email": "Email",
+      "search": "Tìm theo tên hoặc email…",
       "role": "Vai trò",
       "status": "Trạng thái",
       "all": "Tất cả"
@@ -509,6 +514,7 @@
       "id": "ID",
       "name": "Tên",
       "email": "Email",
+      "emailStatus": "Trạng thái email",
       "role": "Vai trò",
       "accountStatus": "Trạng thái tài khoản",
       "created": "Ngày tạo",
@@ -527,6 +533,7 @@
       "account": "Thông tin tài khoản",
       "username": "Tên đăng nhập",
       "email": "Email",
+      "emailStatus": "Trạng thái email",
       "role": "Vai trò",
       "accountStatus": "Trạng thái tài khoản",
       "created": "Ngày tạo",

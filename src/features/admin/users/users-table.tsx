@@ -10,17 +10,26 @@ import { adminUserPath } from "@/config/routes";
 import { userDisplayId } from "@/lib/display-id";
 import { formatDate } from "@/lib/format";
 
-import { RoleBadge, StatusBadge } from "./user-badges";
+import { EmailStatusBadge, RoleBadge, StatusBadge } from "./user-badges";
+import { USER_SORT_FIELD_BY_COLUMN, type UserSortField, type UserSortOrder } from "./users.constants";
 
 type UsersTableProps = {
   isLoading: boolean;
   items: UserDto[];
   onEdit: (user: UserDto) => void;
+  onSort: (field: UserSortField) => void;
   onSuspend: (user: UserDto) => void;
   onView: (user: UserDto) => void;
+  sortBy: UserSortField;
+  sortOrder: UserSortOrder;
 };
 
-export function UsersTable({ isLoading, items, onEdit, onSuspend, onView }: UsersTableProps) {
+/** The table column whose header shows the active sort (the API sorts the Name column by username). */
+function sortColumn(field: UserSortField): string {
+  return Object.entries(USER_SORT_FIELD_BY_COLUMN).find(([, value]) => value === field)?.[0] ?? "createdAt";
+}
+
+export function UsersTable({ isLoading, items, onEdit, onSort, onSuspend, onView, sortBy, sortOrder }: UsersTableProps) {
   const { t } = useTranslation();
   const columns: DataTableColumn<UserDto>[] = [
     {
@@ -28,6 +37,7 @@ export function UsersTable({ isLoading, items, onEdit, onSuspend, onView }: User
       className: "w-[110px]",
       header: t("adminUsers.table.id"),
       key: "id",
+      sortable: true,
     },
     {
       cell: (user) => (
@@ -38,11 +48,13 @@ export function UsersTable({ isLoading, items, onEdit, onSuspend, onView }: User
       ),
       header: t("adminUsers.table.name"),
       key: "name",
+      sortable: true,
     },
-    { cell: (user) => <span className="break-all">{user.email}</span>, header: t("adminUsers.table.email"), key: "email" },
+    { cell: (user) => <span className="break-all">{user.email}</span>, header: t("adminUsers.table.email"), key: "email", sortable: true },
     { cell: (user) => <RoleBadge role={user.role} />, header: t("adminUsers.table.role"), key: "role" },
+    { cell: (user) => <EmailStatusBadge verified={user.emailVerified} />, header: t("adminUsers.table.emailStatus"), key: "emailStatus" },
     { cell: (user) => <StatusBadge status={user.status} />, header: t("adminUsers.table.accountStatus"), key: "status" },
-    { cell: (user) => <span className="text-muted-foreground">{formatDate(user.createdAt)}</span>, header: t("adminUsers.table.created"), key: "createdAt" },
+    { cell: (user) => <span className="text-muted-foreground">{formatDate(user.createdAt)}</span>, header: t("adminUsers.table.created"), key: "createdAt", sortable: true },
     {
       cell: (user) => (
         <div className="flex justify-end">
@@ -84,8 +96,13 @@ export function UsersTable({ isLoading, items, onEdit, onSuspend, onView }: User
       columns={columns}
       emptyState={<p className="py-10 text-center text-[13.5px] text-muted-foreground">{t("adminUsers.table.empty")}</p>}
       isLoading={isLoading}
+      onSort={(key) => {
+        const field = USER_SORT_FIELD_BY_COLUMN[key];
+        if (field) onSort(field);
+      }}
       rowKey={(user) => user.id}
       rows={items}
+      sort={{ direction: sortOrder, key: sortColumn(sortBy) }}
     />
   );
 }

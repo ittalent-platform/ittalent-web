@@ -501,13 +501,18 @@
       "admin": "Admin",
       "user": "Applicant"
     },
+    "emailStatus": {
+      "verified": "Verified",
+      "unverified": "Unverified"
+    },
     "status": {
       "active": "Active",
       "inactive": "Inactive",
       "suspended": "Suspended"
     },
     "toolbar": {
-      "search": "Search by ID, name or email…",
+      "email": "Email",
+      "search": "Search by name or email…",
       "role": "Role",
       "status": "Status",
       "all": "All"
@@ -516,6 +521,7 @@
       "id": "ID",
       "name": "Name",
       "email": "Email",
+      "emailStatus": "Email status",
       "role": "Role",
       "accountStatus": "Account status",
       "created": "Created",
@@ -534,6 +540,7 @@
       "account": "Account information",
       "username": "Username",
       "email": "Email",
+      "emailStatus": "Email status",
       "role": "Role",
       "accountStatus": "Account status",
       "created": "Created",

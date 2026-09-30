@@ -13,7 +13,7 @@ import { userDisplayId } from "@/lib/display-id";
 import { formatDate } from "@/lib/format";
 
 import { SuspendUserDialog } from "./suspend-user-dialog";
-import { RoleBadge, StatusBadge } from "./user-badges";
+import { EmailStatusBadge, RoleBadge, StatusBadge } from "./user-badges";
 import { UserFormDialog } from "./user-form-dialog";
 import { useUserDetailQuery } from "./users.queries";
 
@@ -39,6 +39,7 @@ export function AdminUserDetailPage() {
   const fields = [
     { label: t("adminUsers.detail.username"), value: user.username },
     { label: t("adminUsers.detail.email"), value: user.email },
+    { label: t("adminUsers.detail.emailStatus"), value: <EmailStatusBadge verified={user.emailVerified} /> },
     { label: t("adminUsers.detail.role"), value: <RoleBadge role={user.role} /> },
     { label: t("adminUsers.detail.accountStatus"), value: <StatusBadge status={user.status} /> },
     { label: t("adminUsers.detail.created"), value: user.createdAt ? formatDate(user.createdAt) : "—" },

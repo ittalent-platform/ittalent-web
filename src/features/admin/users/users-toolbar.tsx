@@ -3,9 +3,19 @@ import { useTranslation } from "react-i18next";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { FilterSelect } from "@/components/ui/filter-select";
 
-import { ALL_FILTER, type UserRoleFilter, type UserStatusFilter, USER_ROLE_FILTERS, USER_STATUS_FILTERS } from "./users.constants";
+import {
+  ALL_FILTER,
+  type UserEmailFilter,
+  type UserRoleFilter,
+  type UserStatusFilter,
+  USER_EMAIL_FILTERS,
+  USER_ROLE_FILTERS,
+  USER_STATUS_FILTERS,
+} from "./users.constants";
 
 type UsersToolbarProps = {
+  email: UserEmailFilter;
+  onEmailChange: (email: UserEmailFilter) => void;
   onRoleChange: (role: UserRoleFilter) => void;
   onSearchChange: (value: string) => void;
   onStatusChange: (status: UserStatusFilter) => void;
@@ -23,7 +33,7 @@ function prefixedTrigger(prefix: string) {
   );
 }
 
-export function UsersToolbar({ onRoleChange, onSearchChange, onStatusChange, role, search, status }: UsersToolbarProps) {
+export function UsersToolbar({ email, onEmailChange, onRoleChange, onSearchChange, onStatusChange, role, search, status }: UsersToolbarProps) {
   const { t } = useTranslation();
   const all = t("adminUsers.toolbar.all");
   return (
@@ -36,6 +46,15 @@ export function UsersToolbar({ onRoleChange, onSearchChange, onStatusChange, rol
         ]}
         renderTrigger={prefixedTrigger(`${t("adminUsers.toolbar.role")}:`)}
         value={role}
+      />
+      <FilterSelect
+        onChange={onEmailChange}
+        options={[
+          { label: all, value: ALL_FILTER },
+          ...USER_EMAIL_FILTERS.map((value) => ({ label: t(`adminUsers.emailStatus.${value}`), value })),
+        ]}
+        renderTrigger={prefixedTrigger(`${t("adminUsers.toolbar.email")}:`)}
+        value={email}
       />
       <FilterSelect
         onChange={onStatusChange}
