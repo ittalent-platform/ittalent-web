@@ -1,4 +1,5 @@
 import {
+  Building2,
   PanelLeftClose,
   Users,
   X,
@@ -11,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { end: false, icon: Users, label: "Users", to: "/admin/users" },
+  { end: false, icon: Building2, label: "Enterprise Profiles", to: "/admin/enterprises" },
 ] as const;
 
 type SidebarProps = {

@@ -147,6 +147,10 @@ export type EnterpriseListResponse = {
         industry: string | null;
         location: string | null;
         shortDescription: string | null;
+        companySize: string | null;
+        companyType: string | null;
+        techStack?: Array<string>;
+        status: string;
     }>;
     page: number;
     limit: number;
@@ -157,12 +161,54 @@ export type EnterpriseListResponse = {
 export type EnterpriseDetailDto = {
     id: string;
     name: string;
+    legalName: string | null;
+    taxCode: string | null;
+    registrationNumber: string | null;
+    email: string;
+    phone: string;
+    website: string | null;
+    industry: string;
+    subIndustries?: Array<string>;
+    companySize: string;
+    companyType: string | null;
+    foundedYear: number | null;
+    address: {
+        street: string;
+        city: string;
+        district?: string;
+        state_province?: string;
+        country: string;
+        postal_code?: string;
+    };
+    branches?: Array<{
+        street: string;
+        city: string;
+        district?: string;
+        state_province?: string;
+        country: string;
+        postal_code?: string;
+    }>;
     logoUrl: string | null;
-    industry: string | null;
-    location: string | null;
+    coverUrl: string | null;
     shortDescription: string | null;
     description: string | null;
-    website: string | null;
+    cultureSummary: string | null;
+    benefits?: Array<string>;
+    techStack?: Array<string>;
+    socialLinks: {
+        linkedin?: string | '';
+        facebook?: string | '';
+        github?: string | '';
+        twitter?: string | '';
+    } | null;
+    workingDays: string | null;
+    mediaGallery?: Array<string>;
+    status: string;
+    statusReason: string | null;
+    creatorAccountId: string;
+    activeJobsCount?: number;
+    createdAt: string;
+    updatedAt: string;
 };
 
 export type UserListResponse = {
@@ -171,6 +217,107 @@ export type UserListResponse = {
     page: number;
     limit: number;
     totalPages: number;
+};
+
+export type CreateEnterpriseDto = {
+    name: string;
+    legal_name?: string;
+    tax_code: string;
+    registration_number?: string;
+    email: string;
+    phone: string;
+    website?: string | '';
+    industry: string;
+    sub_industries?: Array<string>;
+    company_size: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
+    company_type?: 'Product' | 'Outsourcing' | 'IT Service' | 'Consulting' | 'Agency' | 'Hybrid' | 'Other';
+    founded_year?: number;
+    address: {
+        street: string;
+        city: string;
+        district?: string;
+        state_province?: string;
+        country: string;
+        postal_code?: string;
+    };
+    branches?: Array<{
+        street: string;
+        city: string;
+        district?: string;
+        state_province?: string;
+        country: string;
+        postal_code?: string;
+    }>;
+    logo_url?: string | '';
+    cover_url?: string | '';
+    short_description?: string;
+    description?: string;
+    culture_summary?: string;
+    benefits?: Array<string>;
+    tech_stack?: Array<string>;
+    social_links?: {
+        linkedin?: string | '';
+        facebook?: string | '';
+        github?: string | '';
+        twitter?: string | '';
+    };
+    working_days?: string;
+    media_gallery?: Array<string>;
+};
+
+export type UpdateEnterpriseDto = {
+    name?: string;
+    legal_name?: string;
+    tax_code?: string;
+    registration_number?: string;
+    email?: string;
+    phone?: string;
+    website?: string | '';
+    industry?: string;
+    sub_industries?: Array<string>;
+    company_size?: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
+    company_type?: 'Product' | 'Outsourcing' | 'IT Service' | 'Consulting' | 'Agency' | 'Hybrid' | 'Other';
+    founded_year?: number;
+    address?: {
+        street: string;
+        city: string;
+        district?: string;
+        state_province?: string;
+        country: string;
+        postal_code?: string;
+    };
+    branches?: Array<{
+        street: string;
+        city: string;
+        district?: string;
+        state_province?: string;
+        country: string;
+        postal_code?: string;
+    }>;
+    logo_url?: string | '';
+    cover_url?: string | '';
+    short_description?: string;
+    description?: string;
+    culture_summary?: string;
+    benefits?: Array<string>;
+    tech_stack?: Array<string>;
+    social_links?: {
+        linkedin?: string | '';
+        facebook?: string | '';
+        github?: string | '';
+        twitter?: string | '';
+    };
+    working_days?: string;
+    media_gallery?: Array<string>;
+};
+
+export type UpdateEnterpriseStatusDto = {
+    status: 'pending' | 'active' | 'suspended' | 'rejected' | 'inactive';
+    reason?: string;
+};
+
+export type EnterpriseMessageResponse = {
+    message: string;
 };
 
 export type GetHealthData = {
@@ -465,6 +612,8 @@ export type GetApiV1EnterprisesData = {
         keyword?: string;
         industry?: string;
         location?: string;
+        company_size?: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
+        status?: 'pending' | 'active' | 'suspended' | 'rejected' | 'inactive' | 'deleted';
     };
     url: '/api/v1/enterprises';
 };
@@ -478,12 +627,84 @@ export type GetApiV1EnterprisesErrors = {
 
 export type GetApiV1EnterprisesResponses = {
     /**
-     * Paginated list of active enterprises (empty items when nothing matches)
+     * Paginated list of enterprise summaries
      */
     200: EnterpriseListResponse;
 };
 
 export type GetApiV1EnterprisesResponse = GetApiV1EnterprisesResponses[keyof GetApiV1EnterprisesResponses];
+
+export type PostApiV1EnterprisesData = {
+    body?: CreateEnterpriseDto;
+    path?: never;
+    query?: never;
+    url: '/api/v1/enterprises';
+};
+
+export type PostApiV1EnterprisesErrors = {
+    /**
+     * Validation failed on input fields
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: insufficient permissions
+     */
+    403: unknown;
+    /**
+     * Conflict: Tax code or email already registered, or account already owns an enterprise
+     */
+    409: unknown;
+};
+
+export type PostApiV1EnterprisesResponses = {
+    /**
+     * Enterprise profile created successfully
+     */
+    201: EnterpriseDetailDto;
+};
+
+export type PostApiV1EnterprisesResponse = PostApiV1EnterprisesResponses[keyof PostApiV1EnterprisesResponses];
+
+export type DeleteApiV1EnterprisesByEnterpriseIdData = {
+    body?: never;
+    path: {
+        enterpriseId: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprises/{enterpriseId}';
+};
+
+export type DeleteApiV1EnterprisesByEnterpriseIdErrors = {
+    /**
+     * Cannot delete enterprise with active job postings
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: System Administrator access required
+     */
+    403: unknown;
+    /**
+     * Enterprise not found
+     */
+    404: unknown;
+};
+
+export type DeleteApiV1EnterprisesByEnterpriseIdResponses = {
+    /**
+     * Enterprise profile deleted successfully
+     */
+    200: EnterpriseMessageResponse;
+};
+
+export type DeleteApiV1EnterprisesByEnterpriseIdResponse = DeleteApiV1EnterprisesByEnterpriseIdResponses[keyof DeleteApiV1EnterprisesByEnterpriseIdResponses];
 
 export type GetApiV1EnterprisesByEnterpriseIdData = {
     body?: never;
@@ -496,23 +717,64 @@ export type GetApiV1EnterprisesByEnterpriseIdData = {
 
 export type GetApiV1EnterprisesByEnterpriseIdErrors = {
     /**
-     * Invalid enterprise ID
+     * Invalid enterprise ID format
      */
     400: unknown;
     /**
-     * Enterprise not found
+     * Enterprise not found or not accessible
      */
     404: unknown;
 };
 
 export type GetApiV1EnterprisesByEnterpriseIdResponses = {
     /**
-     * Public enterprise details
+     * Enterprise detailed profile
      */
     200: EnterpriseDetailDto;
 };
 
 export type GetApiV1EnterprisesByEnterpriseIdResponse = GetApiV1EnterprisesByEnterpriseIdResponses[keyof GetApiV1EnterprisesByEnterpriseIdResponses];
+
+export type PatchApiV1EnterprisesByEnterpriseIdData = {
+    body?: UpdateEnterpriseDto;
+    path: {
+        enterpriseId: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprises/{enterpriseId}';
+};
+
+export type PatchApiV1EnterprisesByEnterpriseIdErrors = {
+    /**
+     * Validation failed on updated fields
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: not authorized to modify this enterprise profile
+     */
+    403: unknown;
+    /**
+     * Enterprise not found
+     */
+    404: unknown;
+    /**
+     * Conflict: Email or tax code already registered by another enterprise
+     */
+    409: unknown;
+};
+
+export type PatchApiV1EnterprisesByEnterpriseIdResponses = {
+    /**
+     * Enterprise profile updated successfully
+     */
+    200: EnterpriseDetailDto;
+};
+
+export type PatchApiV1EnterprisesByEnterpriseIdResponse = PatchApiV1EnterprisesByEnterpriseIdResponses[keyof PatchApiV1EnterprisesByEnterpriseIdResponses];
 
 export type GetApiV1UsersData = {
     body?: never;
@@ -546,3 +808,40 @@ export type GetApiV1UsersResponses = {
 };
 
 export type GetApiV1UsersResponse = GetApiV1UsersResponses[keyof GetApiV1UsersResponses];
+
+export type PatchApiV1EnterprisesByEnterpriseIdStatusData = {
+    body?: UpdateEnterpriseStatusDto;
+    path: {
+        enterpriseId: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprises/{enterpriseId}/status';
+};
+
+export type PatchApiV1EnterprisesByEnterpriseIdStatusErrors = {
+    /**
+     * Invalid status transition or missing mandatory reason
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: System Administrator access required
+     */
+    403: unknown;
+    /**
+     * Enterprise not found
+     */
+    404: unknown;
+};
+
+export type PatchApiV1EnterprisesByEnterpriseIdStatusResponses = {
+    /**
+     * Enterprise status updated successfully
+     */
+    200: EnterpriseDetailDto;
+};
+
+export type PatchApiV1EnterprisesByEnterpriseIdStatusResponse = PatchApiV1EnterprisesByEnterpriseIdStatusResponses[keyof PatchApiV1EnterprisesByEnterpriseIdStatusResponses];

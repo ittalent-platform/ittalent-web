@@ -504,6 +504,24 @@
                 "shortDescription": {
                   "type": "string",
                   "nullable": true
+                },
+                "companySize": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "companyType": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "techStack": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "default": []
+                },
+                "status": {
+                  "type": "string"
                 }
               },
               "required": [
@@ -512,7 +530,10 @@
                 "logoUrl",
                 "industry",
                 "location",
-                "shortDescription"
+                "shortDescription",
+                "companySize",
+                "companyType",
+                "status"
               ]
             }
           },
@@ -546,15 +567,132 @@
           "name": {
             "type": "string"
           },
-          "logoUrl": {
+          "legalName": {
+            "type": "string",
+            "nullable": true
+          },
+          "taxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "website": {
             "type": "string",
             "nullable": true
           },
           "industry": {
+            "type": "string"
+          },
+          "subIndustries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "companySize": {
+            "type": "string"
+          },
+          "companyType": {
             "type": "string",
             "nullable": true
           },
-          "location": {
+          "foundedYear": {
+            "type": "number",
+            "nullable": true
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "city": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "district": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "state_province": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "country": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "postal_code": {
+                "type": "string",
+                "maxLength": 20
+              }
+            },
+            "required": [
+              "street",
+              "city",
+              "country"
+            ]
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "city": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "district": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "state_province": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "postal_code": {
+                  "type": "string",
+                  "maxLength": 20
+                }
+              },
+              "required": [
+                "street",
+                "city",
+                "country"
+              ]
+            },
+            "default": []
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverUrl": {
             "type": "string",
             "nullable": true
           },
@@ -566,20 +704,144 @@
             "type": "string",
             "nullable": true
           },
-          "website": {
+          "cultureSummary": {
             "type": "string",
             "nullable": true
+          },
+          "benefits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "techStack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "socialLinks": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "linkedin": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "facebook": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "github": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "twitter": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "workingDays": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaGallery": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "status": {
+            "type": "string"
+          },
+          "statusReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "creatorAccountId": {
+            "type": "string"
+          },
+          "activeJobsCount": {
+            "type": "number",
+            "default": 0
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
           }
         },
         "required": [
           "id",
           "name",
-          "logoUrl",
+          "legalName",
+          "taxCode",
+          "registrationNumber",
+          "email",
+          "phone",
+          "website",
           "industry",
-          "location",
+          "companySize",
+          "companyType",
+          "foundedYear",
+          "address",
+          "logoUrl",
+          "coverUrl",
           "shortDescription",
           "description",
-          "website"
+          "cultureSummary",
+          "socialLinks",
+          "workingDays",
+          "status",
+          "statusReason",
+          "creatorAccountId",
+          "createdAt",
+          "updatedAt"
         ]
       },
       "UserListResponse": {
@@ -610,6 +872,620 @@
           "page",
           "limit",
           "totalPages"
+        ]
+      },
+      "CreateEnterpriseDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "legal_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "tax_code": {
+            "type": "string",
+            "pattern": "^[0-9]{10,13}$"
+          },
+          "registration_number": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[+]?[0-9\\s().-]{8,20}$"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  ""
+                ]
+              }
+            ]
+          },
+          "industry": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "sub_industries": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 50
+            }
+          },
+          "company_size": {
+            "type": "string",
+            "enum": [
+              "1-10",
+              "11-50",
+              "51-200",
+              "201-500",
+              "501-1000",
+              "1000+"
+            ]
+          },
+          "company_type": {
+            "type": "string",
+            "enum": [
+              "Product",
+              "Outsourcing",
+              "IT Service",
+              "Consulting",
+              "Agency",
+              "Hybrid",
+              "Other"
+            ]
+          },
+          "founded_year": {
+            "type": "integer",
+            "minimum": 1800,
+            "maximum": 2026
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "city": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "district": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "state_province": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "country": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "postal_code": {
+                "type": "string",
+                "maxLength": 20
+              }
+            },
+            "required": [
+              "street",
+              "city",
+              "country"
+            ]
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "city": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "district": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "state_province": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "postal_code": {
+                  "type": "string",
+                  "maxLength": 20
+                }
+              },
+              "required": [
+                "street",
+                "city",
+                "country"
+              ]
+            }
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  ""
+                ]
+              }
+            ]
+          },
+          "cover_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  ""
+                ]
+              }
+            ]
+          },
+          "short_description": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "description": {
+            "type": "string"
+          },
+          "culture_summary": {
+            "type": "string"
+          },
+          "benefits": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "tech_stack": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "social_links": {
+            "type": "object",
+            "properties": {
+              "linkedin": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "facebook": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "github": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "twitter": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "working_days": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "media_gallery": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "tax_code",
+          "email",
+          "phone",
+          "industry",
+          "company_size",
+          "address"
+        ]
+      },
+      "UpdateEnterpriseDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "legal_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "tax_code": {
+            "type": "string",
+            "pattern": "^[0-9]{10,13}$"
+          },
+          "registration_number": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[+]?[0-9\\s().-]{8,20}$"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  ""
+                ]
+              }
+            ]
+          },
+          "industry": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "sub_industries": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 50
+            }
+          },
+          "company_size": {
+            "type": "string",
+            "enum": [
+              "1-10",
+              "11-50",
+              "51-200",
+              "201-500",
+              "501-1000",
+              "1000+"
+            ]
+          },
+          "company_type": {
+            "type": "string",
+            "enum": [
+              "Product",
+              "Outsourcing",
+              "IT Service",
+              "Consulting",
+              "Agency",
+              "Hybrid",
+              "Other"
+            ]
+          },
+          "founded_year": {
+            "type": "integer",
+            "minimum": 1800,
+            "maximum": 2026
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "city": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "district": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "state_province": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "country": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "postal_code": {
+                "type": "string",
+                "maxLength": 20
+              }
+            },
+            "required": [
+              "street",
+              "city",
+              "country"
+            ]
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "city": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "district": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "state_province": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "postal_code": {
+                  "type": "string",
+                  "maxLength": 20
+                }
+              },
+              "required": [
+                "street",
+                "city",
+                "country"
+              ]
+            }
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  ""
+                ]
+              }
+            ]
+          },
+          "cover_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [
+                  ""
+                ]
+              }
+            ]
+          },
+          "short_description": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "description": {
+            "type": "string"
+          },
+          "culture_summary": {
+            "type": "string"
+          },
+          "benefits": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "tech_stack": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "social_links": {
+            "type": "object",
+            "properties": {
+              "linkedin": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "facebook": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "github": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "twitter": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "working_days": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "media_gallery": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "UpdateEnterpriseStatusDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "active",
+              "suspended",
+              "rejected",
+              "inactive"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "EnterpriseMessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
         ]
       }
     },
@@ -1007,12 +1883,57 @@
       }
     },
     "/api/v1/enterprises": {
+      "post": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "Create an enterprise profile",
+        "description": "Creates a new enterprise profile. Authenticated recruiter or admin required. Default status is pending for recruiters and active for admins.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnterpriseDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Enterprise profile created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed on input fields"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: insufficient permissions"
+          },
+          "409": {
+            "description": "Conflict: Tax code or email already registered, or account already owns an enterprise"
+          }
+        }
+      },
       "get": {
         "tags": [
           "Enterprises"
         ],
         "summary": "View enterprise list / search enterprises",
-        "description": "Public. Returns only Active enterprises. Optional keyword (matches name, industry, location), industry and location narrow the list.",
+        "description": "Public for Active enterprises. Administrators can filter by any status or query all enterprises.",
         "parameters": [
           {
             "schema": {
@@ -1064,11 +1985,43 @@
             "required": false,
             "name": "location",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1-10",
+                "11-50",
+                "51-200",
+                "201-500",
+                "501-1000",
+                "1000+"
+              ]
+            },
+            "required": false,
+            "name": "company_size",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "active",
+                "suspended",
+                "rejected",
+                "inactive",
+                "deleted"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
           }
         ],
         "responses": {
           "200": {
-            "description": "Paginated list of active enterprises (empty items when nothing matches)",
+            "description": "Paginated list of enterprise summaries",
             "content": {
               "application/json": {
                 "schema": {
@@ -1088,8 +2041,8 @@
         "tags": [
           "Enterprises"
         ],
-        "summary": "View enterprise detail",
-        "description": "Public. Returns 404 when the enterprise does not exist or is not Active.",
+        "summary": "View an enterprise profile detail",
+        "description": "Returns complete enterprise information. Non-active enterprises are accessible only to the owner or admins.",
         "parameters": [
           {
             "schema": {
@@ -1103,7 +2056,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Public enterprise details",
+            "description": "Enterprise detailed profile",
             "content": {
               "application/json": {
                 "schema": {
@@ -1113,7 +2066,113 @@
             }
           },
           "400": {
-            "description": "Invalid enterprise ID"
+            "description": "Invalid enterprise ID format"
+          },
+          "404": {
+            "description": "Enterprise not found or not accessible"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "Update an enterprise profile information",
+        "description": "Updates company details. Accessible only by the enterprise owner (Recruiter) or a System Administrator.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "enterpriseId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEnterpriseDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enterprise profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed on updated fields"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: not authorized to modify this enterprise profile"
+          },
+          "404": {
+            "description": "Enterprise not found"
+          },
+          "409": {
+            "description": "Conflict: Email or tax code already registered by another enterprise"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "Delete enterprise profile (Soft delete)",
+        "description": "Soft-deletes an enterprise profile. Exclusive to System Administrator. Fails if the enterprise currently has published active jobs.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "enterpriseId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enterprise profile deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Cannot delete enterprise with active job postings"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: System Administrator access required"
           },
           "404": {
             "description": "Enterprise not found"
@@ -1196,6 +2255,64 @@
           },
           "403": {
             "description": "Forbidden: insufficient permissions"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprises/{enterpriseId}/status": {
+      "patch": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "Update an enterprise's lifecycle status",
+        "description": "Transitions enterprise status (pending, active, suspended, rejected, inactive). Exclusive to System Administrator. Justification reason mandatory for suspended and rejected statuses.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "enterpriseId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEnterpriseStatusDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enterprise status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status transition or missing mandatory reason"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: System Administrator access required"
+          },
+          "404": {
+            "description": "Enterprise not found"
           }
         }
       }

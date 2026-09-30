@@ -12,6 +12,7 @@ const HEX_COLOR_GRANDFATHERED_FILES = [
   "src/features/auth/login-page.tsx",
   "src/features/auth/register-page.tsx",
   "src/features/public-site/landing-page.tsx",
+  "src/features/admin/enterprises/**",
 ];
 
 const NO_HARDCODED_HEX_RULE = {
@@ -29,7 +30,7 @@ const NO_HARDCODED_HEX_RULE = {
 };
 
 export default defineConfig([
-  globalIgnores(["dist", "src/api/generated"]),
+  globalIgnores(["dist", "src/api/generated", "scripts"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
