@@ -22,7 +22,7 @@ import { getPasswordRules } from "./password-rules";
 import { PasswordField } from "./password-field";
 import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
-import { AuthStatusCard } from "./auth-status-card";
+import { AuthCardPage, AuthStatusCard } from "./auth-status-card";
 
 function PasswordRules({ password, confirmPassword }: { password: string; confirmPassword: string }) {
   const { t } = useTranslation();
@@ -124,55 +124,60 @@ export function RegisterPage() {
 
   const errors = form.formState.errors;
 
+  if (submittedEmail) {
+    return (
+      <AuthCardPage>
+        <AuthStatusCard>
+          <StatusPanel
+            actions={
+              <>
+                <Button asChild className="h-11 px-5" shape="xl" variant="outline">
+                  <Link to="/login">{t("auth.register.goToSignIn")}</Link>
+                </Button>
+                <Button
+                  className="h-11 px-5"
+                  disabled={resendStatus === "loading"}
+                  onClick={handleResend}
+                  shape="xl"
+                  type="button"
+                >
+                  {resendStatus === "loading" ? t("auth.register.resendSending") : t("auth.register.resend")}
+                </Button>
+              </>
+            }
+            description={
+              <Trans
+                components={{ strong: <strong className="font-semibold text-foreground" /> }}
+                i18nKey="auth.register.checkEmailBody"
+                values={{ email: submittedEmail }}
+              />
+            }
+            icon={Mail}
+            note={t("auth.register.resendLimit")}
+            title={t("auth.register.checkEmailTitle")}
+            tone="success"
+          >
+            {deliveryFailed ? (
+              <div className="w-full text-left">
+                <InlineBanner tone="warning">{t("auth.register.deliveryFailed")}</InlineBanner>
+              </div>
+            ) : null}
+            {resendMessage ? (
+              <div className="w-full text-left">
+                <InlineBanner tone={resendStatus === "success" ? "success" : "error"}>{resendMessage}</InlineBanner>
+              </div>
+            ) : null}
+          </StatusPanel>
+        </AuthStatusCard>
+      </AuthCardPage>
+    );
+  }
+
   return (
     <AuthPageShell aside={<AuthHeroCopy />}>
       <div className="flex h-full flex-1 items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-10">
-        {submittedEmail ? (
-          <AuthStatusCard>
-            <StatusPanel
-              actions={
-                <>
-                  <Button asChild className="h-11 px-5" shape="xl" variant="outline">
-                    <Link to="/login">{t("auth.register.goToSignIn")}</Link>
-                  </Button>
-                  <Button
-                    className="h-11 px-5"
-                    disabled={resendStatus === "loading"}
-                    onClick={handleResend}
-                    shape="xl"
-                    type="button"
-                  >
-                    {resendStatus === "loading" ? t("auth.register.resendSending") : t("auth.register.resend")}
-                  </Button>
-                </>
-              }
-              description={
-                <Trans
-                  components={{ strong: <strong className="font-semibold text-foreground" /> }}
-                  i18nKey="auth.register.checkEmailBody"
-                  values={{ email: submittedEmail }}
-                />
-              }
-              icon={Mail}
-              note={t("auth.register.resendLimit")}
-              title={t("auth.register.checkEmailTitle")}
-              tone="success"
-            >
-              {deliveryFailed ? (
-                <div className="w-full text-left">
-                  <InlineBanner tone="warning">{t("auth.register.deliveryFailed")}</InlineBanner>
-                </div>
-              ) : null}
-              {resendMessage ? (
-                <div className="w-full text-left">
-                  <InlineBanner tone={resendStatus === "success" ? "success" : "error"}>{resendMessage}</InlineBanner>
-                </div>
-              ) : null}
-            </StatusPanel>
-          </AuthStatusCard>
-        ) : (
           <div className="flex w-full max-w-[440px] flex-col gap-[22px]">
-            <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
               <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[30px] font-semibold tracking-[-0.01em] text-foreground">
                 {t("auth.register.title")}
               </h1>
@@ -316,7 +321,6 @@ export function RegisterPage() {
               </Link>
             </p>
           </div>
-        )}
       </div>
     </AuthPageShell>
   );

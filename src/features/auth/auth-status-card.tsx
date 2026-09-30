@@ -1,13 +1,18 @@
 import type { ReactNode } from "react";
 
+import { BrandLogo } from "@/components/layout/brand-logo";
 import { cn } from "@/lib/utils";
 
-import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
 
-/** A full auth screen for one outcome or form: the same split layout as sign in, content centred on the right. */
+
+/** An auth outcome or form screen: the Ember panel narrows to logo and rings, content sits centred on the canvas. */
 export function AuthCardPage({ children }: { children: ReactNode }) {
-  return <AuthPageShell aside={<AuthHeroCopy />}>{children}</AuthPageShell>;
+  return (
+    <AuthPageShell aside={<BrandLogo tone="inverse" />} compact>
+      {children}
+    </AuthPageShell>
+  );
 }
 
 /** The centred column (440px) that holds a result or a form on an auth screen; no box, the screen is the container. */
