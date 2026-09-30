@@ -703,21 +703,26 @@
   max-width: none;
 }
 
-/* Each ring of the auth hero swells outward in turn, so the pulse travels from the centre to the edge. */
+/* The artwork box keeps the 560 x 520 proportions; ring sizes inside it are cqw. */
+.itt-hero-rings {
+  aspect-ratio: 560 / 520;
+  container-type: inline-size;
+}
+
+/* Each ring of the auth hero swells outward in turn (transform only, so it stays on the compositor). */
 @keyframes itt-ring-pulse {
   0%, 100% {
     transform: scale(1);
-    opacity: 1;
   }
-  40% {
-    transform: scale(1.045);
-    opacity: 0.82;
+  50% {
+    transform: scale(1.03);
   }
 }
 
 .itt-ring {
-  transform-origin: 280px 520px;
-  animation: itt-ring-pulse 6s ease-in-out infinite;
+  animation: itt-ring-pulse 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {

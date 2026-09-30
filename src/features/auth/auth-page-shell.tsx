@@ -2,9 +2,7 @@ import type { ReactNode } from "react";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import {
   AUTH_ASIDE_WIDTH_CLASS,
-  HERO_RING_STROKE_WIDTH,
   HERO_RINGS,
-  HERO_VIEWBOX,
 } from "./auth-hero.constants";
 
 export function AuthPageShell({ aside, children }: { aside: ReactNode; children: ReactNode }) {
@@ -12,24 +10,24 @@ export function AuthPageShell({ aside, children }: { aside: ReactNode; children:
     <div className="flex min-h-screen w-full bg-white">
       <div className={`grid min-h-screen w-full grid-cols-1 ${AUTH_ASIDE_WIDTH_CLASS}`}>
         <aside className="relative hidden flex-col overflow-hidden bg-[var(--hero-candidate-bg)] px-14 py-11 text-white lg:flex">
-          <svg
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 bottom-0 block h-auto max-h-full w-full select-none"
-            fill="none"
-            preserveAspectRatio="xMidYMax slice"
-            viewBox={`0 0 ${HERO_VIEWBOX.width} ${HERO_VIEWBOX.height}`}
-          >
+          <div aria-hidden="true" className="itt-hero-rings pointer-events-none absolute inset-x-0 bottom-0 select-none">
             {HERO_RINGS.map((ring) => (
-              <path
-                className={`itt-ring ${ring.strokeClass}`}
-                d={ring.path}
+              <span
+                className={`itt-ring absolute rounded-full border-solid ${ring.borderClass}`}
                 key={ring.id}
-                strokeLinecap="butt"
-                strokeWidth={HERO_RING_STROKE_WIDTH}
-                style={{ animationDelay: `${ring.pulseDelaySeconds}s` /* dynamic: runtime value */ }}
+                style={
+                  {
+                    animationDelay: `${ring.pulseDelaySeconds}s`,
+                    borderWidth: ring.borderWidth,
+                    bottom: ring.bottom,
+                    height: ring.size,
+                    left: ring.left,
+                    width: ring.size,
+                  } /* dynamic: runtime value */
+                }
               />
             ))}
-          </svg>
+          </div>
 
           <div className="relative z-10 flex flex-col">
             {aside}
