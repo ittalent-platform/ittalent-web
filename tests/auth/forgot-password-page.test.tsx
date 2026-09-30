@@ -29,9 +29,9 @@ describe("ForgotPasswordPage", () => {
     renderPage();
 
     expect(
-      screen.getByRole("heading", { name: /forgot your password\?/i }),
+      screen.getByRole("heading", { name: /reset your password/i }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /send reset instructions/i }),
     ).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe("ForgotPasswordPage", () => {
     expect(await screen.findByText(/email is required/i)).toBeInTheDocument();
     expect(mockedForgotPassword).not.toHaveBeenCalled();
 
-    const input = screen.getByLabelText(/email address/i);
+    const input = screen.getByLabelText(/^email$/i);
     await user.type(input, "not-an-email");
     await user.click(submitButton);
 
@@ -75,7 +75,7 @@ describe("ForgotPasswordPage", () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.type(screen.getByLabelText(/email address/i), "user@example.com");
+    await user.type(screen.getByLabelText(/^email$/i), "user@example.com");
     await user.click(
       screen.getByRole("button", { name: /send reset instructions/i }),
     );
@@ -101,7 +101,7 @@ describe("ForgotPasswordPage", () => {
     renderPage();
 
     await user.type(
-      screen.getByLabelText(/email address/i),
+      screen.getByLabelText(/^email$/i),
       "rate-limited@example.com",
     );
     await user.click(
@@ -126,7 +126,7 @@ describe("ForgotPasswordPage", () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.type(screen.getByLabelText(/email address/i), "fail@example.com");
+    await user.type(screen.getByLabelText(/^email$/i), "fail@example.com");
     await user.click(
       screen.getByRole("button", { name: /send reset instructions/i }),
     );
