@@ -263,7 +263,7 @@ export function ResetPasswordPage() {
   if (missingToken) {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto flex size-11 items-center justify-center rounded-[10px] bg-(--danger-bg) text-(--danger-fg)">
             <span
               className="text-[15px] font-bold leading-none"
@@ -296,7 +296,7 @@ export function ResetPasswordPage() {
               Back to sign in
             </Link>
           </div>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
@@ -304,12 +304,12 @@ export function ResetPasswordPage() {
   if (tokenStatus === "checking") {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto size-10 animate-pulse rounded-full bg-(--status-peach-bg)" />
           <p className="mt-4 text-[14px] font-semibold text-muted-foreground">
             Checking reset link...
           </p>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
@@ -317,7 +317,7 @@ export function ResetPasswordPage() {
   if (tokenStatus === "expired") {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-(--status-warning-bg) text-(--status-warning-fg)">
             <svg
               width="30"
@@ -357,7 +357,7 @@ export function ResetPasswordPage() {
           >
             Request new link
           </Link>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
@@ -365,7 +365,7 @@ export function ResetPasswordPage() {
   if (tokenStatus === "invalid") {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-(--danger-bg) text-(--danger-fg)">
             <span
               className="text-[28px] font-bold leading-none"
@@ -387,7 +387,7 @@ export function ResetPasswordPage() {
           >
             Request new link
           </Link>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
@@ -395,7 +395,7 @@ export function ResetPasswordPage() {
   if (tokenStatus === "error") {
     return (
       <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-        <AuthStatusCard className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
+        <div className="w-full max-w-[420px] rounded-[0.8rem] border border-black/15 bg-(--app-canvas) p-9 text-center shadow-[0_24px_80px_rgba(25,25,28,0.12),0_8px_24px_rgba(25,25,28,0.08)]">
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-(--danger-bg) text-(--danger-fg)">
             <span
               className="text-[28px] font-bold leading-none"
@@ -423,14 +423,14 @@ export function ResetPasswordPage() {
           >
             Retry
           </Button>
-        </AuthStatusCard>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-      <AuthStatusCard className="w-full max-w-[560px] rounded-[1.1rem] border border-black/15 bg-(--app-canvas) p-10 shadow-[0_28px_90px_rgba(25,25,28,0.14),0_10px_28px_rgba(25,25,28,0.08)] sm:p-12">
+      <AuthStatusCard>
         <div className="flex size-[52px] items-center justify-center rounded-[14px] bg-(--status-peach-bg) text-(--status-peach-fg)">
           <svg
             width="22"

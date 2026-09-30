@@ -58,6 +58,9 @@
   --status-error-bg: oklch(0.965 0.025 25);
   --status-error-fg: oklch(0.48 0.18 27);
   --status-error-border: oklch(0.86 0.075 28);
+  --danger-fg: #b42318;
+  --danger-bg: #fbe9e7;
+  --danger-border: #efc3bd;
   --status-info-border: oklch(0.84 0.075 255);
   --status-disabled-fg: oklch(0.72 0.006 286);
   --application-submitted: oklch(0.4 0.01 286);
@@ -260,6 +263,7 @@
   --primary-300: #efa370;
   --ph: rgba(0, 0, 0, 0.055);
   --hero-bg: #19191c;
+  --hero-candidate-bg: #cf3a05;
   --hero-fg: #ffffff;
   --sidebar-surface: #111114;
   --sidebar-fg-muted: rgba(255, 255, 255, 0.6);
@@ -293,6 +297,7 @@
   --primary-300: #eb8342;
   --ph: rgba(255, 255, 255, 0.06);
   --hero-bg: #0e0e10;
+  --hero-candidate-bg: #cf3a05;
   --hero-fg: #ffffff;
   --app-canvas: #19191c;
 }
@@ -563,4 +568,24 @@
 
 .news-markdown-editor .news-body {
   max-width: none;
+}
+
+@keyframes itt-breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+.itt-breathe {
+  transform-origin: 280px 520px;
+  animation: itt-breathe 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itt-breathe {
+    animation: none;
+  }
 }
