@@ -297,7 +297,7 @@ export function ResetPasswordPage() {
           </Button>
         </form>
 
-        <Link className="self-start text-[13.5px] font-semibold text-fg-link no-underline hover:underline" to="/login">
+        <Link className="self-center text-[13.5px] font-semibold text-fg-link no-underline hover:underline" to="/login">
           {t("auth.reset.backToSignInPlain")}
         </Link>
       </AuthStatusCard>

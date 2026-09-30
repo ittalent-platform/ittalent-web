@@ -376,7 +376,7 @@ export function EmailVerificationPage() {
           <Button className={AUTH_FULL_ACTION_CLASS} disabled={resend.loading} shape="xl" type="submit">
             {resend.loading ? t("auth.verify.sending") : t("auth.verify.form.submit")}
           </Button>
-          <p className="text-[13.5px]">
+          <p className="text-center text-[13.5px]">
             <Link className={LINK_CLASS} to="/login">
               {t("auth.verify.backToSignIn")}
             </Link>

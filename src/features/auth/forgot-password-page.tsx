@@ -118,7 +118,7 @@ export function ForgotPasswordPage() {
           </Button>
         </form>
 
-        <Link className="self-start text-[13.5px] font-semibold text-fg-link no-underline hover:underline" to="/login">
+        <Link className="self-center text-[13.5px] font-semibold text-fg-link no-underline hover:underline" to="/login">
           {t("auth.forgot.backToSignInPlain")}
         </Link>
       </AuthStatusCard>

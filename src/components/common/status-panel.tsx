@@ -67,8 +67,8 @@ export function StatusPanel({
       ) : null}
       {children}
       {actions ? <div className="grid auto-cols-fr grid-flow-col gap-3 [&>*]:w-full">{actions}</div> : null}
-      {note ? <p className="text-[12.5px] leading-[1.55] text-muted-foreground">{note}</p> : null}
-      {footer ? <p className="text-[13.5px] text-muted-foreground">{footer}</p> : null}
+      {note ? <p className="text-center text-[12.5px] leading-[1.55] text-muted-foreground">{note}</p> : null}
+      {footer ? <p className="text-center text-[13.5px] text-muted-foreground">{footer}</p> : null}
     </div>
   );
 }
