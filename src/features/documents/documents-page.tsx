@@ -6,6 +6,7 @@ import type { Document } from "@/api/generated/types.gen";
 import { DataTable, TableSurface } from "@/components/common/data-table";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { useToast } from "@/components/toast/toast-provider";
@@ -102,18 +103,19 @@ export function DocumentsPage() {
               PDF, DOC, DOCX · maximum 5 MB
             </p>
           </div>
-          <select
-            aria-label="Document type"
-            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          <Select
             disabled={upload.isPending}
-            onChange={(event) =>
-              setUploadType(event.target.value as DocumentType)
-            }
+            onValueChange={(value) => setUploadType(value as DocumentType)}
             value={uploadType}
           >
-            <option value="cv">CV</option>
-            <option value="cover_letter">Cover letter</option>
-          </select>
+            <SelectTrigger aria-label="Document type" className="h-9 w-auto min-w-36 rounded-xl text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="cv">CV</SelectItem>
+              <SelectItem value="cover_letter">Cover letter</SelectItem>
+            </SelectContent>
+          </Select>
           <Button
             disabled={upload.isPending}
             onClick={() => input.current?.click()}

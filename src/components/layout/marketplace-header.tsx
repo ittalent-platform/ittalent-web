@@ -1,6 +1,7 @@
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
 
 import { useSession } from "@/auth/use-session";
+import { slideKey, useSlidingIndicator } from "@/hooks/use-sliding-indicator";
 import { cn } from "@/lib/utils";
 
 import { MarketplaceLogo } from "./marketplace-logo";
@@ -11,6 +12,9 @@ const navItem =
 
 export function MarketplaceHeader({ dark = false }: { dark?: boolean }) {
   const { data: session } = useSession();
+  const { pathname } = useLocation();
+  const activeKey = pathname.startsWith("/career") ? "jobs" : pathname.startsWith("/enterprises") ? "companies" : null;
+  const { containerRef, indicatorRef } = useSlidingIndicator<HTMLElement>(activeKey);
 
   return (
     <header
@@ -35,40 +39,37 @@ export function MarketplaceHeader({ dark = false }: { dark?: boolean }) {
       <nav
         aria-label="Main"
         className={cn(
-          "flex gap-1 rounded-full p-1",
+          "relative flex gap-1 rounded-full p-1",
           dark ? "bg-white/[0.07]" : "bg-mkt-chip",
         )}
+        ref={containerRef}
       >
-        <NavLink
-          className={({ isActive }) =>
-            cn(
+        <span
+          aria-hidden
+          className="absolute bottom-1 left-0 top-1 rounded-full bg-mkt-accent opacity-0 data-[ready=true]:transition-[transform,width,opacity] data-[ready=true]:duration-300 data-[ready=true]:ease-out motion-reduce:transition-none"
+          ref={indicatorRef}
+        />
+        {[
+          { key: "jobs", label: "Jobs", to: "/career" },
+          { key: "companies", label: "Companies", to: "/enterprises" },
+        ].map((item) => (
+          <NavLink
+            {...slideKey(item.key)}
+            className={cn(
               navItem,
-              isActive
-                ? "bg-mkt-accent text-white"
+              "relative z-10 transition-colors duration-200",
+              activeKey === item.key
+                ? "text-white"
                 : dark
-                  ? "text-mkt-on-dark-nav"
-                  : "text-mkt-ink-2",
-            )
-          }
-          to="/career"
-        >
-          Jobs
-        </NavLink>
-        <NavLink
-          className={({ isActive }) =>
-            cn(
-              navItem,
-              isActive
-                ? "bg-mkt-accent text-white"
-                : dark
-                  ? "text-mkt-on-dark-nav"
-                  : "text-mkt-ink-2",
-            )
-          }
-          to="/enterprises"
-        >
-          Companies
-        </NavLink>
+                  ? "text-mkt-on-dark-nav hover:text-white"
+                  : "text-mkt-ink-2 hover:text-mkt-ink",
+            )}
+            key={item.key}
+            to={item.to}
+          >
+            {item.label}
+          </NavLink>
+        ))}
       </nav>
 
       <div className="flex-1" />

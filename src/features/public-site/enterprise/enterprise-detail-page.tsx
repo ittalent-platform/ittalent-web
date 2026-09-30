@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   Building,
@@ -30,6 +30,7 @@ import {
   type EnterpriseDetailDto,
   type JobPosting,
 } from "@/api/generated";
+import { slideKey, useSlidingIndicator } from "@/hooks/use-sliding-indicator";
 import { EnterpriseLogo } from "./enterprise-logo";
 
 type Enterprise = {
@@ -90,6 +91,8 @@ const toJob = (dto: JobPosting): Job => ({
 });
 
 const JOBS_SHOWN = 6;
+/** How long scrolling does not override a tab the visitor just clicked (covers the smooth scroll). */
+const TAB_SCROLL_LOCK_MS = 900;
 
 function safeUrl(value?: string) {
   if (!value) return undefined;
@@ -149,10 +152,65 @@ function DetailSkeleton() {
   );
 }
 
+/** Section tabs; the underline slides to the active tab. It is its own component so the indicator is measured once the tabs are on screen. */
+function CompanyTabs({
+  jobCount,
+  jobsLoading,
+  onJump,
+  tab,
+}: {
+  jobCount: number;
+  jobsLoading: boolean;
+  onJump: (section: "about" | "open-jobs") => void;
+  tab: "about" | "open-jobs";
+}) {
+  const { containerRef, indicatorRef } = useSlidingIndicator<HTMLElement>(tab);
+  const tabClass = (active: boolean) =>
+    cn(
+      "flex h-12 items-center text-[13.5px] font-semibold transition-colors duration-200",
+      active ? "text-mkt-ink" : "text-mkt-muted hover:text-mkt-ink",
+    );
+  return (
+    <nav
+      aria-label="Company sections"
+      className="relative flex gap-7 border-t border-mkt-line-soft px-4 md:px-12"
+      ref={containerRef}
+    >
+      <span
+        aria-hidden
+        className="absolute bottom-0 left-0 h-0.5 bg-mkt-accent opacity-0 data-[ready=true]:transition-[transform,width,opacity] data-[ready=true]:duration-300 data-[ready=true]:ease-out motion-reduce:transition-none"
+        ref={indicatorRef}
+      />
+      <button
+        {...slideKey("about")}
+        aria-current={tab === "about" ? "true" : undefined}
+        className={tabClass(tab === "about")}
+        onClick={() => onJump("about")}
+        type="button"
+      >
+        About
+      </button>
+      <button
+        {...slideKey("open-jobs")}
+        aria-current={tab === "open-jobs" ? "true" : undefined}
+        className={tabClass(tab === "open-jobs")}
+        onClick={() => onJump("open-jobs")}
+        type="button"
+      >
+        Open jobs
+        <span className="ml-1.5 flex h-5 items-center rounded-full bg-mkt-chip px-[7px] text-[11.5px] text-mkt-ink-2">
+          {jobsLoading ? "—" : jobCount}
+        </span>
+      </button>
+    </nav>
+  );
+}
+
 export function EnterpriseDetailPage() {
   const { id } = useParams();
   const { data: session } = useSession();
   const [tab, setTab] = useState<"about" | "open-jobs">("about");
+  const tabClickLockUntil = useRef(0);
 
   const {
     data: enterprise,
@@ -192,9 +250,10 @@ export function EnterpriseDetailPage() {
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [id]);
 
-  // Underline the section tab that is currently in view.
+  // Underline the section tab that is currently in view, except while a tab click is still scrolling.
   useEffect(() => {
     function onScroll() {
+      if (Date.now() < tabClickLockUntil.current) return;
       const el = document.getElementById("open-jobs");
       if (!el) return;
       setTab(el.getBoundingClientRect().top < 160 ? "open-jobs" : "about");
@@ -205,6 +264,7 @@ export function EnterpriseDetailPage() {
 
   function jumpTo(section: "about" | "open-jobs") {
     setTab(section);
+    tabClickLockUntil.current = Date.now() + TAB_SCROLL_LOCK_MS;
     document
       .getElementById(section)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -314,14 +374,6 @@ export function EnterpriseDetailPage() {
         ],
   );
 
-  const tabClass = (active: boolean) =>
-    cn(
-      "flex h-12 items-center text-[13.5px] font-semibold",
-      active
-        ? "text-mkt-ink shadow-[inset_0_-2px_0_#d73c03]"
-        : "text-mkt-muted hover:text-mkt-ink",
-    );
-
   return (
     <main className="flex flex-col">
       {/* Header block */}
@@ -374,30 +426,12 @@ export function EnterpriseDetailPage() {
           ) : null}
         </div>
 
-        <nav
-          aria-label="Company sections"
-          className="flex gap-7 border-t border-mkt-line-soft px-4 md:px-12"
-        >
-          <button
-            aria-current={tab === "about" ? "true" : undefined}
-            className={tabClass(tab === "about")}
-            onClick={() => jumpTo("about")}
-            type="button"
-          >
-            About
-          </button>
-          <button
-            aria-current={tab === "open-jobs" ? "true" : undefined}
-            className={tabClass(tab === "open-jobs")}
-            onClick={() => jumpTo("open-jobs")}
-            type="button"
-          >
-            Open jobs
-            <span className="ml-1.5 flex h-5 items-center rounded-full bg-mkt-chip px-[7px] text-[11.5px] text-mkt-ink-2">
-              {jobsLoading ? "—" : jobCount}
-            </span>
-          </button>
-        </nav>
+        <CompanyTabs
+          jobCount={jobCount}
+          jobsLoading={jobsLoading}
+          onJump={jumpTo}
+          tab={tab}
+        />
       </section>
 
       {/* Body */}
@@ -436,7 +470,7 @@ export function EnterpriseDetailPage() {
                 </span>
               ) : null}
               <div className="flex-1" />
-              {jobCount > 0 ? (
+              {jobCount > JOBS_SHOWN ? (
                 <Link
                   className="text-[13.5px] font-semibold text-mkt-accent-hover hover:text-mkt-accent-dark"
                   to={`/career?company=${enterprise.id}`}

@@ -11,6 +11,7 @@ import {
   Users,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
+import { MarketSelect } from "@/components/common/market-select";
 import { useQuery } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
@@ -120,8 +121,6 @@ const HERO_TILES = [
   { pos: "left-[336px] top-[100px]", l: "KH", bg: "#e4ecfb", fg: "#2a55a8" },
 ];
 
-const selectClass =
-  "w-full border-0 bg-transparent font-[inherit] text-sm text-mkt-ink outline-none";
 
 /** Company size bands the API accepts, smallest first. */
 const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"] as const;
@@ -492,53 +491,32 @@ export function EnterprisePage() {
             ) : null}
           </div>
 
-          <label className="flex h-12 items-center rounded-xl border border-mkt-line bg-white px-3 md:w-[190px]">
-            <span className="sr-only">Industry</span>
-            <select
-              className={selectClass}
-              onChange={(e) => patch({ industry: e.target.value || undefined })}
-              value={query.industry ?? ""}
-            >
-              <option value="">All industries</option>
-              {industries.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.value}
-                </option>
-              ))}
-            </select>
-          </label>
+          <MarketSelect
+            allLabel="All industries"
+            ariaLabel="Industry"
+            className="md:w-[190px]"
+            onChange={(value) => patch({ industry: value || undefined })}
+            options={industries.map((o) => ({ label: o.value, value: o.value }))}
+            value={query.industry ?? ""}
+          />
 
-          <label className="flex h-12 items-center rounded-xl border border-mkt-line bg-white px-3 md:w-[190px]">
-            <span className="sr-only">City</span>
-            <select
-              className={selectClass}
-              onChange={(e) => patch({ location: e.target.value || undefined })}
-              value={query.location ?? ""}
-            >
-              <option value="">All cities</option>
-              {cities.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.value}
-                </option>
-              ))}
-            </select>
-          </label>
+          <MarketSelect
+            allLabel="All cities"
+            ariaLabel="City"
+            className="md:w-[190px]"
+            onChange={(value) => patch({ location: value || undefined })}
+            options={cities.map((o) => ({ label: o.value, value: o.value }))}
+            value={query.location ?? ""}
+          />
 
-          <label className="flex h-12 items-center rounded-xl border border-mkt-line bg-white px-3 md:w-[160px]">
-            <span className="sr-only">Company size</span>
-            <select
-              className={selectClass}
-              onChange={(e) => patch({ size: e.target.value || undefined })}
-              value={query.size ?? ""}
-            >
-              <option value="">Any size</option>
-              {COMPANY_SIZES.map((size) => (
-                <option key={size} value={size}>
-                  {size} people
-                </option>
-              ))}
-            </select>
-          </label>
+          <MarketSelect
+            allLabel="Any size"
+            ariaLabel="Company size"
+            className="md:w-[160px]"
+            onChange={(value) => patch({ size: value || undefined })}
+            options={COMPANY_SIZES.map((size) => ({ label: `${size} people`, value: size }))}
+            value={query.size ?? ""}
+          />
 
           <button
             className="h-12 rounded-full bg-mkt-accent px-7 text-[14.5px] font-semibold text-white hover:bg-mkt-accent-hover"
@@ -615,20 +593,16 @@ export function EnterprisePage() {
             {!isLoading && total > 0 ? ` · showing ${from}–${to}` : ""}
           </span>
           <div className="flex-1" />
-          <label className="flex items-center gap-2 text-[13px] text-mkt-muted">
+          <div className="flex items-center gap-2 text-[13px] text-mkt-muted">
             Sort by
-            <select
-              className="h-9 rounded-full border border-mkt-line-strong bg-white px-2.5 text-[13px] font-semibold text-mkt-ink outline-none focus:border-mkt-accent"
-              onChange={(e) => patch({ sort: e.target.value as EnterpriseSort })}
+            <MarketSelect
+              ariaLabel="Sort by"
+              onChange={(value) => patch({ sort: value as EnterpriseSort })}
+              options={SORT_OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
               value={query.sort ?? "most_jobs"}
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              variant="pill"
+            />
+          </div>
         </div>
 
         {isLoading ? (
