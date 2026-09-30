@@ -8,7 +8,7 @@ export const E2E_API_URL = `http://localhost:${E2E_BACKEND_PORT}`;
 export const E2E_WEB_URL = `http://localhost:${E2E_WEB_PORT}`;
 export const E2E_MONGODB_URI =
   process.env.E2E_MONGODB_URI ??
-  "mongodb://127.0.0.1:27018/ittalent_myapps_e2e?replicaSet=rs0&directConnection=true";
+  "mongodb://127.0.0.1:27017/ittalent_myapps_e2e?replicaSet=rs0&directConnection=true";
 
 const backendDir = "../ittalent-backend";
 export const backendEnv = {

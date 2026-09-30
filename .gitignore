@@ -26,7 +26,6 @@ dist-ssr
 
 # Agents
 .codex
-AGENTS.md
 GEMINI.md
 CLAUDE.md
 

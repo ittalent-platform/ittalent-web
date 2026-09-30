@@ -68,7 +68,7 @@ cd ../ittalent-web && npm run test:e2e              # boots BE :3101 and web :51
 npm run test:e2e:report                             # open the HTML report
 ```
 
-The suite never touches dev data (`ittalent_myapps_e2e` database, separate ports). Set `E2E_MONGODB_URI` to use another database.
+The suite never touches dev data (`ittalent_myapps_e2e` database, separate ports). Set `E2E_MONGODB_URI` to use another MongoDB (for example a different host port).
 
 ## 📂 Project Structure
 
