@@ -509,7 +509,7 @@ function EnterpriseFormContent({
                     onChange={(e) => setLegalName(e.target.value)}
                     className="h-[46px] rounded-xl border-border"
                   />
-                  <span className="text-[12.5px] text-muted-foreground">Optional · as on the business registration</span>
+                  <span className="text-[12.5px] text-muted-foreground">As on the business registration</span>
                 </div>
 
                 <div className="flex flex-col gap-2 min-w-0">
@@ -553,7 +553,6 @@ function EnterpriseFormContent({
                     onChange={(e) => setRegistrationNumber(e.target.value)}
                     className="h-[46px] rounded-xl border-border font-mono"
                   />
-                  <span className="text-[12.5px] text-muted-foreground">Optional</span>
                 </div>
 
                 <div className="flex flex-col gap-2 min-w-0">
@@ -632,7 +631,6 @@ function EnterpriseFormContent({
                     onChange={(e) => setWebsite(e.target.value)}
                     className="h-[46px] rounded-xl border-border"
                   />
-                  <span className="text-[12.5px] text-muted-foreground">Optional</span>
                 </div>
               </div>
             </section>
@@ -1160,7 +1158,7 @@ function EnterpriseFormContent({
             )}
 
             {/* Footer Actions matching design */}
-            <div className="flex items-center justify-end gap-3 pt-4.5 border-t border-border">
+            <div className="flex items-center justify-end gap-3 pt-4.5">
               <Button
                 type="button"
                 variant="outline"
