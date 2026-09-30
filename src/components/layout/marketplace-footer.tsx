@@ -1,5 +1,8 @@
 import { Link } from "react-router";
 
+import { useSession } from "@/auth/use-session";
+import { APPLICATIONS_PATH } from "@/config/routes";
+
 import { MarketplaceLogo } from "./marketplace-logo";
 
 const colTitle =
@@ -7,6 +10,8 @@ const colTitle =
 const link = "text-white hover:text-mkt-brand transition-colors";
 
 export function MarketplaceFooter() {
+  const { data: session } = useSession();
+  const signedIn = Boolean(session);
   return (
     <footer className="box-border flex flex-col gap-10 bg-mkt-ink px-4 pb-7 pt-14 text-white md:px-12">
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -31,12 +36,27 @@ export function MarketplaceFooter() {
           <Link className={link} to="/enterprises">
             Browse companies
           </Link>
-          <Link className={link} to="/register">
-            Create an account
-          </Link>
-          <Link className={link} to="/login">
-            Sign in
-          </Link>
+          {signedIn ? (
+            session?.user.role === "user" ? (
+              <>
+                <Link className={link} to={APPLICATIONS_PATH}>
+                  My applications
+                </Link>
+                <Link className={link} to="/documents">
+                  My documents
+                </Link>
+              </>
+            ) : null
+          ) : (
+            <>
+              <Link className={link} to="/register">
+                Create an account
+              </Link>
+              <Link className={link} to="/login">
+                Sign in
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="flex flex-col gap-3 text-[13.5px]">
@@ -47,9 +67,11 @@ export function MarketplaceFooter() {
           <Link className={link} to="/#employers">
             How hiring works
           </Link>
-          <Link className={link} to="/login">
-            Employer sign in
-          </Link>
+          {signedIn ? null : (
+            <Link className={link} to="/login">
+              Employer sign in
+            </Link>
+          )}
         </div>
 
         <div className="flex flex-col gap-3 text-[13.5px] text-mkt-on-dark">
