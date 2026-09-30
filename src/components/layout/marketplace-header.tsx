@@ -94,7 +94,7 @@ export function MarketplaceHeader({ dark = false }: { dark?: boolean }) {
 
       {session ? (
         <div className="w-auto shrink-0">
-          <UserMenu />
+          <UserMenu variant="pill" />
         </div>
       ) : (
         <div className="flex items-center gap-2">

@@ -1,10 +1,20 @@
 import { useState } from "react";
-import { CircleCheck, FileText } from "lucide-react";
+import { CircleCheck } from "lucide-react";
 import { Link } from "react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-import { getApiV1Documents, postApiV1MeApplications } from "@/api/generated";
+import { postApiV1MeApplications } from "@/api/generated";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { APPLICATIONS_PATH } from "@/config/routes";
+
+import { ApplyDocumentPicker } from "./apply-document-picker";
 
 type ApplyButtonProps = {
   companyName?: string;
@@ -38,26 +48,17 @@ function errorMessage(status: number | undefined, error: unknown) {
   }
 }
 
-export function ApplyButton({ deadline, jobId, jobTitle }: ApplyButtonProps) {
+const MESSAGE_MAX = 1000;
+
+export function ApplyButton({ companyName, deadline, jobId, jobTitle }: ApplyButtonProps) {
   const [open, setOpen] = useState(false);
   const [cvId, setCvId] = useState("");
+  const [coverLetterId, setCoverLetterId] = useState("");
   const [message, setMessage] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   const [now] = useState(() => Date.now());
-const expired = deadline ? new Date(deadline).getTime() < now : false;
-
-  const cvs = useQuery({
-    queryKey: ["my-documents", "cv"],
-    enabled: open,
-    queryFn: async () => {
-      const result = await getApiV1Documents({
-        query: { type: "cv", limit: 100, page: 1 },
-      });
-      if (result.error || !result.data) throw new Error("load-cvs-failed");
-      return result.data.items;
-    },
-  });
+  const expired = deadline ? new Date(deadline).getTime() < now : false;
 
   const apply = useMutation({
     mutationFn: async () => {
@@ -65,6 +66,7 @@ const expired = deadline ? new Date(deadline).getTime() < now : false;
         body: {
           jobPostingId: jobId,
           cvId,
+          ...(coverLetterId ? { coverLetterId } : {}),
           ...(message.trim() ? { message: message.trim() } : {}),
         },
       });
@@ -76,6 +78,7 @@ const expired = deadline ? new Date(deadline).getTime() < now : false;
       }
       return result.data;
     },
+    onSuccess: () => setOpen(false),
     onError: (err: Error & { status?: number; detail?: unknown }) =>
       setFormError(errorMessage(err.status, err.detail)),
   });
@@ -92,8 +95,8 @@ const expired = deadline ? new Date(deadline).getTime() < now : false;
     );
   }
 
-  if (!open) {
-    return (
+  return (
+    <>
       <button
         className={primaryBtn}
         disabled={expired}
@@ -102,95 +105,82 @@ const expired = deadline ? new Date(deadline).getTime() < now : false;
       >
         {expired ? "Applications closed" : "Apply now"}
       </button>
-    );
-  }
+      <Dialog onOpenChange={(next) => !apply.isPending && setOpen(next)} open={open}>
+        <DialogContent className="max-w-[520px] rounded-2xl border border-mkt-line bg-white p-0 font-['Instrument_Sans',system-ui,sans-serif] text-mkt-ink">
+          <DialogHeader className="flex flex-col gap-1 border-0 p-6 pb-2 pr-14 text-left">
+            <DialogTitle className="font-['Space_Grotesk',sans-serif] text-xl font-semibold">
+              {jobTitle ? `Apply for ${jobTitle}` : "Apply for this job"}
+            </DialogTitle>
+            <DialogDescription className="text-[13.5px] text-mkt-muted">
+              {companyName ? `${companyName} · ` : ""}Choose the documents to send with your application.
+            </DialogDescription>
+          </DialogHeader>
 
-  const cvList = cvs.data ?? [];
+          <div className="flex flex-col gap-5 px-6 py-4">
+            <ApplyDocumentPicker
+              emptyText="You have no CV uploaded yet. Upload one to apply."
+              hint="Required"
+              kind="cv"
+              legend="YOUR CV"
+              onChange={(id) => {
+                setCvId(id);
+                setFormError(null);
+              }}
+              onError={setFormError}
+              uploadLabel="Upload a new CV"
+              value={cvId}
+            />
+            <ApplyDocumentPicker
+              emptyText=""
+              hint="Optional"
+              kind="cover_letter"
+              legend="COVER LETTER"
+              noneLabel="No cover letter"
+              onChange={setCoverLetterId}
+              onError={setFormError}
+              uploadLabel="Upload a cover letter"
+              value={coverLetterId}
+            />
+            <label className="flex flex-col gap-1.5 text-[12.5px] text-mkt-muted">
+              Message (optional)
+              <textarea
+                className="min-h-[88px] resize-y rounded-xl border border-mkt-line p-3 text-[13.5px] text-mkt-ink outline-none focus:border-mkt-accent"
+                maxLength={MESSAGE_MAX}
+                onChange={(e) => setMessage(e.target.value)}
+                value={message}
+              />
+              <span className="self-end">{message.length} / {MESSAGE_MAX}</span>
+            </label>
+            {formError ? (
+              <p className="m-0 text-[13px] text-mkt-danger" role="alert">
+                {formError}
+              </p>
+            ) : null}
+          </div>
 
-  return (
-    <div className="flex flex-col gap-3">
-      <span className="text-[13.5px] font-semibold">
-        {jobTitle ? `Apply for ${jobTitle}` : "Apply for this job"}
-      </span>
-
-      <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-        <legend className="pb-1 text-[11.5px] font-bold tracking-[0.05em] text-mkt-label">
-          CHOOSE YOUR CV
-        </legend>
-        {cvs.isLoading ? (
-          <div className="h-10 animate-pulse rounded-xl bg-mkt-chip" />
-        ) : cvs.isError ? (
-          <p className="m-0 text-[13px] text-mkt-danger">
-            Couldn't load your CVs.{" "}
+          <DialogFooter className="flex-row justify-end gap-2 border-t border-mkt-line p-4 px-6">
             <button
-              className="font-semibold underline"
-              onClick={() => cvs.refetch()}
+              className="h-11 rounded-full px-5 text-[13.5px] font-semibold text-mkt-ink-2 hover:text-mkt-ink"
+              disabled={apply.isPending}
+              onClick={() => setOpen(false)}
               type="button"
             >
-              Retry
+              Cancel
             </button>
-          </p>
-        ) : cvList.length === 0 ? (
-          <p className="m-0 text-[13px] text-mkt-muted">
-            You have no CV uploaded yet. Upload a CV first, then apply.
-          </p>
-        ) : (
-          cvList.map((doc) => (
-            <label
-              className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-mkt-line px-3 py-2.5 text-[13.5px] has-[:checked]:border-mkt-accent"
-              key={doc.id}
+            <button
+              className="h-11 rounded-full bg-mkt-accent px-6 text-[14px] font-semibold text-white hover:bg-mkt-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={!cvId || apply.isPending}
+              onClick={() => {
+                setFormError(null);
+                apply.mutate();
+              }}
+              type="button"
             >
-              <input
-                checked={cvId === doc.id}
-                name="cv"
-                onChange={() => {
-                  setCvId(doc.id);
-                  setFormError(null);
-                }}
-                type="radio"
-              />
-              <FileText aria-hidden="true" className="size-4 shrink-0" />
-              <span className="min-w-0 truncate">{doc.fileName}</span>
-            </label>
-          ))
-        )}
-      </fieldset>
-
-      <label className="flex flex-col gap-1.5 text-[12.5px] text-mkt-muted">
-        Message (optional)
-        <textarea
-          className="min-h-[88px] resize-y rounded-xl border border-mkt-line p-3 text-[13.5px] text-mkt-ink outline-none focus:border-mkt-accent"
-          maxLength={1000}
-          onChange={(e) => setMessage(e.target.value)}
-          value={message}
-        />
-        <span className="self-end">{message.length} / 1000</span>
-      </label>
-
-      {formError ? (
-        <p className="m-0 text-[13px] text-mkt-danger" role="alert">
-          {formError}
-        </p>
-      ) : null}
-
-      <button
-        className={primaryBtn}
-        disabled={!cvId || apply.isPending}
-        onClick={() => {
-          setFormError(null);
-          apply.mutate();
-        }}
-        type="button"
-      >
-        {apply.isPending ? "Submitting…" : "Submit application"}
-      </button>
-      <button
-        className="h-10 text-[13.5px] font-semibold text-mkt-ink-2 hover:text-mkt-ink"
-        onClick={() => setOpen(false)}
-        type="button"
-      >
-        Cancel
-      </button>
-    </div>
+              {apply.isPending ? "Submitting…" : "Submit application"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

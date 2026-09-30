@@ -1,5 +1,6 @@
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HomePage } from "@/features/public-site/home/home-page";
@@ -117,15 +118,14 @@ describe("HomePage", () => {
     ).toBeInTheDocument();
   });
 
-  it("sends the keyword and city to the Jobs page", () => {
+  it("sends the keyword and city to the Jobs page", async () => {
     renderHome();
 
     fireEvent.change(screen.getByRole("textbox", { name: /keyword/i }), {
       target: { value: "React" },
     });
-    fireEvent.change(screen.getByRole("combobox", { name: /city/i }), {
-      target: { value: "Da Nang" },
-    });
+    await userEvent.click(screen.getByRole("combobox", { name: /city/i }));
+    await userEvent.click(await screen.findByRole("option", { name: "Da Nang" }));
     fireEvent.click(screen.getByRole("button", { name: "Search jobs" }));
 
     expect(screen.getByTestId("where")).toHaveTextContent(
