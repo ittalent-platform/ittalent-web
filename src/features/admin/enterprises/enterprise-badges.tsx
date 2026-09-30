@@ -4,57 +4,27 @@ import { Badge } from "@/components/ui/badge";
 import { LogoTile, type LogoTileSize } from "@/components/common/logo-tile";
 import { cn } from "@/lib/utils";
 
+const STATUS_VARIANTS = {
+  active: "success",
+  pending: "warning",
+  suspended: "destructive",
+  rejected: "destructive",
+} as const;
+
+/** Same Badge variants as the Users screens, so both status tags look alike. */
 export function EnterpriseStatusBadge({ status }: { status?: string }) {
   const { t } = useTranslation();
-  const normalized = status?.toLowerCase() ?? "pending";
-
-  if (normalized === "active") {
-    return (
-      <Badge className="bg-(--status-success-bg) text-(--status-success-fg) border-(--status-success-border) font-semibold px-2.5 py-0.5 rounded-full text-xs">
-        {t("adminEnterprises.status.active")}
-      </Badge>
-    );
-  }
-
-  if (normalized === "suspended") {
-    return (
-      <Badge className="bg-(--danger-bg) text-(--danger-fg) border-(--danger-border) font-semibold px-2.5 py-0.5 rounded-full text-xs">
-        {t("adminEnterprises.status.suspended")}
-      </Badge>
-    );
-  }
-
-  if (normalized === "pending") {
-    return (
-      <Badge className="bg-(--status-warning-bg) text-(--status-warning-fg) border-(--status-warning-border) font-semibold px-2.5 py-0.5 rounded-full text-xs">
-        {t("adminEnterprises.status.pending")}
-      </Badge>
-    );
-  }
-
-  if (normalized === "rejected") {
-    return (
-      <Badge className="bg-(--danger-bg) text-(--danger-fg) border-(--danger-border) font-semibold px-2.5 py-0.5 rounded-full text-xs">
-        {t("adminEnterprises.status.rejected")}
-      </Badge>
-    );
-  }
-
-  return (
-    <Badge className="bg-muted text-muted-foreground border-border font-semibold px-2.5 py-0.5 rounded-full text-xs">
-      {status ? t(`adminEnterprises.status.${status}`, { defaultValue: status }) : t("adminEnterprises.status.inactive")}
-    </Badge>
-  );
+  const normalized = status?.toLowerCase() ?? "";
+  const variant = STATUS_VARIANTS[normalized as keyof typeof STATUS_VARIANTS] ?? "neutral";
+  const label = normalized
+    ? t(`adminEnterprises.status.${normalized}`, { defaultValue: status })
+    : t("adminEnterprises.status.inactive");
+  return <Badge variant={variant}>{label}</Badge>;
 }
 
 export function CompanyTypeBadge({ type }: { type?: string | null }) {
   if (!type) return null;
-
-  return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-secondary text-secondary-foreground border border-border/40 whitespace-nowrap">
-      {type}
-    </span>
-  );
+  return <Badge variant="neutral">{type}</Badge>;
 }
 
 export function formatEnterpriseId(id?: string): string {

@@ -145,8 +145,8 @@ export function FilterSelect<T extends string>({
         <DropdownMenuPrimitive.Content
           align={align}
           className={cn(
-            "z-50 w-[var(--radix-dropdown-menu-trigger-width)] overflow-hidden rounded-lg border border-border bg-card py-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            size === "sm" ? "min-w-[4.5rem]" : "min-w-[8.5rem]",
+            "z-50 w-max max-w-[min(22rem,var(--radix-dropdown-menu-content-available-width))] max-h-[min(20rem,var(--radix-dropdown-menu-content-available-height))] overflow-y-auto overscroll-contain rounded-lg border border-border bg-card py-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            size === "sm" ? "min-w-[max(var(--radix-dropdown-menu-trigger-width),4.5rem)]" : "min-w-[max(var(--radix-dropdown-menu-trigger-width),8.5rem)]",
             contentClassName,
           )}
           collisionPadding={16}
@@ -233,8 +233,8 @@ export function FilterMultiSelect<T extends string>({
         <DropdownMenuPrimitive.Content
           align="start"
           className={cn(
-            "z-50 w-[var(--radix-dropdown-menu-trigger-width)] overflow-hidden rounded-lg border border-border bg-card py-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-            size === "sm" ? "min-w-[4.5rem]" : "min-w-[8.5rem]",
+            "z-50 w-max max-w-[min(22rem,var(--radix-dropdown-menu-content-available-width))] max-h-[min(20rem,var(--radix-dropdown-menu-content-available-height))] overflow-y-auto overscroll-contain rounded-lg border border-border bg-card py-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            size === "sm" ? "min-w-[max(var(--radix-dropdown-menu-trigger-width),4.5rem)]" : "min-w-[max(var(--radix-dropdown-menu-trigger-width),8.5rem)]",
             contentClassName,
           )}
           collisionPadding={16}

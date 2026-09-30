@@ -74,3 +74,20 @@ export const SOCIAL_LINK_LABELS = [
   ["github", "GitHub"],
   ["twitter", "X"],
 ] as const;
+
+/** Statuses the backend allows to move to "active" (see VALID_STATUS_TRANSITIONS). */
+const ACTIVATABLE_STATUSES: readonly string[] = ["pending", "suspended", "inactive"];
+
+/**
+ * Which lifecycle actions an enterprise offers. An active enterprise can only be suspended;
+ * Delete is the last step for one that is no longer active (and the backend still refuses it
+ * while the company has open jobs).
+ */
+export function getEnterpriseActions(status?: string | null) {
+  const current = status?.toLowerCase() ?? "";
+  return {
+    canSuspend: current === "active",
+    canActivate: ACTIVATABLE_STATUSES.includes(current),
+    canDelete: current !== "active" && current !== "deleted",
+  };
+}
