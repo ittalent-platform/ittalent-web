@@ -23,8 +23,27 @@ const UsersPage = lazy(() => import("@/features/admin/users/users-page").then((m
 const AdminUserDetailPage = lazy(() =>
   import("@/features/admin/users/user-detail-page").then((m) => ({ default: m.AdminUserDetailPage })),
 );
-const ApplicationsPage = lazy(() => import("@/features/applicant/applications/applications-page").then((m) => ({ default: m.ApplicationsPage })));
-const ApplicationDetailPage = lazy(() => import("@/features/applicant/applications/application-detail-page").then((m) => ({ default: m.ApplicationDetailPage })));
+const EnterprisesPage = lazy(() =>
+  import("@/features/admin/enterprises/enterprises-page").then((m) => ({ default: m.EnterprisesPage })),
+);
+const AdminEnterpriseDetailPage = lazy(() =>
+  import("@/features/admin/enterprises/enterprise-detail-page").then((m) => ({
+    default: m.AdminEnterpriseDetailPage,
+  })),
+);
+const EnterpriseFormPage = lazy(() =>
+  import("@/features/admin/enterprises/enterprise-form-page").then((m) => ({
+    default: m.EnterpriseFormPage,
+  })),
+);
+const ApplicationsPage = lazy(() =>
+  import("@/features/applicant/applications/applications-page").then((m) => ({ default: m.ApplicationsPage })),
+);
+const ApplicationDetailPage = lazy(() =>
+  import("@/features/applicant/applications/application-detail-page").then((m) => ({
+    default: m.ApplicationDetailPage,
+  })),
+);
 
 export const appRoutes = [
   {
@@ -55,6 +74,10 @@ export const appRoutes = [
           { index: true, element: <Navigate replace to="/admin/users" /> },
           { path: "users", element: <UsersPage /> },
           { path: "users/:userId", element: <AdminUserDetailPage /> },
+          { path: "enterprises", element: <EnterprisesPage /> },
+          { path: "enterprises/new", element: <EnterpriseFormPage /> },
+          { path: "enterprises/:enterpriseId", element: <AdminEnterpriseDetailPage /> },
+          { path: "enterprises/:enterpriseId/edit", element: <EnterpriseFormPage /> },
         ],
       },
     ],

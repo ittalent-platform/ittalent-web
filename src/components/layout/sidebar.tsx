@@ -1,4 +1,5 @@
 import {
+  Building2,
   PanelLeftClose,
   Users,
   X,
@@ -12,6 +13,7 @@ import { useTranslation } from "react-i18next";
 
 const navItems = [
   { end: false, icon: Users, labelKey: "sidebar.users", to: "/admin/users" },
+  { end: false, icon: Building2, labelKey: "sidebar.enterprises", to: "/admin/enterprises" },
 ] as const;
 
 type SidebarProps = {

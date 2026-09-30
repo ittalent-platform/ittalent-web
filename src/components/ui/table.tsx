@@ -12,13 +12,18 @@ export function Table({ className, children }: { children: ReactNode; className?
   );
 }
 
-export function TableHead({ children }: { children: ReactNode }) {
-  return <thead className="bg-surface-readonly">{children}</thead>;
+export function TableHead({ children, className }: { children: ReactNode; className?: string }) {
+  return <thead className={cn("bg-surface-readonly", className)}>{children}</thead>;
 }
 
-export function TableHeaderRow({ children }: { children: ReactNode }) {
+export function TableHeaderRow({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <tr className="h-[39px] border-b border-line-muted text-left text-[11.5px] font-bold uppercase leading-normal tracking-[0.06em] text-slate-subtle">
+    <tr
+      className={cn(
+        "h-[39px] border-b border-line-muted text-left text-[11.5px] font-bold uppercase leading-normal tracking-[0.06em] text-slate-subtle",
+        className,
+      )}
+    >
       {children}
     </tr>
   );
@@ -107,17 +112,20 @@ function SortIcon({ active, direction }: { active: boolean; direction: SortState
 
 export function SortableHeaderButton({
   active = false,
+  ariaLabel,
   direction,
   label,
   onClick,
 }: {
   active?: boolean;
+  ariaLabel?: string;
   direction: SortState;
   label: string;
   onClick: () => void;
 }) {
   return (
     <button
+      aria-label={ariaLabel}
       className={cn("inline-flex cursor-pointer items-center gap-[5px] uppercase", active ? "text-primary" : "text-inherit")}
       onClick={onClick}
       type="button"

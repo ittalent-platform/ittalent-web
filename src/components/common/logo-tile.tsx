@@ -2,7 +2,12 @@ import { cn } from "@/lib/utils";
 
 // Static class names so Tailwind can see them; the palette itself lives in globals.css (--logo-n).
 const LOGO_TONES = ["bg-(--logo-1)", "bg-(--logo-2)", "bg-(--logo-3)", "bg-(--logo-4)", "bg-(--logo-5)", "bg-(--logo-6)"] as const;
-const LOGO_SIZES = { sm: "size-[22px] rounded-md text-[7px]", md: "size-9 rounded-[10px] text-[11px]", lg: "size-14 rounded-2xl text-lg" } as const;
+const LOGO_SIZES = {
+  sm: "size-[22px] rounded-md text-[7px]",
+  md: "size-9 rounded-[10px] text-xs",
+  lg: "size-14 rounded-2xl text-lg",
+  xl: "size-[52px] rounded-[14px] text-[17px]",
+} as const;
 const INITIALS_LENGTH = 2;
 
 export type LogoTileSize = keyof typeof LOGO_SIZES;
