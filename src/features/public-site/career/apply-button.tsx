@@ -44,7 +44,8 @@ export function ApplyButton({ deadline, jobId, jobTitle }: ApplyButtonProps) {
   const [message, setMessage] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
-  const expired = deadline ? new Date(deadline).getTime() < Date.now() : false;
+  const [now] = useState(() => Date.now());
+const expired = deadline ? new Date(deadline).getTime() < now : false;
 
   const cvs = useQuery({
     queryKey: ["my-documents", "cv"],
