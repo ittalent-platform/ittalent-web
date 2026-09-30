@@ -78,6 +78,7 @@
   --application-withdrawn: var(--muted-foreground);
   --application-withdrawn-bg: var(--muted);
   --primary-border: #f0b4a0;
+  --brand: #f2470c;
   --z-overlay: 40;
   --z-header: 300;
   --z-dialog: 500;
