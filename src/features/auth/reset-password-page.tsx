@@ -265,7 +265,7 @@ export function ResetPasswordPage() {
 
   return (
     <AuthCardPage>
-      <AuthStatusCard className="flex flex-col gap-4 px-7 py-[26px]">
+      <AuthStatusCard className="flex flex-col gap-4">
         <AuthFormHeader description={t("auth.reset.subtitle")} title={t("auth.reset.title")} />
 
         <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>

@@ -2,18 +2,17 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-/** Page for a single auth card: the canvas background with the card centred (Authentication design). */
+import { AuthHeroCopy } from "./auth-hero-copy";
+import { AuthPageShell } from "./auth-page-shell";
+
+/** A full auth screen for one outcome or form: the same split layout as sign in, content centred on the right. */
 export function AuthCardPage({ children }: { children: ReactNode }) {
-  return <div className="flex min-h-screen w-full items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10">{children}</div>;
+  return <AuthPageShell aside={<AuthHeroCopy />}>{children}</AuthPageShell>;
 }
 
-/** The 520px result/form card of the Authentication design: white, hairline border, 16px radius. */
+/** The centred column (440px) that holds a result or a form on an auth screen; no box, the screen is the container. */
 export function AuthStatusCard({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={cn("w-full max-w-[520px] rounded-2xl border border-border bg-card px-[30px] py-8", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("w-full max-w-[440px] px-6 py-10", className)}>{children}</div>;
 }
 
 /** Left-aligned title + explanation at the top of a form card. */

@@ -84,7 +84,7 @@ export function ForgotPasswordPage() {
 
   return (
     <AuthCardPage>
-      <AuthStatusCard className="flex flex-col gap-4 px-7 py-[26px]">
+      <AuthStatusCard className="flex flex-col gap-4">
         <AuthFormHeader description={t("auth.forgot.subtitle")} title={t("auth.forgot.title")} />
 
         <form className="flex flex-col gap-4" noValidate onSubmit={form.handleSubmit(onSubmit, () => setBanner(null))}>
