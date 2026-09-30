@@ -36,7 +36,7 @@ describe("LoginPage", () => {
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /forgot password\?/i })).toHaveAttribute("href", "/forgot-password");
-    expect(screen.getByRole("link", { name: /create an account/i })).toHaveAttribute("href", "/register");
+    expect(screen.getByRole("link", { name: /create a candidate account/i })).toHaveAttribute("href", "/register");
   });
 
   it("toggles password visibility", async () => {

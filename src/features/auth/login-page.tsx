@@ -238,7 +238,7 @@ export function LoginPage() {
             className="flex h-11 w-full items-center justify-center rounded-[12px] border border-(--border-muted) bg-white text-[14px] font-semibold text-foreground no-underline transition hover:bg-[#f4f3ef]"
             to="/register"
           >
-            Create an account
+            Create a candidate account
           </Link>
         </div>
       </div>
