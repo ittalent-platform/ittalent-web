@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { JobPosting } from "@/api/generated/types.gen";
 import { JobPostingForm } from "@/features/job-postings/job-posting-form";
+import { toDeadlineDate } from "@/features/job-postings/job-postings.format";
 
 const posting: JobPosting = {
   benefits: "Remote allowance and learning budget",
@@ -40,11 +41,12 @@ async function choose(user: User, name: RegExp, option: string) {
   await user.click(await screen.findByRole("option", { name: option }));
 }
 
-// Picks the 15th of next month through the calendar and returns it as YYYY-MM-DD.
+// Picks the 15th of next month through the calendar and returns it as YYYY-MM-DD. The calendar works in
+// Vietnam time, so "next month" is computed from that date, not from the machine's clock (CI runs in UTC).
 async function pickDeadline(user: User): Promise<string> {
-  const now = new Date();
-  const next = new Date(now.getFullYear(), now.getMonth() + 1, 15);
-  const iso = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}-15`;
+  const [year, month] = toDeadlineDate(Date.now()).split("-").map(Number);
+  const next = new Date(Date.UTC(year!, month!, 15));
+  const iso = next.toISOString().slice(0, 10);
   await user.click(screen.getByRole("button", { name: /expiry date/i }));
   await user.click(screen.getByRole("button", { name: /next month/i }));
   await user.click(
