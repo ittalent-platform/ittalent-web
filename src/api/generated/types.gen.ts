@@ -22,6 +22,7 @@ export type RegisterResponse = {
         username: string;
         role: string;
         status: string;
+        emailVerified: boolean;
         enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
@@ -49,6 +50,7 @@ export type AuthResponse = {
         username: string;
         role: string;
         status: string;
+        emailVerified: boolean;
         enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
@@ -70,6 +72,7 @@ export type UserDto = {
     username: string;
     role: string;
     status: string;
+    emailVerified: boolean;
     enterpriseId: string | null;
     createdAt?: string;
     updatedAt?: string;
@@ -290,6 +293,7 @@ export type UserListResponse = {
         username: string;
         role: string;
         status: string;
+        emailVerified: boolean;
         enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
@@ -1208,6 +1212,9 @@ export type GetApiV1UsersData = {
         search?: string;
         role?: 'user' | 'admin' | 'recruiter' | 'applicant' | 'interviewer';
         status?: 'active' | 'inactive' | 'suspended' | 'blocked';
+        emailVerified?: 'true' | 'false';
+        sortBy?: 'createdAt' | 'id' | 'username' | 'email';
+        sortOrder?: 'asc' | 'desc';
     };
     url: '/api/v1/users';
 };

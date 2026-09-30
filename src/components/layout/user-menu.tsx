@@ -56,7 +56,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
         <button
           aria-label={t("nav.accountMenu", { name: displayName })}
           className={cn(
-            "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 pb-1 text-left text-foreground outline-none transition hover:bg-black/5 dark:text-white dark:hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-primary/40",
+            "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 pb-1 text-left text-white outline-none transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-primary/40",
             collapsed && "lg:justify-center lg:px-0",
             compactOnMobile && "max-sm:justify-center max-sm:px-0",
           )}
