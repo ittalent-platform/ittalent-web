@@ -4,10 +4,9 @@ import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
 import { ProtectedRoute } from "@/auth/protected-route";
 import { AppLayout } from "@/components/layout/admin-layout";
 import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
-import { PublicLayout } from "@/components/layout/public-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
-import { LandingPage } from "@/features/public-site/landing-page";
+import { HomePage } from "@/features/public-site/home/home-page";
 
 const LoginPage = lazy(() => import("@/features/auth/login-page").then((m) => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import("@/features/auth/register-page").then((m) => ({ default: m.RegisterPage })));
@@ -50,14 +49,9 @@ const EnterpriseDetailPage = lazy(() =>
 
 export const appRoutes = [
   {
-    element: <PublicLayout />,
-    children: [
-      { path: "/", element: <LandingPage /> },
-    ],
-  },
-  {
     element: <MarketplaceLayout />,
     children: [
+      { path: "/", element: <HomePage /> },
       { path: "/career", element: <CareerPage /> },
       { path: "/career/:slug", element: <CareerJobPage /> },
       { path: "/enterprises", element: <EnterprisePage /> },

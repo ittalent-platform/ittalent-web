@@ -591,146 +591,128 @@
       "confirm": "Suspend account"
     }
   },
-  "landing": {
-    "startProject": "Start a project",
+  "home": {
     "hero": {
-      "badge": "Enterprise engineering partner",
-      "title": "<accent>Reliable</accent> software outsourcing, committed to <accent>on-time</accent> delivery",
-      "subtitle": "ITTalent provides specialized engineering teams in Web, Mobile, Cloud, and QA. We turn your vision into high-quality software with complete cost transparency and a firm commitment to project deadlines.",
-      "explore": "Explore services"
+      "badge": "IT jobs from companies across Vietnam",
+      "titleLine1": "Where IT careers",
+      "titleLine2": "take shape.",
+      "subtitle": "Search open roles from every hiring company on ITTalent. Keep one profile and CV, and apply to any of them.",
+      "oneProfile": "One profile, one CV",
+      "popular": "Popular:"
     },
-    "services": {
-      "eyebrow": "Capabilities",
-      "title": "Core<br/>services",
-      "subtitle": "Discover the technology solutions that bring your vision to life with optimized deliverables and complete transparent tracking.",
-      "cards": {
-        "website": {
-          "title": "Website",
-          "desc": "High-performance marketing sites, landing pages and corporate websites — built for conversion and speed.",
-          "items": [
-            "React, Next.js, Tailwind CSS",
-            "SEO & speed optimized",
-            "Pixel-perfect responsive UI"
-          ]
-        },
-        "application": {
-          "title": "Application",
-          "desc": "Robust and secure custom web platforms, e-commerce architectures, and enterprise portals.",
-          "items": [
-            "React, Node.js, PostgreSQL",
-            "RESTful & GraphQL APIs",
-            "Secure user authentication"
-          ]
-        },
-        "cloud": {
-          "title": "Cloud & DevOps",
-          "desc": "Automated scaling, high-availability deployments, serverless functions, and continuous delivery.",
-          "items": [
-            "AWS, Docker, Kubernetes",
-            "CI/CD pipeline setup",
-            "Monitoring & logging"
-          ]
-        },
-        "qa": {
-          "title": "QA & Testing",
-          "desc": "Comprehensive manual and automated software testing suites ensuring bug-free releases.",
-          "items": [
-            "Playwright, Cypress, Jest",
-            "Integration & unit testing",
-            "Continuous quality checks"
-          ]
-        }
-      }
+    "search": {
+      "form": "Search jobs",
+      "keyword": "Keyword",
+      "keywordPlaceholder": "Job title, skill or company",
+      "keywordTooLong": "Keep the search under {{max}} characters.",
+      "keywordUnsafe": "Search keyword contains invalid characters. Please revise your input.",
+      "city": "City",
+      "allCities": "All cities",
+      "submit": "Search jobs"
     },
-    "process": {
-      "eyebrow": "Roadmap",
-      "title": "Process",
-      "centerSubtitle": "— How we work —",
-      "tagline": "From <em>briefing</em> to <em>launch</em>.",
-      "subtitle": "How we work",
-      "cycle": "4-stage engineering cycle",
-      "steps": {
-        "strategy": {
-          "title": "Strategy",
-          "desc": "We get to know you and your brand. Goals, audience, competition. Out of that comes the roadmap everything else stands on.",
-          "bullets": [
-            "Stakeholder workshops",
-            "Competitor gap analysis",
-            "Tech feasibility study",
-            "Project scope blueprint"
-          ]
-        },
-        "design": {
-          "title": "Design",
-          "desc": "Identity, interface, prototype. This is where the brand becomes visible — from logo to the last pixel of the site.",
-          "bullets": [
-            "Interactive Figma prototypes",
-            "UX wireframing",
-            "Design system mapping",
-            "Responsive components"
-          ]
-        },
-        "build": {
-          "title": "Build",
-          "desc": "Engineering on a modern stack: Next.js, React, performance-first. Clean code that scales and still runs in five years.",
-          "bullets": [
-            "Type-safe React & Next.js",
-            "REST & GraphQL APIs",
-            "Automated QA coverage",
-            "Optimized asset loading"
-          ]
-        },
-        "launch": {
-          "title": "Launch & Care",
-          "desc": "Deployment, monitoring, continuous optimization. We stay on it — your brand grows, and we grow with it.",
-          "bullets": [
-            "CI/CD deployment",
-            "AWS cloud scaling",
-            "24/7 monitoring",
-            "Monthly optimization"
-          ]
-        }
-      }
+    "stats": {
+      "label": "Marketplace at a glance",
+      "openJobs": "open jobs you can apply to",
+      "companies": "companies hiring now",
+      "newThisWeek": "new jobs this week",
+      "cities": "cities across Vietnam"
     },
-    "whyUs": {
-      "title": "Superior. Innovative. Reliable.",
-      "subtitle": "We operate with complete cost transparency, high alignment metrics, and dedicated, highly vetted IT professionals.",
-      "stats": {
-        "experience": "Years of experience",
-        "clients": "Global clients",
-        "engineers": "Engineers & experts",
-        "retention": "Client retention",
-        "projects": "Successful projects",
-        "industries": "Industries"
+    "fields": {
+      "eyebrow": "Browse by field",
+      "title": "Find your kind of work",
+      "allJobs": "All jobs",
+      "mostJobs": "Most jobs",
+      "openJobs_one": "{{count}} open job",
+      "openJobs_other": "{{count}} open jobs",
+      "backend": {
+        "name": "Backend",
+        "keyword": "Backend"
       },
-      "dedicated": "Dedicated team, agile mindset",
-      "trustedBy": "Trusted by"
+      "frontend": {
+        "name": "Frontend",
+        "hint": "React, Vue, Angular",
+        "keyword": "Frontend"
+      },
+      "mobile": {
+        "name": "Mobile",
+        "hint": "iOS, Android, Flutter",
+        "keyword": "Mobile"
+      },
+      "devops": {
+        "name": "DevOps & Cloud",
+        "hint": "AWS, Kubernetes, CI/CD",
+        "keyword": "DevOps"
+      },
+      "qa": {
+        "name": "QA & Testing",
+        "hint": "Automation, manual, performance",
+        "keyword": "QA"
+      },
+      "data": {
+        "name": "Data & AI",
+        "hint": "Data engineering, ML, analytics",
+        "keyword": "Data"
+      },
+      "design": {
+        "name": "UI/UX Design",
+        "hint": "Product and interaction design",
+        "keyword": "UI/UX"
+      },
+      "product": {
+        "name": "Product & BA",
+        "hint": "Product owners, analysts",
+        "keyword": "Product"
+      }
     },
-    "faq": {
-      "eyebrow": "Information",
-      "title": "Frequently asked questions",
-      "subtitle": "Everything you need to know about working with ITTalent's specialized outsourced teams.",
-      "items": {
-        "ip": {
-          "q": "Who owns the software intellectual property (IP)?",
-          "a": "You do. Under our standard Master Services Agreement (MSA), 100% of the intellectual property, code repositories, documentation, and cloud architecture assets are owned by and transferred to your business immediately upon invoice clearance."
-        },
-        "communication": {
-          "q": "How does day-to-day communication work?",
-          "a": "We integrate directly into your workflow with shared Slack or Teams channels, sprint demos, and Jira / Trello / Linear. Our developers and project managers communicate fluently in English."
-        },
-        "scale": {
-          "q": "Can I scale the team up or down based on load?",
-          "a": "Absolutely. We require only 30 days notice to scale your dedicated engineering team up or down depending on launch milestones and workload."
-        },
-        "quality": {
-          "q": "What is your quality assurance and compliance policy?",
-          "a": "We embed manual and automated QA into every squad, with CI/CD, linting, unit tests, end-to-end integration tests, and security-conscious delivery practices."
-        }
+    "latest": {
+      "eyebrow": "Latest jobs",
+      "title": "Open roles, newest first",
+      "viewAll": "View all jobs",
+      "applyBy": "Apply by {{date}}",
+      "empty": "No open roles right now. Check back soon.",
+      "error": "We couldn't load the latest jobs. Check your connection and try again.",
+      "anywhere": "Vietnam"
+    },
+    "companies": {
+      "eyebrow": "Top companies hiring",
+      "title": "Meet the teams behind the jobs",
+      "viewAll": "View all companies",
+      "openJobs_one": "{{count}} open job",
+      "openJobs_other": "{{count}} open jobs",
+      "size": "{{size}} people",
+      "viewCompany": "View company"
+    },
+    "how": {
+      "eyebrow": "How ITTalent works",
+      "title": "One platform, two sides of hiring",
+      "candidates": {
+        "badge": "For candidates",
+        "cta": "Create your profile",
+        "step1Title": "Create one profile",
+        "step1Desc": "Sign up, verify your email and upload your CV as a PDF. It works for every company on ITTalent.",
+        "step2Title": "Search and apply",
+        "step2Desc": "Filter open roles by field, city, level and salary, then apply in a couple of clicks.",
+        "step3Title": "Track every application",
+        "step3Desc": "See each application move from Submitted to Under review, Interviewing and Offered."
+      },
+      "employers": {
+        "badge": "For employers",
+        "cta": "Register your company",
+        "step1Title": "Register your company",
+        "step1Desc": "Create a company account. Your profile goes public once the platform team approves it.",
+        "step2Title": "Publish jobs",
+        "step2Desc": "Post roles with a deadline. They appear on Jobs and on your company page while they are open.",
+        "step3Title": "Hire as a team",
+        "step3Desc": "Review applicants, schedule interviews and make offers with your hiring team."
       }
     },
     "cta": {
-      "title": "Let's build something great together"
+      "eyebrow": "Start today",
+      "titleLine1": "One profile.",
+      "titleLine2": "Every company.",
+      "body": "Create your ITTalent profile once, upload your CV, and apply to IT roles across Vietnam in a couple of clicks.",
+      "create": "Create your profile",
+      "browse": "Browse jobs"
     }
   }
 }

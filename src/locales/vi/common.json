@@ -584,146 +584,126 @@
       "confirm": "Tạm khóa tài khoản"
     }
   },
-  "landing": {
-    "startProject": "Bắt đầu dự án",
+  "home": {
     "hero": {
-      "badge": "Đối tác kỹ thuật cho doanh nghiệp",
-      "title": "Gia công phần mềm <accent>đáng tin cậy</accent>, cam kết giao hàng <accent>đúng hạn</accent>",
-      "subtitle": "ITTalent cung cấp các đội kỹ sư chuyên trách về Web, Mobile, Cloud và QA. Chúng tôi biến tầm nhìn của bạn thành phần mềm chất lượng cao, minh bạch chi phí và cam kết chắc chắn về tiến độ dự án.",
-      "explore": "Khám phá dịch vụ"
+      "badge": "Việc làm IT từ các công ty trên khắp Việt Nam",
+      "titleLine1": "Nơi sự nghiệp IT",
+      "titleLine2": "thành hình.",
+      "subtitle": "Tìm vị trí đang tuyển từ mọi công ty trên ITTalent. Một hồ sơ, một CV, ứng tuyển vào bất kỳ công ty nào.",
+      "oneProfile": "Một hồ sơ, một CV",
+      "popular": "Phổ biến:"
     },
-    "services": {
-      "eyebrow": "Năng lực",
-      "title": "Dịch vụ<br/>cốt lõi",
-      "subtitle": "Khám phá các giải pháp công nghệ hiện thực hoá tầm nhìn của bạn, với sản phẩm bàn giao được tối ưu và theo dõi hoàn toàn minh bạch.",
-      "cards": {
-        "website": {
-          "title": "Website",
-          "desc": "Website hiệu năng cao: trang marketing, landing page và website doanh nghiệp, tối ưu cho chuyển đổi và tốc độ.",
-          "items": [
-            "React, Next.js, Tailwind CSS",
-            "Tối ưu SEO và tốc độ",
-            "Giao diện responsive chuẩn từng điểm ảnh"
-          ]
-        },
-        "application": {
-          "title": "Ứng dụng",
-          "desc": "Nền tảng web tuỳ chỉnh mạnh mẽ và an toàn, kiến trúc thương mại điện tử và cổng thông tin doanh nghiệp.",
-          "items": [
-            "React, Node.js, PostgreSQL",
-            "API RESTful và GraphQL",
-            "Xác thực người dùng an toàn"
-          ]
-        },
-        "cloud": {
-          "title": "Cloud & DevOps",
-          "desc": "Tự động mở rộng, triển khai sẵn sàng cao, hàm serverless và phân phối liên tục.",
-          "items": [
-            "AWS, Docker, Kubernetes",
-            "Thiết lập pipeline CI/CD",
-            "Giám sát và ghi log"
-          ]
-        },
-        "qa": {
-          "title": "QA & Kiểm thử",
-          "desc": "Bộ kiểm thử thủ công và tự động toàn diện, đảm bảo bản phát hành không lỗi.",
-          "items": [
-            "Playwright, Cypress, Jest",
-            "Kiểm thử tích hợp và đơn vị",
-            "Kiểm tra chất lượng liên tục"
-          ]
-        }
-      }
+    "search": {
+      "form": "Tìm việc làm",
+      "keyword": "Từ khóa",
+      "keywordPlaceholder": "Chức danh, kỹ năng hoặc công ty",
+      "keywordTooLong": "Từ khóa tìm kiếm tối đa {{max}} ký tự.",
+      "keywordUnsafe": "Từ khóa có ký tự không hợp lệ. Vui lòng chỉnh sửa lại.",
+      "city": "Thành phố",
+      "allCities": "Tất cả thành phố",
+      "submit": "Tìm việc"
     },
-    "process": {
-      "eyebrow": "Lộ trình",
-      "title": "Quy trình",
-      "centerSubtitle": "— Cách chúng tôi làm việc —",
-      "tagline": "Từ <em>tiếp nhận yêu cầu</em> đến <em>ra mắt</em>.",
-      "subtitle": "Cách chúng tôi làm việc",
-      "cycle": "Chu trình kỹ thuật 4 giai đoạn",
-      "steps": {
-        "strategy": {
-          "title": "Chiến lược",
-          "desc": "Chúng tôi tìm hiểu bạn và thương hiệu của bạn: mục tiêu, khách hàng, đối thủ. Từ đó hình thành lộ trình cho mọi bước tiếp theo.",
-          "bullets": [
-            "Workshop với các bên liên quan",
-            "Phân tích khoảng trống đối thủ",
-            "Nghiên cứu khả thi công nghệ",
-            "Bản thiết kế phạm vi dự án"
-          ]
-        },
-        "design": {
-          "title": "Thiết kế",
-          "desc": "Nhận diện, giao diện, nguyên mẫu. Thương hiệu hiện hình ở đây, từ logo đến từng điểm ảnh cuối của website.",
-          "bullets": [
-            "Nguyên mẫu Figma tương tác",
-            "Wireframe trải nghiệm người dùng",
-            "Xây dựng design system",
-            "Thành phần responsive"
-          ]
-        },
-        "build": {
-          "title": "Xây dựng",
-          "desc": "Phát triển trên stack hiện đại: Next.js, React, ưu tiên hiệu năng. Mã sạch, mở rộng được và vẫn chạy tốt sau năm năm.",
-          "bullets": [
-            "React & Next.js an toàn kiểu",
-            "API REST và GraphQL",
-            "Độ phủ QA tự động",
-            "Tối ưu tải tài nguyên"
-          ]
-        },
-        "launch": {
-          "title": "Ra mắt & Đồng hành",
-          "desc": "Triển khai, giám sát, tối ưu liên tục. Chúng tôi ở lại cùng bạn: thương hiệu lớn lên, chúng tôi lớn lên cùng.",
-          "bullets": [
-            "Triển khai CI/CD",
-            "Mở rộng đám mây AWS",
-            "Giám sát 24/7",
-            "Tối ưu hằng tháng"
-          ]
-        }
-      }
+    "stats": {
+      "label": "Tổng quan thị trường",
+      "openJobs": "việc làm đang mở để ứng tuyển",
+      "companies": "công ty đang tuyển",
+      "newThisWeek": "việc làm mới trong tuần",
+      "cities": "thành phố trên cả nước"
     },
-    "whyUs": {
-      "title": "Vượt trội. Đổi mới. Đáng tin cậy.",
-      "subtitle": "Chúng tôi vận hành với chi phí hoàn toàn minh bạch, chỉ số đồng thuận cao và các chuyên gia CNTT tận tâm, được sàng lọc kỹ.",
-      "stats": {
-        "experience": "Năm kinh nghiệm",
-        "clients": "Khách hàng toàn cầu",
-        "engineers": "Kỹ sư & chuyên gia",
-        "retention": "Tỷ lệ giữ chân khách hàng",
-        "projects": "Dự án thành công",
-        "industries": "Ngành nghề"
+    "fields": {
+      "eyebrow": "Theo lĩnh vực",
+      "title": "Tìm công việc phù hợp với bạn",
+      "allJobs": "Tất cả việc làm",
+      "mostJobs": "Nhiều việc nhất",
+      "openJobs_other": "{{count}} việc đang mở",
+      "backend": {
+        "name": "Backend",
+        "keyword": "Backend"
       },
-      "dedicated": "Đội ngũ chuyên trách, tư duy linh hoạt",
-      "trustedBy": "Được tin tưởng bởi"
+      "frontend": {
+        "name": "Frontend",
+        "hint": "React, Vue, Angular",
+        "keyword": "Frontend"
+      },
+      "mobile": {
+        "name": "Mobile",
+        "hint": "iOS, Android, Flutter",
+        "keyword": "Mobile"
+      },
+      "devops": {
+        "name": "DevOps & Cloud",
+        "hint": "AWS, Kubernetes, CI/CD",
+        "keyword": "DevOps"
+      },
+      "qa": {
+        "name": "QA & Kiểm thử",
+        "hint": "Tự động hóa, thủ công, hiệu năng",
+        "keyword": "QA"
+      },
+      "data": {
+        "name": "Dữ liệu & AI",
+        "hint": "Kỹ thuật dữ liệu, ML, phân tích",
+        "keyword": "Dữ liệu"
+      },
+      "design": {
+        "name": "Thiết kế UI/UX",
+        "hint": "Thiết kế sản phẩm và tương tác",
+        "keyword": "UI/UX"
+      },
+      "product": {
+        "name": "Sản phẩm & BA",
+        "hint": "Product owner, phân tích nghiệp vụ",
+        "keyword": "Quản lý"
+      }
     },
-    "faq": {
-      "eyebrow": "Thông tin",
-      "title": "Câu hỏi thường gặp",
-      "subtitle": "Mọi điều bạn cần biết khi làm việc với các đội gia công chuyên trách của ITTalent.",
-      "items": {
-        "ip": {
-          "q": "Ai sở hữu quyền sở hữu trí tuệ (IP) của phần mềm?",
-          "a": "Bạn sở hữu. Theo Hợp đồng dịch vụ khung (MSA) tiêu chuẩn của chúng tôi, 100% quyền sở hữu trí tuệ, kho mã nguồn, tài liệu và tài sản kiến trúc đám mây được chuyển cho doanh nghiệp của bạn ngay khi hoá đơn được thanh toán."
-        },
-        "communication": {
-          "q": "Giao tiếp hằng ngày diễn ra như thế nào?",
-          "a": "Chúng tôi hoà vào quy trình của bạn qua kênh Slack hoặc Teams dùng chung, buổi demo sprint và Jira / Trello / Linear. Lập trình viên và quản lý dự án của chúng tôi giao tiếp tiếng Anh trôi chảy."
-        },
-        "scale": {
-          "q": "Tôi có thể tăng hoặc giảm quy mô đội theo khối lượng công việc không?",
-          "a": "Hoàn toàn được. Chúng tôi chỉ cần báo trước 30 ngày để tăng hoặc giảm đội kỹ sư chuyên trách theo cột mốc ra mắt và khối lượng công việc."
-        },
-        "quality": {
-          "q": "Chính sách đảm bảo chất lượng và tuân thủ của bạn là gì?",
-          "a": "Chúng tôi tích hợp QA thủ công và tự động vào từng nhóm, cùng CI/CD, linting, kiểm thử đơn vị, kiểm thử tích hợp end-to-end và quy trình bàn giao chú trọng bảo mật."
-        }
+    "latest": {
+      "eyebrow": "Việc làm mới nhất",
+      "title": "Vị trí đang mở, mới nhất trước",
+      "viewAll": "Xem tất cả việc làm",
+      "applyBy": "Hạn nộp {{date}}",
+      "empty": "Hiện chưa có vị trí nào đang mở. Hãy quay lại sau.",
+      "error": "Không tải được việc làm mới nhất. Kiểm tra kết nối và thử lại.",
+      "anywhere": "Việt Nam"
+    },
+    "companies": {
+      "eyebrow": "Công ty tuyển dụng hàng đầu",
+      "title": "Gặp gỡ các đội ngũ đứng sau công việc",
+      "viewAll": "Xem tất cả công ty",
+      "openJobs_other": "{{count}} việc đang mở",
+      "size": "{{size}} nhân sự",
+      "viewCompany": "Xem công ty"
+    },
+    "how": {
+      "eyebrow": "ITTalent hoạt động thế nào",
+      "title": "Một nền tảng, hai phía tuyển dụng",
+      "candidates": {
+        "badge": "Dành cho ứng viên",
+        "cta": "Tạo hồ sơ của bạn",
+        "step1Title": "Tạo một hồ sơ",
+        "step1Desc": "Đăng ký, xác minh email và tải CV dạng PDF. Hồ sơ dùng được cho mọi công ty trên ITTalent.",
+        "step2Title": "Tìm và ứng tuyển",
+        "step2Desc": "Lọc vị trí theo lĩnh vực, thành phố, cấp bậc và mức lương rồi ứng tuyển chỉ với vài cú nhấp.",
+        "step3Title": "Theo dõi mọi đơn ứng tuyển",
+        "step3Desc": "Xem từng đơn chuyển từ Đã nộp sang Đang xem xét, Phỏng vấn và Đã có offer."
+      },
+      "employers": {
+        "badge": "Dành cho nhà tuyển dụng",
+        "cta": "Đăng ký công ty",
+        "step1Title": "Đăng ký công ty",
+        "step1Desc": "Tạo tài khoản công ty. Hồ sơ công ty được công khai sau khi đội ngũ nền tảng phê duyệt.",
+        "step2Title": "Đăng tin tuyển dụng",
+        "step2Desc": "Đăng vị trí kèm hạn nộp. Tin hiển thị ở mục Việc làm và trang công ty khi còn mở.",
+        "step3Title": "Tuyển dụng theo nhóm",
+        "step3Desc": "Xem ứng viên, lên lịch phỏng vấn và gửi offer cùng đội ngũ tuyển dụng."
       }
     },
     "cta": {
-      "title": "Cùng nhau xây dựng điều tuyệt vời"
+      "eyebrow": "Bắt đầu ngay",
+      "titleLine1": "Một hồ sơ.",
+      "titleLine2": "Mọi công ty.",
+      "body": "Tạo hồ sơ ITTalent một lần, tải CV lên và ứng tuyển vào các vị trí IT trên khắp Việt Nam chỉ với vài cú nhấp.",
+      "create": "Tạo hồ sơ của bạn",
+      "browse": "Xem việc làm"
     }
   }
 }
