@@ -104,23 +104,21 @@ export function RegisterPage() {
 
           <div className="flex flex-col gap-5">
             <h2 className="m-0 font-['Space_Grotesk',sans-serif] text-4xl font-semibold leading-[1.15]">
-              Build your future
+              Where IT careers
               <br />
-              with ITTalent.
+              take shape.
             </h2>
 
-            <p className="m-0 max-w-[320px] text-sm leading-[1.6] text-white/60">
-              Create an account to join the leading tech talent platform and connect
-              with top-tier opportunities.
+            <p className="m-0 max-w-[340px] text-sm leading-[1.6] text-white/80">
+              Apply to IT jobs from verified companies and follow every application in one place.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-xs text-white/45">
-            <span>Fast Onboarding</span>
-            <span>·</span>
-            <span>Stateless Security</span>
-            <span>·</span>
-            <span>Developer Driven</span>
+          <div className="text-xs text-white/80">
+            Hiring?{" "}
+            <Link className="font-medium underline hover:text-white" to="/employer">
+              Go to ITTalent for employers →
+            </Link>
           </div>
         </>
       }
