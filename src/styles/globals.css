@@ -463,3 +463,23 @@
 .news-markdown-editor .news-body {
   max-width: none;
 }
+
+@keyframes itt-breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+.itt-breathe {
+  transform-origin: 280px 520px;
+  animation: itt-breathe 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itt-breathe {
+    animation: none;
+  }
+}
