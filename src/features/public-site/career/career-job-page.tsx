@@ -554,8 +554,8 @@ export function CareerJobPage() {
                 <ApplyButton
                   companyName={companyName}
                   deadline={job.expires_at}
+                  jobId={job._id}
                   jobTitle={job.title}
-                  slug={slug!}
                 />
               ) : (
                 <>
