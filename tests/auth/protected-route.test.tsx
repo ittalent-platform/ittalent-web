@@ -88,4 +88,35 @@ describe("ProtectedRoute", () => {
 
     expect(screen.getByText("Admin Content")).toBeInTheDocument();
   });
+
+  it("redirects recruiters away from admin routes to their dashboard", () => {
+    vi.spyOn(useSessionModule, "useSession").mockReturnValue({
+      data: {
+        user: {
+          id: "r1",
+          email: "recruiter@example.com",
+          username: "recruiter",
+          role: "recruiter",
+          status: "active",
+        },
+      },
+      isPending: false,
+      logout: vi.fn(),
+      refetch: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/admin/users"]}>
+        <Routes>
+          <Route element={<ProtectedRoute requiredRole="admin" />}>
+            <Route path="/admin/users" element={<div>Admin Content</div>} />
+          </Route>
+          <Route path="/recruiter/job-postings" element={<div>Recruiter Dashboard</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Recruiter Dashboard")).toBeInTheDocument();
+    expect(screen.queryByText("Admin Content")).not.toBeInTheDocument();
+  });
 });

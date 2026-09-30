@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { BriefcaseBusiness, ChevronDown, LogOut, Users } from "lucide-react";
+import { BriefcaseBusiness, ChevronDown, FileText, LogOut, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/toast/toast-provider";
 import { getLogoutSuccessToast } from "@/features/auth/logout-toast";
 import { APPLICATIONS_PATH } from "@/config/routes";
@@ -65,8 +70,12 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
             <p className="truncate text-[0.95rem] font-semibold">
               {displayName}
             </p>
-            <p className="truncate text-[0.8rem] text-white/60">
-              {user?.role === "admin" ? "Admin" : "User"}
+            <p className="truncate text-[0.8rem] text-muted-foreground">
+              {user?.role === "admin"
+                ? "Admin"
+                : user?.role === "recruiter"
+                  ? "Recruiter"
+                  : "User"}
             </p>
           </div>
         </button>
@@ -75,9 +84,14 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
 
       <DropdownMenuContent align="end" className="w-[260px] rounded-2xl py-1" side="bottom" sideOffset={8}>
         <div className="px-4 py-3 border-b border-border">
-          <p className="truncate text-sm font-bold text-foreground">{displayName}</p>
+          <p className="truncate text-sm font-bold text-foreground">
+            {displayName}
+          </p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            {user?.email} · <span className="capitalize font-medium">{user?.role ?? "user"}</span>
+            {user?.email} ·{" "}
+            <span className="capitalize font-medium">
+              {user?.role ?? "user"}
+            </span>
           </p>
         </div>
 
@@ -91,6 +105,25 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           </DropdownMenuItem>
         ) : null}
 
+        {user?.role === "user" ? (
+          <DropdownMenuItem
+            className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer"
+            onSelect={() => navigate("/documents")}
+          >
+            <FileText className="size-4" />
+            My Documents
+          </DropdownMenuItem>
+        ) : null}
+
+        {user?.role === "recruiter" ? (
+          <DropdownMenuItem
+            className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer"
+            onSelect={() => navigate("/recruiter/job-postings")}
+          >
+            <BriefcaseBusiness className="size-4" />
+            Job postings
+          </DropdownMenuItem>
+        ) : null}
         {user?.role === "user" ? <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate(APPLICATIONS_PATH)}><BriefcaseBusiness className="size-4" />{t("applications.title")}</DropdownMenuItem> : null}
 
         <DropdownMenuItem

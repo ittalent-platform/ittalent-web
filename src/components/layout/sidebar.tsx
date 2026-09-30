@@ -1,30 +1,64 @@
 import {
+  BriefcaseBusiness,
   Building2,
   PanelLeftClose,
   Users,
   X,
 } from "lucide-react";
-import { BrandLogo } from "./brand-logo";
 
-import { UserMenu } from "./user-menu";
+import { RECRUITER_JOB_POSTINGS_PATH } from "@/config/routes";
 import { SidebarNavList } from "./sidebar-nav-list";
+import { BrandLogo } from "./brand-logo";
+import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
-const navItems = [
+// const adminNavItems = [
+//   { end: false, icon: Users, label: "Users", to: "/admin/users" },
+//   {
+//     end: false,
+//     icon: BriefcaseBusiness,
+//     label: "Job postings",
+//     to: "/admin/job-postings",
+//   },
+// ] as const;
+
+// const recruiterNavItems = [
+//   {
+//     end: false,
+//     icon: BriefcaseBusiness,
+//     label: "Job postings",
+//     to: "/recruiter/job-postings",
+//   },
+// ] as const;
+
+const adminNavItems = [
   { end: false, icon: Users, labelKey: "sidebar.users", to: "/admin/users" },
   { end: false, icon: Building2, labelKey: "sidebar.enterprises", to: "/admin/enterprises" },
 ] as const;
 
+const recruiterNavItems = [
+  { end: false, icon: BriefcaseBusiness, labelKey: "sidebar.jobPostings", to: RECRUITER_JOB_POSTINGS_PATH },
+] as const;
+
 type SidebarProps = {
+  actor: "admin" | "recruiter";
   collapsed: boolean;
   mobileOpen: boolean;
   onCloseMobile: () => void;
   onToggleCollapsed: () => void;
 };
 
-export function Sidebar({ collapsed, mobileOpen, onCloseMobile, onToggleCollapsed }: SidebarProps) {
+// export function Sidebar({
+//   actor,
+//   collapsed,
+//   mobileOpen,
+//   onCloseMobile,
+//   onToggleCollapsed,
+// }: SidebarProps) {
+export function Sidebar({ actor, collapsed, mobileOpen, onCloseMobile, onToggleCollapsed }: SidebarProps) {
   const { t } = useTranslation();
+  const navItems = actor === "recruiter" ? recruiterNavItems : adminNavItems;
   return (
     <aside
       className={cn(
@@ -60,7 +94,12 @@ export function Sidebar({ collapsed, mobileOpen, onCloseMobile, onToggleCollapse
 
       <SidebarNavList collapsed={collapsed} items={navItems.map(({ labelKey, ...item }) => ({ ...item, label: t(labelKey) }))} onItemClick={onCloseMobile} />
 
-      <div className={cn("mt-auto border-t border-[var(--sidebar-border)] pt-3 lg:shrink-0", collapsed && "lg:w-full")}>
+      <div
+        className={cn(
+          "mt-auto border-t border-[var(--sidebar-border)] pt-3 lg:shrink-0",
+          collapsed && "lg:w-full",
+        )}
+      >
         <UserMenu collapsed={collapsed} />
       </div>
     </aside>
