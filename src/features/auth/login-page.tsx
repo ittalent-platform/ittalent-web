@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router";
@@ -6,6 +7,7 @@ import { useForm } from "react-hook-form";
 
 import { postApiV1AuthLogin } from "@/api/generated";
 import { authClient } from "@/auth/auth-client";
+import { authKeys } from "@/auth/use-session";
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
@@ -30,6 +32,7 @@ interface SubmitAlertState {
 export function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const reason = searchParams.get("reason");
   const [submitAlert, setSubmitAlert] = useState<SubmitAlertState | null>(null);
@@ -53,6 +56,8 @@ export function LoginPage() {
       }
 
       authClient.login(result.data.tokens, result.data.user);
+      // Replace any earlier "signed out" session result, or ProtectedRoute would send the user straight back here.
+      queryClient.setQueryData(authKeys.me(), result.data.user);
 
       if (result.data.user.role === "admin") {
         navigate("/admin/users", { replace: true });
