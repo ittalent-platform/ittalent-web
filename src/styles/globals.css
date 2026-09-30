@@ -47,6 +47,9 @@
   --status-success-fg: oklch(0.5009 0.1115 157.848);
   --status-warning-bg: oklch(0.9669 0.0232 82.1219);
   --status-warning-fg: oklch(0.5553 0.1455 48.9975);
+  --status-warning-border: #f0d9ad;
+  --status-success-border: #bce0cc;
+  --status-toast-accent: #4ade80;
   --status-blocked-bg: oklch(0.944 0.0248 301.0696);
   --status-blocked-fg: oklch(0.498 0.1953 291.5008);
   --status-neutral-bg: oklch(0.9523 0.007 88.6434);
@@ -264,6 +267,15 @@
   --ph: rgba(0, 0, 0, 0.055);
   --hero-bg: #19191c;
   --hero-candidate-bg: #cf3a05;
+  --hero-ring-1: #d4400b;
+  --hero-ring-2: #dd4a13;
+  --hero-ring-3: #e85a22;
+  --hero-ring-4: #f37139;
+  --hero-ring-5: #fb8f5f;
+  --hero-ring-6: #ffb08c;
+  --hero-ring-7: #ffcdb5;
+  --hero-ring-8: #ffe4d7;
+  --hero-ring-9: #fff7f2;
   --hero-fg: #ffffff;
   --sidebar-surface: #111114;
   --sidebar-fg-muted: rgba(255, 255, 255, 0.6);
@@ -305,6 +317,15 @@
   --ph: rgba(255, 255, 255, 0.06);
   --hero-bg: #0e0e10;
   --hero-candidate-bg: #cf3a05;
+  --hero-ring-1: #d4400b;
+  --hero-ring-2: #dd4a13;
+  --hero-ring-3: #e85a22;
+  --hero-ring-4: #f37139;
+  --hero-ring-5: #fb8f5f;
+  --hero-ring-6: #ffb08c;
+  --hero-ring-7: #ffcdb5;
+  --hero-ring-8: #ffe4d7;
+  --hero-ring-9: #fff7f2;
   --hero-fg: #ffffff;
   --app-canvas: #19191c;
   --danger-fg: #f87171;
@@ -340,6 +361,9 @@
   --status-blocked-fg: #6941c6;
   --status-warning-bg: #fcf3e3;
   --status-warning-fg: #b45309;
+  --status-warning-border: #f0d9ad;
+  --status-success-border: #bce0cc;
+  --status-toast-accent: #4ade80;
   --status-success-bg: #e8f5ee;
   --status-success-fg: #12764a;
   --status-error-bg: #fbe9e7;
@@ -395,6 +419,9 @@
   --status-blocked-fg: #b9a2f0;
   --status-warning-bg: #33260f;
   --status-warning-fg: #f3b562;
+  --status-warning-border: #5a4420;
+  --status-success-border: #24503a;
+  --status-toast-accent: #4ade80;
   --status-success-bg: #16301f;
   --status-success-fg: #6fd39b;
   --status-error-bg: #3a1a17;
@@ -424,6 +451,9 @@
   --status-blocked-fg: #6941c6;
   --status-warning-bg: #fcf3e3;
   --status-warning-fg: #b45309;
+  --status-warning-border: #f0d9ad;
+  --status-success-border: #bce0cc;
+  --status-toast-accent: #4ade80;
   --status-success-bg: #e8f5ee;
   --status-success-fg: #12764a;
   --status-error-bg: #fbe9e7;
@@ -479,6 +509,9 @@
   --status-blocked-fg: #b9a2f0;
   --status-warning-bg: #33260f;
   --status-warning-fg: #f3b562;
+  --status-warning-border: #5a4420;
+  --status-success-border: #24503a;
+  --status-toast-accent: #4ade80;
   --status-success-bg: #16301f;
   --status-success-fg: #6fd39b;
   --status-error-bg: #3a1a17;
@@ -670,22 +703,30 @@
   max-width: none;
 }
 
-@keyframes itt-breathe {
+/* The artwork box keeps the 560 x 520 proportions; ring sizes inside it are cqw. */
+.itt-hero-rings {
+  aspect-ratio: 560 / 520;
+  container-type: inline-size;
+}
+
+/* Each ring of the auth hero swells outward in turn (transform only, so it stays on the compositor). */
+@keyframes itt-ring-pulse {
   0%, 100% {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.035);
+    transform: scale(1.03);
   }
 }
 
-.itt-breathe {
-  transform-origin: 280px 520px;
-  animation: itt-breathe 9s ease-in-out infinite;
+.itt-ring {
+  animation: itt-ring-pulse 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .itt-breathe {
+  .itt-ring {
     animation: none;
   }
 }

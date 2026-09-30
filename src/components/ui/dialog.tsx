@@ -2,6 +2,7 @@ import * as React from "react"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
+import { useTranslation } from "react-i18next"
 
 function Dialog(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -39,6 +40,7 @@ function DialogContent({
   onOpenAutoFocus,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & { showCloseButton?: boolean }) {
+  const { t } = useTranslation()
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -67,7 +69,7 @@ function DialogContent({
             className="absolute right-5 top-5 grid size-[30px] place-items-center rounded-md text-[18px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none disabled:pointer-events-none"
           >
             ✕
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{t("actions.close")}</span>
           </DialogPrimitive.Close>
         ) : null}
       </DialogPrimitive.Content>

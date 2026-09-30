@@ -6,7 +6,7 @@ export function LoadingScreen() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(234,88,12,0.16),_transparent_34%),linear-gradient(180deg,#fff,_#fbfbfb)] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm rounded-[2rem] border border-border/70 bg-card/90 p-6 shadow-2xl backdrop-blur">
         <div className="space-y-4">
           <Skeleton className="h-4 w-24" />

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import type { TFunction } from "i18next";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -30,6 +32,7 @@ function getToastTone(status?: number): ToastTone {
 }
 
 function getToastCopy(
+  t: TFunction,
   tone: ToastTone,
   status?: number,
   fallbackMessage?: string,
@@ -38,7 +41,7 @@ function getToastCopy(
     return {
       message:
         fallbackMessage ??
-        "If an account exists for this email, reset instructions have been sent. Check your inbox.",
+        t("auth.forgot.sentGeneric"),
       tone,
     };
   }
@@ -47,7 +50,7 @@ function getToastCopy(
     return {
       message:
         fallbackMessage ??
-        "Too many reset requests for this email. Please try again later.",
+        t("auth.forgot.tooMany"),
       tone,
     };
   }
@@ -56,13 +59,13 @@ function getToastCopy(
     return {
       message:
         fallbackMessage ??
-        "We couldn't send the email right now. Please try again later.",
+        t("auth.forgot.sendFailed"),
       tone,
     };
   }
 
   return {
-    message: fallbackMessage ?? "Email must be a valid email address.",
+    message: fallbackMessage ?? t("auth.forgot.invalidEmail"),
     tone,
   };
 }
@@ -71,22 +74,22 @@ function getToastStyles(tone: ToastTone) {
   switch (tone) {
     case "success":
       return {
-        box: "bg-(--status-success-bg) border-[#bce0cc]",
+        box: "bg-(--status-success-bg) border-(--status-success-border)",
         icon: "text-(--status-success-fg)",
-        message: "text-[#0e5c3a]",
+        message: "text-(--status-success-fg)",
         note: "text-(--fg-faint)",
       };
     case "warning":
       return {
-        box: "bg-(--status-warning-bg) border-[#f0d9ad]",
-        icon: "text-[#b43709]",
-        message: "text-[#8a4b06]",
+        box: "bg-(--status-warning-bg) border-(--status-warning-border)",
+        icon: "text-(--status-warning-fg)",
+        message: "text-(--status-warning-fg)",
         note: "text-(--fg-faint)",
       };
     case "error":
     default:
       return {
-        box: "bg-(--danger-bg) border-[#efc3bd]",
+        box: "bg-(--danger-bg) border-(--danger-border)",
         icon: "text-(--danger-fg)",
         message: "text-(--danger-fg)",
         note: "text-(--fg-faint)",
@@ -176,6 +179,7 @@ function ToastCard({ toast }: { toast: ToastState }) {
 }
 
 export function ForgotPasswordPage() {
+  const { t } = useTranslation();
   const [toast, setToast] = useState<ToastState | null>(null);
 
   const form = useForm<ForgotPasswordFormValues>({
@@ -199,11 +203,12 @@ export function ForgotPasswordPage() {
       const tone = getToastTone(status);
       setToast(
         getToastCopy(
+          t,
           tone,
           status,
           getAuthErrorMessage(
             response.error,
-            "Unable to send reset instructions right now.",
+            t("auth.forgot.errorFallback"),
           ),
         ),
       );
@@ -212,10 +217,11 @@ export function ForgotPasswordPage() {
 
     setToast(
       getToastCopy(
+        t,
         "success",
         response.response?.status,
         response.data?.message ??
-          "If an account exists for this email, reset instructions have been sent. Check your inbox.",
+          t("auth.forgot.sentGeneric"),
       ),
     );
     form.reset({ email: values.email });
@@ -254,11 +260,10 @@ export function ForgotPasswordPage() {
 
         <div className="mt-4">
           <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[28px] font-semibold text-foreground">
-            Reset your password
+            {t("auth.forgot.title")}
           </h1>
           <p className="mt-2 text-[16px] leading-[1.6] text-muted-foreground">
-            Enter your registered email and we'll send reset instructions. The
-            link expires in 24 hours and can be used once.
+            {t("auth.forgot.subtitle")}
           </p>
         </div>
 
@@ -277,13 +282,13 @@ export function ForgotPasswordPage() {
               className="mb-2 block text-[15px] font-semibold text-foreground"
               htmlFor="forgot-password-email"
             >
-              Email
+              {t("auth.forgot.email")}
             </label>
 
             <Input
               id="forgot-password-email"
               className="h-12 w-full rounded-[1rem] border border-(--border-muted) bg-white px-5 text-[16px] text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-4 focus:ring-primary/15"
-              placeholder="you@example.com"
+              placeholder={t("auth.forgot.emailPlaceholder")}
               type="email"
               {...form.register("email")}
             />
@@ -302,8 +307,8 @@ export function ForgotPasswordPage() {
             type="submit"
           >
             {form.formState.isSubmitting
-              ? "Sending..."
-              : "Send reset instructions"}
+              ? t("auth.forgot.submitting")
+              : t("auth.forgot.submit")}
           </Button>
         </form>
 
@@ -311,7 +316,7 @@ export function ForgotPasswordPage() {
           className="mt-7 block text-center text-[15px] text-muted-foreground no-underline hover:text-foreground"
           to="/login"
         >
-          ← Back to sign in
+          {t("auth.forgot.backToSignIn")}
         </Link>
       </AuthStatusCard>
     </div>
