@@ -1,5 +1,6 @@
 import {
   BriefcaseBusiness,
+  Building2,
   PanelLeftClose,
   Users,
   X,
@@ -33,6 +34,7 @@ import { useTranslation } from "react-i18next";
 
 const adminNavItems = [
   { end: false, icon: Users, labelKey: "sidebar.users", to: "/admin/users" },
+  { end: false, icon: Building2, labelKey: "sidebar.enterprises", to: "/admin/enterprises" },
 ] as const;
 
 const recruiterNavItems = [

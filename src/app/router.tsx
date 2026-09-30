@@ -91,6 +91,19 @@ const ApplicationDetailPage = lazy(() =>
     (m) => ({ default: m.ApplicationDetailPage }),
   ),
 );
+const EnterprisesPage = lazy(() =>
+  import("@/features/admin/enterprises/enterprises-page").then((m) => ({ default: m.EnterprisesPage })),
+);
+const AdminEnterpriseDetailPage = lazy(() =>
+  import("@/features/admin/enterprises/enterprise-detail-page").then((m) => ({
+    default: m.AdminEnterpriseDetailPage,
+  })),
+);
+const EnterpriseFormPage = lazy(() =>
+  import("@/features/admin/enterprises/enterprise-form-page").then((m) => ({
+    default: m.EnterpriseFormPage,
+  })),
+);
 
 export const appRoutes = [
   {
@@ -132,6 +145,10 @@ export const appRoutes = [
           { index: true, element: <Navigate replace to="/admin/users" /> },
           { path: "users", element: <UsersPage /> },
           { path: "users/:userId", element: <AdminUserDetailPage /> },
+          { path: "enterprises", element: <EnterprisesPage /> },
+          { path: "enterprises/new", element: <EnterpriseFormPage /> },
+          { path: "enterprises/:enterpriseId", element: <AdminEnterpriseDetailPage /> },
+          { path: "enterprises/:enterpriseId/edit", element: <EnterpriseFormPage /> },
           { path: "job-postings", element: <JobPostingsPage /> },
           {
             path: "job-postings/:jobPostingId",
