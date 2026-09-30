@@ -242,18 +242,22 @@
   },
   "auth": {
     "forgot": {
-      "backToSignIn": "← Quay lại đăng nhập",
       "email": "Email",
       "emailPlaceholder": "ban@example.com",
       "errorFallback": "Hiện chưa thể gửi hướng dẫn đặt lại mật khẩu.",
       "invalidEmail": "Email phải là địa chỉ email hợp lệ.",
-      "sendFailed": "Hiện chưa thể gửi email. Vui lòng thử lại sau.",
-      "sentGeneric": "Nếu có tài khoản dùng email này, hướng dẫn đặt lại mật khẩu đã được gửi. Hãy kiểm tra hộp thư của bạn.",
-      "submit": "Gửi hướng dẫn đặt lại",
+      "sendFailed": "Hiện chúng tôi chưa gửi được email. Hãy thử lại sau.",
+      "submit": "Gửi liên kết đặt lại",
       "submitting": "Đang gửi...",
-      "subtitle": "Nhập email đã đăng ký, chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu. Liên kết hết hạn sau 24 giờ và chỉ dùng được một lần.",
+      "subtitle": "Nhập email của bạn. Chúng tôi sẽ gửi một liên kết dùng được một lần và hết hạn sau 24 giờ.",
       "title": "Đặt lại mật khẩu",
-      "tooMany": "Có quá nhiều yêu cầu đặt lại cho email này. Vui lòng thử lại sau."
+      "tooMany": "Quá nhiều yêu cầu đặt lại cho email này. Hãy thử lại sau 15 phút.",
+      "backToSignInPlain": "Quay lại đăng nhập",
+      "sentTitle": "Kiểm tra email của bạn",
+      "sentBody": "Nếu tồn tại tài khoản cho <strong>{{email}}</strong>, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu.",
+      "sentNote": "Liên kết dùng được một lần và hết hạn sau 24 giờ. Chưa thấy email sau vài phút? Hãy kiểm tra Spam hoặc Quảng cáo.",
+      "wrongEmail": "Sai email?",
+      "useDifferentEmail": "Dùng email khác"
     },
     "hero": {
       "body": "Ứng tuyển việc làm IT từ các công ty đã xác minh và theo dõi mọi đơn ứng tuyển tại một nơi.",
@@ -304,62 +308,49 @@
       "show": "Hiện {{label}}"
     },
     "register": {
-      "checkEmailBody": "Nếu có thể dùng <strong>{{email}}</strong>, chúng tôi đã gửi một liên kết để xác minh. Liên kết chỉ dùng được một lần và hết hạn sau 24 giờ.",
-      "checkEmailTitle": "Kiểm tra email của bạn",
       "confirmPassword": "Xác nhận mật khẩu",
-      "deliveryFailed": "Tài khoản đã được tạo nhưng chúng tôi không gửi được email xác minh.",
       "email": "Email",
       "emailPlaceholder": "ban@example.com",
       "errorFallback": "Hiện chưa thể tạo tài khoản.",
       "fullName": "Họ và tên",
       "fullNameHint": "2–100 ký tự",
       "fullNamePlaceholder": "Nguyễn Văn A",
-      "goToSignIn": "Đến trang đăng nhập",
       "haveAccount": "Bạn đã có tài khoản?",
       "mobile": "Số điện thoại",
+      "mobileHint": "Không bắt buộc · 10–15 chữ số",
       "mobilePlaceholder": "0901 234 567",
-      "optional": "Không bắt buộc",
       "password": "Mật khẩu",
       "passwordHint": "8–64 ký tự, gồm chữ hoa, chữ thường, chữ số và ký tự đặc biệt.",
-      "resend": "Gửi lại email",
-      "resendError": "Chúng tôi không gửi được email xác minh. Vui lòng thử lại sau.",
-      "resendLimit": "Bạn chỉ được gửi lại tối đa 3 lần mỗi 24 giờ.",
-      "resendSending": "Đang gửi...",
-      "resendSuccess": "Đã gửi liên kết xác minh mới đến email của bạn.",
       "signIn": "Đăng nhập",
       "signInInstead": "Đăng nhập",
       "submit": "Tạo tài khoản",
       "submitting": "Đang tạo tài khoản...",
-      "subtitle": "Bắt đầu với ITTalent chỉ trong vài giây",
+      "subtitle": "Đăng ký với vai trò ứng viên. Chúng tôi sẽ gửi email kèm liên kết để xác minh địa chỉ của bạn.",
       "terms": "Tôi đồng ý với <terms>Điều khoản sử dụng</terms> và <privacy>Chính sách quyền riêng tư</privacy>.",
-      "title": "Tạo tài khoản",
+      "title": "Tạo tài khoản của bạn",
       "username": "Tên đăng nhập",
       "usernamePlaceholder": "ví dụ: alex_dev"
     },
     "reset": {
-      "backToSignIn": "← Quay lại đăng nhập",
       "backToSignInPlain": "Quay lại đăng nhập",
       "checkFailedBody": "Hiện chưa thể xác minh liên kết đặt lại này. Vui lòng thử lại.",
       "checkFailedTitle": "Không thể kiểm tra liên kết đặt lại",
       "checking": "Đang kiểm tra liên kết đặt lại...",
-      "confirmPassword": "Xác nhận mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu mới",
       "errorFallback": "Hiện chưa thể đặt lại mật khẩu.",
-      "expiredBody": "Liên kết đặt lại này đã hết hạn hoặc đã được sử dụng. Hãy yêu cầu liên kết đặt lại mật khẩu mới để tiếp tục.",
-      "expiredTitle": "Liên kết đã hết hạn",
-      "invalidBody": "Liên kết đặt lại mật khẩu này không hợp lệ. Hãy yêu cầu liên kết mới để tiếp tục.",
-      "invalidTitle": "Liên kết đặt lại không hợp lệ",
-      "missingBody": "Liên kết đặt lại mật khẩu này thiếu mã hoặc đã hết hạn. Hãy yêu cầu liên kết mới để tiếp tục.",
       "newPassword": "Mật khẩu mới",
-      "requestNewLink": "Yêu cầu liên kết mới",
       "requestNewLinkShort": "Yêu cầu liên kết mới",
       "retry": "Thử lại",
       "signIn": "Đăng nhập",
-      "submit": "Đặt lại mật khẩu",
+      "submit": "Lưu mật khẩu mới",
       "submitting": "Đang đặt lại...",
       "subtitle": "Chọn mật khẩu mới đủ mạnh cho tài khoản của bạn. Liên kết đặt lại chỉ dùng được một lần.",
-      "success": "Đặt lại mật khẩu thành công.",
-      "successNote": "Bạn có thể đăng nhập bằng mật khẩu mới.",
-      "title": "Đặt mật khẩu mới"
+      "title": "Đặt mật khẩu mới",
+      "unusableTitle": "Không thể dùng liên kết đặt lại này",
+      "unusableBody": "Liên kết đã hết hạn hoặc đã được dùng. Hãy yêu cầu liên kết mới.",
+      "passwordHint": "8–64 ký tự gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
+      "successTitle": "Đã đổi mật khẩu",
+      "successBody": "Email của bạn cũng đã được xác minh. Bạn đã bị đăng xuất khỏi mọi thiết bị, hãy đăng nhập bằng mật khẩu mới."
     },
     "validation": {
       "confirmPasswordMatch": "Xác nhận mật khẩu phải trùng với mật khẩu",
@@ -385,47 +376,72 @@
     },
     "verify": {
       "alreadyVerified": {
-        "body": "Bạn không cần làm gì thêm — email đã được xác minh trước đó và tài khoản vẫn đang hoạt động.",
-        "title": "Đã xác minh"
+        "body": "Email của tài khoản này đã được xác minh. Không cần làm gì thêm. Hãy đăng nhập để tiếp tục.",
+        "title": "Email đã được xác minh",
+        "forgot": "Quên mật khẩu?",
+        "reset": "Đặt lại"
       },
-      "deliveryFailed": "Chúng tôi không gửi được email xác minh. Vui lòng yêu cầu gửi lại email xác minh.",
-      "emailAddress": "Địa chỉ email",
+      "emailAddress": "Email",
       "emailPlaceholder": "ban@example.com",
       "emailRequired": "Nhập địa chỉ email sẽ nhận liên kết xác minh.",
       "expired": {
-        "body": "Đã quá thời hạn xác minh 24 giờ. Tài khoản của bạn hiện bị chặn do chưa xác minh.",
-        "note": "Chỉ được gửi lại tối đa 3 lần mỗi 24 giờ.",
+        "body": "Liên kết xác minh có hiệu lực 24 giờ. Chúng tôi có thể gửi liên kết mới tới email của tài khoản này.",
+        "note": "Liên kết mới sẽ thay thế mọi liên kết trước đó. Bạn có thể gửi lại tối đa 3 lần trong 24 giờ.",
         "title": "Liên kết đã hết hạn"
       },
       "goToSignIn": "Đến trang đăng nhập",
-      "goToSignInArrow": "Đến trang đăng nhập →",
       "invalid": {
-        "body": "Liên kết xác minh email này không hợp lệ. Hãy kiểm tra xem bạn đã mở email mới nhất chưa.",
-        "note": "Các lần thử sai liên tiếp sẽ bị chặn tạm thời (5 lần mỗi 10 phút).",
-        "title": "Liên kết xác minh không hợp lệ"
+        "body": "Liên kết có thể chưa đầy đủ, đã được dùng hoặc đã bị thay bằng liên kết mới hơn. Hãy mở email mới nhất từ ITTalent hoặc yêu cầu liên kết mới.",
+        "note": "Bạn chép liên kết bằng tay? Hãy chắc chắn đã chép đầy đủ. Sau nhiều lần không hợp lệ, việc kiểm tra sẽ tạm dừng 10 phút.",
+        "title": "Liên kết không hợp lệ"
       },
-      "registration": {
-        "body": "Hãy kiểm tra email để xác minh tài khoản. Liên kết xác minh chỉ dùng một lần và hết hạn sau 24 giờ.",
-        "note": "Bạn chỉ được gửi lại tối đa 3 lần mỗi 24 giờ.",
-        "title": "Đăng ký thành công"
-      },
-      "resend": "Gửi lại email xác minh",
+      "resend": "Gửi lại email",
       "resendError": "Chúng tôi không gửi được email xác minh. Vui lòng thử lại sau.",
-      "resendSuccess": "Đã gửi email xác minh. Vui lòng kiểm tra hộp thư.",
       "retryLater": {
-        "body": "Có quá nhiều lần xác minh trong thời gian ngắn. Vui lòng đợi rồi thử lại.",
-        "title": "Vui lòng thử lại sau"
+        "body": "Có quá nhiều lần xác minh trong thời gian ngắn. Vui lòng đợi trước khi thử lại.",
+        "title": "Vui lòng thử lại sau",
+        "note": "Các lần thử không hợp lệ liên tiếp sẽ bị tạm dừng 10 phút."
       },
       "sending": "Đang gửi...",
-      "sentTo": "Đã gửi đến <strong>{{email}}</strong>",
       "signIn": "Đăng nhập",
       "success": {
-        "body": "Tài khoản của bạn đã được kích hoạt. Bạn có thể đăng nhập và bắt đầu khám phá.",
-        "title": "Đã xác minh email"
+        "body": "Tài khoản của bạn đã sẵn sàng. Đăng nhập để hoàn thiện hồ sơ và ứng tuyển.",
+        "title": "Email đã được xác minh",
+        "note": "Vì lý do bảo mật, chúng tôi không tự động đăng nhập cho bạn từ liên kết trong email."
       },
       "verifying": {
         "body": "Vui lòng đợi trong khi chúng tôi xác minh địa chỉ email của bạn...",
         "title": "Đang xác minh email của bạn"
+      },
+      "sendNewLink": "Gửi liên kết mới",
+      "requestNewLink": "Yêu cầu liên kết mới",
+      "checkEmail": {
+        "title": "Kiểm tra email của bạn",
+        "body": "Nếu có thể dùng <strong>{{email}}</strong>, chúng tôi đã gửi cho địa chỉ đó một liên kết để xác minh tài khoản của bạn.",
+        "bodyNoEmail": "Chúng tôi đã gửi cho bạn một liên kết để xác minh tài khoản.",
+        "step1": "Mở email từ <strong>ITTalent</strong>. Email có thể mất một phút để đến.",
+        "step2": "Chọn <strong>Xác minh email</strong>. Liên kết chỉ dùng được một lần và hết hạn sau 24 giờ.",
+        "step3": "Quay lại và đăng nhập để bắt đầu ứng tuyển.",
+        "note": "Không thấy email? Hãy kiểm tra Spam hoặc Promotions. Bạn có thể gửi lại tối đa 3 lần trong 24 giờ, mỗi lần cách nhau một phút.",
+        "wrongEmail": "Sai email?",
+        "signUpAgain": "Đăng ký lại",
+        "deliveryFailed": "Tài khoản đã được tạo, nhưng chúng tôi không gửi được email xác minh."
+      },
+      "resendAgainIn": "Gửi lại sau {{time}}",
+      "resendLimitReached": "Đã hết lượt gửi lại",
+      "resendSent": "Đã gửi liên kết mới. Các liên kết trong email trước không còn hiệu lực.",
+      "resendLimited": "Bạn đã yêu cầu 3 liên kết trong 24 giờ. Hãy dùng email mới nhất hoặc thử lại vào ngày mai.",
+      "sendAgain": "Gửi lại",
+      "backToSignIn": "Quay lại đăng nhập",
+      "sentResult": {
+        "body": "Nếu <strong>{{email}}</strong> thuộc một tài khoản cần xác minh, một liên kết mới đang được gửi tới. Các liên kết trong email trước không còn hiệu lực.",
+        "note": "Vài phút vẫn chưa thấy? Hãy kiểm tra Spam hoặc chắc rằng email được nhập đúng.",
+        "differentEmail": "Dùng email khác"
+      },
+      "form": {
+        "title": "Gửi lại email xác minh",
+        "description": "Nhập email bạn đã dùng để đăng ký. Nếu nó thuộc một tài khoản cần xác minh, chúng tôi sẽ gửi liên kết mới.",
+        "submit": "Gửi liên kết"
       }
     }
   },

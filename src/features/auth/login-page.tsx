@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router";
@@ -6,6 +7,8 @@ import { useForm } from "react-hook-form";
 
 import { postApiV1AuthLogin } from "@/api/generated";
 import { authClient } from "@/auth/auth-client";
+import { authKeys } from "@/auth/use-session";
+import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +32,7 @@ interface SubmitAlertState {
 export function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const reason = searchParams.get("reason");
   const [submitAlert, setSubmitAlert] = useState<SubmitAlertState | null>(null);
@@ -52,6 +56,8 @@ export function LoginPage() {
       }
 
       authClient.login(result.data.tokens, result.data.user);
+      // Replace any earlier "signed out" session result, or ProtectedRoute would send the user straight back here.
+      queryClient.setQueryData(authKeys.me(), result.data.user);
 
       if (result.data.user.role === "admin") {
         navigate("/admin/users", { replace: true });
@@ -110,7 +116,7 @@ export function LoginPage() {
     <AuthPageShell
       aside={<AuthHeroCopy />}
     >
-      <div className="flex flex-1 h-full items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-12">
+      <div className="flex h-full flex-1 items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-10">
         <div className="flex w-full max-w-[420px] flex-col gap-[22px]">
           <div className="flex flex-col gap-2">
             <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[30px] font-semibold tracking-[-0.01em] text-foreground">
@@ -134,61 +140,45 @@ export function LoginPage() {
               {submitAlert.message}
             </InlineBanner>
           ) : reason === "session_expired" ? (
-            <InlineBanner tone="warning">
+            <InlineBanner tone="info">
               {t("auth.login.sessionExpired")}
             </InlineBanner>
           ) : reason === "logged_out" ? (
-            <InlineBanner tone="info">
+            <InlineBanner tone="success">
               {t("auth.login.loggedOut")}
             </InlineBanner>
           ) : null}
 
           <form
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-[22px]"
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <div>
-              <label
-                className="mb-2 block text-[13.5px] font-semibold text-foreground"
-                htmlFor="login-identifier"
-              >
-                {t("auth.login.identifierLabel")}
-              </label>
-
+            <div className="flex flex-col gap-4">
+            <FormField
+              error={form.formState.errors.identifier?.message}
+              htmlFor="login-identifier"
+              label={t("auth.login.identifierLabel")}
+            >
               <Input
+                aria-invalid={Boolean(form.formState.errors.identifier)}
                 id="login-identifier"
                 placeholder={t("auth.login.identifierPlaceholder")}
                 type="text"
                 {...form.register("identifier")}
               />
+            </FormField>
 
-              {form.formState.errors.identifier ? (
-                <p className="mt-1.5 text-sm text-destructive">
-                  {form.formState.errors.identifier.message}
-                </p>
-              ) : null}
-            </div>
-
-            <div>
-              <PasswordField
-                id="login-password"
-                label={t("auth.login.passwordLabel")}
-                labelExtra={
-                  <Link
-                    className="text-[13px] font-semibold text-(--primary-600) no-underline hover:underline"
-                    to={forgotPasswordPath}
-                  >
-                    {t("auth.login.forgotPassword")}
-                  </Link>
-                }
-                registration={form.register("password")}
-              />
-
-              {form.formState.errors.password ? (
-                <p className="mt-1.5 text-sm text-destructive">
-                  {form.formState.errors.password.message}
-                </p>
-              ) : null}
+            <PasswordField
+              error={form.formState.errors.password?.message}
+              id="login-password"
+              label={t("auth.login.passwordLabel")}
+              labelExtra={
+                <Link className="text-[13px] font-semibold text-fg-link no-underline hover:underline" to={forgotPasswordPath}>
+                  {t("auth.login.forgotPassword")}
+                </Link>
+              }
+              registration={form.register("password")}
+            />
             </div>
 
             <Button

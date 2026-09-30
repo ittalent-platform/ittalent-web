@@ -7,7 +7,7 @@ import {
 
 export function AuthPageShell({ aside, children }: { aside: ReactNode; children: ReactNode }) {
   return (
-    <div className="flex min-h-screen w-full bg-white">
+    <div className="flex min-h-screen w-full bg-(--app-canvas)">
       <div className={`grid min-h-screen w-full grid-cols-1 ${AUTH_ASIDE_WIDTH_CLASS}`}>
         <aside className="relative hidden flex-col overflow-hidden bg-[var(--hero-candidate-bg)] px-14 py-11 text-white lg:flex">
           <div aria-hidden="true" className="itt-hero-rings pointer-events-none absolute inset-x-0 bottom-0 select-none">
@@ -33,7 +33,7 @@ export function AuthPageShell({ aside, children }: { aside: ReactNode; children:
           </div>
         </aside>
 
-        <main className="flex min-h-screen flex-col bg-white overflow-y-auto">
+        <main className="flex min-h-screen flex-col overflow-y-auto bg-(--app-canvas)">
           <div className="flex items-center bg-[var(--hero-candidate-bg)] px-6 py-5 text-white lg:hidden">
             <BrandLogo tone="inverse" />
           </div>

@@ -1,3 +1,5 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactElement } from "react";
 import { MemoryRouter } from "react-router";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -25,13 +27,21 @@ const mockedRegister = vi.mocked(postApiV1AuthRegister);
 const mockedResend = vi.mocked(postApiV1AuthResendVerificationEmail);
 const mockedAuthLogin = vi.mocked(authClient.login);
 
+
+// The pages read and write the session cache, so they need a QueryClient like the real app provides.
+function renderWithClient(ui: ReactElement): QueryClient {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+  return queryClient;
+}
+
 describe("RegisterPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders candidate registration fields and terms checkbox", () => {
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/register"]}>
         <RegisterPage />
       </MemoryRouter>,
@@ -41,8 +51,8 @@ describe("RegisterPage", () => {
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/mobile/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^confirm password$/i, { selector: "input" })).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password \*$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^confirm password \*$/i, { selector: "input" })).toBeInTheDocument();
     expect(screen.getByLabelText(/terms of use/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /create account/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /sign in/i })).toHaveAttribute("href", "/login");
@@ -51,13 +61,13 @@ describe("RegisterPage", () => {
   it("updates password requirement rules as the user types", async () => {
     const user = userEvent.setup();
 
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/register"]}>
         <RegisterPage />
       </MemoryRouter>,
     );
 
-    const passwordInput = screen.getByLabelText(/^password$/i);
+    const passwordInput = screen.getByLabelText(/^password \*$/i);
     await user.type(passwordInput, "Secret123!");
 
     expect(screen.getByText(/8–64 chars ✓/i)).toBeInTheDocument();
@@ -90,7 +100,7 @@ describe("RegisterPage", () => {
 
     const user = userEvent.setup();
 
-    render(
+    renderWithClient(
       <MemoryRouter initialEntries={["/register"]}>
         <RegisterPage />
       </MemoryRouter>,
@@ -99,8 +109,8 @@ describe("RegisterPage", () => {
     await user.type(screen.getByLabelText(/full name/i), "Nguyen Van A");
     await user.type(screen.getByLabelText(/username/i), "newuser");
     await user.type(screen.getByLabelText(/email/i), "newuser@example.com");
-    await user.type(screen.getByLabelText(/^password$/i), "Secret123!");
-    await user.type(screen.getByLabelText(/^confirm password$/i, { selector: "input" }), "Secret123!");
+    await user.type(screen.getByLabelText(/^password \*$/i), "Secret123!");
+    await user.type(screen.getByLabelText(/^confirm password \*$/i, { selector: "input" }), "Secret123!");
     await user.click(screen.getByLabelText(/terms of use/i));
 
     await user.click(screen.getByRole("button", { name: /create account/i }));
@@ -129,6 +139,6 @@ describe("RegisterPage", () => {
     expect(mockedResend).toHaveBeenCalledWith({
       body: { email: "newuser@example.com" },
     });
-    expect(await screen.findByText(/new verification link has been sent/i)).toBeInTheDocument();
+    expect(await screen.findByText(/new link sent/i)).toBeInTheDocument();
   });
 });
