@@ -1,11 +1,13 @@
 import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
+  Building,
   Building2,
   Globe,
   MapPin,
   RefreshCw,
   TriangleAlert,
+  Users,
 } from "lucide-react";
 import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -39,6 +41,8 @@ type Enterprise = {
   shortDescription?: string;
   description?: string;
   website?: string;
+  companySize?: string;
+  offices?: string[];
 };
 
 type Job = {
@@ -65,6 +69,9 @@ const toEnterprise = (dto: EnterpriseDetailDto): Enterprise => ({
   shortDescription: dto.shortDescription ?? undefined,
   description: dto.description ?? undefined,
   website: dto.website ?? undefined,
+  companySize: dto.companySize ?? undefined,
+  // Offices other than the headquarters.
+  offices: (dto.branches ?? []).map((branch) => branch.city).filter(Boolean),
 });
 
 const toJob = (dto: JobPosting): Job => ({
@@ -279,6 +286,8 @@ export function EnterpriseDetailPage() {
   const meta: ReactNode[] = [];
   if (enterprise.industry)
     meta.push(<span key="industry">{enterprise.industry}</span>);
+  if (enterprise.companySize)
+    meta.push(<span key="size">{enterprise.companySize} people</span>);
   if (enterprise.location)
     meta.push(<span key="hq">Headquarters: {enterprise.location}</span>);
   if (website)
@@ -537,12 +546,28 @@ export function EnterpriseDetailPage() {
               >
                 {enterprise.industry ?? "—"}
               </Fact>
+              {enterprise.companySize ? (
+                <Fact
+                  icon={<Users aria-hidden="true" className="size-[18px]" />}
+                  label="Company size"
+                >
+                  {enterprise.companySize} people
+                </Fact>
+              ) : null}
               <Fact
                 icon={<MapPin aria-hidden="true" className="size-[18px]" />}
                 label="Headquarters"
               >
                 {enterprise.location ?? "—"}
               </Fact>
+              {enterprise.offices && enterprise.offices.length > 0 ? (
+                <Fact
+                  icon={<Building aria-hidden="true" className="size-[18px]" />}
+                  label="Offices"
+                >
+                  {enterprise.offices.join(", ")}
+                </Fact>
+              ) : null}
               <Fact
                 icon={<Globe aria-hidden="true" className="size-[18px]" />}
                 label="Website"
