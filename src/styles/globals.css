@@ -261,6 +261,8 @@
   --border-strong: #dcdde0;
   --primary: #f2470c;
   --primary-600: #d9400a;
+  --fg-link: #b33305;
+  --brand: #f2470c;
   --primary-50: #fdf3ea;
   --primary-100: #fbe4d3;
   --primary-300: #efa370;
@@ -311,6 +313,8 @@
   --border-strong: #44454a;
   --primary: #f2470c;
   --primary-600: #eb8342;
+  --fg-link: #f6c9b6;
+  --brand: #f2470c;
   --primary-50: rgba(242, 71, 12, 0.12);
   --primary-100: rgba(242, 71, 12, 0.18);
   --primary-300: #eb8342;

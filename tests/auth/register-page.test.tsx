@@ -41,8 +41,8 @@ describe("RegisterPage", () => {
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/mobile/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^confirm password$/i, { selector: "input" })).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password \*$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^confirm password \*$/i, { selector: "input" })).toBeInTheDocument();
     expect(screen.getByLabelText(/terms of use/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /create account/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /sign in/i })).toHaveAttribute("href", "/login");
@@ -57,7 +57,7 @@ describe("RegisterPage", () => {
       </MemoryRouter>,
     );
 
-    const passwordInput = screen.getByLabelText(/^password$/i);
+    const passwordInput = screen.getByLabelText(/^password \*$/i);
     await user.type(passwordInput, "Secret123!");
 
     expect(screen.getByText(/8–64 chars ✓/i)).toBeInTheDocument();
@@ -99,8 +99,8 @@ describe("RegisterPage", () => {
     await user.type(screen.getByLabelText(/full name/i), "Nguyen Van A");
     await user.type(screen.getByLabelText(/username/i), "newuser");
     await user.type(screen.getByLabelText(/email/i), "newuser@example.com");
-    await user.type(screen.getByLabelText(/^password$/i), "Secret123!");
-    await user.type(screen.getByLabelText(/^confirm password$/i, { selector: "input" }), "Secret123!");
+    await user.type(screen.getByLabelText(/^password \*$/i), "Secret123!");
+    await user.type(screen.getByLabelText(/^confirm password \*$/i, { selector: "input" }), "Secret123!");
     await user.click(screen.getByLabelText(/terms of use/i));
 
     await user.click(screen.getByRole("button", { name: /create account/i }));
@@ -129,6 +129,6 @@ describe("RegisterPage", () => {
     expect(mockedResend).toHaveBeenCalledWith({
       body: { email: "newuser@example.com" },
     });
-    expect(await screen.findByText(/new verification link has been sent/i)).toBeInTheDocument();
+    expect(await screen.findByText(/new link sent/i)).toBeInTheDocument();
   });
 });

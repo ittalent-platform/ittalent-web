@@ -83,6 +83,7 @@ Before creating a component, look in `components/ui`, `components/common`, `comp
 | Table / pagination / skeleton | `ui/table`, `ui/pagination`, `TableSkeletonRows` |
 | Empty, error, inline notice | `EmptyState`, `ErrorState`, `Callout`, `InlineBanner` |
 | Confirm dialog (any tone, optional body) | `ActionConfirmDialog` |
+| Centred outcome (icon disc, title, text, actions, note) | `StatusPanel` inside `AuthStatusCard` |
 | Label / value lines | `DetailRow` (`layout="grid"` on detail pages) |
 | Side-rail card, history | `RailCard`, `Timeline` (includes "View all" and message dialogs) |
 | Progress through a pipeline | `Stepper` |
