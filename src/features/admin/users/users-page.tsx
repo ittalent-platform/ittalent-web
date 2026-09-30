@@ -10,11 +10,13 @@ import { useListParams } from "@/hooks/use-list-params";
 import { UsersTable } from "./users-table";
 import { UsersToolbar } from "./users-toolbar";
 import { DEFAULT_PAGE_SIZE, useUsersListQuery } from "./users.queries";
+import { useTranslation } from "react-i18next";
 
 type RoleFilter = "user" | "admin" | "all";
 type StatusFilter = "active" | "inactive" | "suspended" | "all";
 
 export function UsersPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { page, limit, search, set } = useListParams({ defaultLimit: DEFAULT_PAGE_SIZE });
   const [role, setRole] = useState<RoleFilter>("all");
@@ -49,8 +51,8 @@ export function UsersPage() {
   return (
     <div className="flex flex-col gap-6">
       <AdminPageHeader
-        description="View and inspect registered user accounts and system permissions."
-        title="Users"
+        description={t("adminUsers.page.description")}
+        title={t("adminUsers.page.title")}
       />
 
       <UsersToolbar

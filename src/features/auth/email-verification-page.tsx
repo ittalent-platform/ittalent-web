@@ -1,23 +1,23 @@
-import { useEffect, useMemo, useState, type FormEvent, type MouseEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
-import {
-  AlertTriangle,
-  CircleCheck,
-  CircleX,
-  Clock3,
-  Info,
-  Loader2,
-} from "lucide-react";
+import { AlertTriangle, Check, CircleX, Clock3, Info, Loader2, Mail } from "lucide-react";
 
-import { getApiV1AuthVerifyEmail, postApiV1AuthResendVerificationEmail } from "@/api/generated";
+import { getApiV1AuthVerifyEmail } from "@/api/generated";
+import { FormField } from "@/components/common/form-field";
+import { StatusPanel } from "@/components/common/status-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthStatusCard } from "./auth-status-card";
+import { AuthCardPage, AuthStatusCard } from "./auth-status-card";
+import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS, VERIFY_NEW_LINK_PATH } from "./auth-status.constants";
+import { CheckEmailScreen } from "./check-email-screen";
 import {
   emailVerificationPath,
   getEmailVerificationCallbackURL,
 } from "./email-verification";
-import { getAuthErrorMessage } from "./auth-utils";
+import { forgotPasswordPath } from "./password-reset";
+import { ResendBanners, ResendButton } from "./resend-button";
+import { useResendVerification } from "./use-resend-verification";
 
 type VerificationMode =
   | "registration"
@@ -130,69 +130,11 @@ export function resolveVerificationMode(
   return "success";
 }
 
-function getModeCopy(mode: VerificationMode) {
-  switch (mode) {
-    case "verifying":
-      return {
-        badgeClassName: "bg-(--surface-4) text-foreground",
-        icon: <Loader2 className="size-7 animate-spin" strokeWidth={2.1} />,
-        title: "Verifying your email",
-        body: "Please wait while we verify your email address...",
-        note: null,
-      };
-    case "registration":
-      return {
-        badgeClassName: "bg-(--status-success-bg) text-(--status-success-fg)",
-        icon: <CircleCheck className="size-7" strokeWidth={2.1} />,
-        title: "Registration successful",
-        body: "Please check your email to verify your account. The verification link is single-use and expires in 24 hours.",
-        note: "Resend is limited to 3 times per 24 hours.",
-      };
-    case "already-verified":
-      return {
-        badgeClassName: "bg-(--status-info-bg) text-(--status-info-fg)",
-        icon: <Info className="size-7" strokeWidth={2.1} />,
-        title: "Already verified",
-        body: "No further action is needed — your email was verified earlier and your account remains active.",
-        note: null,
-      };
-    case "invalid":
-      return {
-        badgeClassName: "bg-(--status-error-bg) text-(--status-error-fg)",
-        icon: <CircleX className="size-7" strokeWidth={2.1} />,
-        title: "Invalid verification link",
-        body: "This email verification link is not valid. Check that you opened the most recent email.",
-        note: "Repeated invalid attempts are temporarily blocked (5 per 10 min).",
-      };
-    case "expired":
-      return {
-        badgeClassName: "bg-(--status-warning-bg) text-(--status-warning-fg)",
-        icon: <Clock3 className="size-7" strokeWidth={2.1} />,
-        title: "Link expired",
-        body: "The 24-hour verification window has passed. Your account is now blocked-unverified.",
-        note: "Resend limited to 3 per 24 hours.",
-      };
-    case "retry-later":
-      return {
-        badgeClassName: "bg-(--status-warning-bg) text-(--status-warning-fg)",
-        icon: <AlertTriangle className="size-7" strokeWidth={2.1} />,
-        title: "Please try again later",
-        body: "Too many verification attempts were made in a short period. Please wait before retrying.",
-        note: "Repeated invalid attempts are temporarily blocked (5 per 10 min).",
-      };
-    case "success":
-    default:
-      return {
-        badgeClassName: "bg-(--status-success-bg) text-(--status-success-fg)",
-        icon: <CircleCheck className="size-7" strokeWidth={2.1} />,
-        title: "Email verified",
-        body: "Your account is now active. You can sign in and start exploring.",
-        note: null,
-      };
-  }
-}
+const STRONG = { strong: <strong className="font-semibold text-foreground" /> };
+const LINK_CLASS = "font-semibold text-fg-link hover:underline";
 
 export function EmailVerificationPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const token = searchParams.get("token")?.trim();
   const hasStage = Boolean(
@@ -210,10 +152,9 @@ export function EmailVerificationPage() {
   const deliveryFailed = searchParams.get("delivery") === "failed";
   const emailFromQuery = searchParams.get("email")?.trim() ?? "";
   const [email, setEmail] = useState(emailFromQuery);
-  const [resendStatus, setResendStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-  const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [formSent, setFormSent] = useState(false);
+  const resend = useResendVerification();
 
   useEffect(() => {
     if (!token || hasStage) return;
@@ -257,182 +198,192 @@ export function EmailVerificationPage() {
     };
   }, [token, hasStage, searchParams, setSearchParams]);
 
-  const copy = getModeCopy(mode);
-  const canResend = mode === "registration" || mode === "expired";
-  const lockedEmail = mode === "registration" && emailFromQuery.length > 0;
-  const buttonText =
-    resendStatus === "loading" ? "Sending..." : "Resend verification email";
-
-  async function handleResend(
-    event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>,
-  ) {
+  async function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    const targetEmail = (lockedEmail ? emailFromQuery : email).trim();
-    if (!targetEmail) {
-      setResendStatus("error");
-      setResendMessage(
-        "Enter the email address that should receive the verification link.",
-      );
+    const target = email.trim();
+    if (!target) {
+      setEmailError(t("auth.verify.emailRequired"));
       return;
     }
-
-    setResendStatus("loading");
-    setResendMessage(null);
-
-    let response;
-    try {
-      response = await postApiV1AuthResendVerificationEmail({
-        body: {
-          email: targetEmail,
-        },
-      });
-    } catch (error) {
-      setResendStatus("error");
-      setResendMessage(
-        getAuthErrorMessage(
-          error,
-          "We could not send the verification email. Please try again later.",
-        ),
-      );
-      return;
-    }
-
-    if (response.error) {
-      const message = getAuthErrorMessage(
-        response.error,
-        "We could not send the verification email. Please try again later.",
-      );
-      setResendStatus("error");
-      setResendMessage(message);
-      return;
-    }
-
-    setResendStatus("success");
-    setResendMessage(response.data?.message ?? "Verification email sent. Please check your inbox.");
+    setEmailError(null);
+    if (await resend.resend(target)) setFormSent(true);
   }
 
+  function screen(props: Parameters<typeof StatusPanel>[0]) {
+    return (
+      <AuthCardPage>
+        <AuthStatusCard>
+          <StatusPanel {...props} />
+        </AuthStatusCard>
+      </AuthCardPage>
+    );
+  }
+
+  const signInLink = (variant: "default" | "outline", label: string) => (
+    <Button asChild className={AUTH_ACTION_CLASS} shape="xl" variant={variant}>
+      <Link to="/login">{label}</Link>
+    </Button>
+  );
+
+  switch (mode) {
+    case "registration":
+      return <CheckEmailScreen deliveryFailed={deliveryFailed} email={emailFromQuery || undefined} />;
+
+    case "verifying":
+      return screen({
+        description: t("auth.verify.verifying.body"),
+        icon: Loader2,
+        iconClassName: "animate-spin",
+        title: t("auth.verify.verifying.title"),
+        tone: "info",
+      });
+
+    case "success":
+      return screen({
+        actions: signInLink("default", t("auth.verify.signIn")),
+        description: t("auth.verify.success.body"),
+        icon: Check,
+        note: t("auth.verify.success.note"),
+        title: t("auth.verify.success.title"),
+        tone: "success",
+      });
+
+    case "already-verified":
+      return screen({
+        actions: signInLink("default", t("auth.verify.signIn")),
+        description: t("auth.verify.alreadyVerified.body"),
+        footer: (
+          <>
+            {t("auth.verify.alreadyVerified.forgot")}{" "}
+            <Link className={LINK_CLASS} to={forgotPasswordPath}>
+              {t("auth.verify.alreadyVerified.reset")}
+            </Link>
+          </>
+        ),
+        icon: Info,
+        title: t("auth.verify.alreadyVerified.title"),
+        tone: "info",
+      });
+
+    case "invalid":
+      return screen({
+        actions: (
+          <>
+            {signInLink("outline", t("auth.verify.goToSignIn"))}
+            <Button asChild className={AUTH_ACTION_CLASS} shape="xl">
+              <Link to={VERIFY_NEW_LINK_PATH}>{t("auth.verify.requestNewLink")}</Link>
+            </Button>
+          </>
+        ),
+        description: t("auth.verify.invalid.body"),
+        icon: CircleX,
+        note: t("auth.verify.invalid.note"),
+        title: t("auth.verify.invalid.title"),
+        tone: "danger",
+      });
+
+    case "retry-later":
+      return screen({
+        actions: signInLink("outline", t("auth.verify.goToSignIn")),
+        description: t("auth.verify.retryLater.body"),
+        icon: AlertTriangle,
+        note: t("auth.verify.retryLater.note"),
+        title: t("auth.verify.retryLater.title"),
+        tone: "warning",
+      });
+
+    case "expired":
+    default:
+      break;
+  }
+
+  // Expired link with the account's address known: send a new link straight away.
+  if (emailFromQuery) {
+    return screen({
+      actions: (
+        <>
+          {signInLink("outline", t("auth.verify.goToSignIn"))}
+          <ResendButton
+            idleLabel={t("auth.verify.sendNewLink")}
+            onResend={() => void resend.resend(emailFromQuery)}
+            resend={resend}
+          />
+        </>
+      ),
+      children: <ResendBanners resend={resend} />,
+      description: t("auth.verify.expired.body"),
+      icon: Clock3,
+      note: t("auth.verify.expired.note"),
+      title: t("auth.verify.expired.title"),
+      tone: "warning",
+    });
+  }
+
+  // The form was sent: the neutral "Check your email" result (same text for every address).
+  if (formSent) {
+    return screen({
+      actions: (
+        <>
+          <ResendButton
+            idleLabel={t("auth.verify.sendAgain")}
+            onResend={() => void resend.resend(email.trim())}
+            resend={resend}
+            variant="outline"
+          />
+          <Button asChild className={AUTH_ACTION_CLASS} shape="xl">
+            <Link to="/login">{t("auth.verify.backToSignIn")}</Link>
+          </Button>
+        </>
+      ),
+      children: <ResendBanners announceAfter={1} resend={resend} />,
+      description: <Trans components={STRONG} i18nKey="auth.verify.sentResult.body" values={{ email: email.trim() }} />,
+      icon: Mail,
+      note: (
+        <>
+          {t("auth.verify.sentResult.note")}{" "}
+          <button className={LINK_CLASS} onClick={() => setFormSent(false)} type="button">
+            {t("auth.verify.sentResult.differentEmail")}
+          </button>
+        </>
+      ),
+      title: t("auth.verify.checkEmail.title"),
+      tone: "success",
+    });
+  }
+
+  // Expired link, no address known yet: the design's "Resend verification email" form.
   return (
-    <div className="flex min-h-screen min-w-screen items-center justify-center bg-(--app-canvas) px-5 py-8 sm:px-6 sm:py-10 sm:[background:radial-gradient(circle_at_50%_0%,rgb(253,232,224)_0%,transparent_55%)_rgb(244,242,238)] lg:px-8">
-      <AuthStatusCard className="overflow-hidden rounded-[0.8rem] bg-white p-0">
-        <div className="flex flex-col items-center px-5 py-11 text-center sm:px-10 sm:py-12">
-          <div
-            className={`grid size-[60px] place-items-center rounded-full text-[26px] ${copy.badgeClassName}`}
-          >
-            {copy.icon}
+    <AuthCardPage>
+      <AuthStatusCard>
+        <form className="flex flex-col gap-[22px]" noValidate onSubmit={handleFormSubmit}>
+          <div className="flex flex-col gap-2">
+            <h1 className="itt-display text-[30px] font-semibold tracking-[-0.01em] text-foreground">
+              {t("auth.verify.form.title")}
+            </h1>
+            <p className="text-[14.5px] leading-[1.55] text-muted-foreground">{t("auth.verify.form.description")}</p>
           </div>
-
-          <h1 className="mt-4 font-['Space_Grotesk',sans-serif] text-[26px] font-semibold text-foreground sm:text-[30px]">
-            {copy.title}
-          </h1>
-
-          <p className="mt-3 max-w-[380px] text-[14.5px] leading-[1.6] text-muted-foreground sm:text-[15px]">
-            {copy.body}
+          {resend.errorMessage ? <ResendBanners resend={resend} /> : null}
+          <FormField error={emailError ?? undefined} htmlFor="verification-email" label={t("auth.verify.emailAddress")} required>
+            <Input
+              aria-invalid={emailError ? true : undefined}
+              id="verification-email"
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder={t("auth.verify.emailPlaceholder")}
+              type="email"
+              value={email}
+            />
+          </FormField>
+          <Button className={AUTH_FULL_ACTION_CLASS} disabled={resend.loading} shape="xl" type="submit">
+            {resend.loading ? t("auth.verify.sending") : t("auth.verify.form.submit")}
+          </Button>
+          <p className="text-center text-[13.5px]">
+            <Link className={LINK_CLASS} to="/login">
+              {t("auth.verify.backToSignIn")}
+            </Link>
           </p>
-
-          {mode === "registration" && emailFromQuery ? (
-            <div className="mt-4 rounded-[0.5rem] bg-(--surface-4) px-4 py-2 text-[13px] text-muted-foreground">
-              Sent to <strong className="text-foreground">{emailFromQuery}</strong>
-            </div>
-          ) : null}
-
-          {copy.note ? (
-            <p className="mt-3 max-w-[380px] text-[12px] leading-[1.55] text-(--fg-faint)">
-              {copy.note}
-            </p>
-          ) : null}
-
-          {deliveryFailed ? (
-            <p className="mt-3 max-w-[380px] text-[13px] leading-[1.55] text-(--danger-fg)">
-              We could not send the verification email. Please request a new
-              verification email.
-            </p>
-          ) : null}
-
-          {canResend ? (
-            lockedEmail ? (
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  className="flex h-11 items-center justify-center rounded-xl border-0 bg-primary px-6 text-[14.5px] font-semibold text-white no-underline transition hover:bg-primary/85"
-                  to="/login"
-                >
-                  Go to sign in
-                </Link>
-
-                <Button
-                  className="h-11 px-6 text-[14.5px] font-semibold"
-                  disabled={resendStatus === "loading"}
-                  onClick={handleResend}
-                  type="button"
-                  variant="outline"
-                >
-                  {buttonText}
-                </Button>
-              </div>
-            ) : (
-              <form
-                className="mt-6 flex w-full max-w-[360px] flex-col gap-3 text-left"
-                onSubmit={handleResend}
-              >
-                <div>
-                  <label
-                    className="mb-1.5 block text-[13px] font-semibold text-foreground"
-                    htmlFor="verification-email"
-                  >
-                    Email address
-                  </label>
-
-                  <Input
-                    id="verification-email"
-                    className="h-11 w-full rounded-[0.5rem] border border-(--border-muted) bg-white px-3.5 text-sm text-foreground outline-none transition placeholder:text-(--fg-faint) focus:border-primary focus:ring-2 focus:ring-primary/15"
-                    placeholder="you@example.com"
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                  />
-                </div>
-
-                <Button
-                  className="h-11 px-6 text-[14.5px] font-semibold"
-                  disabled={resendStatus === "loading"}
-                  type="submit"
-                  variant="outline"
-                >
-                  {buttonText}
-                </Button>
-              </form>
-            )
-          ) : null}
-
-          {mode === "success" ? (
-            <Link
-              className="mt-6 flex h-11 items-center justify-center rounded-xl border-0 bg-primary px-6 text-[14.5px] font-semibold text-white no-underline transition hover:bg-primary/85"
-              to="/login"
-            >
-              Sign in
-            </Link>
-          ) : null}
-
-          {mode === "already-verified" ? (
-            <Link
-              className="mt-5 text-[13.5px] font-semibold text-(--primary-600) no-underline hover:underline"
-              to="/login"
-            >
-              Go to sign in →
-            </Link>
-          ) : null}
-
-          {resendMessage ? (
-            <p
-              aria-live="polite"
-              className={`mt-4 max-w-[380px] text-[13px] leading-[1.55] ${resendStatus === "error" ? "text-(--danger-fg)" : "text-(--status-success-fg)"}`}
-            >
-              {resendMessage}
-            </p>
-          ) : null}
-        </div>
+        </form>
       </AuthStatusCard>
-    </div>
+    </AuthCardPage>
   );
 }
 

@@ -26,7 +26,12 @@
     "rows": "Rows:",
     "page": "Page",
     "previous": "Previous page",
-    "next": "Next page"
+    "next": "Next page",
+    "label": "Pagination",
+    "pageN": "Page {{page}}",
+    "pageNumber": "Page number",
+    "totalPages_one": "{{count}} total page",
+    "totalPages_other": "{{count}} total pages"
   },
   "errorState": {
     "defaultTitle": "Something went wrong",
@@ -240,5 +245,438 @@
     "notificationsUnread": "Notifications, {{count}} unread",
     "accountMenu": "Account menu, {{name}}",
     "signingOut": "Signing out..."
+  },
+  "auth": {
+    "forgot": {
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "errorFallback": "Unable to send reset instructions right now.",
+      "invalidEmail": "Email must be a valid email address.",
+      "sendFailed": "We couldn't send the email right now. Try again later.",
+      "submit": "Send reset link",
+      "submitting": "Sending...",
+      "subtitle": "Enter your email. We'll send a link that works once and expires in 24 hours.",
+      "title": "Reset your password",
+      "tooMany": "Too many reset requests for this email. Try again in 15 minutes.",
+      "backToSignInPlain": "Back to sign in",
+      "sentTitle": "Check your email",
+      "sentBody": "If an account exists for <strong>{{email}}</strong>, we sent reset instructions.",
+      "sentNote": "The link works once and expires in 24 hours. Nothing after a few minutes? Check Spam or Promotions.",
+      "wrongEmail": "Wrong email?",
+      "useDifferentEmail": "Use a different email"
+    },
+    "hero": {
+      "body": "Apply to IT jobs from verified companies and follow every application in one place.",
+      "employers": "Hiring? Go to ITTalent for employers →",
+      "title1": "Where IT careers",
+      "title2": "take shape."
+    },
+    "login": {
+      "createAccount": "Create a candidate account",
+      "errorFallback": "Unable to sign in right now.",
+      "forgotPassword": "Forgot password?",
+      "identifierLabel": "Email or Username",
+      "identifierPlaceholder": "you@example.com or username",
+      "invalidCredentials": "Email or password is incorrect.",
+      "loggedOut": "You've been signed out.",
+      "newHere": "New to ITTalent?",
+      "passwordLabel": "Password",
+      "resendEmail": "Resend email",
+      "sessionExpired": "Your session has expired. Sign in again to continue.",
+      "submit": "Sign in",
+      "submitting": "Signing in...",
+      "subtitle": "Sign in to your ITTalent candidate account.",
+      "suspended": "This account is suspended. Contact ITTalent support if you think this is a mistake.",
+      "title": "Welcome back",
+      "tooManyAttempts": "Too many sign-in attempts. Please try again in 15 minutes.",
+      "verifyEmail": "Verify your email to continue."
+    },
+    "logout": {
+      "dismiss": "Dismiss",
+      "expiredMessage": "Your session has expired. Please sign in again.",
+      "expiredTitle": "Session already expired",
+      "failureMessage": "Something went wrong signing you out. Please try again.",
+      "failureTitle": "Logout failed (safe retry)",
+      "successMessage": "You've been signed out.",
+      "successTitle": "Logged out — landed on public page"
+    },
+    "password": {
+      "hide": "Hide {{label}}",
+      "placeholder": "••••••••",
+      "rule": {
+        "length": "8–64 chars",
+        "lowercase": "Lowercase",
+        "match": "Match",
+        "number": "Number",
+        "special": "!@#$%^&*",
+        "uppercase": "Uppercase"
+      },
+      "show": "Show {{label}}"
+    },
+    "register": {
+      "confirmPassword": "Confirm password",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "errorFallback": "Unable to create your account right now.",
+      "fullName": "Full name",
+      "fullNameHint": "2–100 characters",
+      "fullNamePlaceholder": "Nguyen Van A",
+      "haveAccount": "Already have an account?",
+      "mobile": "Mobile",
+      "mobileHint": "Optional · 10–15 digits",
+      "mobilePlaceholder": "0901 234 567",
+      "password": "Password",
+      "passwordHint": "8–64 characters with upper case, lower case, a number and a special character.",
+      "signIn": "Sign in",
+      "signInInstead": "Sign in instead",
+      "submit": "Create account",
+      "submitting": "Creating account...",
+      "subtitle": "Sign up as a candidate. We will email you a link to verify your address.",
+      "terms": "I agree to the <terms>Terms of use</terms> and <privacy>Privacy policy</privacy>.",
+      "title": "Create your account",
+      "username": "Username",
+      "usernamePlaceholder": "e.g. alex_dev"
+    },
+    "reset": {
+      "backToSignInPlain": "Back to sign in",
+      "checkFailedBody": "We could not verify this reset link right now. Please try again.",
+      "checkFailedTitle": "Unable to check reset link",
+      "checking": "Checking reset link...",
+      "confirmPassword": "Confirm new password",
+      "errorFallback": "Unable to reset your password right now.",
+      "newPassword": "New password",
+      "requestNewLinkShort": "Request a new link",
+      "retry": "Retry",
+      "signIn": "Sign in",
+      "submit": "Save new password",
+      "submitting": "Resetting...",
+      "subtitle": "Choose a strong new password for your account. The reset link can be used once.",
+      "title": "Set a new password",
+      "unusableTitle": "This reset link can't be used",
+      "unusableBody": "It has expired or was already used. Request a new one.",
+      "passwordHint": "8–64 characters with upper case, lower case, a number and a special character.",
+      "successTitle": "Password changed",
+      "successBody": "Your email is verified too. You were signed out on every device, so sign in with the new password."
+    },
+    "validation": {
+      "confirmPasswordMatch": "Confirm password must match password",
+      "confirmPasswordRequired": "Please confirm your password",
+      "emailInvalid": "Enter a valid email address",
+      "emailRequired": "Email is required",
+      "fullNameMax": "Full name cannot exceed 100 characters",
+      "fullNameMin": "Full name must be at least 2 characters",
+      "identifierRequired": "Email or username is required",
+      "mobileDigits": "Mobile must be 10–15 digits",
+      "passwordLowercase": "Password must contain a lowercase letter",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordNumber": "Password must contain a number",
+      "passwordRequired": "Password is required",
+      "passwordSpecial": "Password must contain a special character",
+      "passwordStrength": "Password must be 8 to 64 characters and contain uppercase, lowercase, number, and special character",
+      "passwordUppercase": "Password must contain an uppercase letter",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "termsRequired": "You must agree to the Terms of use and Privacy policy",
+      "usernameChars": "Username may only contain letters, numbers, and underscores",
+      "usernameMax": "Username cannot exceed 30 characters",
+      "usernameMin": "Username must be at least 3 characters"
+    },
+    "verify": {
+      "alreadyVerified": {
+        "body": "This account’s email is verified. Nothing else to do. Sign in to continue.",
+        "title": "Email already verified",
+        "forgot": "Forgot your password?",
+        "reset": "Reset it"
+      },
+      "emailAddress": "Email",
+      "emailPlaceholder": "you@example.com",
+      "emailRequired": "Enter the email address that should receive the verification link.",
+      "expired": {
+        "body": "Verification links last 24 hours. We can send a new one to the email on this account.",
+        "note": "The new link replaces every earlier one. Resend is limited to 3 times per 24 hours.",
+        "title": "This link has expired"
+      },
+      "goToSignIn": "Go to sign in",
+      "invalid": {
+        "body": "It may be incomplete, already used, or replaced by a newer link. Open the most recent email from ITTalent, or ask for a new link.",
+        "note": "Copying the link by hand? Make sure you have all of it. After several invalid tries, checks pause for 10 minutes.",
+        "title": "This link isn’t valid"
+      },
+      "resend": "Resend email",
+      "resendError": "We could not send the verification email. Please try again later.",
+      "retryLater": {
+        "body": "Too many verification attempts were made in a short period. Please wait before retrying.",
+        "title": "Please try again later",
+        "note": "Repeated invalid attempts are paused for 10 minutes."
+      },
+      "sending": "Sending...",
+      "signIn": "Sign in",
+      "success": {
+        "body": "Your account is ready. Sign in to complete your profile and apply for jobs.",
+        "title": "Email verified",
+        "note": "For your security we don’t sign you in automatically from an email link."
+      },
+      "verifying": {
+        "body": "Please wait while we verify your email address...",
+        "title": "Verifying your email"
+      },
+      "sendNewLink": "Send a new link",
+      "requestNewLink": "Request a new link",
+      "checkEmail": {
+        "title": "Check your email",
+        "body": "If <strong>{{email}}</strong> can be used, we sent it a link to verify your account.",
+        "bodyNoEmail": "We sent you a link to verify your account.",
+        "step1": "Open the email from <strong>ITTalent</strong>. It can take a minute to arrive.",
+        "step2": "Select <strong>Verify email</strong>. The link works once and expires in 24 hours.",
+        "step3": "Come back and sign in to start applying.",
+        "note": "Can’t find it? Check Spam or Promotions. Resend is limited to 3 times per 24 hours, one minute apart.",
+        "wrongEmail": "Wrong email?",
+        "signUpAgain": "Sign up again",
+        "deliveryFailed": "Your account was created, but we couldn't send the verification email."
+      },
+      "resendAgainIn": "Resend again in {{time}}",
+      "resendLimitReached": "Resend limit reached",
+      "resendSent": "New link sent. Links from earlier emails no longer work.",
+      "resendLimited": "You’ve asked for 3 links in 24 hours. Use the newest email, or try again tomorrow.",
+      "sendAgain": "Send again",
+      "backToSignIn": "Back to sign in",
+      "sentResult": {
+        "body": "If <strong>{{email}}</strong> belongs to an account that still needs verifying, a new link is on its way. Links from earlier emails no longer work.",
+        "note": "Nothing after a few minutes? Check Spam, or make sure the email is spelled right.",
+        "differentEmail": "Use a different email"
+      },
+      "form": {
+        "title": "Resend verification email",
+        "description": "Enter the email you signed up with. If it belongs to an account that still needs verifying, we’ll send a new link.",
+        "submit": "Send link"
+      }
+    }
+  },
+  "footer": {
+    "tagline": "Expertly engineered web applications, mobile platforms, automated QA environments, and scalable cloud solutions for international industry leaders.",
+    "contact": "Contact",
+    "address": "600 Nguyen Van Cu, Can Tho, Vietnam",
+    "navigation": "Navigation",
+    "services": "Services",
+    "process": "Process",
+    "whyUs": "Why us",
+    "faq": "FAQ",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "copyright": "Copyright © {{year}} ITTalent Platform. All rights reserved.",
+    "backToTop": "Back to top ↑"
+  },
+  "header": {
+    "toggleTheme": "Toggle theme",
+    "toggleMenu": "Toggle navigation menu",
+    "signIn": "Sign in",
+    "getStarted": "Get started"
+  },
+  "sidebar": {
+    "users": "Users",
+    "collapse": "Collapse sidebar",
+    "closeMenu": "Close menu"
+  },
+  "adminLayout": {
+    "openMenu": "Open menu",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar"
+  },
+  "filterSelect": {
+    "all": "All",
+    "filter": "Filter",
+    "noResults": "No results"
+  },
+  "toast": {
+    "dismiss": "Dismiss",
+    "region": "Toast notifications"
+  },
+  "adminUsers": {
+    "page": {
+      "title": "Users",
+      "description": "View and inspect registered user accounts and system permissions."
+    },
+    "role": {
+      "admin": "Admin",
+      "user": "User"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended"
+    },
+    "toolbar": {
+      "search": "Search by username or email...",
+      "role": "Role",
+      "status": "Status",
+      "allRoles": "All roles",
+      "allStatuses": "All statuses"
+    },
+    "table": {
+      "id": "ID",
+      "user": "User",
+      "role": "Role",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions",
+      "viewDetails": "View details for {{name}}",
+      "view": "View",
+      "empty": "No users found."
+    },
+    "detail": {
+      "back": "Back to users",
+      "notFoundTitle": "User not found",
+      "notFoundDescription": "The requested user profile could not be loaded.",
+      "idLabel": "ID: {{id}}",
+      "account": "Account details",
+      "username": "Username",
+      "email": "Email address",
+      "fullId": "Full ID",
+      "permissions": "Permissions & lifecycle",
+      "assignedRole": "Assigned role",
+      "accountStatus": "Account status",
+      "memberSince": "Member since"
+    }
+  },
+  "landing": {
+    "startProject": "Start a project",
+    "hero": {
+      "badge": "Enterprise engineering partner",
+      "title": "<accent>Reliable</accent> software outsourcing, committed to <accent>on-time</accent> delivery",
+      "subtitle": "ITTalent provides specialized engineering teams in Web, Mobile, Cloud, and QA. We turn your vision into high-quality software with complete cost transparency and a firm commitment to project deadlines.",
+      "explore": "Explore services"
+    },
+    "services": {
+      "eyebrow": "Capabilities",
+      "title": "Core<br/>services",
+      "subtitle": "Discover the technology solutions that bring your vision to life with optimized deliverables and complete transparent tracking.",
+      "cards": {
+        "website": {
+          "title": "Website",
+          "desc": "High-performance marketing sites, landing pages and corporate websites — built for conversion and speed.",
+          "items": [
+            "React, Next.js, Tailwind CSS",
+            "SEO & speed optimized",
+            "Pixel-perfect responsive UI"
+          ]
+        },
+        "application": {
+          "title": "Application",
+          "desc": "Robust and secure custom web platforms, e-commerce architectures, and enterprise portals.",
+          "items": [
+            "React, Node.js, PostgreSQL",
+            "RESTful & GraphQL APIs",
+            "Secure user authentication"
+          ]
+        },
+        "cloud": {
+          "title": "Cloud & DevOps",
+          "desc": "Automated scaling, high-availability deployments, serverless functions, and continuous delivery.",
+          "items": [
+            "AWS, Docker, Kubernetes",
+            "CI/CD pipeline setup",
+            "Monitoring & logging"
+          ]
+        },
+        "qa": {
+          "title": "QA & Testing",
+          "desc": "Comprehensive manual and automated software testing suites ensuring bug-free releases.",
+          "items": [
+            "Playwright, Cypress, Jest",
+            "Integration & unit testing",
+            "Continuous quality checks"
+          ]
+        }
+      }
+    },
+    "process": {
+      "eyebrow": "Roadmap",
+      "title": "Process",
+      "centerSubtitle": "— How we work —",
+      "tagline": "From <em>briefing</em> to <em>launch</em>.",
+      "subtitle": "How we work",
+      "cycle": "4-stage engineering cycle",
+      "steps": {
+        "strategy": {
+          "title": "Strategy",
+          "desc": "We get to know you and your brand. Goals, audience, competition. Out of that comes the roadmap everything else stands on.",
+          "bullets": [
+            "Stakeholder workshops",
+            "Competitor gap analysis",
+            "Tech feasibility study",
+            "Project scope blueprint"
+          ]
+        },
+        "design": {
+          "title": "Design",
+          "desc": "Identity, interface, prototype. This is where the brand becomes visible — from logo to the last pixel of the site.",
+          "bullets": [
+            "Interactive Figma prototypes",
+            "UX wireframing",
+            "Design system mapping",
+            "Responsive components"
+          ]
+        },
+        "build": {
+          "title": "Build",
+          "desc": "Engineering on a modern stack: Next.js, React, performance-first. Clean code that scales and still runs in five years.",
+          "bullets": [
+            "Type-safe React & Next.js",
+            "REST & GraphQL APIs",
+            "Automated QA coverage",
+            "Optimized asset loading"
+          ]
+        },
+        "launch": {
+          "title": "Launch & Care",
+          "desc": "Deployment, monitoring, continuous optimization. We stay on it — your brand grows, and we grow with it.",
+          "bullets": [
+            "CI/CD deployment",
+            "AWS cloud scaling",
+            "24/7 monitoring",
+            "Monthly optimization"
+          ]
+        }
+      }
+    },
+    "whyUs": {
+      "title": "Superior. Innovative. Reliable.",
+      "subtitle": "We operate with complete cost transparency, high alignment metrics, and dedicated, highly vetted IT professionals.",
+      "stats": {
+        "experience": "Years of experience",
+        "clients": "Global clients",
+        "engineers": "Engineers & experts",
+        "retention": "Client retention",
+        "projects": "Successful projects",
+        "industries": "Industries"
+      },
+      "dedicated": "Dedicated team, agile mindset",
+      "trustedBy": "Trusted by"
+    },
+    "faq": {
+      "eyebrow": "Information",
+      "title": "Frequently asked questions",
+      "subtitle": "Everything you need to know about working with ITTalent's specialized outsourced teams.",
+      "items": {
+        "ip": {
+          "q": "Who owns the software intellectual property (IP)?",
+          "a": "You do. Under our standard Master Services Agreement (MSA), 100% of the intellectual property, code repositories, documentation, and cloud architecture assets are owned by and transferred to your business immediately upon invoice clearance."
+        },
+        "communication": {
+          "q": "How does day-to-day communication work?",
+          "a": "We integrate directly into your workflow with shared Slack or Teams channels, sprint demos, and Jira / Trello / Linear. Our developers and project managers communicate fluently in English."
+        },
+        "scale": {
+          "q": "Can I scale the team up or down based on load?",
+          "a": "Absolutely. We require only 30 days notice to scale your dedicated engineering team up or down depending on launch milestones and workload."
+        },
+        "quality": {
+          "q": "What is your quality assurance and compliance policy?",
+          "a": "We embed manual and automated QA into every squad, with CI/CD, linting, unit tests, end-to-end integration tests, and security-conscious delivery practices."
+        }
+      }
+    },
+    "cta": {
+      "title": "Let's build something great together"
+    }
   }
 }

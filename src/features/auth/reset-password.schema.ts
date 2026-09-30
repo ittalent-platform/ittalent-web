@@ -1,4 +1,6 @@
 import { z } from "zod";
+
+import { validationMessage } from "./auth-validation";
 import { strongPasswordSchema } from "./password-schema";
 
 export const resetPasswordSchema = z
@@ -7,7 +9,7 @@ export const resetPasswordSchema = z
     newPassword: strongPasswordSchema,
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Confirm password must match password",
+    ...validationMessage("auth.validation.confirmPasswordMatch"),
     path: ["confirmPassword"],
   });
 

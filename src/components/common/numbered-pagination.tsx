@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 function getVisiblePages(currentPage: number, totalPages: number) {
   if (totalPages <= 5) {
@@ -16,7 +17,7 @@ function getVisiblePages(currentPage: number, totalPages: number) {
 }
 
 export function NumberedPagination({
-  ariaLabel = "Pagination",
+  ariaLabel,
   onPageChange,
   page,
   totalPages,
@@ -26,17 +27,18 @@ export function NumberedPagination({
   page: number;
   totalPages: number;
 }) {
+  const { t } = useTranslation();
   const visiblePages = getVisiblePages(page, totalPages);
 
   return (
-    <nav aria-label={ariaLabel} className="flex items-center gap-2">
-      <Button aria-label="Previous page" disabled={page <= 1} onClick={() => onPageChange(page - 1)} size="icon" variant="outline">
+    <nav aria-label={ariaLabel ?? t("pagination.label")} className="flex items-center gap-2">
+      <Button aria-label={t("pagination.previous")} disabled={page <= 1} onClick={() => onPageChange(page - 1)} size="icon" variant="outline">
         <ChevronLeft className="size-[18px]" />
       </Button>
       {visiblePages.map((visiblePage) => (
         <Button
           aria-current={visiblePage === page ? "page" : undefined}
-          aria-label={`Page ${visiblePage}`}
+          aria-label={t("pagination.pageN", { page: visiblePage })}
           key={visiblePage}
           onClick={() => onPageChange(visiblePage)}
           size="icon"
@@ -45,7 +47,7 @@ export function NumberedPagination({
           {visiblePage}
         </Button>
       ))}
-      <Button aria-label="Next page" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)} size="icon" variant="outline">
+      <Button aria-label={t("pagination.next")} disabled={page >= totalPages} onClick={() => onPageChange(page + 1)} size="icon" variant="outline">
         <ChevronRight className="size-[18px]" />
       </Button>
     </nav>

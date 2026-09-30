@@ -7,6 +7,8 @@ import {
   type AuthTokens,
 } from "@/api/client";
 
+const HTTP_UNAUTHORIZED = 401;
+
 export async function getCurrentUser(): Promise<UserDto | null> {
   const tokens = getStoredTokens();
   if (!tokens?.accessToken) {
@@ -15,7 +17,11 @@ export async function getCurrentUser(): Promise<UserDto | null> {
 
   const result = await getApiV1AuthMe();
   if (result.error || !result.data) {
-    setStoredTokens(null);
+    // Only a rejected session ends it. A dropped or aborted request (for example a reload while this
+    // call is in flight) must not wipe the stored tokens and silently sign the user out.
+    if (result.response?.status === HTTP_UNAUTHORIZED) {
+      setStoredTokens(null);
+    }
     return null;
   }
 

@@ -58,6 +58,18 @@ The **IT Talent Platform Web** application provides an intuitive user interface 
 
 ---
 
+> **Contributing agents and developers:** structure, reuse and coding rules are in [`AGENTS.md`](./AGENTS.md); the design system (tokens, components, layout) is in [`DESIGN.md`](./DESIGN.md).
+
+### End-to-end tests (backend + web together)
+
+```bash
+cd ../ittalent-backend && docker compose up -d      # MongoDB (replica set) + Redis, once
+cd ../ittalent-web && npm run test:e2e              # boots BE :3101 and web :5174, seeds a dedicated DB, runs Playwright (system Chrome)
+npm run test:e2e:report                             # open the HTML report
+```
+
+The suite never touches dev data (`ittalent_myapps_e2e` database, separate ports). Set `E2E_MONGODB_URI` to use another MongoDB (for example a different host port).
+
 ## 📂 Project Structure
 
 ```text
@@ -128,7 +140,7 @@ cp .env.example .env
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `VITE_API_URL` | Base URL of the backend API service | `http://localhost:3000` |
-| `OPENAPI_URL` | *(Optional)* Remote URL for fetching OpenAPI spec | `./openapi.json` |
+| `OPENAPI_URL` | *(Optional)* Override URL for fetching OpenAPI spec | `http://localhost:3001/openapi.json` |
 
 ### Development Server
 
@@ -166,12 +178,14 @@ npm run preview
 | `npm run test` | `vitest run` | Runs all unit and component tests with Vitest |
 | `npm run lint` | `eslint .` | Runs ESLint across all source files |
 | `npm run format` | `prettier --write .` | Formats all code files with Prettier |
-| `npm run generate:client` | `openapi-ts` | Regenerates the API client from `openapi.json` |
+| `npm run generate:client` | `openapi-ts` | Regenerates the API client from the running backend OpenAPI |
 | `npm run preview` | `vite preview` | Serves the production build locally for verification |
 
 ---
 
 ## 🔄 API Client Generation
+
+My Applications local development: start the backend from the sibling `ittalent-backend` repo on port `3001`, use `VITE_API_URL=http://localhost:3001` (the default in `.env.example`), and run `npm run dev`. The candidate demo credentials are in the backend README. The `/my-applications` route is available after signing in. The list, detail, history and PATCH withdrawal call the backend via the generated SDK. Regenerate using `npm run generate:client` while the backend is running (or set `OPENAPI_URL` to another live contract URL). The old checked-in `openapi.json` is a legacy snapshot, not the source for new SDK generation; it declares an admin users list not yet declared by the new backend. The existing admin list query uses the shared client until that endpoint is implemented in the backend contract.
 
 The project uses [@hey-api/openapi-ts](https://heyapi.dev/) to generate type-safe API clients directly from the OpenAPI specification:
 
@@ -179,11 +193,11 @@ The project uses [@hey-api/openapi-ts](https://heyapi.dev/) to generate type-saf
 npm run generate:client
 ```
 
-- Schema source: `openapi.json` (or `OPENAPI_URL` environment variable)
+- Schema source: `http://localhost:3001/openapi.json` (override with `OPENAPI_URL`)
 - Output directory: `src/api/generated/`
 - Configuration file: `openapi-ts.config.ts`
 
-Whenever backend API contracts change, update `openapi.json` and re-run this script.
+Whenever backend API contracts change, start the backend and rerun this script. The checked-in `openapi.json` is retained as a legacy snapshot, not the active generator input.
 
 ---
 
