@@ -1,30 +1,15 @@
-import { client } from "@/api/client";
+import {
+  getApiV1Enterprises,
+  getApiV1EnterprisesByEnterpriseId,
+  type EnterpriseDetailDto,
+  type EnterpriseListResponse as ApiEnterpriseList,
+} from "@/api/generated";
 import {
   fetchJobsByEnterprise,
   fetchOpenRoleCounts,
 } from "@/features/public-site/career/career.api";
 
-type EnterpriseSummaryDto = {
-  id: string;
-  name: string;
-  logoUrl: string | null;
-  industry: string | null;
-  location: string | null;
-  shortDescription: string | null;
-};
-
-type EnterpriseDetailDto = EnterpriseSummaryDto & {
-  description: string | null;
-  website: string | null;
-};
-
-type PaginatedDto<T> = {
-  items: T[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-};
+type EnterpriseSummaryDto = ApiEnterpriseList["items"][number];
 
 export type Enterprise = {
   id: string;
@@ -60,16 +45,21 @@ const BACKEND_MAX_LIMIT = 100;
 function toEnterprise(
   dto: EnterpriseSummaryDto | EnterpriseDetailDto,
 ): Enterprise {
-  const detail = dto as Partial<EnterpriseDetailDto>;
+  // The detail payload has a structured address instead of a location string.
+  const detail = "address" in dto ? dto : undefined;
+  const location = detail
+    ? [detail.address.city, detail.address.country].filter(Boolean).join(", ")
+    : (dto as EnterpriseSummaryDto).location;
+
   return {
     id: dto.id,
     name: dto.name,
     logoUrl: dto.logoUrl ?? undefined,
     industry: dto.industry ?? undefined,
-    location: dto.location ?? undefined,
+    location: location || undefined,
     shortDescription: dto.shortDescription ?? undefined,
-    description: detail.description ?? undefined,
-    website: detail.website ?? undefined,
+    description: detail?.description ?? undefined,
+    website: detail?.website ?? undefined,
   };
 }
 
@@ -84,18 +74,12 @@ function fail(
   );
 }
 
-async function getPage(
-  query: EnterpriseListQuery,
-): Promise<PaginatedDto<EnterpriseSummaryDto>> {
-  const result = await client.get<
-    { 200: PaginatedDto<EnterpriseSummaryDto> },
-    { "*": unknown }
-  >({
+async function getPage(query: EnterpriseListQuery): Promise<ApiEnterpriseList> {
+  const result = await getApiV1Enterprises({
     query: { ...query, limit: query.limit ?? BACKEND_MAX_LIMIT },
-    url: "/api/v1/enterprises",
   });
   if (result.error || !result.data) fail(result);
-  return result.data as PaginatedDto<EnterpriseSummaryDto>;
+  return result.data;
 }
 
 /** Search, filters and pagination are all handled by the backend. */
@@ -166,15 +150,11 @@ export function fetchEnterpriseDirectory() {
 }
 
 export async function fetchEnterprise(id: string): Promise<Enterprise> {
-  const result = await client.get<
-    { 200: EnterpriseDetailDto },
-    { "*": unknown }
-  >({
+  const result = await getApiV1EnterprisesByEnterpriseId({
     path: { enterpriseId: id },
-    url: "/api/v1/enterprises/{enterpriseId}",
   });
   if (result.error || !result.data) fail(result, true);
-  return toEnterprise(result.data as EnterpriseDetailDto);
+  return toEnterprise(result.data);
 }
 
 /** Open positions of one enterprise, taken from the public job-postings list. */

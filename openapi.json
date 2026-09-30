@@ -24,18 +24,13 @@
         "properties": {
           "status": {
             "type": "string",
-            "enum": [
-              "ok"
-            ]
+            "enum": ["ok"]
           },
           "timestamp": {
             "type": "string"
           }
         },
-        "required": [
-          "status",
-          "timestamp"
-        ]
+        "required": ["status", "timestamp"]
       },
       "RegisterRequest": {
         "type": "object",
@@ -57,11 +52,7 @@
             "pattern": "[A-Z]"
           }
         },
-        "required": [
-          "email",
-          "username",
-          "password"
-        ]
+        "required": ["email", "username", "password"]
       },
       "RegisterResponse": {
         "type": "object",
@@ -85,6 +76,10 @@
               "status": {
                 "type": "string"
               },
+              "enterpriseId": {
+                "type": "string",
+                "nullable": true
+              },
               "createdAt": {
                 "type": "string"
               },
@@ -97,7 +92,8 @@
               "email",
               "username",
               "role",
-              "status"
+              "status",
+              "enterpriseId"
             ]
           },
           "tokens": {
@@ -110,20 +106,13 @@
                 "type": "string"
               }
             },
-            "required": [
-              "accessToken",
-              "refreshToken"
-            ]
+            "required": ["accessToken", "refreshToken"]
           },
           "verificationEmailSent": {
             "type": "boolean"
           }
         },
-        "required": [
-          "user",
-          "tokens",
-          "verificationEmailSent"
-        ]
+        "required": ["user", "tokens", "verificationEmailSent"]
       },
       "LoginRequest": {
         "type": "object",
@@ -137,10 +126,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "identifier",
-          "password"
-        ]
+        "required": ["identifier", "password"]
       },
       "RefreshTokenRequest": {
         "type": "object",
@@ -150,9 +136,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "refreshToken"
-        ]
+        "required": ["refreshToken"]
       },
       "AuthResponse": {
         "type": "object",
@@ -176,6 +160,10 @@
               "status": {
                 "type": "string"
               },
+              "enterpriseId": {
+                "type": "string",
+                "nullable": true
+              },
               "createdAt": {
                 "type": "string"
               },
@@ -188,7 +176,8 @@
               "email",
               "username",
               "role",
-              "status"
+              "status",
+              "enterpriseId"
             ]
           },
           "tokens": {
@@ -201,16 +190,10 @@
                 "type": "string"
               }
             },
-            "required": [
-              "accessToken",
-              "refreshToken"
-            ]
+            "required": ["accessToken", "refreshToken"]
           }
         },
-        "required": [
-          "user",
-          "tokens"
-        ]
+        "required": ["user", "tokens"]
       },
       "RefreshTokenResponse": {
         "type": "object",
@@ -222,10 +205,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "accessToken",
-          "refreshToken"
-        ]
+        "required": ["accessToken", "refreshToken"]
       },
       "UserDTO": {
         "type": "object",
@@ -246,6 +226,10 @@
           "status": {
             "type": "string"
           },
+          "enterpriseId": {
+            "type": "string",
+            "nullable": true
+          },
           "createdAt": {
             "type": "string"
           },
@@ -258,7 +242,8 @@
           "email",
           "username",
           "role",
-          "status"
+          "status",
+          "enterpriseId"
         ]
       },
       "VerifyEmailQuery": {
@@ -269,9 +254,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "token"
-        ]
+        "required": ["token"]
       },
       "ResendVerificationEmailRequest": {
         "type": "object",
@@ -281,18 +264,14 @@
             "format": "email"
           }
         },
-        "required": [
-          "email"
-        ]
+        "required": ["email"]
       },
       "ResendVerificationEmailResponse": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean",
-            "enum": [
-              true
-            ]
+            "enum": [true]
           },
           "message": {
             "type": "string"
@@ -304,16 +283,10 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "verificationEmailSent"
-            ]
+            "required": ["verificationEmailSent"]
           }
         },
-        "required": [
-          "success",
-          "message",
-          "data"
-        ]
+        "required": ["success", "message", "data"]
       },
       "ForgotPasswordRequest": {
         "type": "object",
@@ -323,18 +296,14 @@
             "format": "email"
           }
         },
-        "required": [
-          "email"
-        ]
+        "required": ["email"]
       },
       "ForgotPasswordResponse": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean",
-            "enum": [
-              true
-            ]
+            "enum": [true]
           },
           "message": {
             "type": "string"
@@ -345,10 +314,7 @@
             "default": {}
           }
         },
-        "required": [
-          "success",
-          "message"
-        ]
+        "required": ["success", "message"]
       },
       "ResetPasswordTokenQuery": {
         "type": "object",
@@ -358,9 +324,7 @@
             "minLength": 1
           }
         },
-        "required": [
-          "token"
-        ]
+        "required": ["token"]
       },
       "ResetPasswordTokenResponse": {
         "type": "object",
@@ -378,15 +342,10 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "valid"
-            ]
+            "required": ["valid"]
           }
         },
-        "required": [
-          "success",
-          "data"
-        ]
+        "required": ["success", "data"]
       },
       "ResetPasswordRequest": {
         "type": "object",
@@ -402,19 +361,14 @@
             "pattern": "[A-Z]"
           }
         },
-        "required": [
-          "token",
-          "newPassword"
-        ]
+        "required": ["token", "newPassword"]
       },
       "ResetPasswordResponse": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean",
-            "enum": [
-              true
-            ]
+            "enum": [true]
           },
           "message": {
             "type": "string"
@@ -425,10 +379,7 @@
             "default": {}
           }
         },
-        "required": [
-          "success",
-          "message"
-        ]
+        "required": ["success", "message"]
       },
       "ChangePasswordRequest": {
         "type": "object",
@@ -447,19 +398,14 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "currentPassword",
-          "newPassword"
-        ]
+        "required": ["currentPassword", "newPassword"]
       },
       "ChangePasswordResponse": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean",
-            "enum": [
-              true
-            ]
+            "enum": [true]
           },
           "message": {
             "type": "string"
@@ -470,9 +416,80 @@
             "default": {}
           }
         },
+        "required": ["success", "message"]
+      },
+      "JobPostingResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "enterpriseId": {
+            "type": "string"
+          },
+          "postedByUserId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "employmentType": {
+            "type": "string"
+          },
+          "salaryMin": {
+            "type": "number"
+          },
+          "salaryMax": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "requirements": {
+            "type": "string"
+          },
+          "benefits": {
+            "type": "string"
+          },
+          "openings": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "published", "archived"]
+          },
+          "expiresAt": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
         "required": [
-          "success",
-          "message"
+          "id",
+          "enterpriseId",
+          "postedByUserId",
+          "title",
+          "slug",
+          "currency",
+          "status",
+          "createdAt",
+          "updatedAt"
         ]
       },
       "EnterpriseListResponse": {
@@ -504,6 +521,24 @@
                 "shortDescription": {
                   "type": "string",
                   "nullable": true
+                },
+                "companySize": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "companyType": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "techStack": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "default": []
+                },
+                "status": {
+                  "type": "string"
                 }
               },
               "required": [
@@ -512,7 +547,10 @@
                 "logoUrl",
                 "industry",
                 "location",
-                "shortDescription"
+                "shortDescription",
+                "companySize",
+                "companyType",
+                "status"
               ]
             }
           },
@@ -529,13 +567,7 @@
             "type": "integer"
           }
         },
-        "required": [
-          "items",
-          "page",
-          "limit",
-          "total",
-          "totalPages"
-        ]
+        "required": ["items", "page", "limit", "total", "totalPages"]
       },
       "EnterpriseDetailDTO": {
         "type": "object",
@@ -546,15 +578,124 @@
           "name": {
             "type": "string"
           },
-          "logoUrl": {
+          "legalName": {
+            "type": "string",
+            "nullable": true
+          },
+          "taxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "website": {
             "type": "string",
             "nullable": true
           },
           "industry": {
+            "type": "string"
+          },
+          "subIndustries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "companySize": {
+            "type": "string"
+          },
+          "companyType": {
             "type": "string",
             "nullable": true
           },
-          "location": {
+          "foundedYear": {
+            "type": "number",
+            "nullable": true
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "city": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "district": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "state_province": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "country": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "postal_code": {
+                "type": "string",
+                "maxLength": 20
+              }
+            },
+            "required": ["street", "city", "country"]
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "city": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "district": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "state_province": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "postal_code": {
+                  "type": "string",
+                  "maxLength": 20
+                }
+              },
+              "required": ["street", "city", "country"]
+            },
+            "default": []
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverUrl": {
             "type": "string",
             "nullable": true
           },
@@ -566,21 +707,1204 @@
             "type": "string",
             "nullable": true
           },
-          "website": {
+          "cultureSummary": {
             "type": "string",
             "nullable": true
+          },
+          "benefits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "techStack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "socialLinks": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "linkedin": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              },
+              "facebook": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              },
+              "github": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              },
+              "twitter": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              }
+            }
+          },
+          "workingDays": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaGallery": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "status": {
+            "type": "string"
+          },
+          "statusReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "creatorAccountId": {
+            "type": "string"
+          },
+          "activeJobsCount": {
+            "type": "number",
+            "default": 0
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
           }
         },
         "required": [
           "id",
           "name",
-          "logoUrl",
+          "legalName",
+          "taxCode",
+          "registrationNumber",
+          "email",
+          "phone",
+          "website",
           "industry",
-          "location",
+          "companySize",
+          "companyType",
+          "foundedYear",
+          "address",
+          "logoUrl",
+          "coverUrl",
           "shortDescription",
           "description",
-          "website"
+          "cultureSummary",
+          "socialLinks",
+          "workingDays",
+          "status",
+          "statusReason",
+          "creatorAccountId",
+          "createdAt",
+          "updatedAt"
         ]
+      },
+      "CreateEnterpriseDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "legal_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "tax_code": {
+            "type": "string",
+            "pattern": "^[0-9]{10,13}$"
+          },
+          "registration_number": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[+]?[0-9\\s().-]{8,20}$"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [""]
+              }
+            ]
+          },
+          "industry": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "sub_industries": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 50
+            }
+          },
+          "company_size": {
+            "type": "string",
+            "enum": ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"]
+          },
+          "company_type": {
+            "type": "string",
+            "enum": [
+              "Product",
+              "Outsourcing",
+              "IT Service",
+              "Consulting",
+              "Agency",
+              "Hybrid",
+              "Other"
+            ]
+          },
+          "founded_year": {
+            "type": "integer",
+            "minimum": 1800,
+            "maximum": 2026
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "city": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "district": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "state_province": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "country": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "postal_code": {
+                "type": "string",
+                "maxLength": 20
+              }
+            },
+            "required": ["street", "city", "country"]
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "city": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "district": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "state_province": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "postal_code": {
+                  "type": "string",
+                  "maxLength": 20
+                }
+              },
+              "required": ["street", "city", "country"]
+            }
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [""]
+              }
+            ]
+          },
+          "cover_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [""]
+              }
+            ]
+          },
+          "short_description": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "description": {
+            "type": "string"
+          },
+          "culture_summary": {
+            "type": "string"
+          },
+          "benefits": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "tech_stack": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "social_links": {
+            "type": "object",
+            "properties": {
+              "linkedin": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              },
+              "facebook": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              },
+              "github": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              },
+              "twitter": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              }
+            }
+          },
+          "working_days": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "media_gallery": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "tax_code",
+          "email",
+          "phone",
+          "industry",
+          "company_size",
+          "address"
+        ]
+      },
+      "UpdateEnterpriseDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "legal_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "tax_code": {
+            "type": "string",
+            "pattern": "^[0-9]{10,13}$"
+          },
+          "registration_number": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^[+]?[0-9\\s().-]{8,20}$"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [""]
+              }
+            ]
+          },
+          "industry": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "sub_industries": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 50
+            }
+          },
+          "company_size": {
+            "type": "string",
+            "enum": ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"]
+          },
+          "company_type": {
+            "type": "string",
+            "enum": [
+              "Product",
+              "Outsourcing",
+              "IT Service",
+              "Consulting",
+              "Agency",
+              "Hybrid",
+              "Other"
+            ]
+          },
+          "founded_year": {
+            "type": "integer",
+            "minimum": 1800,
+            "maximum": 2026
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "city": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "district": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "state_province": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "country": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "postal_code": {
+                "type": "string",
+                "maxLength": 20
+              }
+            },
+            "required": ["street", "city", "country"]
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "city": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "district": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "state_province": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "postal_code": {
+                  "type": "string",
+                  "maxLength": 20
+                }
+              },
+              "required": ["street", "city", "country"]
+            }
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [""]
+              }
+            ]
+          },
+          "cover_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "string",
+                "enum": [""]
+              }
+            ]
+          },
+          "short_description": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "description": {
+            "type": "string"
+          },
+          "culture_summary": {
+            "type": "string"
+          },
+          "benefits": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "tech_stack": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "social_links": {
+            "type": "object",
+            "properties": {
+              "linkedin": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              },
+              "facebook": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              },
+              "github": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              },
+              "twitter": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [""]
+                  }
+                ]
+              }
+            }
+          },
+          "working_days": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "media_gallery": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "UpdateEnterpriseStatusDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["pending", "active", "suspended", "rejected", "inactive"]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": ["status"]
+      },
+      "EnterpriseMessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["message"]
+      },
+      "CreateApplicationRequest": {
+        "type": "object",
+        "properties": {
+          "jobPostingId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "cvId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "coverLetterId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": ["jobPostingId", "cvId"],
+        "additionalProperties": false
+      },
+      "ApplicationDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "jobPostingId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "cvId": {
+            "type": "string"
+          },
+          "coverLetterId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "reappliedFrom": {
+            "type": "string",
+            "nullable": true
+          },
+          "reappliedAs": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "jobPostingId",
+          "status",
+          "cvId",
+          "coverLetterId",
+          "message",
+          "reappliedFrom",
+          "reappliedAs",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ApplicationDetailDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "jobId": {
+            "type": "string"
+          },
+          "job": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "companyName": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string",
+                "nullable": true
+              },
+              "jobType": {
+                "type": "string",
+                "nullable": true
+              },
+              "deadline": {
+                "type": "string",
+                "nullable": true
+              },
+              "publicStatus": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "companyName",
+              "location",
+              "jobType",
+              "deadline",
+              "publicStatus"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "under_review",
+              "interviewing",
+              "offered",
+              "hired",
+              "rejected",
+              "withdrawn"
+            ]
+          },
+          "reviewStage": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "screening",
+              "interview",
+              "offer",
+              "hired",
+              "rejected",
+              null
+            ]
+          },
+          "submittedDocuments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["cv", "cover_letter"]
+            }
+          },
+          "canWithdraw": {
+            "type": "boolean"
+          },
+          "canApplyAgain": {
+            "type": "boolean"
+          },
+          "reappliedFrom": {
+            "type": "string",
+            "nullable": true
+          },
+          "reappliedAs": {
+            "type": "string",
+            "nullable": true
+          },
+          "submittedAt": {
+            "type": "string"
+          },
+          "latestStatusAt": {
+            "type": "string"
+          },
+          "withdrawnAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "withdrawalReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "documentId": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["cv", "cover_letter"]
+                },
+                "fileName": {
+                  "type": "string"
+                },
+                "mimeType": {
+                  "type": "string"
+                },
+                "size": {
+                  "type": "number"
+                },
+                "submittedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "documentId",
+                "type",
+                "fileName",
+                "mimeType",
+                "size",
+                "submittedAt"
+              ]
+            }
+          },
+          "version": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "jobId",
+          "job",
+          "status",
+          "reviewStage",
+          "submittedDocuments",
+          "canWithdraw",
+          "canApplyAgain",
+          "reappliedFrom",
+          "reappliedAs",
+          "submittedAt",
+          "latestStatusAt",
+          "withdrawnAt",
+          "message",
+          "withdrawalReason",
+          "attachments",
+          "version",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ApplicationListResponse": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "jobId": {
+                  "type": "string"
+                },
+                "job": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "companyName": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "jobType": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "deadline": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "publicStatus": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "companyName",
+                    "location",
+                    "jobType",
+                    "deadline",
+                    "publicStatus"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "under_review",
+                    "interviewing",
+                    "offered",
+                    "hired",
+                    "rejected",
+                    "withdrawn"
+                  ]
+                },
+                "reviewStage": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "screening",
+                    "interview",
+                    "offer",
+                    "hired",
+                    "rejected",
+                    null
+                  ]
+                },
+                "submittedDocuments": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["cv", "cover_letter"]
+                  }
+                },
+                "canWithdraw": {
+                  "type": "boolean"
+                },
+                "canApplyAgain": {
+                  "type": "boolean"
+                },
+                "reappliedFrom": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "reappliedAs": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "submittedAt": {
+                  "type": "string"
+                },
+                "latestStatusAt": {
+                  "type": "string"
+                },
+                "withdrawnAt": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "jobId",
+                "job",
+                "status",
+                "reviewStage",
+                "submittedDocuments",
+                "canWithdraw",
+                "canApplyAgain",
+                "reappliedFrom",
+                "reappliedAs",
+                "submittedAt",
+                "latestStatusAt",
+                "withdrawnAt"
+              ]
+            }
+          },
+          "statusCounts": {
+            "type": "object",
+            "properties": {
+              "submitted": {
+                "type": "number"
+              },
+              "under_review": {
+                "type": "number"
+              },
+              "interviewing": {
+                "type": "number"
+              },
+              "offered": {
+                "type": "number"
+              },
+              "hired": {
+                "type": "number"
+              },
+              "rejected": {
+                "type": "number"
+              },
+              "withdrawn": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "submitted",
+              "under_review",
+              "interviewing",
+              "offered",
+              "hired",
+              "rejected",
+              "withdrawn"
+            ]
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages",
+          "items",
+          "statusCounts"
+        ]
+      },
+      "ApplicationHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "under_review",
+                    "interviewing",
+                    "offered",
+                    "hired",
+                    "rejected",
+                    "withdrawn"
+                  ]
+                },
+                "reviewStage": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "screening",
+                    "interview",
+                    "offer",
+                    "hired",
+                    "rejected",
+                    null
+                  ]
+                },
+                "actorRole": {
+                  "type": "string",
+                  "enum": ["candidate", "company", "system"]
+                },
+                "occurredAt": {
+                  "type": "string"
+                }
+              },
+              "required": ["status", "reviewStage", "actorRole", "occurredAt"]
+            }
+          }
+        },
+        "required": ["page", "limit", "total", "totalPages", "items"]
+      },
+      "WithdrawApplicationBody": {
+        "type": "object",
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": ["expectedVersion"]
+      },
+      "PaginatedJobPostingsResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobPostingResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": ["items", "page", "limit", "total", "totalPages"]
       },
       "UserListResponse": {
         "type": "object",
@@ -604,13 +1928,7 @@
             "type": "integer"
           }
         },
-        "required": [
-          "items",
-          "total",
-          "page",
-          "limit",
-          "totalPages"
-        ]
+        "required": ["items", "total", "page", "limit", "totalPages"]
       }
     },
     "parameters": {}
@@ -618,9 +1936,7 @@
   "paths": {
     "/health": {
       "get": {
-        "tags": [
-          "Health"
-        ],
+        "tags": ["Health"],
         "summary": "Service health check",
         "responses": {
           "200": {
@@ -638,9 +1954,7 @@
     },
     "/api/v1/auth/register": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Register a new user account",
         "requestBody": {
           "content": {
@@ -670,9 +1984,7 @@
     },
     "/api/v1/auth/verify-email": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Verify user email address using token",
         "parameters": [
           {
@@ -694,9 +2006,7 @@
     },
     "/api/v1/auth/resend-verification-email": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Resend email verification link",
         "requestBody": {
           "content": {
@@ -726,9 +2036,7 @@
     },
     "/api/v1/auth/login": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Authenticate with email or username and password",
         "requestBody": {
           "content": {
@@ -758,9 +2066,7 @@
     },
     "/api/v1/auth/refresh": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Refresh access and refresh tokens",
         "requestBody": {
           "content": {
@@ -790,9 +2096,7 @@
     },
     "/api/v1/auth/me": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Get current authenticated user profile",
         "security": [
           {
@@ -818,9 +2122,7 @@
     },
     "/api/v1/auth/forgot-password": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Request a password reset link",
         "requestBody": {
           "content": {
@@ -850,9 +2152,7 @@
     },
     "/api/v1/auth/reset-password": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Validate password reset token",
         "parameters": [
           {
@@ -888,9 +2188,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Reset password using token",
         "requestBody": {
           "content": {
@@ -926,9 +2224,7 @@
     },
     "/api/v1/auth/change-password": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Change account password while authenticated",
         "security": [
           {
@@ -964,11 +2260,311 @@
         }
       }
     },
+    "/api/v1/documents": {
+      "post": {
+        "tags": ["Documents"],
+        "summary": "Upload the current user CV or cover letter",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Document uploaded"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Documents"],
+        "summary": "List current user documents",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated documents"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/documents": {
+      "get": {
+        "tags": ["Documents"],
+        "summary": "List all CVs and cover letters for administrators",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated documents"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings": {
+      "get": {
+        "tags": ["Job Postings"],
+        "summary": "List published job postings",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["draft", "published", "archived"]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "location",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "employment_type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "level",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["created_at", "title", "expires_at"],
+              "default": "created_at"
+            },
+            "required": false,
+            "name": "sort_by",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            },
+            "required": false,
+            "name": "sort_order",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated job postings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedJobPostingsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Job Postings"],
+        "summary": "Create a job posting for the authenticated recruiter enterprise",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Job posting created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPostingResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Recruiter access and enterprise membership required"
+          }
+        }
+      }
+    },
+    "/api/v1/recruiter/job-postings": {
+      "get": {
+        "tags": ["Job Postings"],
+        "summary": "List the recruiter's enterprise job postings",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enterprise job postings"
+          },
+          "403": {
+            "description": "Recruiter is not assigned to an enterprise"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}": {
+      "get": {
+        "tags": ["Job Postings"],
+        "summary": "Get a job posting for management",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPostingResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Job posting belongs to another enterprise"
+          },
+          "404": {
+            "description": "Job posting not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Job Postings"],
+        "summary": "Update a job posting for management",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job posting updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPostingResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Job posting belongs to another enterprise"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Job Postings"],
+        "summary": "Delete a job posting for management",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Job posting deleted"
+          },
+          "403": {
+            "description": "Job posting belongs to another enterprise"
+          }
+        }
+      }
+    },
     "/api/v1/users/{id}": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Get user by ID",
         "security": [
           {
@@ -1007,12 +2603,53 @@
       }
     },
     "/api/v1/enterprises": {
-      "get": {
-        "tags": [
-          "Enterprises"
+      "post": {
+        "tags": ["Enterprises"],
+        "summary": "Create an enterprise profile",
+        "description": "Creates a new enterprise profile. Authenticated recruiter or admin required. Default status is pending for recruiters and active for admins.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnterpriseDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Enterprise profile created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed on input fields"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: insufficient permissions"
+          },
+          "409": {
+            "description": "Conflict: Tax code or email already registered, or account already owns an enterprise"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Enterprises"],
         "summary": "View enterprise list / search enterprises",
-        "description": "Public. Returns only Active enterprises. Optional keyword (matches name, industry, location), industry and location narrow the list.",
+        "description": "Public for Active enterprises. Administrators can filter by any status or query all enterprises.",
         "parameters": [
           {
             "schema": {
@@ -1064,11 +2701,43 @@
             "required": false,
             "name": "location",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1-10",
+                "11-50",
+                "51-200",
+                "201-500",
+                "501-1000",
+                "1000+"
+              ]
+            },
+            "required": false,
+            "name": "company_size",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "active",
+                "suspended",
+                "rejected",
+                "inactive",
+                "deleted"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
           }
         ],
         "responses": {
           "200": {
-            "description": "Paginated list of active enterprises (empty items when nothing matches)",
+            "description": "Paginated list of enterprise summaries",
             "content": {
               "application/json": {
                 "schema": {
@@ -1085,11 +2754,9 @@
     },
     "/api/v1/enterprises/{enterpriseId}": {
       "get": {
-        "tags": [
-          "Enterprises"
-        ],
-        "summary": "View enterprise detail",
-        "description": "Public. Returns 404 when the enterprise does not exist or is not Active.",
+        "tags": ["Enterprises"],
+        "summary": "View an enterprise profile detail",
+        "description": "Returns complete enterprise information. Non-active enterprises are accessible only to the owner or admins.",
         "parameters": [
           {
             "schema": {
@@ -1103,7 +2770,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Public enterprise details",
+            "description": "Enterprise detailed profile",
             "content": {
               "application/json": {
                 "schema": {
@@ -1113,7 +2780,109 @@
             }
           },
           "400": {
-            "description": "Invalid enterprise ID"
+            "description": "Invalid enterprise ID format"
+          },
+          "404": {
+            "description": "Enterprise not found or not accessible"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Enterprises"],
+        "summary": "Update an enterprise profile information",
+        "description": "Updates company details. Accessible only by the enterprise owner (Recruiter) or a System Administrator.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "enterpriseId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEnterpriseDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enterprise profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed on updated fields"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: not authorized to modify this enterprise profile"
+          },
+          "404": {
+            "description": "Enterprise not found"
+          },
+          "409": {
+            "description": "Conflict: Email or tax code already registered by another enterprise"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Enterprises"],
+        "summary": "Delete enterprise profile (Soft delete)",
+        "description": "Soft-deletes an enterprise profile. Exclusive to System Administrator. Fails if the enterprise currently has published active jobs.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "enterpriseId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enterprise profile deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Cannot delete enterprise with active job postings"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: System Administrator access required"
           },
           "404": {
             "description": "Enterprise not found"
@@ -1121,11 +2890,419 @@
         }
       }
     },
+    "/api/v1/enterprises/{enterpriseId}/status": {
+      "patch": {
+        "tags": ["Enterprises"],
+        "summary": "Update an enterprise's lifecycle status",
+        "description": "Transitions enterprise status (pending, active, suspended, rejected, inactive). Exclusive to System Administrator. Justification reason mandatory for suspended and rejected statuses.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "enterpriseId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEnterpriseStatusDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enterprise status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status transition or missing mandatory reason"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: System Administrator access required"
+          },
+          "404": {
+            "description": "Enterprise not found"
+          }
+        }
+      }
+    },
+    "/api/v1/me/applications": {
+      "post": {
+        "tags": ["Applications"],
+        "summary": "Apply for a job",
+        "description": "Applicant only. Requires a verified email and a Published + Open job. One active application per job: after a Withdrawn or Rejected application the applicant may apply again, which creates a new linked record (the closed one is never reopened). At most two applications per job; never after Hired.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApplicationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Application submitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (bad IDs, message too long, CV/cover letter not available)"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Email not verified, account not active, or caller is not an Applicant"
+          },
+          "404": {
+            "description": "Job not found / no longer available"
+          },
+          "409": {
+            "description": "ALREADY_APPLIED (an active application exists), APPLY_AGAIN_NOT_ALLOWED (Hired, or two applications already used), or POSITION_FILLED"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Applications"],
+        "summary": "List my applications with filtering, sorting and pagination",
+        "description": "Applicant only. Returns a bounded list of the caller's own applications (any status), newest first by default. Filters: `status` (one value or a comma-separated list), `jobId`, `reviewStage`, submitted date range and a keyword on the job title or company name. Sort by submitted date, last update or ID. Also returns status counts over the same filters for board views (UC-MYAPP-01.AC.3).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["submittedAt", "latestStatusAt", "id"],
+              "default": "submittedAt"
+            },
+            "required": false,
+            "name": "sortBy",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            },
+            "required": false,
+            "name": "sortOrder",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "jobId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["screening", "interview", "offer", "hired", "rejected"]
+            },
+            "required": false,
+            "name": "reviewStage",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "submittedFrom",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "submittedTo",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated applications with status counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or contradictory filter, sort or paging values"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: applicant role required, or the account cannot be resolved to a candidate"
+          }
+        }
+      }
+    },
+    "/api/v1/me/applications/{id}": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "View one of my applications",
+        "description": "Applicant only. Public job summary, submitted attachment metadata (no file URLs), status, stage label and the reapplication links. Another candidate's application is indistinguishable from a missing one (404).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid application ID"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: applicant role required, or the account cannot be resolved to a candidate"
+          },
+          "404": {
+            "description": "Application not found or not owned by the caller"
+          }
+        }
+      }
+    },
+    "/api/v1/me/applications/{id}/history": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "View the status history of one of my applications",
+        "description": "Applicant only. Append-only, oldest first. Each entry has the public status, stage label, actor role (candidate, company or system) and timestamp; never account identifiers or private notes.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationHistoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid application ID or paging values"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: applicant role required, or the account cannot be resolved to a candidate"
+          },
+          "404": {
+            "description": "Application not found or not owned by the caller"
+          }
+        }
+      }
+    },
+    "/api/v1/me/applications/{id}/withdraw": {
+      "patch": {
+        "tags": ["Applications"],
+        "summary": "Withdraw one of my applications",
+        "description": "Applicant only. Allowed while Submitted or Under Review; Withdrawn is closed and never reopened (a later application is a new record). `expectedVersion` is the version returned by the detail endpoint (the number of history entries); a stale version returns 409 and changes nothing.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawApplicationBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Application after withdrawal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, or the status is not Submitted / Under Review"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: applicant role required, or the account cannot be resolved to a candidate"
+          },
+          "404": {
+            "description": "Application not found or not owned by the caller"
+          },
+          "409": {
+            "description": "The application changed after the client read it"
+          }
+        }
+      }
+    },
     "/api/v1/users": {
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "List users (requires admin authorization)",
         "security": [
           {
@@ -1161,10 +3338,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "user",
-                "admin"
-              ]
+              "enum": ["user", "admin"]
             }
           },
           {
@@ -1172,11 +3346,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": [
-                "active",
-                "inactive",
-                "suspended"
-              ]
+              "enum": ["active", "inactive", "suspended"]
             }
           }
         ],

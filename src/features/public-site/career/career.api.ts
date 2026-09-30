@@ -1,35 +1,4 @@
-import { client } from "@/api/client";
-
-type JobPostingSummaryDto = {
-  id: string;
-  enterpriseId: string;
-  title: string;
-  location: string | null;
-  employmentType: string | null;
-  level: string | null;
-  salaryMin: number | null;
-  salaryMax: number | null;
-  currency: string | null;
-  postedAt: string;
-  /** Not part of the list contract today; shown when the backend starts sending it. */
-  deadline?: string | null;
-};
-
-type JobPostingDetailDto = JobPostingSummaryDto & {
-  description: string | null;
-  requirements: string | null;
-  benefits: string | null;
-  openings: number;
-  deadline: string | null;
-};
-
-type PaginatedDto<T> = {
-  items: T[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-};
+import { getApiV1JobPostings, type JobPostingResponse } from "@/api/generated";
 
 const BACKEND_MAX_LIMIT = 100;
 
@@ -98,53 +67,43 @@ const EMPLOYMENT_TYPE_MAP: Record<string, string> = {
   remote: "remote",
 };
 
-function toJob(dto: JobPostingSummaryDto | JobPostingDetailDto): Job {
-  const detail = dto as Partial<JobPostingDetailDto>;
-
+function toJob(dto: JobPostingResponse): Job {
   return {
     _id: dto.id,
     enterpriseId: dto.enterpriseId,
     slug: dto.id,
     title: dto.title,
-    location: dto.location ?? undefined,
+    location: dto.location,
     employment_type: dto.employmentType
       ? (EMPLOYMENT_TYPE_MAP[dto.employmentType] ?? dto.employmentType)
       : undefined,
-    salary_min: dto.salaryMin ?? undefined,
-    salary_max: dto.salaryMax ?? undefined,
-    currency: dto.currency ?? undefined,
-    level: dto.level ?? undefined,
-    description: detail.description ?? undefined,
-    requirements: detail.requirements ?? undefined,
-    benefits: detail.benefits ?? undefined,
-    openings: detail.openings,
-    expires_at: dto.deadline ?? undefined,
-    published_at: dto.postedAt,
-    createdAt: dto.postedAt,
+    salary_min: dto.salaryMin,
+    salary_max: dto.salaryMax,
+    currency: dto.currency,
+    level: dto.level,
+    description: dto.description,
+    requirements: dto.requirements,
+    benefits: dto.benefits,
+    openings: dto.openings,
+    expires_at: dto.expiresAt,
+    published_at: dto.createdAt,
+    createdAt: dto.createdAt,
   };
 }
 
-async function getPage(
-  page: number,
-): Promise<PaginatedDto<JobPostingSummaryDto>> {
-  const result = await client.get<
-    { 200: PaginatedDto<JobPostingSummaryDto> },
-    { "*": unknown }
-  >({
+async function getPage(page: number) {
+  const result = await getApiV1JobPostings({
     query: { limit: BACKEND_MAX_LIMIT, page },
-    url: "/api/v1/job-postings",
   });
 
   if (result.error || !result.data) {
     throw Object.assign(
       result.error && typeof result.error === "object" ? result.error : {},
-      {
-        status: result.response?.status,
-      },
+      { status: result.response?.status },
     );
   }
 
-  return result.data as PaginatedDto<JobPostingSummaryDto>;
+  return result.data;
 }
 
 const LIST_CACHE_MS = 30_000;
@@ -271,7 +230,7 @@ export async function fetchJobs(query: JobListQuery): Promise<JobListResponse> {
     }
     if (!matchesSalary(job, query)) return false;
     if (term) {
-      // The list endpoint does not return descriptions, so search covers the summary fields.
+      // Search covers the summary fields only, not the description text.
       const haystack = [job.title, job.location, job.level, job.employment_type]
         .join(" ")
         .toLowerCase();
@@ -298,26 +257,13 @@ export async function fetchJobs(query: JobListQuery): Promise<JobListResponse> {
 }
 
 export async function fetchJob(id: string): Promise<Job> {
-  const result = await client.get<
-    { 200: JobPostingDetailDto },
-    { "*": unknown }
-  >({
-    url: "/api/v1/job-postings/{id}",
-    path: { id },
-  });
+  // GET /job-postings/{id} is a recruiter/admin endpoint, so visitors read the
+  // job from the public list, which already carries the full description.
+  const job = (await getAllJobs()).find((item) => item._id === id);
 
-  if (result.error || !result.data) {
-    const status = result.response?.status;
-    throw Object.assign(
-      result.error && typeof result.error === "object" ? result.error : {},
-      {
-        // A malformed id is answered with 400; to the visitor that is simply "job not found".
-        status: status === 400 ? 404 : status,
-      },
-    );
-  }
+  if (!job) throw Object.assign(new Error("Job not found"), { status: 404 });
 
-  return toJob(result.data as JobPostingDetailDto);
+  return job;
 }
 
 export async function fetchJobsByEnterprise(enterpriseId: string): Promise<Job[]> {
