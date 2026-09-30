@@ -20,6 +20,8 @@ export type RegisterResponse = {
         id: string;
         email: string;
         username: string;
+        fullName: string | null;
+        phone: string | null;
         role: string;
         status: string;
         emailVerified: boolean;
@@ -48,6 +50,8 @@ export type AuthResponse = {
         id: string;
         email: string;
         username: string;
+        fullName: string | null;
+        phone: string | null;
         role: string;
         status: string;
         emailVerified: boolean;
@@ -70,6 +74,8 @@ export type UserDto = {
     id: string;
     email: string;
     username: string;
+    fullName: string | null;
+    phone: string | null;
     role: string;
     status: string;
     emailVerified: boolean;
@@ -188,9 +194,20 @@ export type PaginatedDocuments = {
     totalPages: number;
 };
 
+export type JobPostingEnterpriseSummary = {
+    id: string;
+    name: string;
+    logoUrl: string | null;
+};
+
 export type JobPosting = {
     id: string;
     enterpriseId: string;
+    enterprise: {
+        id: string;
+        name: string;
+        logoUrl: string | null;
+    };
     postedByUserId: string;
     title: string;
     slug: string;
@@ -230,19 +247,19 @@ export type CreateJobPostingRequest = {
 
 export type UpdateJobPostingRequest = {
     title?: string;
-    location?: string;
-    employment_type?: string;
-    salary_min?: number;
-    salary_max?: number;
+    location?: string | null;
+    employment_type?: string | null;
+    salary_min?: number | null;
+    salary_max?: number | null;
     salary_negotiable?: boolean;
     currency?: string;
-    level?: string;
-    description?: string;
-    requirements?: string;
-    benefits?: string;
-    openings?: number;
+    level?: string | null;
+    description?: string | null;
+    requirements?: string | null;
+    benefits?: string | null;
+    openings?: number | null;
     status?: 'draft' | 'published' | 'archived';
-    expires_at?: string;
+    expires_at?: string | null;
 };
 
 export type JobPostingListQuery = {
@@ -261,6 +278,11 @@ export type PaginatedJobPostings = {
     items: Array<{
         id: string;
         enterpriseId: string;
+        enterprise: {
+            id: string;
+            name: string;
+            logoUrl: string | null;
+        };
         postedByUserId: string;
         title: string;
         slug: string;
@@ -291,6 +313,8 @@ export type UserListResponse = {
         id: string;
         email: string;
         username: string;
+        fullName: string | null;
+        phone: string | null;
         role: string;
         status: string;
         emailVerified: boolean;
@@ -302,6 +326,12 @@ export type UserListResponse = {
     limit: number;
     total: number;
     totalPages: number;
+};
+
+export type UpdateUserRequest = {
+    fullName?: string;
+    phone?: string | null;
+    role?: 'admin' | 'user';
 };
 
 export type EnterpriseListResponse = {
@@ -1213,7 +1243,7 @@ export type GetApiV1UsersData = {
         role?: 'user' | 'admin' | 'recruiter' | 'applicant' | 'interviewer';
         status?: 'active' | 'inactive' | 'suspended' | 'blocked';
         emailVerified?: 'true' | 'false';
-        sortBy?: 'createdAt' | 'id' | 'username' | 'email';
+        sortBy?: 'createdAt' | 'id' | 'name' | 'username' | 'email';
         sortOrder?: 'asc' | 'desc';
     };
     url: '/api/v1/users';
@@ -1283,6 +1313,47 @@ export type GetApiV1UsersByIdResponses = {
 };
 
 export type GetApiV1UsersByIdResponse = GetApiV1UsersByIdResponses[keyof GetApiV1UsersByIdResponses];
+
+export type PatchApiV1UsersByIdData = {
+    body: UpdateUserRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}';
+};
+
+export type PatchApiV1UsersByIdErrors = {
+    /**
+     * Invalid user ID or update body
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Administrator role required or self-role change blocked
+     */
+    403: unknown;
+    /**
+     * User not found
+     */
+    404: unknown;
+    /**
+     * Account storage unavailable
+     */
+    503: unknown;
+};
+
+export type PatchApiV1UsersByIdResponses = {
+    /**
+     * Updated user account
+     */
+    200: UserDto;
+};
+
+export type PatchApiV1UsersByIdResponse = PatchApiV1UsersByIdResponses[keyof PatchApiV1UsersByIdResponses];
 
 export type GetApiV1EnterprisesData = {
     body?: never;

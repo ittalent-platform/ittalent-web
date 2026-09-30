@@ -42,6 +42,9 @@ export function JobsPage() {
           {query.data.items.map((job) => (
             <article className="rounded-lg border bg-card p-5" key={job.id}>
               <p className="text-lg font-semibold">{job.title}</p>
+              <p className="mt-1 text-sm font-medium text-muted-foreground">
+                {job.enterprise.name}
+              </p>
               <p className="mt-2 text-sm text-muted-foreground">
                 {[job.location, job.employmentType, job.level]
                   .filter(Boolean)
@@ -78,7 +81,7 @@ export function JobsPage() {
       ) : null}
       <p className="mt-8 text-sm text-muted-foreground">
         Administrator?{" "}
-        <Link className="text-primary" to="/admin/job-postings">
+        <Link className="text-fg-link hover:underline" to="/admin/job-postings">
           Manage job postings
         </Link>
         .

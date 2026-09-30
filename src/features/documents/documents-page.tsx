@@ -11,7 +11,11 @@ import { Pagination } from "@/components/ui/pagination";
 import { useToast } from "@/components/toast/toast-provider";
 import { formatDate } from "@/lib/format";
 import { useListParams } from "@/hooks/use-list-params";
-import { type DocumentType, useDocuments, useUploadDocument } from "./documents.queries";
+import {
+  type DocumentType,
+  useDocuments,
+  useUploadDocument,
+} from "./documents.queries";
 
 const allowedMimeTypes = new Set([
   "application/pdf",
@@ -34,7 +38,12 @@ export function DocumentsPage() {
   const [listType, setListType] = useState<DocumentType | "all">("all");
   const input = useRef<HTMLInputElement>(null);
   const toast = useToast();
-  const query = useDocuments({ page, limit, sort_order: "desc", ...(listType === "all" ? {} : { type: listType }) });
+  const query = useDocuments({
+    page,
+    limit,
+    sort_order: "desc",
+    ...(listType === "all" ? {} : { type: listType }),
+  });
   const upload = useUploadDocument();
   const selectFile = (file?: File) => {
     if (!file || upload.isPending) return;
@@ -53,7 +62,15 @@ export function DocumentsPage() {
             tone: "success",
           });
         },
-        onError: (uploadError) => toast.showToast({ title: "Could not upload document", message: requestErrorMessage(uploadError, "The document could not be uploaded."), tone: "error" }),
+        onError: (uploadError) =>
+          toast.showToast({
+            title: "Could not upload document",
+            message: requestErrorMessage(
+              uploadError,
+              "The document could not be uploaded.",
+            ),
+            tone: "error",
+          }),
       },
     );
   };
@@ -165,7 +182,7 @@ export function DocumentsPage() {
                   cell: (row) => (
                     <a
                       aria-label={`Open ${row.fileName}`}
-                      className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                      className="inline-flex items-center gap-1 text-sm text-fg-link hover:underline"
                       href={row.fileUrl}
                       rel="noreferrer"
                       target="_blank"
