@@ -46,7 +46,7 @@ type EnterprisesTableProps = {
   onDelete: (enterprise: EnterpriseSummaryDto) => void;
 };
 
-function formatCreator(id?: string): string {
+function formatCreator(id?: string | null): string {
   if (!id) return "";
   if (id === "u1" || id.toLowerCase() === "admin") return "System Admin";
   if (/^[0-9a-f]{24}$/i.test(id)) return "System Admin";

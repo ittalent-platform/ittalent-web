@@ -347,6 +347,10 @@ export type EnterpriseListResponse = {
         companyType: string | null;
         techStack?: Array<string>;
         status: string;
+        email?: string | null;
+        phone?: string | null;
+        createdAt?: string | null;
+        creatorAccountId?: string | null;
     }>;
     page: number;
     limit: number;

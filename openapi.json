@@ -1327,6 +1327,22 @@
                 },
                 "status": {
                   "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "phone": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "creatorAccountId": {
+                  "type": "string",
+                  "nullable": true
                 }
               },
               "required": [
