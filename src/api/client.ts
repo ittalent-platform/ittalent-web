@@ -6,6 +6,7 @@ export type AuthTokens = RefreshTokenResponse;
 
 const env = getPublicEnv(import.meta.env);
 
+export const SESSION_EXPIRED_EVENT = "auth:session-expired";
 const ACCESS_TOKEN_KEY = "ittalent_access_token";
 const REFRESH_TOKEN_KEY = "ittalent_refresh_token";
 
@@ -59,7 +60,7 @@ export async function refreshAuthTokens(): Promise<string | null> {
     if (!res.ok) {
       setStoredTokens(null);
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("auth:session-expired"));
+        window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
       }
       return null;
     }
@@ -75,13 +76,13 @@ export async function refreshAuthTokens(): Promise<string | null> {
 
     setStoredTokens(null);
     if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("auth:session-expired"));
+      window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
     }
     return null;
   } catch {
     setStoredTokens(null);
     if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("auth:session-expired"));
+      window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
     }
     return null;
   } finally {
@@ -132,6 +133,10 @@ client.interceptors.response.use(async (response, request, opts) => {
 
   const tokens = getStoredTokens();
   if (!tokens?.refreshToken) {
+    // No way to renew the session: tell the app to send the user to Sign in.
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
+    }
     return response;
   }
 

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getApiV1Users, getApiV1UsersById } from "@/api/generated";
+import { getApiV1UsersById } from "@/api/generated";
+import { client } from "@/api/client";
 import type { UserDto } from "@/api/generated/types.gen";
 
 export type UsersListParams = {
@@ -30,7 +31,8 @@ export function useUsersListQuery(params: UsersListParams) {
     queryKey: usersKeys.list({ ...queryParams, limit }),
     queryFn: async () => {
       try {
-        const result = await getApiV1Users({
+        const result = await client.get<{ 200: { items: UserDto[]; total: number; page: number; limit: number; totalPages: number } }>({
+          url: "/api/v1/users",
           query: {
             limit,
             page: queryParams.page,

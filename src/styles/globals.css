@@ -402,6 +402,90 @@
   --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
+/* Candidate workspace tokens come from ittalent-design-system.html. Scope to the
+   applicant shell so marketing and admin screens keep their existing identity. */
+.candidate-root {
+  --app-canvas: #fafaf8;
+  --background: #ffffff;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --foreground: #19191c;
+  --muted: #f1efea;
+  --muted-foreground: #64646b;
+  --border: #e6e4df;
+  --border-strong: #dedcd6;
+  --primary: #f2470c;
+  --primary-foreground: #ffffff;
+  --status-neutral-bg: #f1efea;
+  --status-neutral-fg: #4a4a50;
+  --status-info-bg: #e4ecfb;
+  --status-info-fg: #2a55a8;
+  --status-blocked-bg: #efe9fb;
+  --status-blocked-fg: #6941c6;
+  --status-warning-bg: #fcf3e3;
+  --status-warning-fg: #b45309;
+  --status-success-bg: #e8f5ee;
+  --status-success-fg: #12764a;
+  --status-error-bg: #fbe9e7;
+  --status-error-fg: #b42318;
+  --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  /* Ember CTA: the darker #d73c03 fill keeps white 14px/600 labels above 4.5:1 (DESIGN.md "Ember-Is-Not-Text"). */
+  --primary: #d73c03;
+  --brand: #f2470c;
+  --fg-link: #b33305;
+  --line-muted: #efede8;
+  --line-dashed: #c9c7c1;
+  --surface-readonly: #f6f5f1;
+  --surface-subtle: #fbfaf8;
+  --slate-subtle: #737379;
+  --destructive: #b42318;
+  --destructive-solid: #c62a1c;
+  --destructive-border: #f2c4bc;
+  --notification-badge: #d92d20;
+  --overlay: rgba(25, 25, 28, 0.55);
+  /* Company logo tile palette: a company gets one by hashing its name (see logo-tile.tsx). */
+  --logo-1: #1c6b3f;
+  --logo-2: #2a55a8;
+  --logo-3: #8a4b06;
+  --logo-4: #f2470c;
+  --logo-5: #b42318;
+  --logo-6: #6941c6;
+}
+
+.candidate-root.dark {
+  --fg-link: #f6c9b6;
+  --line-muted: #2e2e32;
+  --line-dashed: #4a4a50;
+  --surface-readonly: #26262a;
+  --surface-subtle: #222226;
+  --slate-subtle: #9a9a9f;
+  --destructive: #f4a399;
+  --destructive-solid: #c62a1c;
+  --destructive-border: #5a2a25;
+  --app-canvas: #19191c;
+  --background: #19191c;
+  --card: #222226;
+  --popover: #222226;
+  --foreground: #f4f2ee;
+  --muted: #2e2e32;
+  --muted-foreground: #9a9a9f;
+  --border: #2e2e32;
+  --border-strong: #3a3a40;
+  --status-neutral-bg: #2e2e32;
+  --status-neutral-fg: #c2c2c6;
+  --status-info-bg: #1a2540;
+  --status-info-fg: #93b2ee;
+  --status-blocked-bg: #2a2140;
+  --status-blocked-fg: #b9a2f0;
+  --status-warning-bg: #33260f;
+  --status-warning-fg: #f3b562;
+  --status-success-bg: #16301f;
+  --status-success-fg: #6fd39b;
+  --status-error-bg: #3a1a17;
+  --status-error-fg: #f4a399;
+  --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
 @keyframes itt-pulse {
   0%,
   100% {
