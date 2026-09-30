@@ -13,6 +13,7 @@ import { userDisplayId } from "@/lib/display-id";
 import { formatDate } from "@/lib/format";
 
 import { SuspendUserDialog } from "./suspend-user-dialog";
+import { userDisplayName } from "./user-display";
 import { EmailStatusBadge, RoleBadge, StatusBadge } from "./user-badges";
 import { UserFormDialog } from "./user-form-dialog";
 import { useUserDetailQuery } from "./users.queries";
@@ -37,8 +38,10 @@ export function AdminUserDetailPage() {
   }
 
   const fields = [
+    { label: t("adminUsers.detail.fullName"), value: user.fullName ?? "—" },
     { label: t("adminUsers.detail.username"), value: user.username },
     { label: t("adminUsers.detail.email"), value: user.email },
+    { label: t("adminUsers.detail.phone"), value: user.phone ?? "—" },
     { label: t("adminUsers.detail.emailStatus"), value: <EmailStatusBadge verified={user.emailVerified} /> },
     { label: t("adminUsers.detail.role"), value: <RoleBadge role={user.role} /> },
     { label: t("adminUsers.detail.accountStatus"), value: <StatusBadge status={user.status} /> },
@@ -56,10 +59,10 @@ export function AdminUserDetailPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
-        <PersonAvatar tone="peach" className="size-12 text-[17px]" name={user.username} />
+        <PersonAvatar tone="peach" className="size-12 text-[17px]" name={userDisplayName(user)} />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="itt-display text-2xl font-semibold text-foreground">{user.username}</h1>
+            <h1 className="itt-display text-2xl font-semibold text-foreground">{userDisplayName(user)}</h1>
             <StatusBadge status={user.status} />
             <RoleBadge role={user.role} />
           </div>

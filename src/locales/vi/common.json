@@ -505,7 +505,7 @@
     },
     "toolbar": {
       "email": "Email",
-      "search": "Tìm theo tên hoặc email…",
+      "search": "Tìm theo tên, email hoặc số điện thoại…",
       "role": "Vai trò",
       "status": "Trạng thái",
       "all": "Tất cả"
@@ -523,7 +523,8 @@
       "view": "Xem chi tiết",
       "edit": "Chỉnh sửa",
       "suspend": "Tạm khóa",
-      "empty": "Không tìm thấy người dùng."
+      "empty": "Không tìm thấy người dùng.",
+      "mobile": "Di động"
     },
     "detail": {
       "back": "Quay lại danh sách",
@@ -538,14 +539,16 @@
       "accountStatus": "Trạng thái tài khoản",
       "created": "Ngày tạo",
       "accountId": "Mã tài khoản",
-      "suspend": "Tạm khóa"
+      "suspend": "Tạm khóa",
+      "fullName": "Họ và tên",
+      "phone": "Số điện thoại"
     },
     "form": {
       "createTitle": "Tạo người dùng nội bộ",
       "createDescription": "Ảnh đại diện được tạo từ chữ cái đầu · được ghi vào nhật ký kiểm toán",
       "editTitle": "Chỉnh sửa người dùng",
       "created": "tạo ngày {{date}}",
-      "unavailable": "Chưa thể lưu thay đổi: API người dùng hiện chỉ cho phép xem.",
+      "unavailable": "Chưa thể tạo tài khoản: tài khoản mới cần cách nhận thông tin đăng nhập.",
       "identity": "Danh tính",
       "fullName": "Họ và tên",
       "fullNamePlaceholder": "Nguyễn Văn A",
@@ -561,7 +564,19 @@
       "since": "từ {{date}}",
       "statusNote": "Không thể đổi trạng thái trong biểu mẫu này. Để tạm khóa hoặc kích hoạt tài khoản, hãy dùng menu ở dòng trong danh sách hoặc trang chi tiết người dùng.",
       "save": "Lưu thay đổi",
-      "create": "Tạo người dùng"
+      "create": "Tạo người dùng",
+      "mobile": "Số di động",
+      "mobilePlaceholder": "0901 234 567",
+      "mobileHint": "Không bắt buộc · 9–15 chữ số, có thể có dấu cách",
+      "fullNameError": "Nhập họ tên từ {{min}}–{{max}} ký tự.",
+      "mobileError": "Nhập số di động hợp lệ: 9–15 chữ số, có thể bắt đầu bằng +.",
+      "emailLocked": "Email là danh tính đăng nhập nên không thể đổi ở đây.",
+      "roleLocked": "Bạn không thể đổi vai trò của chính mình.",
+      "saving": "Đang lưu…",
+      "saved": "Đã lưu thay đổi",
+      "savedMessage": "Đã cập nhật {{name}}.",
+      "saveFailed": "Không lưu được thay đổi. Hãy thử lại sau ít phút.",
+      "noChanges": "Chưa có gì để lưu."
     },
     "suspend": {
       "title": "Tạm khóa {{name}}?",

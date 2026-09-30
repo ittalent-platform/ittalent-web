@@ -512,7 +512,7 @@
     },
     "toolbar": {
       "email": "Email",
-      "search": "Search by name or email…",
+      "search": "Search by name, email or phone…",
       "role": "Role",
       "status": "Status",
       "all": "All"
@@ -530,7 +530,8 @@
       "view": "View details",
       "edit": "Edit",
       "suspend": "Suspend",
-      "empty": "No users found."
+      "empty": "No users found.",
+      "mobile": "Mobile"
     },
     "detail": {
       "back": "Back to users",
@@ -545,14 +546,16 @@
       "accountStatus": "Account status",
       "created": "Created",
       "accountId": "Account ID",
-      "suspend": "Suspend"
+      "suspend": "Suspend",
+      "fullName": "Full name",
+      "phone": "Phone"
     },
     "form": {
       "createTitle": "Create internal user",
       "createDescription": "Avatar is generated from initials · recorded in audit log",
       "editTitle": "Edit user",
       "created": "created {{date}}",
-      "unavailable": "Saving changes isn't available yet: the users API is read-only for now.",
+      "unavailable": "Creating accounts isn't available yet: a new account needs a way to receive its sign-in credentials.",
       "identity": "Identity",
       "fullName": "Full name",
       "fullNamePlaceholder": "Nguyen Van A",
@@ -568,7 +571,19 @@
       "since": "since {{date}}",
       "statusNote": "Status can't be changed in this form. To suspend or activate the account, use the row menu in the user list or the user's detail page.",
       "save": "Save changes",
-      "create": "Create user"
+      "create": "Create user",
+      "mobile": "Mobile number",
+      "mobilePlaceholder": "0901 234 567",
+      "mobileHint": "Optional · 9–15 digits, spaces allowed",
+      "fullNameError": "Enter a name of {{min}}–{{max}} characters.",
+      "mobileError": "Enter a valid mobile number: 9–15 digits, optionally starting with +.",
+      "emailLocked": "Email is the sign-in identity and can't be changed here.",
+      "roleLocked": "You can't change your own role.",
+      "saving": "Saving…",
+      "saved": "Changes saved",
+      "savedMessage": "{{name}} was updated.",
+      "saveFailed": "Couldn't save the changes. Try again in a moment.",
+      "noChanges": "Nothing to save yet."
     },
     "suspend": {
       "title": "Suspend {{name}}?",

@@ -20,6 +20,8 @@ export type RegisterResponse = {
         id: string;
         email: string;
         username: string;
+        fullName: string | null;
+        phone: string | null;
         role: string;
         status: string;
         emailVerified: boolean;
@@ -48,6 +50,8 @@ export type AuthResponse = {
         id: string;
         email: string;
         username: string;
+        fullName: string | null;
+        phone: string | null;
         role: string;
         status: string;
         emailVerified: boolean;
@@ -70,6 +74,8 @@ export type UserDto = {
     id: string;
     email: string;
     username: string;
+    fullName: string | null;
+    phone: string | null;
     role: string;
     status: string;
     emailVerified: boolean;
@@ -199,6 +205,8 @@ export type UserListResponse = {
         id: string;
         email: string;
         username: string;
+        fullName: string | null;
+        phone: string | null;
         role: string;
         status: string;
         emailVerified: boolean;
@@ -959,7 +967,7 @@ export type GetApiV1UsersData = {
         role?: 'user' | 'admin' | 'recruiter' | 'applicant' | 'interviewer';
         status?: 'active' | 'inactive' | 'suspended' | 'blocked';
         emailVerified?: 'true' | 'false';
-        sortBy?: 'createdAt' | 'id' | 'username' | 'email';
+        sortBy?: 'createdAt' | 'id' | 'name' | 'username' | 'email';
         sortOrder?: 'asc' | 'desc';
     };
     url: '/api/v1/users';
@@ -1029,6 +1037,51 @@ export type GetApiV1UsersByIdResponses = {
 };
 
 export type GetApiV1UsersByIdResponse = GetApiV1UsersByIdResponses[keyof GetApiV1UsersByIdResponses];
+
+export type PatchApiV1UsersByIdData = {
+    body: {
+        fullName?: string;
+        phone?: string | null;
+        role?: 'admin' | 'user';
+    };
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}';
+};
+
+export type PatchApiV1UsersByIdErrors = {
+    /**
+     * Invalid user ID or body, or nothing to update
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a System Administrator, or is changing their own role
+     */
+    403: unknown;
+    /**
+     * User not found
+     */
+    404: unknown;
+    /**
+     * Account storage unavailable, retry later
+     */
+    503: unknown;
+};
+
+export type PatchApiV1UsersByIdResponses = {
+    /**
+     * The updated user account
+     */
+    200: UserDto;
+};
+
+export type PatchApiV1UsersByIdResponse = PatchApiV1UsersByIdResponses[keyof PatchApiV1UsersByIdResponses];
 
 export type GetApiV1EnterprisesData = {
     body?: never;

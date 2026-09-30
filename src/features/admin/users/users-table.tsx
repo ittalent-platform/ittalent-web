@@ -11,6 +11,7 @@ import { userDisplayId } from "@/lib/display-id";
 import { formatDate } from "@/lib/format";
 
 import { EmailStatusBadge, RoleBadge, StatusBadge } from "./user-badges";
+import { userDisplayName } from "./user-display";
 import { USER_SORT_FIELD_BY_COLUMN, type UserSortField, type UserSortOrder } from "./users.constants";
 
 type UsersTableProps = {
@@ -24,7 +25,7 @@ type UsersTableProps = {
   sortOrder: UserSortOrder;
 };
 
-/** The table column whose header shows the active sort (the API sorts the Name column by username). */
+/** The table column whose header shows the active sort. */
 function sortColumn(field: UserSortField): string {
   return Object.entries(USER_SORT_FIELD_BY_COLUMN).find(([, value]) => value === field)?.[0] ?? "createdAt";
 }
@@ -42,8 +43,8 @@ export function UsersTable({ isLoading, items, onEdit, onSort, onSuspend, onView
     {
       cell: (user) => (
         <Link className="group flex min-w-0 items-center gap-2.5 font-bold text-foreground no-underline" to={adminUserPath(user.id)}>
-          <PersonAvatar tone="peach" className="size-9 text-[13px] no-underline" name={user.username} />
-          <span className="truncate transition-colors group-hover:text-(--link-hover)">{user.username}</span>
+          <PersonAvatar tone="peach" className="size-9 text-[13px] no-underline" name={userDisplayName(user)} />
+          <span className="truncate transition-colors group-hover:text-(--link-hover)">{userDisplayName(user)}</span>
         </Link>
       ),
       header: t("adminUsers.table.name"),
@@ -51,6 +52,7 @@ export function UsersTable({ isLoading, items, onEdit, onSort, onSuspend, onView
       sortable: true,
     },
     { cell: (user) => <span className="break-all">{user.email}</span>, header: t("adminUsers.table.email"), key: "email", sortable: true },
+    { cell: (user) => <span className="whitespace-nowrap text-muted-foreground">{user.phone ?? "—"}</span>, header: t("adminUsers.table.mobile"), key: "mobile" },
     { cell: (user) => <RoleBadge role={user.role} />, header: t("adminUsers.table.role"), key: "role" },
     { cell: (user) => <EmailStatusBadge verified={user.emailVerified} />, header: t("adminUsers.table.emailStatus"), key: "emailStatus" },
     { cell: (user) => <StatusBadge status={user.status} />, header: t("adminUsers.table.accountStatus"), key: "status" },
@@ -61,7 +63,7 @@ export function UsersTable({ isLoading, items, onEdit, onSort, onSuspend, onView
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                aria-label={t("adminUsers.table.rowActions", { name: user.username })}
+                aria-label={t("adminUsers.table.rowActions", { name: userDisplayName(user) })}
                 className="grid size-8 cursor-pointer place-items-center rounded-[10px] text-muted-foreground hover:bg-muted"
                 type="button"
               >

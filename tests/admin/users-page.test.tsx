@@ -1,18 +1,31 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { patchApiV1UsersById } from "@/api/generated";
+import { authKeys } from "@/auth/use-session";
+import { ToastProvider } from "@/components/toast/toast-provider";
 
 import { AdminUserDetailPage } from "@/features/admin/users/user-detail-page";
 import { UsersPage } from "@/features/admin/users/users-page";
 import * as usersQueries from "@/features/admin/users/users.queries";
+
+vi.mock("@/api/generated", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/api/generated")>()),
+  patchApiV1UsersById: vi.fn(),
+}));
+const mockedPatch = vi.mocked(patchApiV1UsersById);
 
 const user = {
   createdAt: "2026-01-01T00:00:00.000Z",
   email: "dev@example.com",
   emailVerified: true,
   enterpriseId: null,
+  fullName: "John Doe",
   id: "6a4a5424c8097df77a6ed9be",
+  phone: "0901122334",
   role: "user",
   status: "active",
   username: "johndoe",
@@ -30,14 +43,30 @@ function LocationProbe() {
   return <output data-testid="location">{location.search}</output>;
 }
 
-function renderList(path = "/admin/users") {
+/** The pages read the session and show toasts, so they render inside the same providers as the app. */
+function renderApp(ui: React.ReactElement, queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })) {
   render(
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>{ui}</ToastProvider>
+    </QueryClientProvider>,
+  );
+  return queryClient;
+}
+
+function renderList(path = "/admin/users", queryClient?: QueryClient) {
+  return renderApp(
     <MemoryRouter initialEntries={[path]}>
       <UsersPage />
       <LocationProbe />
     </MemoryRouter>,
+    queryClient,
   );
 }
+
+beforeEach(() => {
+  localStorage.clear();
+  mockedPatch.mockReset();
+});
 
 const lastListParams = (spy: { mock: { calls: unknown[][] } }) => spy.mock.calls.at(-1)?.[0] as Record<string, unknown>;
 
@@ -45,7 +74,7 @@ afterEach(() => vi.restoreAllMocks());
 
 describe("UsersPage", () => {
   it("renders the header, filters and one row per user with backed columns only", () => {
-    mockList([user, { ...user, email: "admin@example.com", id: "7b4a5424c8097df77a6ed9bf", role: "admin", username: "adminboss" }]);
+    mockList([user, { ...user, email: "admin@example.com", fullName: "Admin Boss", id: "7b4a5424c8097df77a6ed9bf", role: "admin", username: "adminboss" }]);
     renderList();
 
     expect(screen.getByRole("heading", { name: "Users" })).toBeInTheDocument();
@@ -53,12 +82,21 @@ describe("UsersPage", () => {
     expect(screen.getByRole("button", { name: /create user/i })).toBeInTheDocument();
     expect(screen.getByText("Role:")).toBeInTheDocument();
     expect(screen.getByText("Status:")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /johndoe/ })).toHaveAttribute("href", "/admin/users/6a4a5424c8097df77a6ed9be");
+    expect(screen.getByRole("link", { name: /John Doe/ })).toHaveAttribute("href", "/admin/users/6a4a5424c8097df77a6ed9be");
     expect(screen.getByText("dev@example.com")).toBeInTheDocument();
     expect(screen.getByText("Applicant")).toBeInTheDocument();
     expect(screen.getByText("Email:")).toBeInTheDocument();
-    // Full name and phone are not stored yet, so there is no column for them.
-    expect(screen.queryByRole("columnheader", { name: /mobile/i })).not.toBeInTheDocument();
+  });
+
+  it("shows the full name (or the username when there is none) and the mobile number", () => {
+    mockList([user, { ...user, fullName: null, id: "7b4a5424c8097df77a6ed9bf", phone: null, username: "nameless" }]);
+    renderList();
+
+    expect(screen.getByRole("columnheader", { name: /mobile/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /John Doe/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /nameless/ })).toBeInTheDocument();
+    expect(screen.getByText("0901122334")).toBeInTheDocument();
+    expect(screen.getByText("—")).toBeInTheDocument();
   });
 
   it("shows each account's email status", () => {
@@ -89,7 +127,7 @@ describe("UsersPage", () => {
       expect(screen.getByTestId("location")).toHaveTextContent("?search=flakeian");
       expect(screen.getByTestId("location")).not.toHaveTextContent("page=3");
       expect(box).toHaveValue("flakeian");
-      expect(box).toHaveAttribute("placeholder", "Search by name or email…");
+      expect(box).toHaveAttribute("placeholder", "Search by name, email or phone…");
     } finally {
       vi.useRealTimers();
     }
@@ -142,7 +180,7 @@ describe("UsersPage", () => {
     expect(lastListParams(spy)).toMatchObject({ sortBy: "email", sortOrder: "desc" });
 
     fireEvent.click(within(screen.getByRole("columnheader", { name: /^name$/i })).getByRole("button"));
-    expect(lastListParams(spy)).toMatchObject({ sortBy: "username", sortOrder: "asc" });
+    expect(lastListParams(spy)).toMatchObject({ sortBy: "name", sortOrder: "asc" });
 
     fireEvent.click(within(screen.getByRole("columnheader", { name: /^id$/i })).getByRole("button"));
     expect(lastListParams(spy)).toMatchObject({ sortBy: "id", sortOrder: "asc" });
@@ -195,14 +233,15 @@ describe("UsersPage", () => {
     expect(screen.queryByText(/accounts in your authorized scope/)).not.toBeInTheDocument();
   });
 
-  it("opens the create dialog with a disabled submit while the API is read-only", () => {
+  it("opens the create dialog with the mobile field and a disabled submit while creating accounts is unsupported", () => {
     mockList([]);
     renderList();
 
     fireEvent.click(screen.getByRole("button", { name: /create user/i }));
 
     expect(screen.getByRole("dialog", { name: "Create internal user" })).toBeInTheDocument();
-    expect(screen.getByText(/saving changes isn't available yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/creating accounts isn't available yet/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/mobile number/i)).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Create user" }).at(-1)).toBeDisabled();
   });
 });
@@ -214,7 +253,7 @@ describe("AdminUserDetailPage", () => {
       error: null,
       isLoading: false,
     } as unknown as ReturnType<typeof usersQueries.useUserDetailQuery>);
-    render(
+    renderApp(
       <MemoryRouter initialEntries={["/admin/users/6a4a5424c8097df77a6ed9be"]}>
         <Routes>
           <Route element={<AdminUserDetailPage />} path="/admin/users/:userId" />
@@ -226,12 +265,16 @@ describe("AdminUserDetailPage", () => {
   it("shows only the account fields the API returns, with Edit and Suspend actions", () => {
     renderDetail();
 
-    expect(screen.getByRole("heading", { name: "johndoe" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "John Doe" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Users" })).toHaveAttribute("href", "/admin/users");
     expect(screen.getByText("Account information")).toBeInTheDocument();
     expect(screen.getByText("Account ID")).toBeInTheDocument();
     expect(screen.getByText("Email status")).toBeInTheDocument();
     expect(screen.getByText("Verified")).toBeInTheDocument();
+    expect(screen.getByText("Full name")).toBeInTheDocument();
+    expect(screen.getByText("John Doe", { selector: "dd, p, span, div" })).toBeInTheDocument();
+    expect(screen.getByText("Phone")).toBeInTheDocument();
+    expect(screen.getByText("0901122334")).toBeInTheDocument();
     expect(screen.queryByText("Activity")).not.toBeInTheDocument();
     expect(screen.queryByText(/audit history/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/last sign-in/i)).not.toBeInTheDocument();
@@ -243,7 +286,7 @@ describe("AdminUserDetailPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Suspend" }));
 
-    expect(screen.getByRole("alertdialog")).toHaveTextContent("Suspend johndoe?");
+    expect(screen.getByRole("alertdialog")).toHaveTextContent("Suspend John Doe?");
     expect(screen.getByRole("button", { name: "Suspend account" })).toBeDisabled();
   });
 
@@ -254,5 +297,142 @@ describe("AdminUserDetailPage", () => {
 
     expect(screen.getByRole("dialog", { name: "Edit user" })).toBeInTheDocument();
     expect(screen.getByText(/status can't be changed in this form/i)).toBeInTheDocument();
+  });
+});
+
+describe("Edit user form (UC-USER-03)", () => {
+  const admin = { ...user, id: "7b4a5424c8097df77a6ed9bf", role: "admin", username: "boss", fullName: "Minh Admin", phone: null };
+
+  function renderEdit(target = user, currentUserId = "someone-else") {
+    localStorage.setItem("ittalent_access_token", "token");
+    localStorage.setItem("ittalent_refresh_token", "refresh");
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    queryClient.setQueryData(authKeys.me(), { ...admin, id: currentUserId });
+    mockList([target]);
+    renderList("/admin/users", queryClient);
+    return queryClient;
+  }
+
+  async function openEdit(name: string) {
+    const events = userEvent.setup();
+    await events.click(screen.getByRole("button", { name: `Actions for ${name}` }));
+    await events.click(await screen.findByRole("menuitem", { name: /edit/i }));
+    return { events, dialog: await screen.findByRole("dialog", { name: /edit user/i }) };
+  }
+
+  const saved = { ...user, fullName: "Mai Dương", phone: "0987654321" };
+
+  it("fills the form from the account and locks the email, with Save off until something changes", async () => {
+    renderEdit();
+    const { dialog } = await openEdit("John Doe");
+
+    expect(within(dialog).getByLabelText(/full name/i)).toHaveValue("John Doe");
+    expect(within(dialog).getByLabelText(/mobile number/i)).toHaveValue("0901122334");
+    expect(within(dialog).getByLabelText(/^email/i)).toBeDisabled();
+    expect(within(dialog).getByLabelText(/^email/i)).toHaveValue("dev@example.com");
+    expect(within(dialog).getByText(/can't be changed here/i)).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Save changes" })).toBeDisabled();
+  });
+
+  it("sends only the fields that changed, then closes and refreshes the list", async () => {
+    mockedPatch.mockResolvedValue({ data: saved, error: undefined, response: { status: 200 } } as never);
+    const queryClient = renderEdit();
+    const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+    const { events, dialog } = await openEdit("John Doe");
+
+    await events.clear(within(dialog).getByLabelText(/full name/i));
+    await events.type(within(dialog).getByLabelText(/full name/i), "  Mai Dương ");
+    await events.clear(within(dialog).getByLabelText(/mobile number/i));
+    await events.type(within(dialog).getByLabelText(/mobile number/i), "0987 654 321");
+    await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => expect(mockedPatch).toHaveBeenCalledTimes(1));
+    expect(mockedPatch).toHaveBeenCalledWith({ body: { fullName: "Mai Dương", phone: "0987654321" }, path: { id: user.id } });
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: /edit user/i })).not.toBeInTheDocument());
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ["admin-users", "list"] });
+    expect(await screen.findByText("Mai Dương was updated.")).toBeInTheDocument();
+  });
+
+  it("clears the mobile number by sending null when the field is emptied", async () => {
+    mockedPatch.mockResolvedValue({ data: { ...user, phone: null }, error: undefined, response: { status: 200 } } as never);
+    renderEdit();
+    const { events, dialog } = await openEdit("John Doe");
+
+    await events.clear(within(dialog).getByLabelText(/mobile number/i));
+    await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => expect(mockedPatch).toHaveBeenCalledWith({ body: { phone: null }, path: { id: user.id } }));
+  });
+
+  it("changes the role of another account", async () => {
+    mockedPatch.mockResolvedValue({ data: { ...user, role: "admin" }, error: undefined, response: { status: 200 } } as never);
+    renderEdit();
+    const { events, dialog } = await openEdit("John Doe");
+
+    await events.click(within(dialog).getByRole("button", { name: "Admin" }));
+    await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => expect(mockedPatch).toHaveBeenCalledWith({ body: { role: "admin" }, path: { id: user.id } }));
+  });
+
+  it("does not send the role when it was not touched, even for a role the form cannot show", async () => {
+    mockedPatch.mockResolvedValue({ data: { ...user, role: "recruiter", fullName: "New Name" }, error: undefined, response: { status: 200 } } as never);
+    renderEdit({ ...user, role: "recruiter" });
+    const { events, dialog } = await openEdit("John Doe");
+
+    await events.clear(within(dialog).getByLabelText(/full name/i));
+    await events.type(within(dialog).getByLabelText(/full name/i), "New Name");
+    await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => expect(mockedPatch).toHaveBeenCalledWith({ body: { fullName: "New Name" }, path: { id: user.id } }));
+  });
+
+  it("locks the role of the signed-in administrator's own account", async () => {
+    renderEdit(admin, admin.id);
+    const { dialog } = await openEdit("Minh Admin");
+
+    expect(within(dialog).getByText("You can't change your own role.")).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Admin" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "Applicant" })).toBeDisabled();
+  });
+
+  it("explains an invalid name or number and does not call the API", async () => {
+    renderEdit();
+    const { events, dialog } = await openEdit("John Doe");
+
+    await events.clear(within(dialog).getByLabelText(/full name/i));
+    await events.type(within(dialog).getByLabelText(/full name/i), "A");
+    await events.clear(within(dialog).getByLabelText(/mobile number/i));
+    await events.type(within(dialog).getByLabelText(/mobile number/i), "12ab");
+    await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
+
+    expect(await within(dialog).findByText("Enter a name of 2–100 characters.")).toBeInTheDocument();
+    expect(within(dialog).getByText(/enter a valid mobile number/i)).toBeInTheDocument();
+    expect(mockedPatch).not.toHaveBeenCalled();
+  });
+
+  it("shows the API's reason when it rejects the edit and keeps the dialog open", async () => {
+    mockedPatch.mockResolvedValue({ data: undefined, error: { message: "You can't change your own role" }, response: { status: 403 } } as never);
+    renderEdit();
+    const { events, dialog } = await openEdit("John Doe");
+
+    await events.clear(within(dialog).getByLabelText(/full name/i));
+    await events.type(within(dialog).getByLabelText(/full name/i), "Someone Else");
+    await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
+
+    expect(await within(dialog).findByText("You can't change your own role")).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: /edit user/i })).toBeInTheDocument();
+  });
+
+  it("shows a generic message when the server fails", async () => {
+    mockedPatch.mockResolvedValue({ data: undefined, error: { message: "Unable to load user accounts right now." }, response: { status: 503 } } as never);
+    renderEdit();
+    const { events, dialog } = await openEdit("John Doe");
+
+    await events.clear(within(dialog).getByLabelText(/full name/i));
+    await events.type(within(dialog).getByLabelText(/full name/i), "Someone Else");
+    await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
+
+    expect(await within(dialog).findByText("Couldn't save the changes. Try again in a moment.")).toBeInTheDocument();
   });
 });

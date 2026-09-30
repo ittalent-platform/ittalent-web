@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import type { UserDto } from "@/api/generated/types.gen";
 import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
+import { userDisplayName } from "./user-display";
 
 /** Suspend confirmation (Users design). There is no suspend endpoint yet, so confirming stays disabled. */
 export function SuspendUserDialog({ onOpenChange, open, user }: { onOpenChange: (open: boolean) => void; open: boolean; user: UserDto }) {
@@ -17,7 +18,7 @@ export function SuspendUserDialog({ onOpenChange, open, user }: { onOpenChange: 
       onConfirm={() => onOpenChange(false)}
       onOpenChange={onOpenChange}
       open={open}
-      title={t("adminUsers.suspend.title", { name: user.username })}
+      title={t("adminUsers.suspend.title", { name: userDisplayName(user) })}
       variant="destructive-solid"
     >
       <p className="text-[12.5px] text-muted-foreground">{t("adminUsers.form.unavailable")}</p>

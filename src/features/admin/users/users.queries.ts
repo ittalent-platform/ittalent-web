@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { getApiV1UsersById } from "@/api/generated";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getApiV1UsersById, patchApiV1UsersById } from "@/api/generated";
 import { client } from "@/api/client";
-import type { UserDto } from "@/api/generated/types.gen";
+import type { PatchApiV1UsersByIdData, UserDto } from "@/api/generated/types.gen";
 
 import type { UserSortField, UserSortOrder } from "./users.constants";
 
@@ -81,6 +81,28 @@ export function useUserDetailQuery(userId: string | undefined) {
       }
 
       return result.data;
+    },
+  });
+}
+
+export type UpdateUserInput = { body: PatchApiV1UsersByIdData["body"]; id: string };
+
+/** UC-USER-03. Rejects with an Error whose `message` is the API's message and `status` its HTTP status. */
+export function useUpdateUserMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ body, id }: UpdateUserInput): Promise<UserDto> => {
+      const result = await patchApiV1UsersById({ body, path: { id } });
+      if (result.error || !result.data) {
+        const message = (result.error as { message?: string } | undefined)?.message;
+        throw Object.assign(new Error(message ?? "Update failed"), { status: result.response?.status });
+      }
+      return result.data;
+    },
+    onSuccess: (user) => {
+      queryClient.setQueryData(usersKeys.detail(user.id), user);
+      void queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
     },
   });
 }

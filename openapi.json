@@ -79,6 +79,14 @@
               "username": {
                 "type": "string"
               },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
               "role": {
                 "type": "string"
               },
@@ -103,6 +111,8 @@
               "id",
               "email",
               "username",
+              "fullName",
+              "phone",
               "role",
               "status",
               "emailVerified",
@@ -179,6 +189,14 @@
               "username": {
                 "type": "string"
               },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
               "role": {
                 "type": "string"
               },
@@ -203,6 +221,8 @@
               "id",
               "email",
               "username",
+              "fullName",
+              "phone",
               "role",
               "status",
               "emailVerified",
@@ -258,6 +278,14 @@
           "username": {
             "type": "string"
           },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
           "role": {
             "type": "string"
           },
@@ -282,6 +310,8 @@
           "id",
           "email",
           "username",
+          "fullName",
+          "phone",
           "role",
           "status",
           "emailVerified",
@@ -702,6 +732,14 @@
                 "username": {
                   "type": "string"
                 },
+                "fullName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "phone": {
+                  "type": "string",
+                  "nullable": true
+                },
                 "role": {
                   "type": "string"
                 },
@@ -726,6 +764,8 @@
                 "id",
                 "email",
                 "username",
+                "fullName",
+                "phone",
                 "role",
                 "status",
                 "emailVerified",
@@ -3092,6 +3132,7 @@
               "enum": [
                 "createdAt",
                 "id",
+                "name",
                 "username",
                 "email"
               ],
@@ -3142,6 +3183,85 @@
       }
     },
     "/api/v1/users/{id}": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Edit a user account",
+        "description": "System Administrator only (UC-USER-03). Changes only the fields sent: `fullName` (2\u2013100 characters), `phone` (9\u201315 digits, optional leading +; null or an empty string clears it) and `role` (`admin` or `user`). Email and status are not editable here, and an administrator cannot change their own role.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 100
+                  },
+                  "phone": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "admin",
+                      "user"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated user account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user ID or body, or nothing to update"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a System Administrator, or is changing their own role"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "503": {
+            "description": "Account storage unavailable, retry later"
+          }
+        }
+      },
       "get": {
         "tags": [
           "Users"
