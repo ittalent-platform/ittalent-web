@@ -3,6 +3,7 @@ import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
 import { AppLayout } from "@/components/layout/admin-layout";
+import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
 import { LandingPage } from "@/features/public-site/landing-page";
@@ -23,11 +24,41 @@ const AdminUserDetailPage = lazy(() =>
   import("@/features/admin/users/user-detail-page").then((m) => ({ default: m.AdminUserDetailPage })),
 );
 
+const CareerPage = lazy(() =>
+  import("@/features/public-site/career/career-page").then((m) => ({
+    default: m.CareerPage,
+  })),
+);
+const CareerJobPage = lazy(() =>
+  import("@/features/public-site/career/career-job-page").then((m) => ({
+    default: m.CareerJobPage,
+  })),
+);
+const EnterprisePage = lazy(() =>
+  import("@/features/public-site/enterprise/enterprise-page").then((m) => ({
+    default: m.EnterprisePage,
+  })),
+);
+const EnterpriseDetailPage = lazy(() =>
+  import("@/features/public-site/enterprise/enterprise-detail-page").then((m) => ({
+    default: m.EnterpriseDetailPage,
+  })),
+);
+
 export const appRoutes = [
   {
     element: <PublicLayout />,
     children: [
       { path: "/", element: <LandingPage /> },
+    ],
+  },
+  {
+    element: <MarketplaceLayout />,
+    children: [
+      { path: "/career", element: <CareerPage /> },
+      { path: "/career/:slug", element: <CareerJobPage /> },
+      { path: "/enterprises", element: <EnterprisePage /> },
+      { path: "/enterprises/:id", element: <EnterpriseDetailPage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },
