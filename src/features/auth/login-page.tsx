@@ -55,25 +55,25 @@ export function LoginPage() {
         <>
           <AuthBrand />
 
-          <div className="flex flex-col gap-5">
-            <h2 className="m-0 font-['Space_Grotesk',sans-serif] text-4xl font-semibold leading-[1.15]">
+          <div className="mt-22 flex flex-col gap-4.5">
+            <h2 className="m-0 font-['Space_Grotesk',sans-serif] text-[46px] font-semibold leading-[1.06] tracking-[-0.015em]">
               Where IT careers
               <br />
               take shape.
             </h2>
 
-            <p className="m-0 max-w-[320px] text-sm leading-[1.6] text-white/60">
-              Sign in to manage your ITTalent account, view profiles, and access
-              the administrative dashboard.
+            <p className="m-0 max-w-[400px] text-[15.5px] leading-[1.6] text-white/90">
+              Apply to IT jobs from verified companies and follow every application in one place.
             </p>
-          </div>
 
-          <div className="flex flex-wrap gap-4 text-xs text-white/45">
-            <span>Verified Talents</span>
-            <span>·</span>
-            <span>Secure Access</span>
-            <span>·</span>
-            <span>Enterprise Roles</span>
+            <div className="mt-1.5 text-sm">
+              <Link
+                className="font-semibold text-white underline underline-offset-4 decoration-white/50 hover:text-white"
+                to="/employer"
+              >
+                Hiring? Go to ITTalent for employers →
+              </Link>
+            </div>
           </div>
         </>
       }

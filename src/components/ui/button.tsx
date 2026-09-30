@@ -46,6 +46,7 @@ const buttonVariants = cva(
       shape: {
         default: "rounded-md",
         pill: "rounded-full",
+        xl: "rounded-[12px]",
       },
     },
     defaultVariants: {
