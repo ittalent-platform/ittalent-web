@@ -12,12 +12,12 @@ import {
 } from "./support";
 
 const withdrawUrl = (index: number) =>
-  `**/api/v1/applications/${applicationId(index)}/withdraw`;
+  `**/api/v1/me/applications/${applicationId(index)}/withdraw`;
 const dialog = (page: Page, name: string | RegExp) =>
   page.getByRole("alertdialog", { name });
 const statusOf = async (index: number) =>
   (
-    (await api(ACCOUNTS.demo, `/api/v1/applications/${applicationId(index)}`))
+    (await api(ACCOUNTS.demo, `/api/v1/me/applications/${applicationId(index)}`))
       .json as { status: string; version: number }
   ).status;
 const historyOf = async (index: number) =>
@@ -25,7 +25,7 @@ const historyOf = async (index: number) =>
     (
       await api(
         ACCOUNTS.demo,
-        `/api/v1/applications/${applicationId(index)}/history`,
+        `/api/v1/me/applications/${applicationId(index)}/history`,
       )
     ).json as { items: { status: string; actorRole: string }[] }
   ).items;
@@ -108,7 +108,7 @@ test.describe("UC-MYAPP-04 withdraw my application", () => {
     // Withdrawn is terminal: a second attempt is refused and adds no event.
     const again = await api(
       ACCOUNTS.demo,
-      `/api/v1/applications/${applicationId(SEED.submitted)}/withdraw`,
+      `/api/v1/me/applications/${applicationId(SEED.submitted)}/withdraw`,
       { method: "PATCH", body: { expectedVersion: 2 } },
     );
     expect(again.status).toBe(400);
@@ -176,7 +176,7 @@ test.describe("UC-MYAPP-04 withdraw my application", () => {
   test("EX.4 a stale expectedVersion is rejected by the server without changing anything", async () => {
     const stale = await api(
       ACCOUNTS.demo,
-      `/api/v1/applications/${applicationId(SEED.reapplication)}/withdraw`,
+      `/api/v1/me/applications/${applicationId(SEED.reapplication)}/withdraw`,
       { method: "PATCH", body: { expectedVersion: 99 } },
     );
     expect(stale.status).toBe(409);
@@ -187,13 +187,13 @@ test.describe("UC-MYAPP-04 withdraw my application", () => {
   test("EX.2 another candidate's application cannot be withdrawn", async () => {
     const attempt = await api(
       ACCOUNTS.demo,
-      `/api/v1/applications/${FOREIGN_APPLICATION_ID}/withdraw`,
+      `/api/v1/me/applications/${FOREIGN_APPLICATION_ID}/withdraw`,
       { method: "PATCH", body: { expectedVersion: 0 } },
     );
     expect(attempt.status).toBe(404);
     const owner = await api(
       ACCOUNTS.other,
-      `/api/v1/applications/${FOREIGN_APPLICATION_ID}`,
+      `/api/v1/me/applications/${FOREIGN_APPLICATION_ID}`,
     );
     expect((owner.json as { status: string }).status).toBe("submitted");
   });
@@ -207,11 +207,11 @@ test.describe("UC-MYAPP-04 withdraw my application", () => {
       SEED.withdrawnLinked,
     ]) {
       const before = (
-        await api(ACCOUNTS.demo, `/api/v1/applications/${applicationId(index)}`)
+        await api(ACCOUNTS.demo, `/api/v1/me/applications/${applicationId(index)}`)
       ).json as { version: number; status: string };
       const attempt = await api(
         ACCOUNTS.demo,
-        `/api/v1/applications/${applicationId(index)}/withdraw`,
+        `/api/v1/me/applications/${applicationId(index)}/withdraw`,
         { method: "PATCH", body: { expectedVersion: before.version } },
       );
       expect(attempt.status, before.status).toBe(400);
@@ -221,7 +221,7 @@ test.describe("UC-MYAPP-04 withdraw my application", () => {
 
   test("EX.1 a signed-out request cannot withdraw", async () => {
     const response = await fetch(
-      `http://localhost:3101/api/v1/applications/${applicationId(SEED.drag)}/withdraw`,
+      `http://localhost:3101/api/v1/me/applications/${applicationId(SEED.drag)}/withdraw`,
       {
         method: "PATCH",
         headers: { "content-type": "application/json" },
@@ -361,7 +361,7 @@ test.describe("UC-MYAPP-04 withdraw my application", () => {
   });
 
   test("BR-APP-008 after withdrawing a first application, the pair still allows only one active record", async () => {
-    const list = (await api(ACCOUNTS.demo, "/api/v1/applications?limit=100"))
+    const list = (await api(ACCOUNTS.demo, "/api/v1/me/applications?limit=100"))
       .json as {
       items: { status: string; canApplyAgain: boolean; id: string }[];
     };

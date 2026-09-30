@@ -1136,16 +1136,16 @@ export type PatchApiV1EnterprisesByEnterpriseIdStatusResponses = {
 
 export type PatchApiV1EnterprisesByEnterpriseIdStatusResponse = PatchApiV1EnterprisesByEnterpriseIdStatusResponses[keyof PatchApiV1EnterprisesByEnterpriseIdStatusResponses];
 
-export type GetApiV1ApplicationsMineData = {
+export type GetApiV1MeApplicationsMineData = {
     body?: never;
     path?: never;
     query: {
         jobPostingId: string;
     };
-    url: '/api/v1/applications/mine';
+    url: '/api/v1/me/applications/mine';
 };
 
-export type GetApiV1ApplicationsMineErrors = {
+export type GetApiV1MeApplicationsMineErrors = {
     /**
      * Invalid job posting ID
      */
@@ -1160,16 +1160,16 @@ export type GetApiV1ApplicationsMineErrors = {
     403: unknown;
 };
 
-export type GetApiV1ApplicationsMineResponses = {
+export type GetApiV1MeApplicationsMineResponses = {
     /**
      * The application (any status) or null
      */
     200: MyApplicationResponse;
 };
 
-export type GetApiV1ApplicationsMineResponse = GetApiV1ApplicationsMineResponses[keyof GetApiV1ApplicationsMineResponses];
+export type GetApiV1MeApplicationsMineResponse = GetApiV1MeApplicationsMineResponses[keyof GetApiV1MeApplicationsMineResponses];
 
-export type GetApiV1ApplicationsData = {
+export type GetApiV1MeApplicationsData = {
     body?: never;
     path?: never;
     query?: {
@@ -1184,10 +1184,10 @@ export type GetApiV1ApplicationsData = {
         submittedFrom?: string | null;
         submittedTo?: string | null;
     };
-    url: '/api/v1/applications';
+    url: '/api/v1/me/applications';
 };
 
-export type GetApiV1ApplicationsErrors = {
+export type GetApiV1MeApplicationsErrors = {
     /**
      * Invalid or contradictory filter, sort or paging values
      */
@@ -1202,23 +1202,23 @@ export type GetApiV1ApplicationsErrors = {
     403: unknown;
 };
 
-export type GetApiV1ApplicationsResponses = {
+export type GetApiV1MeApplicationsResponses = {
     /**
      * Paginated applications with status counts
      */
     200: ApplicationListResponse;
 };
 
-export type GetApiV1ApplicationsResponse = GetApiV1ApplicationsResponses[keyof GetApiV1ApplicationsResponses];
+export type GetApiV1MeApplicationsResponse = GetApiV1MeApplicationsResponses[keyof GetApiV1MeApplicationsResponses];
 
-export type PostApiV1ApplicationsData = {
+export type PostApiV1MeApplicationsData = {
     body: CreateApplicationRequest;
     path?: never;
     query?: never;
-    url: '/api/v1/applications';
+    url: '/api/v1/me/applications';
 };
 
-export type PostApiV1ApplicationsErrors = {
+export type PostApiV1MeApplicationsErrors = {
     /**
      * Validation failed (bad IDs, message too long, CV/cover letter not available)
      */
@@ -1241,25 +1241,25 @@ export type PostApiV1ApplicationsErrors = {
     409: unknown;
 };
 
-export type PostApiV1ApplicationsResponses = {
+export type PostApiV1MeApplicationsResponses = {
     /**
      * Application submitted
      */
     201: ApplicationDto;
 };
 
-export type PostApiV1ApplicationsResponse = PostApiV1ApplicationsResponses[keyof PostApiV1ApplicationsResponses];
+export type PostApiV1MeApplicationsResponse = PostApiV1MeApplicationsResponses[keyof PostApiV1MeApplicationsResponses];
 
-export type GetApiV1ApplicationsByIdData = {
+export type GetApiV1MeApplicationsByIdData = {
     body?: never;
     path: {
         id: string;
     };
     query?: never;
-    url: '/api/v1/applications/{id}';
+    url: '/api/v1/me/applications/{id}';
 };
 
-export type GetApiV1ApplicationsByIdErrors = {
+export type GetApiV1MeApplicationsByIdErrors = {
     /**
      * Invalid application ID
      */
@@ -1278,16 +1278,16 @@ export type GetApiV1ApplicationsByIdErrors = {
     404: unknown;
 };
 
-export type GetApiV1ApplicationsByIdResponses = {
+export type GetApiV1MeApplicationsByIdResponses = {
     /**
      * Application detail
      */
     200: ApplicationDetailDto;
 };
 
-export type GetApiV1ApplicationsByIdResponse = GetApiV1ApplicationsByIdResponses[keyof GetApiV1ApplicationsByIdResponses];
+export type GetApiV1MeApplicationsByIdResponse = GetApiV1MeApplicationsByIdResponses[keyof GetApiV1MeApplicationsByIdResponses];
 
-export type GetApiV1ApplicationsByIdHistoryData = {
+export type GetApiV1MeApplicationsByIdHistoryData = {
     body?: never;
     path: {
         id: string;
@@ -1296,10 +1296,10 @@ export type GetApiV1ApplicationsByIdHistoryData = {
         page?: number;
         limit?: number;
     };
-    url: '/api/v1/applications/{id}/history';
+    url: '/api/v1/me/applications/{id}/history';
 };
 
-export type GetApiV1ApplicationsByIdHistoryErrors = {
+export type GetApiV1MeApplicationsByIdHistoryErrors = {
     /**
      * Invalid application ID or paging values
      */
@@ -1318,25 +1318,25 @@ export type GetApiV1ApplicationsByIdHistoryErrors = {
     404: unknown;
 };
 
-export type GetApiV1ApplicationsByIdHistoryResponses = {
+export type GetApiV1MeApplicationsByIdHistoryResponses = {
     /**
      * Paginated history
      */
     200: ApplicationHistoryResponse;
 };
 
-export type GetApiV1ApplicationsByIdHistoryResponse = GetApiV1ApplicationsByIdHistoryResponses[keyof GetApiV1ApplicationsByIdHistoryResponses];
+export type GetApiV1MeApplicationsByIdHistoryResponse = GetApiV1MeApplicationsByIdHistoryResponses[keyof GetApiV1MeApplicationsByIdHistoryResponses];
 
-export type PatchApiV1ApplicationsByIdWithdrawData = {
+export type PatchApiV1MeApplicationsByIdWithdrawData = {
     body: WithdrawApplicationBody;
     path: {
         id: string;
     };
     query?: never;
-    url: '/api/v1/applications/{id}/withdraw';
+    url: '/api/v1/me/applications/{id}/withdraw';
 };
 
-export type PatchApiV1ApplicationsByIdWithdrawErrors = {
+export type PatchApiV1MeApplicationsByIdWithdrawErrors = {
     /**
      * Invalid input, or the status is not Submitted / Under Review
      */
@@ -1359,11 +1359,11 @@ export type PatchApiV1ApplicationsByIdWithdrawErrors = {
     409: unknown;
 };
 
-export type PatchApiV1ApplicationsByIdWithdrawResponses = {
+export type PatchApiV1MeApplicationsByIdWithdrawResponses = {
     /**
      * Application after withdrawal
      */
     200: ApplicationDetailDto;
 };
 
-export type PatchApiV1ApplicationsByIdWithdrawResponse = PatchApiV1ApplicationsByIdWithdrawResponses[keyof PatchApiV1ApplicationsByIdWithdrawResponses];
+export type PatchApiV1MeApplicationsByIdWithdrawResponse = PatchApiV1MeApplicationsByIdWithdrawResponses[keyof PatchApiV1MeApplicationsByIdWithdrawResponses];

@@ -50,7 +50,7 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await page.goto("/my-applications");
     await expect(page.getByText(displayId(SEED.submitted))).toBeVisible();
     let listCalls = 0;
-    await page.route("**/api/v1/applications?*", (route) => {
+    await page.route("**/api/v1/me/applications?*", (route) => {
       listCalls += 1;
       return route.continue();
     });
@@ -161,7 +161,7 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
   }) => {
     const detail = await api(
       ACCOUNTS.demo,
-      `/api/v1/applications?search=Pixel`,
+      `/api/v1/me/applications?search=Pixel`,
     );
     const jobId = (detail.json as { items: { jobId: string }[] }).items[0]!
       .jobId;
@@ -202,7 +202,7 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     const closed = (
       await api(
         ACCOUNTS.demo,
-        "/api/v1/applications?status=hired,rejected&limit=100",
+        "/api/v1/me/applications?status=hired,rejected&limit=100",
       )
     ).json as { items: { status: string }[]; total: number };
     expect(closed.total).toBe(2);
@@ -212,12 +212,12 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     const asc = (
       await api(
         ACCOUNTS.demo,
-        "/api/v1/applications?sortBy=submittedAt&sortOrder=asc&limit=100",
+        "/api/v1/me/applications?sortBy=submittedAt&sortOrder=asc&limit=100",
       )
     ).json as { items: { submittedAt: string }[] };
     const dates = asc.items.map((item) => item.submittedAt);
     expect([...dates].sort()).toEqual(dates);
-    const other = (await api(ACCOUNTS.other, "/api/v1/applications")).json as {
+    const other = (await api(ACCOUNTS.other, "/api/v1/me/applications")).json as {
       total: number;
     };
     expect(other.total).toBe(1);

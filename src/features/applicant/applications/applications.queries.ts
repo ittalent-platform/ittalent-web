@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getApiV1Applications, getApiV1ApplicationsById, getApiV1ApplicationsByIdHistory, patchApiV1ApplicationsByIdWithdraw } from "@/api/generated";
-import type { GetApiV1ApplicationsData } from "@/api/generated/types.gen";
+import { getApiV1MeApplications, getApiV1MeApplicationsById, getApiV1MeApplicationsByIdHistory, patchApiV1MeApplicationsByIdWithdraw } from "@/api/generated";
+import type { GetApiV1MeApplicationsData } from "@/api/generated/types.gen";
 import { HISTORY_PAGE_SIZE } from "./applications.constants";
 
-export type ListParams = NonNullable<GetApiV1ApplicationsData["query"]>;
+export type ListParams = NonNullable<GetApiV1MeApplicationsData["query"]>;
 export type ApplicationRequestError = Error & { status?: number };
 
 export const applicationKeys = {
@@ -30,16 +30,16 @@ export function requestStatus(error: unknown): number | undefined {
 
 /** `enabled: false` skips the request while the filters are invalid (nothing is fetched for an invalid query). */
 export function useApplications(params: ListParams, options: { enabled?: boolean } = {}) {
-  return useQuery({ queryKey: applicationKeys.list(params), queryFn: async () => unwrap(await getApiV1Applications({ query: params })), enabled: options.enabled ?? true });
+  return useQuery({ queryKey: applicationKeys.list(params), queryFn: async () => unwrap(await getApiV1MeApplications({ query: params })), enabled: options.enabled ?? true });
 }
 
 export function useApplication(id: string) {
-  return useQuery({ queryKey: applicationKeys.detail(id), queryFn: async () => unwrap(await getApiV1ApplicationsById({ path: { id } })), enabled: Boolean(id) });
+  return useQuery({ queryKey: applicationKeys.detail(id), queryFn: async () => unwrap(await getApiV1MeApplicationsById({ path: { id } })), enabled: Boolean(id) });
 }
 
 // History is an append-only list capped by the API page size; one request covers the timeline and its "View all" dialog.
 export function useApplicationHistory(id: string) {
-  return useQuery({ queryKey: applicationKeys.history(id), queryFn: async () => unwrap(await getApiV1ApplicationsByIdHistory({ path: { id }, query: { page: 1, limit: HISTORY_PAGE_SIZE } })), enabled: Boolean(id) });
+  return useQuery({ queryKey: applicationKeys.history(id), queryFn: async () => unwrap(await getApiV1MeApplicationsByIdHistory({ path: { id }, query: { page: 1, limit: HISTORY_PAGE_SIZE } })), enabled: Boolean(id) });
 }
 
 export type WithdrawInput = { id: string; reason?: string; expectedVersion?: number };
@@ -54,8 +54,8 @@ export function useWithdrawApplications() {
     mutationFn: async (inputs: WithdrawInput[]) => {
       const results = await Promise.allSettled(
         inputs.map(async ({ id, reason, expectedVersion }) => {
-          const version = expectedVersion ?? unwrap(await getApiV1ApplicationsById({ path: { id } })).version;
-          return unwrap(await patchApiV1ApplicationsByIdWithdraw({ path: { id }, body: { expectedVersion: version, ...(reason ? { reason } : {}) } }));
+          const version = expectedVersion ?? unwrap(await getApiV1MeApplicationsById({ path: { id } })).version;
+          return unwrap(await patchApiV1MeApplicationsByIdWithdraw({ path: { id }, body: { expectedVersion: version, ...(reason ? { reason } : {}) } }));
         }),
       );
       const failed = results.flatMap((result, index) => (result.status === "rejected" ? [{ id: inputs[index]!.id, error: result.reason as unknown }] : []));

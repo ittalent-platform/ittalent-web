@@ -3108,7 +3108,7 @@
         }
       }
     },
-    "/api/v1/applications/mine": {
+    "/api/v1/me/applications/mine": {
       "get": {
         "tags": [
           "Applications"
@@ -3154,7 +3154,7 @@
         }
       }
     },
-    "/api/v1/applications": {
+    "/api/v1/me/applications": {
       "post": {
         "tags": [
           "Applications"
@@ -3350,7 +3350,7 @@
         }
       }
     },
-    "/api/v1/applications/{id}": {
+    "/api/v1/me/applications/{id}": {
       "get": {
         "tags": [
           "Applications"
@@ -3399,7 +3399,7 @@
         }
       }
     },
-    "/api/v1/applications/{id}/history": {
+    "/api/v1/me/applications/{id}/history": {
       "get": {
         "tags": [
           "Applications"
@@ -3469,7 +3469,7 @@
         }
       }
     },
-    "/api/v1/applications/{id}/withdraw": {
+    "/api/v1/me/applications/{id}/withdraw": {
       "patch": {
         "tags": [
           "Applications"
