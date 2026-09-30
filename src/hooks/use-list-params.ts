@@ -16,18 +16,25 @@ export function useListParams(options: { defaultLimit?: number } = {}) {
   const sort = searchParams.get("sort") ?? undefined;
   const debouncedSearch = useDebouncedValue(search, 300);
 
-  const set = useCallback(
-    (key: string, value: string | null) => {
+  // Several keys in ONE update: React Router applies each functional update to the params of the last render,
+  // so two separate calls in the same event would drop the first change.
+  const setMany = useCallback(
+    (patch: Record<string, string | null>) => {
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev);
-        if (value === null || value === "") next.delete(key);
-        else next.set(key, value);
-        if (key !== "page") next.delete("page");
+        for (const [key, value] of Object.entries(patch)) {
+          if (value === null || value === "") next.delete(key);
+          else next.set(key, value);
+        }
+        // Any change other than paging itself goes back to the first page.
+        if (!("page" in patch)) next.delete("page");
         return next;
       });
     },
     [setSearchParams],
   );
 
-  return { page, limit, search, debouncedSearch, sort, set };
+  const set = useCallback((key: string, value: string | null) => setMany({ [key]: value }), [setMany]);
+
+  return { page, limit, search, debouncedSearch, sort, set, setMany };
 }
