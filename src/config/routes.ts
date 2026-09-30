@@ -5,3 +5,10 @@ export const APPLICATIONS_PATH = "/my-applications";
 export function jobPath(jobId: string): string {
   return `/jobs/${jobId}`;
 }
+
+/** Admin user accounts list and detail. */
+export const ADMIN_USERS_PATH = "/admin/users";
+
+export function adminUserPath(userId: string): string {
+  return `${ADMIN_USERS_PATH}/${userId}`;
+}

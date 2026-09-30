@@ -13,12 +13,12 @@ export function Table({ className, children }: { children: ReactNode; className?
 }
 
 export function TableHead({ children }: { children: ReactNode }) {
-  return <thead className="bg-muted">{children}</thead>;
+  return <thead className="bg-surface-readonly">{children}</thead>;
 }
 
 export function TableHeaderRow({ children }: { children: ReactNode }) {
   return (
-    <tr className="h-[39px] border-b border-border text-left text-[11.5px] font-bold uppercase leading-normal tracking-[0.05em] text-muted-foreground">
+    <tr className="h-[39px] border-b border-line-muted text-left text-[11.5px] font-bold uppercase leading-normal tracking-[0.06em] text-slate-subtle">
       {children}
     </tr>
   );
@@ -44,7 +44,7 @@ export function TableRow({
   return (
     <tr
       className={cn(
-        "h-[58px] border-b border-border text-[13.5px] font-normal leading-normal text-foreground transition-colors last:border-b-0 hover:bg-muted/50",
+        "h-[58px] border-b border-line-muted text-[13.5px] font-normal leading-normal text-foreground transition-colors last:border-b-0 hover:bg-surface-subtle",
         className,
       )}
       onClick={onClick}
