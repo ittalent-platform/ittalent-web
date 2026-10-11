@@ -740,6 +740,7 @@
       "mobileError": "Enter a valid mobile number: 9–15 digits, optionally starting with +.",
       "emailLocked": "Email is the sign-in identity and can't be changed here.",
       "roleLocked": "You can't change your own role.",
+      "roleReadOnly": "Role changes are not available in this profile form.",
       "saving": "Saving…",
       "saved": "Changes saved",
       "savedMessage": "{{name}} was updated.",

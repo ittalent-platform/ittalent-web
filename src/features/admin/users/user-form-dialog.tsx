@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import type { PatchApiV1UsersByIdData, UserDto } from "@/api/generated/types.gen";
-import { useSession } from "@/auth/use-session";
 import { FormField, FormSectionLabel } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { PersonAvatar } from "@/components/common/person-avatar";
@@ -46,28 +45,25 @@ const HTTP_SERVER_ERROR = 500;
 const roleOf = (user?: UserDto): UserFormRole => (user?.role === "admin" ? "admin" : "applicant");
 
 /** Only what the administrator changed: the API edits exactly the fields it receives. */
-export function buildUserPatch(user: UserDto, values: Pick<FormValues, "fullName" | "phone">, role: UserFormRole): UserPatch {
-  const patch: UserPatch = {};
+export function buildUserPatch(user: UserDto, values: Pick<FormValues, "fullName" | "phone">): UserPatch {
+  const patch: UserPatch = { expectedVersion: user.version ?? 0 };
   const fullName = values.fullName.trim();
   if (fullName !== (user.fullName ?? "")) patch.fullName = fullName;
   const phone = values.phone.replace(PHONE_NOISE, "");
   if (phone !== (user.phone ?? "")) patch.phone = phone === "" ? null : phone;
-  if (role !== roleOf(user)) patch.role = role === "admin" ? "admin" : "user";
   return patch;
 }
 
 /**
- * Create internal user / Edit user (Users design). Editing saves the full name, mobile number and role; the email
+ * Create internal user / Edit user (Users design). Editing saves the full name and mobile number; the email, role
  * (the sign-in identity) and the status stay read-only. Creating an account is not supported yet: a new account
  * needs a way to receive its credentials, so that form keeps a disabled submit and says so.
  */
 export function UserFormDialog({ onOpenChange, open, user }: UserFormDialogProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
-  const { data: session } = useSession();
   const mutation = useUpdateUserMutation();
   const editing = Boolean(user);
-  const ownAccount = Boolean(user && session?.user.id === user.id);
   const [role, setRole] = useState<UserFormRole>(roleOf(user));
   const [status, setStatus] = useState<UserFormStatus>("active");
   const [failure, setFailure] = useState<string | null>(null);
@@ -90,13 +86,13 @@ export function UserFormDialog({ onOpenChange, open, user }: UserFormDialogProps
     resolver: zodResolver(schema),
   });
   const [fullName = "", phone = ""] = useWatch({ control: form.control, name: ["fullName", "phone"] });
-  const changed = user ? Object.keys(buildUserPatch(user, { fullName, phone }, role)).length > 0 : false;
+  const changed = user ? Object.keys(buildUserPatch(user, { fullName, phone })).some((key) => key !== "expectedVersion") : false;
   const errors = form.formState.errors;
 
   const save = form.handleSubmit(async (values) => {
     if (!user) return;
-    const body = buildUserPatch(user, values, role);
-    if (!Object.keys(body).length) return;
+    const body = buildUserPatch(user, values);
+    if (!Object.keys(body).some((key) => key !== "expectedVersion")) return;
     setFailure(null);
     try {
       const updated = await mutation.mutateAsync({ body, id: user.id });
@@ -170,13 +166,14 @@ export function UserFormDialog({ onOpenChange, open, user }: UserFormDialogProps
                 <span className="text-[13.5px] font-semibold">
                   {t("adminUsers.form.role")} <span className="text-(--field-error)">*</span>
                 </span>
-                <SegmentedToggle
-                  disabled={ownAccount}
+                {editing && user ? (
+                  <Input aria-label={t("adminUsers.form.role")} readOnly value={t(`adminUsers.role.${user.role}`, { defaultValue: user.role })} />
+                ) : <SegmentedToggle
                   onChange={setRole}
                   options={USER_FORM_ROLES.map((value) => ({ label: t(`adminUsers.role.${value === "admin" ? "admin" : "user"}`), value }))}
                   value={role}
-                />
-                {ownAccount ? <p className="text-[12.5px] leading-normal text-muted-foreground">{t("adminUsers.form.roleLocked")}</p> : null}
+                />}
+                {editing ? <p className="text-[12.5px] leading-normal text-muted-foreground">{t("adminUsers.form.roleReadOnly")}</p> : null}
               </div>
               <div className="flex flex-col gap-2">
                 <span className="text-[13.5px] font-semibold">

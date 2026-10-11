@@ -105,6 +105,10 @@
               },
               "updatedAt": {
                 "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0
               }
             },
             "required": [
@@ -215,6 +219,10 @@
               },
               "updatedAt": {
                 "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0
               }
             },
             "required": [
@@ -304,6 +312,10 @@
           },
           "updatedAt": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": [
@@ -1226,6 +1238,10 @@
                 },
                 "updatedAt": {
                   "type": "string"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
                 }
               },
               "required": [
@@ -1274,14 +1290,328 @@
             "type": "string",
             "nullable": true
           },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateUserStatusRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "suspended",
+              "active"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "status",
+          "reason",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "CreateAdminUserRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 30,
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "phone": {
+            "type": "string"
+          },
           "role": {
             "type": "string",
             "enum": [
-              "admin",
-              "user"
+              "user",
+              "recruiter"
+            ]
+          },
+          "enterpriseId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        },
+        "required": [
+          "email",
+          "username",
+          "fullName",
+          "role"
+        ],
+        "additionalProperties": false
+      },
+      "CreateAdminUserResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "username": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
+              "role": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "emailVerified": {
+                "type": "boolean"
+              },
+              "enterpriseId": {
+                "type": "string",
+                "nullable": true
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "id",
+              "email",
+              "username",
+              "fullName",
+              "phone",
+              "role",
+              "status",
+              "emailVerified",
+              "enterpriseId"
+            ]
+          },
+          "invitation": {
+            "type": "object",
+            "properties": {
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deliveryStatus": {
+                "type": "string",
+                "enum": [
+                  "sent",
+                  "failed"
+                ]
+              }
+            },
+            "required": [
+              "expiresAt",
+              "deliveryStatus"
             ]
           }
         },
+        "required": [
+          "user",
+          "invitation"
+        ]
+      },
+      "AcceptNewAccountInvitationRequest": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 64,
+            "pattern": "[A-Z]"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "AcceptExistingAccountInvitationRequest": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "additionalProperties": false
+      },
+      "InviteExistingUserRequest": {
+        "type": "object",
+        "properties": {
+          "enterpriseId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        },
+        "required": [
+          "enterpriseId"
+        ],
+        "additionalProperties": false
+      },
+      "UserAuditHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "actorId": {
+                  "type": "string"
+                },
+                "action": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "string",
+                  "enum": [
+                    "success"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "changes": {
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "occurredAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "actorId",
+                "action",
+                "result",
+                "reason",
+                "changes",
+                "version",
+                "occurredAt"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "RequestUserEmailChange": {
+        "type": "object",
+        "properties": {
+          "newEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "newEmail",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "ConfirmUserEmailChange": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "token",
+          "currentPassword"
+        ],
         "additionalProperties": false
       },
       "EnterpriseListResponse": {
@@ -4050,12 +4380,22 @@
               "enum": [
                 "active",
                 "inactive",
+                "invited",
                 "suspended",
                 "blocked"
               ]
             },
             "required": false,
             "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterpriseId",
             "in": "query"
           },
           {
@@ -4124,6 +4464,115 @@
             "description": "Account storage unavailable, retry later"
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Create a user or HR account and send an invitation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created; invitation delivery result is included",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAdminUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid role, user fields, or company context"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "409": {
+            "description": "Email or username already exists"
+          },
+          "503": {
+            "description": "Account storage unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/status": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Suspend or reopen a user account",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated account status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status transition input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          },
+          "409": {
+            "description": "Illegal transition, stale version, or final administrator"
+          }
+        }
       }
     },
     "/api/v1/users/{id}": {
@@ -4133,7 +4582,7 @@
         ],
         "operationId": "patchApiV1UsersById",
         "summary": "Edit a user account",
-        "description": "System Administrator only. Updates only fullName, phone, and role; null or an empty phone clears the stored number. An administrator cannot change their own role.",
+        "description": "System Administrator only. Updates only fullName and phone using expectedVersion; null or an empty phone clears the stored number. Role and email changes use separate flows.",
         "security": [
           {
             "bearerAuth": []
@@ -4232,6 +4681,359 @@
           },
           "404": {
             "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/invitations": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Invite an existing user to join an enterprise as HR",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteExistingUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Invitation created and delivery attempted"
+          },
+          "400": {
+            "description": "Invalid user ID or enterprise ID"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "User or enterprise not found"
+          },
+          "409": {
+            "description": "User cannot be granted an HR membership"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/invitation-deliveries": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Resend a pending new-account invitation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Invitation replaced and delivery attempted"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "410": {
+            "description": "No resendable invitation exists"
+          }
+        }
+      }
+    },
+    "/api/v1/user-invitations/accept": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Accept a new-account invitation and set a password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptNewAccountInvitationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account activated; credentials are now available to the invitee"
+          },
+          "400": {
+            "description": "Invalid invitation payload"
+          },
+          "409": {
+            "description": "Account or enterprise state no longer permits acceptance"
+          },
+          "410": {
+            "description": "Invitation is expired, revoked or already used"
+          }
+        }
+      }
+    },
+    "/api/v1/user-invitations/accept-existing": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Accept an HR invitation as the authenticated existing user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptExistingAccountInvitationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Existing account receives the invited HR membership"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Invitation belongs to another user"
+          },
+          "409": {
+            "description": "Account cannot accept the invited membership"
+          },
+          "410": {
+            "description": "Invitation is expired, revoked or already used"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/history": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Read safe paginated user account history",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "account_invited",
+                "profile_updated",
+                "status_suspended",
+                "status_reopened",
+                "invitation_accepted",
+                "email_change_requested",
+                "email_changed"
+              ]
+            },
+            "required": false,
+            "name": "action",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Append-only account history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAuditHistoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid account ID or pagination/filter input"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          },
+          "503": {
+            "description": "History store unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/email-change-requests": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Request a user email change; the account owner must confirm it",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestUserEmailChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Request saved; email delivery was attempted"
+          },
+          "400": {
+            "description": "Invalid email or version"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "409": {
+            "description": "Email is already used or account version is stale"
+          }
+        }
+      }
+    },
+    "/api/v1/user-email-changes/confirm": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Confirm a requested email change as the account owner",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmUserEmailChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email changed; old sessions and pending identity tokens are invalidated"
+          },
+          "400": {
+            "description": "Invalid confirmation payload"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Request belongs to another user or current password is invalid"
+          },
+          "409": {
+            "description": "Email conflict or stale account version"
+          },
+          "410": {
+            "description": "Request is expired, revoked or already completed"
+          },
+          "429": {
+            "description": "Too many failed confirmation attempts for this account or IP"
           }
         }
       }

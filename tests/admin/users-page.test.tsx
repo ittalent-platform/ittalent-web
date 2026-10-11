@@ -347,7 +347,7 @@ describe("Edit user form (UC-USER-03)", () => {
     await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
 
     await waitFor(() => expect(mockedPatch).toHaveBeenCalledTimes(1));
-    expect(mockedPatch).toHaveBeenCalledWith({ body: { fullName: "Mai Dương", phone: "0987654321" }, path: { id: user.id } });
+    expect(mockedPatch).toHaveBeenCalledWith({ body: { fullName: "Mai Dương", phone: "0987654321", expectedVersion: 0 }, path: { id: user.id } });
     await waitFor(() => expect(screen.queryByRole("dialog", { name: /edit user/i })).not.toBeInTheDocument());
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ["admin-users", "list"] });
     expect(await screen.findByText("Mai Dương was updated.")).toBeInTheDocument();
@@ -361,18 +361,16 @@ describe("Edit user form (UC-USER-03)", () => {
     await events.clear(within(dialog).getByLabelText(/mobile number/i));
     await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
 
-    await waitFor(() => expect(mockedPatch).toHaveBeenCalledWith({ body: { phone: null }, path: { id: user.id } }));
+    await waitFor(() => expect(mockedPatch).toHaveBeenCalledWith({ body: { phone: null, expectedVersion: 0 }, path: { id: user.id } }));
   });
 
-  it("changes the role of another account", async () => {
-    mockedPatch.mockResolvedValue({ data: { ...user, role: "admin" }, error: undefined, response: { status: 200 } } as never);
+  it("keeps another account's role read-only and cannot submit a role-only change", async () => {
     renderEdit();
-    const { events, dialog } = await openEdit("John Doe");
-
-    await events.click(within(dialog).getByRole("button", { name: "Admin" }));
-    await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
-
-    await waitFor(() => expect(mockedPatch).toHaveBeenCalledWith({ body: { role: "admin" }, path: { id: user.id } }));
+    const { dialog } = await openEdit("John Doe");
+    expect(within(dialog).getByLabelText("Role")).toHaveAttribute("readonly");
+    expect(within(dialog).queryByRole("button", { name: "Admin" })).not.toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Save changes" })).toBeDisabled();
+    expect(mockedPatch).not.toHaveBeenCalled();
   });
 
   it("does not send the role when it was not touched, even for a role the form cannot show", async () => {
@@ -384,16 +382,16 @@ describe("Edit user form (UC-USER-03)", () => {
     await events.type(within(dialog).getByLabelText(/full name/i), "New Name");
     await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
 
-    await waitFor(() => expect(mockedPatch).toHaveBeenCalledWith({ body: { fullName: "New Name" }, path: { id: user.id } }));
+    await waitFor(() => expect(mockedPatch).toHaveBeenCalledWith({ body: { fullName: "New Name", expectedVersion: 0 }, path: { id: user.id } }));
   });
 
   it("locks the role of the signed-in administrator's own account", async () => {
     renderEdit(admin, admin.id);
     const { dialog } = await openEdit("Minh Admin");
 
-    expect(within(dialog).getByText("You can't change your own role.")).toBeInTheDocument();
-    expect(within(dialog).getByRole("button", { name: "Admin" })).toBeDisabled();
-    expect(within(dialog).getByRole("button", { name: "Applicant" })).toBeDisabled();
+    expect(within(dialog).getByText("Role changes are not available in this profile form.")).toBeInTheDocument();
+    expect(within(dialog).getByLabelText("Role")).toHaveAttribute("readonly");
+    expect(within(dialog).queryByRole("button", { name: "Applicant" })).not.toBeInTheDocument();
   });
 
   it("explains an invalid name or number and does not call the API", async () => {
@@ -434,5 +432,18 @@ describe("Edit user form (UC-USER-03)", () => {
     await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
 
     expect(await within(dialog).findByText("Couldn't save the changes. Try again in a moment.")).toBeInTheDocument();
+  });
+
+  it("sends the loaded account version and preserves input when the server reports a conflict", async () => {
+    mockedPatch.mockResolvedValue({ data: undefined, error: { message: "The account changed. Reload and try again." }, response: { status: 409 } } as never);
+    renderEdit({ ...user, version: 7 });
+    const { events, dialog } = await openEdit("John Doe");
+    await events.clear(within(dialog).getByLabelText(/full name/i));
+    await events.type(within(dialog).getByLabelText(/full name/i), "Unsaved Name");
+    await events.click(within(dialog).getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(mockedPatch).toHaveBeenCalledWith({ body: { fullName: "Unsaved Name", expectedVersion: 7 }, path: { id: user.id } }));
+    expect(await within(dialog).findByText("The account changed. Reload and try again.")).toBeInTheDocument();
+    expect(within(dialog).getByLabelText(/full name/i)).toHaveValue("Unsaved Name");
+    expect(screen.getByRole("dialog", { name: /edit user/i })).toBeInTheDocument();
   });
 });

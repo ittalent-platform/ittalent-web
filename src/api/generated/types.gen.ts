@@ -28,6 +28,7 @@ export type RegisterResponse = {
         enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
+        version?: number;
     };
     tokens: {
         accessToken: string;
@@ -58,6 +59,7 @@ export type AuthResponse = {
         enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
+        version?: number;
     };
     tokens: {
         accessToken: string;
@@ -82,6 +84,7 @@ export type UserDto = {
     enterpriseId: string | null;
     createdAt?: string;
     updatedAt?: string;
+    version?: number;
 };
 
 export type VerifyEmailQuery = {
@@ -323,6 +326,7 @@ export type UserListResponse = {
         enterpriseId: string | null;
         createdAt?: string;
         updatedAt?: string;
+        version?: number;
     }>;
     page: number;
     limit: number;
@@ -333,7 +337,85 @@ export type UserListResponse = {
 export type UpdateUserRequest = {
     fullName?: string;
     phone?: string | null;
-    role?: 'admin' | 'user';
+    expectedVersion: number;
+};
+
+export type UpdateUserStatusRequest = {
+    status: 'suspended' | 'active';
+    reason: string;
+    expectedVersion: number;
+};
+
+export type CreateAdminUserRequest = {
+    email: string;
+    username: string;
+    fullName: string;
+    phone?: string;
+    role: 'user' | 'recruiter';
+    enterpriseId?: string;
+};
+
+export type CreateAdminUserResponse = {
+    user: {
+        id: string;
+        email: string;
+        username: string;
+        fullName: string | null;
+        phone: string | null;
+        role: string;
+        status: string;
+        emailVerified: boolean;
+        enterpriseId: string | null;
+        createdAt?: string;
+        updatedAt?: string;
+        version?: number;
+    };
+    invitation: {
+        expiresAt: string;
+        deliveryStatus: 'sent' | 'failed';
+    };
+};
+
+export type AcceptNewAccountInvitationRequest = {
+    token: string;
+    password: string;
+};
+
+export type AcceptExistingAccountInvitationRequest = {
+    token: string;
+};
+
+export type InviteExistingUserRequest = {
+    enterpriseId: string;
+};
+
+export type UserAuditHistoryResponse = {
+    items: Array<{
+        id: string;
+        actorId: string;
+        action: string;
+        result: 'success';
+        reason: string | null;
+        changes: {
+            [key: string]: string | null;
+        } | null;
+        version: number;
+        occurredAt: string;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type RequestUserEmailChange = {
+    newEmail: string;
+    expectedVersion: number;
+};
+
+export type ConfirmUserEmailChange = {
+    token: string;
+    currentPassword: string;
 };
 
 export type EnterpriseListResponse = {
@@ -1277,7 +1359,8 @@ export type GetApiV1UsersData = {
         limit?: number;
         search?: string;
         role?: 'user' | 'admin' | 'recruiter' | 'applicant' | 'interviewer';
-        status?: 'active' | 'inactive' | 'suspended' | 'blocked';
+        status?: 'active' | 'inactive' | 'invited' | 'suspended' | 'blocked';
+        enterpriseId?: string;
         emailVerified?: 'true' | 'false';
         sortBy?: 'createdAt' | 'id' | 'name' | 'username' | 'email';
         sortOrder?: 'asc' | 'desc';
@@ -1312,6 +1395,86 @@ export type GetApiV1UsersResponses = {
 };
 
 export type GetApiV1UsersResponse = GetApiV1UsersResponses[keyof GetApiV1UsersResponses];
+
+export type PostApiV1UsersData = {
+    body: CreateAdminUserRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users';
+};
+
+export type PostApiV1UsersErrors = {
+    /**
+     * Invalid role, user fields, or company context
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Email or username already exists
+     */
+    409: unknown;
+    /**
+     * Account storage unavailable
+     */
+    503: unknown;
+};
+
+export type PostApiV1UsersResponses = {
+    /**
+     * Account created; invitation delivery result is included
+     */
+    201: CreateAdminUserResponse;
+};
+
+export type PostApiV1UsersResponse = PostApiV1UsersResponses[keyof PostApiV1UsersResponses];
+
+export type PatchApiV1UsersByIdStatusData = {
+    body: UpdateUserStatusRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/status';
+};
+
+export type PatchApiV1UsersByIdStatusErrors = {
+    /**
+     * Invalid status transition input
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Account not found
+     */
+    404: unknown;
+    /**
+     * Illegal transition, stale version, or final administrator
+     */
+    409: unknown;
+};
+
+export type PatchApiV1UsersByIdStatusResponses = {
+    /**
+     * Updated account status
+     */
+    200: UserDto;
+};
+
+export type PatchApiV1UsersByIdStatusResponse = PatchApiV1UsersByIdStatusResponses[keyof PatchApiV1UsersByIdStatusResponses];
 
 export type GetApiV1UsersByIdData = {
     body?: never;
@@ -1390,6 +1553,263 @@ export type PatchApiV1UsersByIdResponses = {
 };
 
 export type PatchApiV1UsersByIdResponse = PatchApiV1UsersByIdResponses[keyof PatchApiV1UsersByIdResponses];
+
+export type PostApiV1UsersByIdInvitationsData = {
+    body: InviteExistingUserRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/invitations';
+};
+
+export type PostApiV1UsersByIdInvitationsErrors = {
+    /**
+     * Invalid user ID or enterprise ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * User or enterprise not found
+     */
+    404: unknown;
+    /**
+     * User cannot be granted an HR membership
+     */
+    409: unknown;
+};
+
+export type PostApiV1UsersByIdInvitationsResponses = {
+    /**
+     * Invitation created and delivery attempted
+     */
+    202: unknown;
+};
+
+export type PostApiV1UsersByIdInvitationDeliveriesData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/invitation-deliveries';
+};
+
+export type PostApiV1UsersByIdInvitationDeliveriesErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * No resendable invitation exists
+     */
+    410: unknown;
+};
+
+export type PostApiV1UsersByIdInvitationDeliveriesResponses = {
+    /**
+     * Invitation replaced and delivery attempted
+     */
+    202: unknown;
+};
+
+export type PostApiV1UserInvitationsAcceptData = {
+    body: AcceptNewAccountInvitationRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/user-invitations/accept';
+};
+
+export type PostApiV1UserInvitationsAcceptErrors = {
+    /**
+     * Invalid invitation payload
+     */
+    400: unknown;
+    /**
+     * Account or enterprise state no longer permits acceptance
+     */
+    409: unknown;
+    /**
+     * Invitation is expired, revoked or already used
+     */
+    410: unknown;
+};
+
+export type PostApiV1UserInvitationsAcceptResponses = {
+    /**
+     * Account activated; credentials are now available to the invitee
+     */
+    200: unknown;
+};
+
+export type PostApiV1UserInvitationsAcceptExistingData = {
+    body: AcceptExistingAccountInvitationRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/user-invitations/accept-existing';
+};
+
+export type PostApiV1UserInvitationsAcceptExistingErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Invitation belongs to another user
+     */
+    403: unknown;
+    /**
+     * Account cannot accept the invited membership
+     */
+    409: unknown;
+    /**
+     * Invitation is expired, revoked or already used
+     */
+    410: unknown;
+};
+
+export type PostApiV1UserInvitationsAcceptExistingResponses = {
+    /**
+     * Existing account receives the invited HR membership
+     */
+    200: unknown;
+};
+
+export type GetApiV1UsersByIdHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        page?: number;
+        limit?: number;
+        action?: 'account_invited' | 'profile_updated' | 'status_suspended' | 'status_reopened' | 'invitation_accepted' | 'email_change_requested' | 'email_changed';
+    };
+    url: '/api/v1/users/{id}/history';
+};
+
+export type GetApiV1UsersByIdHistoryErrors = {
+    /**
+     * Invalid account ID or pagination/filter input
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Account not found
+     */
+    404: unknown;
+    /**
+     * History store unavailable
+     */
+    503: unknown;
+};
+
+export type GetApiV1UsersByIdHistoryResponses = {
+    /**
+     * Append-only account history
+     */
+    200: UserAuditHistoryResponse;
+};
+
+export type GetApiV1UsersByIdHistoryResponse = GetApiV1UsersByIdHistoryResponses[keyof GetApiV1UsersByIdHistoryResponses];
+
+export type PostApiV1UsersByIdEmailChangeRequestsData = {
+    body: RequestUserEmailChange;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/email-change-requests';
+};
+
+export type PostApiV1UsersByIdEmailChangeRequestsErrors = {
+    /**
+     * Invalid email or version
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * User not found
+     */
+    404: unknown;
+    /**
+     * Email is already used or account version is stale
+     */
+    409: unknown;
+};
+
+export type PostApiV1UsersByIdEmailChangeRequestsResponses = {
+    /**
+     * Request saved; email delivery was attempted
+     */
+    202: unknown;
+};
+
+export type PostApiV1UserEmailChangesConfirmData = {
+    body: ConfirmUserEmailChange;
+    path?: never;
+    query?: never;
+    url: '/api/v1/user-email-changes/confirm';
+};
+
+export type PostApiV1UserEmailChangesConfirmErrors = {
+    /**
+     * Invalid confirmation payload
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Request belongs to another user or current password is invalid
+     */
+    403: unknown;
+    /**
+     * Email conflict or stale account version
+     */
+    409: unknown;
+    /**
+     * Request is expired, revoked or already completed
+     */
+    410: unknown;
+    /**
+     * Too many failed confirmation attempts for this account or IP
+     */
+    429: unknown;
+};
+
+export type PostApiV1UserEmailChangesConfirmResponses = {
+    /**
+     * Email changed; old sessions and pending identity tokens are invalidated
+     */
+    200: unknown;
+};
 
 export type GetApiV1EnterprisesData = {
     body?: never;
