@@ -79,7 +79,7 @@ export function ResumeDraftForm({
         <InlineBanner tone="error">{error}</InlineBanner>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
+      <form id="resume-draft-form" onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
         <FormField
           htmlFor="resume_email"
           label="Work email"
@@ -95,19 +95,16 @@ export function ResumeDraftForm({
             className="h-[46px] rounded-xl border-border bg-card px-[15px] text-[14px]"
           />
         </FormField>
-
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
-        >
-          {isSubmitting ? "Sending link..." : "Send link"}
-        </Button>
       </form>
 
-      <p className="text-[12.5px] leading-[1.55] text-muted-foreground">
-        For your privacy we show the same message whether or not this email has a registration.
-      </p>
+      <Button
+        type="submit"
+        form="resume-draft-form"
+        disabled={isSubmitting}
+        className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
+      >
+        {isSubmitting ? "Sending link..." : "Send link"}
+      </Button>
 
       <div className="pt-1 text-[13.5px] text-muted-foreground">
         New here?{" "}
