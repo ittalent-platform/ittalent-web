@@ -324,7 +324,9 @@ export function JobPostingTable({
                           <DropdownMenuItem
                             className="flex cursor-pointer items-center gap-2.5 border-t border-border/50 px-3 py-2 text-[13.5px]"
                             disabled={hasApplications}
-                            onClick={() => !hasApplications && onUnpublish?.(row)}
+                            onClick={() =>
+                              !hasApplications && onUnpublish?.(row)
+                            }
                           >
                             <Undo2 className="size-4 text-muted-foreground" />
                             <span className="flex-1">

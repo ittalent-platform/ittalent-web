@@ -21,15 +21,21 @@ const BCRYPT_ROUNDS = 10;
  */
 export async function seedEnterpriseAdminJobPostings(): Promise<void> {
   Object.assign(process.env, backendEnv);
-  const [databaseModule, accountModule, enterpriseModule, auditModule, jobModule, userModule] =
-    await Promise.all([
-      import("../../ittalent-backend/src/config/db.ts"),
-      import("../../ittalent-backend/src/models/account.model.ts"),
-      import("../../ittalent-backend/src/models/enterprise.model.ts"),
-      import("../../ittalent-backend/src/models/job-posting-audit.model.ts"),
-      import("../../ittalent-backend/src/models/job-posting.model.ts"),
-      import("../../ittalent-backend/src/models/user.model.ts"),
-    ]);
+  const [
+    databaseModule,
+    accountModule,
+    enterpriseModule,
+    auditModule,
+    jobModule,
+    userModule,
+  ] = await Promise.all([
+    import("../../ittalent-backend/src/config/db.ts"),
+    import("../../ittalent-backend/src/models/account.model.ts"),
+    import("../../ittalent-backend/src/models/enterprise.model.ts"),
+    import("../../ittalent-backend/src/models/job-posting-audit.model.ts"),
+    import("../../ittalent-backend/src/models/job-posting.model.ts"),
+    import("../../ittalent-backend/src/models/user.model.ts"),
+  ]);
   const { connectDatabase, disconnectDatabase } = databaseModule;
   const { Account } = accountModule;
   const { Enterprise } = enterpriseModule;

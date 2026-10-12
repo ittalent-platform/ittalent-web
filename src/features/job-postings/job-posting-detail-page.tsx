@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
 
 import { Breadcrumb } from "@/components/common/breadcrumb";
+import { LogoTile } from "@/components/common/logo-tile";
 import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -164,16 +165,16 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
   function handlePublishClick() {
     const isReady = Boolean(
       posting.title &&
-        posting.employmentType &&
-        posting.location &&
-        posting.description &&
-        posting.description.trim().length >= 20 &&
-        posting.requirements &&
-        posting.requirements.trim().length > 0 &&
-        posting.benefits &&
-        posting.benefits.trim().length > 0 &&
-        posting.expiresAt &&
-        new Date(posting.expiresAt).getTime() >= Date.now(),
+      posting.employmentType &&
+      posting.location &&
+      posting.description &&
+      posting.description.trim().length >= 20 &&
+      posting.requirements &&
+      posting.requirements.trim().length > 0 &&
+      posting.benefits &&
+      posting.benefits.trim().length > 0 &&
+      posting.expiresAt &&
+      new Date(posting.expiresAt).getTime() >= Date.now(),
     );
     if (!isReady) {
       setPublishChecklistOpen(true);
@@ -211,10 +212,17 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
             <h1 className="itt-display text-2xl font-bold tracking-tight text-foreground sm:text-[26px]">
               {posting.title}
             </h1>
-            <JobPostingStatusBadge mode="publication" posting={posting} />
+            <JobPostingStatusBadge posting={posting} />
+          </div>
+          <div className="flex items-center gap-2">
+            <LogoTile name={posting.enterprise.name} size="sm" />
+            <span className="text-[14px] font-semibold text-foreground">
+              {posting.enterprise.name}
+            </span>
           </div>
           <p className="m-0 text-[13.5px] text-muted-foreground">
             {[
+              posting.enterprise.name,
               jobDisplayId(posting.id),
               posting.publishedAt
                 ? t("jobPostings.detail.metaPosted", {
@@ -349,7 +357,10 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
                   <MoreVertical className="size-4" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 text-sm shadow-xl">
+              <DropdownMenuContent
+                align="end"
+                className="w-48 rounded-xl p-1 text-sm shadow-xl"
+              >
                 <DropdownMenuItem
                   className="flex cursor-pointer items-center gap-2 px-3 py-2 text-[13.5px]"
                   onClick={() => setHistoryModalOpen(true)}
@@ -363,7 +374,9 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
                   onClick={() => setConfirmingDelete(true)}
                 >
                   <Trash2 className="size-4" />
-                  <span className="flex-1">{t("jobPostings.actions.delete")}</span>
+                  <span className="flex-1">
+                    {t("jobPostings.actions.delete")}
+                  </span>
                   {applicationCount > 0 ? (
                     <span className="text-[11.5px] text-muted-foreground">
                       {t("jobPostings.actions.hasApplications")}
@@ -554,7 +567,7 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
           {/* HISTORY RAIL CARD */}
           <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-xs">
             <span className="text-[11.5px] font-bold tracking-[0.05em] text-muted-foreground uppercase">
-              {t("jobPostings.detail.historySection")}
+              {t("jobPostings.history.title")}
             </span>
             {historyItems.length === 0 ? (
               <p className="m-0 text-[13px] text-muted-foreground">

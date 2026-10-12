@@ -7,7 +7,12 @@ import { AppLayout } from "@/components/layout/admin-layout";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
-import { LandingPage } from "@/features/public-site/landing-page";
+
+const LandingPage = lazy(() =>
+  import("@/features/public-site/landing-page").then((m) => ({
+    default: m.LandingPage,
+  })),
+);
 
 const LoginPage = lazy(() =>
   import("@/features/auth/login-page").then((m) => ({ default: m.LoginPage })),
@@ -93,7 +98,9 @@ const ApplicationDetailPage = lazy(() =>
   ),
 );
 const EnterprisesPage = lazy(() =>
-  import("@/features/admin/enterprises/enterprises-page").then((m) => ({ default: m.EnterprisesPage })),
+  import("@/features/admin/enterprises/enterprises-page").then((m) => ({
+    default: m.EnterprisesPage,
+  })),
 );
 const AdminEnterpriseDetailPage = lazy(() =>
   import("@/features/admin/enterprises/enterprise-detail-page").then((m) => ({
@@ -148,8 +155,14 @@ export const appRoutes = [
           { path: "users/:userId", element: <AdminUserDetailPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
           { path: "enterprises/new", element: <EnterpriseFormPage /> },
-          { path: "enterprises/:enterpriseId", element: <AdminEnterpriseDetailPage /> },
-          { path: "enterprises/:enterpriseId/edit", element: <EnterpriseFormPage /> },
+          {
+            path: "enterprises/:enterpriseId",
+            element: <AdminEnterpriseDetailPage />,
+          },
+          {
+            path: "enterprises/:enterpriseId/edit",
+            element: <EnterpriseFormPage />,
+          },
           { path: "job-postings", element: <JobPostingsPage /> },
           {
             path: "job-postings/:jobPostingId",

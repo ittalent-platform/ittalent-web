@@ -443,7 +443,8 @@ export function JobPostingForm({
               aria-invalid={errorOf("title") ? true : undefined}
               className={cn(
                 "h-11 rounded-lg border-border text-[14px]",
-                errorOf("title") && "border-destructive ring-1 ring-destructive/30",
+                errorOf("title") &&
+                  "border-destructive ring-1 ring-destructive/30",
               )}
               id="title"
               placeholder="Senior Backend Engineer (Java)"
@@ -537,7 +538,9 @@ export function JobPostingForm({
                     value={field.value || NO_SELECTION}
                   >
                     <SelectTrigger
-                      aria-invalid={errorOf("employmentType") ? true : undefined}
+                      aria-invalid={
+                        errorOf("employmentType") ? true : undefined
+                      }
                       aria-label={t("jobPostings.employmentType")}
                       className={cn(
                         "h-11 rounded-lg border-border text-[13.5px]",
@@ -822,7 +825,9 @@ function RichTextareaField({
           <span
             className={cn(
               "text-[12px]",
-              required ? "font-medium text-destructive" : "text-muted-foreground",
+              required
+                ? "font-medium text-destructive"
+                : "text-muted-foreground",
             )}
           >
             {subtext}

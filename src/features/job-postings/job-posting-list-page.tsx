@@ -65,11 +65,16 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
   const [pendingDelete, setPendingDelete] = useState<JobPosting | null>(null);
   const [pendingClose, setPendingClose] = useState<JobPosting | null>(null);
   const [pendingArchive, setPendingArchive] = useState<JobPosting | null>(null);
-  const [pendingUnarchive, setPendingUnarchive] = useState<JobPosting | null>(null);
+  const [pendingUnarchive, setPendingUnarchive] = useState<JobPosting | null>(
+    null,
+  );
   const [pendingReopen, setPendingReopen] = useState<JobPosting | null>(null);
   const [pendingPublish, setPendingPublish] = useState<JobPosting | null>(null);
-  const [pendingPublishBlocked, setPendingPublishBlocked] = useState<JobPosting | null>(null);
-  const [pendingUnpublish, setPendingUnpublish] = useState<JobPosting | null>(null);
+  const [pendingPublishBlocked, setPendingPublishBlocked] =
+    useState<JobPosting | null>(null);
+  const [pendingUnpublish, setPendingUnpublish] = useState<JobPosting | null>(
+    null,
+  );
 
   const type = searchParams.get(LIST_PARAMS.type) ?? ALL_OPTION;
   const level = searchParams.get(LIST_PARAMS.level) ?? ALL_OPTION;
@@ -228,16 +233,16 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
   function handlePublishAttempt(posting: JobPosting) {
     const isReady = Boolean(
       posting.title &&
-        posting.employmentType &&
-        posting.location &&
-        posting.description &&
-        posting.description.trim().length >= 20 &&
-        posting.requirements &&
-        posting.requirements.trim().length > 0 &&
-        posting.benefits &&
-        posting.benefits.trim().length > 0 &&
-        posting.expiresAt &&
-        new Date(posting.expiresAt).getTime() >= Date.now(),
+      posting.employmentType &&
+      posting.location &&
+      posting.description &&
+      posting.description.trim().length >= 20 &&
+      posting.requirements &&
+      posting.requirements.trim().length > 0 &&
+      posting.benefits &&
+      posting.benefits.trim().length > 0 &&
+      posting.expiresAt &&
+      new Date(posting.expiresAt).getTime() >= Date.now(),
     );
     if (!isReady) {
       setPendingPublishBlocked(posting);
@@ -323,7 +328,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
             placeholder={t("jobPostings.toolbar.all")}
             renderTrigger={(selectedLabel) => (
               <span>
-                {t("jobPostings.status")}:{" "}
+                {t("jobPostings.toolbar.publicationStatus")}:{" "}
                 <span className="font-semibold text-foreground">
                   {selectedLabel}
                 </span>

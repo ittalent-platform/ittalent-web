@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { AlertTriangle, Archive, Check, Lock, RotateCcw, Send, Trash2, Undo2, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Archive,
+  Check,
+  Lock,
+  RotateCcw,
+  Send,
+  Trash2,
+  Undo2,
+  X,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
@@ -215,9 +225,9 @@ export function PublishChecklistDialog({
 
   const isBasicsReady = Boolean(
     posting.title &&
-      posting.title.trim().length >= 5 &&
-      posting.employmentType &&
-      posting.location,
+    posting.title.trim().length >= 5 &&
+    posting.employmentType &&
+    posting.location,
   );
   const isDescReady = Boolean(
     posting.description && posting.description.trim().length >= 20,
@@ -297,7 +307,9 @@ export function PublishChecklistDialog({
                   </span>
                   <span
                     className={
-                      item.ready ? "text-muted-foreground" : "font-medium text-foreground"
+                      item.ready
+                        ? "text-muted-foreground"
+                        : "font-medium text-foreground"
                     }
                   >
                     {item.label}

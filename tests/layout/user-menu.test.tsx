@@ -19,40 +19,44 @@ describe("UserMenu job posting navigation", () => {
   it.each([
     ["recruiter", "Recruiter"],
     ["enterprise_admin", "Enterprise admin"],
-  ])("shows the shared job posting entry for %s", async (role, roleLabel) => {
-    vi.spyOn(useSessionModule, "useSession").mockReturnValue({
-      data: {
-        user: {
-          id: "manager-1",
-          email: `${role}@example.com`,
-          username: role,
-          role,
-          status: "active",
+  ])(
+    "shows the shared job posting entry for %s",
+    async (role, roleLabel) => {
+      vi.spyOn(useSessionModule, "useSession").mockReturnValue({
+        data: {
+          user: {
+            id: "manager-1",
+            email: `${role}@example.com`,
+            username: role,
+            role,
+            status: "active",
+          },
         },
-      },
-      isPending: false,
-      logout: vi.fn(),
-      refetch: vi.fn(),
-    });
-    const client = new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    });
-    const user = userEvent.setup();
+        isPending: false,
+        logout: vi.fn(),
+        refetch: vi.fn(),
+      });
+      const client = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      const user = userEvent.setup();
 
-    render(
-      <QueryClientProvider client={client}>
-        <MemoryRouter>
-          <UserMenu />
-        </MemoryRouter>
-      </QueryClientProvider>,
-    );
+      render(
+        <QueryClientProvider client={client}>
+          <MemoryRouter>
+            <UserMenu />
+          </MemoryRouter>
+        </QueryClientProvider>,
+      );
 
-    expect(screen.getByText(roleLabel)).toBeInTheDocument();
-    await user.click(
-      screen.getByRole("button", { name: `Account menu, ${role}` }),
-    );
-    expect(
-      await screen.findByRole("menuitem", { name: "Job postings" }),
-    ).toBeInTheDocument();
-  }, 15000);
+      expect(screen.getByText(roleLabel)).toBeInTheDocument();
+      await user.click(
+        screen.getByRole("button", { name: `Account menu, ${role}` }),
+      );
+      expect(
+        await screen.findByRole("menuitem", { name: "Job postings" }),
+      ).toBeInTheDocument();
+    },
+    15000,
+  );
 });
