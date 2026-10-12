@@ -208,7 +208,7 @@ export const appRoutes = [
   },
   {
     path: "/recruiter",
-    element: <ProtectedRoute allowedRoles={JOB_POSTING_MANAGER_ROLES} />,
+    element: <ProtectedRoute requiredRoles={JOB_POSTING_MANAGER_ROLES} />,
     children: [
       {
         element: <AppLayout actor="recruiter" />,
