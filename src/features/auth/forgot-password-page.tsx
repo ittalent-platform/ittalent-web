@@ -15,9 +15,8 @@ import { AuthCardPage, AuthFormHeader, AuthStatusCard } from "./auth-status-card
 import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS } from "./auth-status.constants";
 import { forgotPasswordSchema, type ForgotPasswordFormValues } from "./forgot-password.schema";
 import { getAuthErrorMessage } from "./auth-utils";
+import { HTTP_TOO_MANY_REQUESTS, HTTP_SERVICE_UNAVAILABLE } from "@/api/http-status";
 
-const HTTP_TOO_MANY_REQUESTS = 429;
-const HTTP_SERVICE_UNAVAILABLE = 503;
 
 type Banner = { message: string; tone: "error" | "warning" };
 

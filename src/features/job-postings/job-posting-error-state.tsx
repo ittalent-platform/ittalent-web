@@ -5,10 +5,9 @@ import { requestErrorMessage, requestStatus } from "@/api/request-error";
 import { ErrorState } from "@/components/common/error-state";
 
 import { jobPostingErrorMessage } from "./job-posting-errors";
+import { HTTP_FORBIDDEN, HTTP_NOT_FOUND } from "@/api/http-status";
 
 const OTHER_ENTERPRISE_MESSAGE = "Job posting belongs to another enterprise";
-const HTTP_FORBIDDEN = 403;
-const HTTP_NOT_FOUND = 404;
 
 export function JobPostingErrorState({
   backTo,

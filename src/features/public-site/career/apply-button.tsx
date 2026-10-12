@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { APPLICATIONS_PATH } from "@/config/routes";
 
-import { useApplyCertificates } from "./apply-certificates.queries";
+import { useCertificatesQuery } from "@/features/certificates/certificates.queries";
 import { ApplyCertificatePicker } from "./apply-certificate-picker";
 import { ApplyDocumentPicker } from "./apply-document-picker";
 
@@ -53,6 +53,9 @@ function errorMessage(status: number | undefined, error: unknown) {
 
 const MESSAGE_MAX = 1000;
 
+// shortcut: the picker shows the first 100 certificates only, page through them if candidates ever keep more.
+const CERTIFICATE_PICKER_PARAMS = { limit: 100, page: 1 } as const;
+
 export function ApplyButton({ companyName, deadline, jobId, jobTitle }: ApplyButtonProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -60,7 +63,7 @@ export function ApplyButton({ companyName, deadline, jobId, jobTitle }: ApplyBut
   const [coverLetterId, setCoverLetterId] = useState("");
   const [message, setMessage] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
-  const certificates = useApplyCertificates(open);
+  const certificates = useCertificatesQuery(CERTIFICATE_PICKER_PARAMS, open);
   const certificateItems = certificates.data?.items ?? [];
   // null until the candidate changes the ticks: suggested certificates start ticked. Ids no longer listed drop out.
   const [tickedIds, setTickedIds] = useState<string[] | null>(null);

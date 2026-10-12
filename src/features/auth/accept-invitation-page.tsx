@@ -15,11 +15,11 @@ import { cn } from "@/lib/utils";
 
 import { AUTH_FULL_ACTION_CLASS } from "./auth-status.constants";
 import { AuthCardPage, AuthFactsBox, AuthFormHeader, AuthStatusCard } from "./auth-status-card";
-import { HTTP_BAD_REQUEST, HTTP_CONFLICT, HTTP_GONE } from "./invitation.constants";
 import { acceptAccountInvitation, previewAccountInvitation } from "./invitation.queries";
 import { PasswordField } from "./password-field";
 import { PASSWORD_RULES } from "./password-rules";
 import { strongPasswordSchema } from "./password-schema";
+import { HTTP_BAD_REQUEST, HTTP_CONFLICT, HTTP_GONE } from "@/api/http-status";
 
 const schema = z.object({ password: strongPasswordSchema, confirmPassword: z.string() })
   .refine((values) => values.password === values.confirmPassword, { path: ["confirmPassword"], message: "mismatch" });

@@ -25,10 +25,6 @@ export const HISTORY_ACTION_TONE: Record<HistoryAction, "error" | "info" | "succ
   status_suspended: "error",
 };
 
-export const HTTP_CONFLICT = 409;
-export const HTTP_GONE = 410;
-export const HTTP_TOO_MANY_REQUESTS = 429;
-export const HTTP_SERVER_ERROR = 500;
 
 /** The API's `code` on a 409 says which conflict it is. */
 export const CONFLICT_CODES: Record<string, "accountConflict" | "companyUnavailable" | "lastAdmin" | "lastEnterpriseAdmin" | "stale" | "transition"> = {

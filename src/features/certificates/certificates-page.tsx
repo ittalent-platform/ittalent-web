@@ -19,13 +19,12 @@ import { useUrlSearchInput } from "@/hooks/use-url-search-input";
 import { CertificateFormDialog } from "./certificate-form-dialog";
 import { CertificateRow } from "./certificate-row";
 import { CERTIFICATE_LIMITS, CERTIFICATES_PAGE_SIZE, NEW_CERTIFICATE_HIGHLIGHT_MS } from "./certificates.constants";
-import { type CertificateError, useCertificatesQuery, useDeleteCertificate, useUpdateCertificate } from "./certificates.queries";
+import { useCertificatesQuery, useDeleteCertificate, useUpdateCertificate } from "./certificates.queries";
+import { HTTP_UNAUTHORIZED, HTTP_FORBIDDEN, HTTP_NOT_FOUND } from "@/api/http-status";
+import type { RequestError } from "@/api/request-error";
 
 type Dialog = { kind: "add" } | { kind: "edit"; certificate: CertificateLink } | { kind: "delete"; certificate: CertificateLink } | { kind: "conflict" } | null;
 
-const HTTP_UNAUTHORIZED = 401;
-const HTTP_FORBIDDEN = 403;
-const HTTP_NOT_FOUND = 404;
 
 export function CertificatesPage() {
   const { t } = useTranslation();
@@ -61,7 +60,7 @@ export function CertificatesPage() {
   const close = () => setDialog(null);
 
   function handleMutationError(error: unknown, fallbackKey: string) {
-    const { code, status } = error as CertificateError;
+    const { code, status } = error as RequestError;
     if (code === "VERSION_CONFLICT" || status === HTTP_NOT_FOUND) setDialog({ kind: "conflict" });
     else setActionError(t(fallbackKey));
   }
@@ -91,7 +90,7 @@ export function CertificatesPage() {
     }
   }
 
-  const status = (query.error as CertificateError | null)?.status;
+  const status = (query.error as RequestError | null)?.status;
   if (status === HTTP_UNAUTHORIZED || status === HTTP_FORBIDDEN) {
     return (
       <Shell>

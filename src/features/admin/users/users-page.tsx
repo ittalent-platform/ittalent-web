@@ -20,19 +20,10 @@ import { UserFormDialog } from "./user-form-dialog";
 import { UsersFilterChips, type UsersFilterChip } from "./users-filter-chips";
 import { UsersTable } from "./users-table";
 import { UsersToolbar } from "./users-toolbar";
-import {
-  CHIP_MAX_COMPANY_NAMES,
-  COMPANY_SEARCH_DEBOUNCE_MS,
-  CREATED_HIGHLIGHT_MS,
-  FORBIDDEN_HOME_PATH,
-  HTTP_BAD_REQUEST,
-  HTTP_FORBIDDEN,
-  USER_FILTER_PARAM,
-  type UserSortField,
-  type UserSortOrder,
-} from "./users.constants";
+import {CHIP_MAX_COMPANY_NAMES, COMPANY_SEARCH_DEBOUNCE_MS, CREATED_HIGHLIGHT_MS, FORBIDDEN_HOME_PATH, USER_FILTER_PARAM, type UserSortField, type UserSortOrder } from "./users.constants";
 import { PAGE_SIZE_OPTIONS, useActiveEnterprisesQuery, useUsersListQuery } from "./users.queries";
 import { emailVerifiedFilter, useUsersFilters } from "./use-users-filters";
+import { HTTP_BAD_REQUEST, HTTP_FORBIDDEN } from "@/api/http-status";
 
 type Dialog = { kind: "create" } | { kind: "edit"; user: UserDto } | { kind: "suspend"; user: UserDto } | null;
 

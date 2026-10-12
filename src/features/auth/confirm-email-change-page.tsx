@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 
 import { AUTH_FULL_ACTION_CLASS } from "./auth-status.constants";
 import { AuthCardPage, AuthFactsBox, AuthFormHeader, AuthStatusCard } from "./auth-status-card";
-import { HTTP_CONFLICT, HTTP_FORBIDDEN, HTTP_GONE, HTTP_TOO_MANY_REQUESTS } from "./invitation.constants";
+import { HTTP_FORBIDDEN, HTTP_CONFLICT, HTTP_GONE, HTTP_TOO_MANY_REQUESTS } from "@/api/http-status";
 
 const FAILURE_KEY: Record<number, string> = {
   [HTTP_CONFLICT]: "accountEmailChange.conflict",

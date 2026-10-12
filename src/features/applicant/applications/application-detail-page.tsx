@@ -18,10 +18,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ApplicationCertificates } from "./application-certificates";
 import { ApplicationStatusBadge } from "./application-status-badge";
 import { applicationDisplayId, formatDate, formatDateTime, jobFacts } from "./application-formatters";
-import { APPLICATIONS_PATH, ATTACHMENT_KIND, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, NEXT_STEP_TEXT, PIPELINE_STEPS, TIMELINE_TONES } from "./applications.constants";
+import { APPLICATIONS_PATH, ATTACHMENT_KIND, NEXT_STEP_TEXT, PIPELINE_STEPS, TIMELINE_TONES } from "./applications.constants";
 import { jobPath } from "@/config/routes";
-import { requestStatus, useApplication, useApplicationHistory } from "./applications.queries";
+import { useApplication, useApplicationHistory } from "./applications.queries";
 import { WithdrawApplicationsDialog } from "./withdraw-applications-dialog";
+import { HTTP_BAD_REQUEST, HTTP_NOT_FOUND } from "@/api/http-status";
+import { requestStatus } from "@/api/request-error";
 
 const PAGE = "mx-auto flex w-full max-w-[1264px] flex-col gap-5 px-4 pb-12 pt-8 sm:px-6";
 const CARD = "rounded-2xl border border-border bg-card";
