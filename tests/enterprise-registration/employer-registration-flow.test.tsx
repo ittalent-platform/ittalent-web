@@ -368,11 +368,11 @@ describe("Employer Registration Flow Components", () => {
         </MemoryRouter>,
       );
 
-      expect(screen.getByText(/registration case submitted/i)).toBeInTheDocument();
-      expect(screen.getByText("REG-20261012-ABC12")).toBeInTheDocument();
-      expect(screen.getByText(/intake status:/i)).toBeInTheDocument();
-      expect(screen.getAllByText(/under review/i).length).toBeGreaterThan(0);
-      expect(screen.getByRole("link", { name: /return to homepage/i })).toHaveAttribute("href", "/");
+      expect(screen.getByText(/REG-20261012-ABC12/)).toBeInTheDocument();
+      expect(screen.getByText(/pending review/i)).toBeInTheDocument();
+      expect(screen.getByText(/submitted for review/i)).toBeInTheDocument();
+      expect(screen.getByText(/work email confirmed/i)).toBeInTheDocument();
+      expect(screen.getByText(/admin review/i)).toBeInTheDocument();
     });
   });
 });

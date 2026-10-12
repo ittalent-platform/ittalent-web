@@ -74,10 +74,10 @@ const MOCK_PREVIEW_DRAFT: EnterpriseRegistrationDetail = {
 };
 
 const MOCK_SUBMISSION_RECEIPT: SubmissionReceiptResponse = {
-  registration_code: "ENT-2026-00892",
+  registration_code: "REG-0042",
   status: "pending_review",
-  version: 1,
-  submitted_at: "2026-10-12T09:00:00Z",
+  version: 3,
+  submitted_at: "2026-10-06T09:15:00Z",
   estimated_sla_days: 2,
 };
 
@@ -91,7 +91,11 @@ export function RegisterCompanyPage() {
     searchParams.get("view") ||
     "";
 
-  const isPreviewReceipt = previewParam === "receipt";
+  const isPreviewReceipt =
+    previewParam === "receipt" ||
+    previewParam === "status" ||
+    previewParam === "status-pending" ||
+    previewParam === "pending";
   const isPreviewWizard =
     previewParam === "step1" ||
     previewParam === "step2" ||
@@ -164,9 +168,10 @@ export function RegisterCompanyPage() {
 
   if (submissionReceipt) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-4 sm:p-8">
-        <RegistrationSubmittedReceipt receipt={submissionReceipt} />
-      </div>
+      <RegistrationSubmittedReceipt
+        receipt={submissionReceipt}
+        draft={detailQuery.data || (isPreviewReceipt ? MOCK_PREVIEW_DRAFT : null)}
+      />
     );
   }
 
