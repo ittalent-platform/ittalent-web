@@ -16,7 +16,6 @@ import { Link, useNavigate } from "react-router";
 
 import type { JobPosting } from "@/api/generated/types.gen";
 import { EmptyState } from "@/components/common/empty-state";
-import { LogoTile } from "@/components/common/logo-tile";
 import { SearchEmptyState } from "@/components/common/search-empty-state";
 import {
   DropdownMenu,
@@ -173,7 +172,6 @@ export function JobPostingTable({
               >
                 <TableCell className={`${bodyCell} min-w-[280px] pl-5`}>
                   <div className="flex min-w-0 items-center gap-3">
-                    <LogoTile name={row.enterprise.name} size="md" />
                     <Link
                       className="group/link flex min-w-0 flex-1 flex-col no-underline"
                       to={detailPath}
