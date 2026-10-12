@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreateEmployeeMutation } from "./employees.queries";
-import { useMyEnterpriseProfileQuery } from "../company-profile/company-profile.queries";
+import { useMyEnterpriseProfileQuery } from "@/features/recruiter/company-profile/company-profile.queries";
 import {
   inviteEmployeeSchema,
   type InviteEmployeeFormValues,
