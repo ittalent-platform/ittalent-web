@@ -15,10 +15,12 @@ interface RegistrationWizardContextType {
   registrationId: string | null;
   currentStep: WizardStepKey;
   draft: EnterpriseRegistrationDetail | null;
+  isLegalRepresentative: boolean;
   isSaving: boolean;
   setRegistrationId: (id: string | null) => void;
   setCurrentStep: (step: WizardStepKey) => void;
   setDraft: (draft: EnterpriseRegistrationDetail | null) => void;
+  setIsLegalRepresentative: (isLegal: boolean) => void;
   saveDraft: (data: SaveEnterpriseRegistrationDraftRequest) => Promise<void>;
 }
 
@@ -43,6 +45,7 @@ export function RegistrationWizardProvider({
   const [draft, setDraft] = useState<EnterpriseRegistrationDetail | null>(
     initialDraft,
   );
+  const [isLegalRepresentative, setIsLegalRepresentative] = useState<boolean>(true);
 
   const saveMutation = useSaveRegistrationDraftMutation();
 
@@ -61,10 +64,12 @@ export function RegistrationWizardProvider({
         registrationId,
         currentStep,
         draft,
+        isLegalRepresentative,
         isSaving: saveMutation.isPending,
         setRegistrationId,
         setCurrentStep,
         setDraft,
+        setIsLegalRepresentative,
         saveDraft: handleSaveDraft,
       }}
     >
