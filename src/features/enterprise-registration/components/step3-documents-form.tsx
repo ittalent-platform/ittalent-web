@@ -210,7 +210,7 @@ export function Step3DocumentsForm({
         {errorMessage ? <InlineBanner tone="error">{errorMessage}</InlineBanner> : null}
 
         <input
-          accept={ALLOWED_MIME_TYPES.join(",")}
+          accept={PDF_EXTENSION}
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
