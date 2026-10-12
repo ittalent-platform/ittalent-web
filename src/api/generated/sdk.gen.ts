@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteApiV1EnterprisesByEnterpriseIdData, DeleteApiV1EnterprisesByEnterpriseIdErrors, DeleteApiV1EnterprisesByEnterpriseIdResponses, DeleteApiV1JobPostingsByIdData, DeleteApiV1JobPostingsByIdErrors, DeleteApiV1JobPostingsByIdResponses, GetApiV1AdminDocumentsData, GetApiV1AdminDocumentsErrors, GetApiV1AdminDocumentsResponses, GetApiV1AdminJobPostingsData, GetApiV1AdminJobPostingsErrors, GetApiV1AdminJobPostingsResponses, GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1DocumentsData, GetApiV1DocumentsErrors, GetApiV1DocumentsResponses, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesResponses, GetApiV1JobPostingsByIdData, GetApiV1JobPostingsByIdErrors, GetApiV1JobPostingsByIdPublicData, GetApiV1JobPostingsByIdPublicErrors, GetApiV1JobPostingsByIdPublicResponses, GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsData, GetApiV1JobPostingsErrors, GetApiV1JobPostingsResponses, GetApiV1MeApplicationsByIdData, GetApiV1MeApplicationsByIdErrors, GetApiV1MeApplicationsByIdHistoryData, GetApiV1MeApplicationsByIdHistoryErrors, GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsData, GetApiV1MeApplicationsErrors, GetApiV1MeApplicationsResponses, GetApiV1RecruiterJobPostingsData, GetApiV1RecruiterJobPostingsErrors, GetApiV1RecruiterJobPostingsResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PatchApiV1EnterprisesByEnterpriseIdData, PatchApiV1EnterprisesByEnterpriseIdErrors, PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdStatusData, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1JobPostingsByIdData, PatchApiV1JobPostingsByIdErrors, PatchApiV1JobPostingsByIdResponses, PatchApiV1MeApplicationsByIdWithdrawData, PatchApiV1MeApplicationsByIdWithdrawErrors, PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1UsersByIdData, PatchApiV1UsersByIdErrors, PatchApiV1UsersByIdResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses, PostApiV1DocumentsData, PostApiV1DocumentsErrors, PostApiV1DocumentsResponses, PostApiV1EnterprisesData, PostApiV1EnterprisesErrors, PostApiV1EnterprisesResponses, PostApiV1JobPostingsData, PostApiV1JobPostingsErrors, PostApiV1JobPostingsResponses, PostApiV1MeApplicationsData, PostApiV1MeApplicationsErrors, PostApiV1MeApplicationsResponses } from './types.gen';
+import type { DeleteApiV1DocumentsByIdData, DeleteApiV1DocumentsByIdErrors, DeleteApiV1DocumentsByIdResponses, DeleteApiV1EnterprisesByEnterpriseIdData, DeleteApiV1EnterprisesByEnterpriseIdErrors, DeleteApiV1EnterprisesByEnterpriseIdResponses, DeleteApiV1JobPostingsByIdData, DeleteApiV1JobPostingsByIdErrors, DeleteApiV1JobPostingsByIdResponses, GetApiV1AdminJobPostingsData, GetApiV1AdminJobPostingsErrors, GetApiV1AdminJobPostingsResponses, GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1DocumentsByIdDownloadData, GetApiV1DocumentsByIdDownloadErrors, GetApiV1DocumentsByIdDownloadResponses, GetApiV1DocumentsByIdPreviewData, GetApiV1DocumentsByIdPreviewErrors, GetApiV1DocumentsByIdPreviewResponses, GetApiV1DocumentsData, GetApiV1DocumentsErrors, GetApiV1DocumentsResponses, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesResponses, GetApiV1JobPostingsByIdData, GetApiV1JobPostingsByIdErrors, GetApiV1JobPostingsByIdPublicData, GetApiV1JobPostingsByIdPublicErrors, GetApiV1JobPostingsByIdPublicResponses, GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsData, GetApiV1JobPostingsErrors, GetApiV1JobPostingsResponses, GetApiV1MeApplicationsByIdData, GetApiV1MeApplicationsByIdErrors, GetApiV1MeApplicationsByIdHistoryData, GetApiV1MeApplicationsByIdHistoryErrors, GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsData, GetApiV1MeApplicationsErrors, GetApiV1MeApplicationsResponses, GetApiV1RecruiterJobPostingsData, GetApiV1RecruiterJobPostingsErrors, GetApiV1RecruiterJobPostingsResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PatchApiV1DocumentsByIdDefaultData, PatchApiV1DocumentsByIdDefaultErrors, PatchApiV1DocumentsByIdDefaultResponses, PatchApiV1EnterprisesByEnterpriseIdData, PatchApiV1EnterprisesByEnterpriseIdErrors, PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdStatusData, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1JobPostingsByIdData, PatchApiV1JobPostingsByIdErrors, PatchApiV1JobPostingsByIdResponses, PatchApiV1MeApplicationsByIdWithdrawData, PatchApiV1MeApplicationsByIdWithdrawErrors, PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1UsersByIdData, PatchApiV1UsersByIdErrors, PatchApiV1UsersByIdResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses, PostApiV1DocumentsData, PostApiV1DocumentsErrors, PostApiV1DocumentsResponses, PostApiV1EnterprisesData, PostApiV1EnterprisesErrors, PostApiV1EnterprisesResponses, PostApiV1JobPostingsData, PostApiV1JobPostingsErrors, PostApiV1JobPostingsResponses, PostApiV1MeApplicationsData, PostApiV1MeApplicationsErrors, PostApiV1MeApplicationsResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -151,11 +151,40 @@ export const postApiV1Documents = <ThrowOnError extends boolean = false>(options
 });
 
 /**
- * List all CVs and cover letters for administrators
+ * Download an owned active document
  */
-export const getApiV1AdminDocuments = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AdminDocumentsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1AdminDocumentsResponses, GetApiV1AdminDocumentsErrors, ThrowOnError>({
+export const getApiV1DocumentsByIdDownload = <ThrowOnError extends boolean = false>(options: Options<GetApiV1DocumentsByIdDownloadData, ThrowOnError>) => (options.client ?? client).get<GetApiV1DocumentsByIdDownloadResponses, GetApiV1DocumentsByIdDownloadErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/admin/documents',
+    url: '/api/v1/documents/{id}/download',
+    ...options
+});
+
+/**
+ * Preview an owned active document
+ */
+export const getApiV1DocumentsByIdPreview = <ThrowOnError extends boolean = false>(options: Options<GetApiV1DocumentsByIdPreviewData, ThrowOnError>) => (options.client ?? client).get<GetApiV1DocumentsByIdPreviewResponses, GetApiV1DocumentsByIdPreviewErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/documents/{id}/preview',
+    ...options
+});
+
+/**
+ * Set an owned active document as the default for its type
+ */
+export const patchApiV1DocumentsByIdDefault = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1DocumentsByIdDefaultData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1DocumentsByIdDefaultResponses, PatchApiV1DocumentsByIdDefaultErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/documents/{id}/default',
+    ...options
+});
+
+/**
+ * Soft-delete an owned active document
+ *
+ * Deletion is blocked while any application references the document. Deleting a default promotes the newest remaining active document of the same type.
+ */
+export const deleteApiV1DocumentsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1DocumentsByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1DocumentsByIdResponses, DeleteApiV1DocumentsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/documents/{id}',
     ...options
 });
 

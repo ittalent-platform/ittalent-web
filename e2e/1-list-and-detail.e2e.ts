@@ -342,7 +342,7 @@ test.describe("UC-MYAPP-02 view my application detail", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Apply again" }),
-    ).toHaveAttribute("href", /\/jobs\//);
+    ).toHaveAttribute("href", /\/career\//);
   });
 
   test("statuses the candidate cannot withdraw show no Withdraw action (Interviewing, Offered, Hired, Rejected)", async ({

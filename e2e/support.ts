@@ -1,6 +1,9 @@
 import { readFileSync } from "node:fs";
 import { test as base, expect, type Page } from "@playwright/test";
 
+import { runBackendScript } from "./backend-script";
+import { E2E_API_URL } from "./environment";
+
 export { expect };
 
 export const PASSWORD = "Candidate123!";
@@ -8,10 +11,19 @@ export const ACCOUNTS = {
   demo: "candidate-myapps@example.com",
   empty: "candidate-empty@example.com",
   other: "candidate-other@example.com",
+  documentA: "document-applicant-a@example.test",
+  documentB: "document-applicant-b@example.test",
 } as const;
+export const ACCOUNT_PASSWORDS: Record<(typeof ACCOUNTS)[keyof typeof ACCOUNTS], string> = {
+  [ACCOUNTS.demo]: PASSWORD,
+  [ACCOUNTS.empty]: PASSWORD,
+  [ACCOUNTS.other]: PASSWORD,
+  [ACCOUNTS.documentA]: "DocumentE2E123!",
+  [ACCOUNTS.documentB]: "DocumentE2E123!",
+};
 export const TOKEN_DIR = "e2e/.auth";
 export const tokenFile = (email: string) => `${TOKEN_DIR}/${email}.json`;
-export const API_URL = "http://localhost:3101";
+export const API_URL = E2E_API_URL;
 
 /** Seed order (see ittalent-backend/src/scripts/seed-applications.ts); ids are derived from the index. */
 export const SEED = {
@@ -66,19 +78,33 @@ export const test = base.extend<{ candidate: Page }>({
   },
 });
 
+export function resetDocumentFixtures(): void {
+  runBackendScript("seed:documents:e2e");
+}
+
+export async function authenticatedApiResponse(
+  email: string,
+  path: string,
+  init: RequestInit = {},
+): Promise<Response> {
+  const { tokens } = loadSession(email);
+  const headers = new Headers(init.headers);
+  headers.set("authorization", `Bearer ${tokens.accessToken}`);
+  return fetch(`${API_URL}${path}`, { ...init, headers });
+}
+
 /** Calls the real API as a signed-in account (used to assert what the server enforces regardless of the UI). */
 export async function api(
   email: string,
   path: string,
   init: { method?: string; body?: unknown } = {},
 ): Promise<{ status: number; json: unknown }> {
+  const headers = new Headers({ "content-type": "application/json" });
   const { tokens } = loadSession(email);
+  headers.set("authorization", `Bearer ${tokens.accessToken}`);
   const response = await fetch(`${API_URL}${path}`, {
     method: init.method ?? "GET",
-    headers: {
-      authorization: `Bearer ${tokens.accessToken}`,
-      "content-type": "application/json",
-    },
+    headers,
     ...(init.body ? { body: JSON.stringify(init.body) } : {}),
   });
   return {
