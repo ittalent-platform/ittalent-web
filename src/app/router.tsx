@@ -4,6 +4,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, createBrowserRouter, RouterProvider, useLocation } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
+import { JOB_POSTING_MANAGER_ROLES } from "@/auth/roles";
 import { AppLayout } from "@/components/layout/admin-layout";
 import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
@@ -105,7 +106,9 @@ const ApplicationDetailPage = lazy(() =>
   ),
 );
 const EnterprisesPage = lazy(() =>
-  import("@/features/admin/enterprises/enterprises-page").then((m) => ({ default: m.EnterprisesPage })),
+  import("@/features/admin/enterprises/enterprises-page").then((m) => ({
+    default: m.EnterprisesPage,
+  })),
 );
 const AdminEnterpriseDetailPage = lazy(() =>
   import("@/features/admin/enterprises/enterprise-detail-page").then((m) => ({
@@ -187,8 +190,14 @@ export const appRoutes = [
           { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
           { path: "enterprises/new", element: <EnterpriseFormPage /> },
-          { path: "enterprises/:enterpriseId", element: <AdminEnterpriseDetailPage /> },
-          { path: "enterprises/:enterpriseId/edit", element: <EnterpriseFormPage /> },
+          {
+            path: "enterprises/:enterpriseId",
+            element: <AdminEnterpriseDetailPage />,
+          },
+          {
+            path: "enterprises/:enterpriseId/edit",
+            element: <EnterpriseFormPage />,
+          },
           { path: "job-postings", element: <JobPostingsPage /> },
           {
             path: "job-postings/:jobPostingId",
@@ -200,7 +209,7 @@ export const appRoutes = [
   },
   {
     path: "/recruiter",
-    element: <ProtectedRoute requiredRoles={["recruiter", "enterprise_admin"]} />,
+    element: <ProtectedRoute requiredRoles={JOB_POSTING_MANAGER_ROLES} />,
     children: [
       {
         element: <AppLayout actor="recruiter" />,

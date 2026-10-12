@@ -5,13 +5,31 @@ import { backendEnv, E2E_API_URL } from "../playwright.config";
 
 const ADMIN_EMAIL = "manage-users-e2e@example.test";
 const ADMIN_PASSWORD = "ManageUsers123!";
+const isWindows = process.platform === "win32";
+const npmCommand = isWindows ? "cmd.exe" : "npm";
+
+function seedAdmin() {
+  return spawnSync(
+    npmCommand,
+    isWindows
+      ? ["/d", "/s", "/c", "npm.cmd", "run", "seed:admin"]
+      : ["run", "seed:admin"],
+    {
+      cwd: "../ittalent-backend",
+      env: {
+        ...process.env,
+        ...backendEnv,
+        ADMIN_EMAIL,
+        ADMIN_USERNAME: "manage_users_e2e",
+        ADMIN_PASSWORD,
+      },
+      encoding: "utf8",
+    },
+  );
+}
 
 test("admin edits an account with its loaded version against the real API", async ({ page, request }) => {
-  const seed = spawnSync("npm", ["run", "seed:admin"], {
-    cwd: "../ittalent-backend",
-    env: { ...process.env, ...backendEnv, ADMIN_EMAIL, ADMIN_USERNAME: "manage_users_e2e", ADMIN_PASSWORD },
-    encoding: "utf8",
-  });
+  const seed = seedAdmin();
   expect(seed.status, seed.stderr).toBe(0);
   const login = await request.post(`${E2E_API_URL}/api/v1/auth/login`, { data: { identifier: ADMIN_EMAIL, password: ADMIN_PASSWORD } });
   expect(login.ok()).toBe(true);
@@ -46,11 +64,7 @@ test("admin edits an account with its loaded version against the real API", asyn
 });
 
 test("admin creates an HR account with an active company and receives invitation delivery feedback", async ({ page, request }) => {
-  const seed = spawnSync("npm", ["run", "seed:admin"], {
-    cwd: "../ittalent-backend",
-    env: { ...process.env, ...backendEnv, ADMIN_EMAIL, ADMIN_USERNAME: "manage_users_e2e", ADMIN_PASSWORD },
-    encoding: "utf8",
-  });
+  const seed = seedAdmin();
   expect(seed.status, seed.stderr).toBe(0);
   const login = await request.post(`${E2E_API_URL}/api/v1/auth/login`, { data: { identifier: ADMIN_EMAIL, password: ADMIN_PASSWORD } });
   expect(login.ok()).toBe(true);
@@ -90,11 +104,7 @@ test("admin creates an HR account with an active company and receives invitation
 });
 
 test("admin filters the users list with multi-select filters kept in the URL", async ({ page, request }) => {
-  const seed = spawnSync("npm", ["run", "seed:admin"], {
-    cwd: "../ittalent-backend",
-    env: { ...process.env, ...backendEnv, ADMIN_EMAIL, ADMIN_USERNAME: "manage_users_e2e", ADMIN_PASSWORD },
-    encoding: "utf8",
-  });
+  const seed = seedAdmin();
   expect(seed.status, seed.stderr).toBe(0);
   const login = await request.post(`${E2E_API_URL}/api/v1/auth/login`, { data: { identifier: ADMIN_EMAIL, password: ADMIN_PASSWORD } });
   expect(login.ok()).toBe(true);

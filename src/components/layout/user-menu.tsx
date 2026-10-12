@@ -28,6 +28,14 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
   const user = session?.user;
   const displayName = user?.username ?? user?.email ?? "User";
   const avatarName = user?.fullName?.trim() || displayName;
+  const roleLabel =
+    user?.role === "admin"
+      ? t("roles.admin")
+      : user?.role === "enterprise_admin"
+        ? t("roles.enterpriseAdmin")
+        : user?.role === "recruiter"
+          ? t("roles.recruiter")
+          : t("roles.user");
 
   function handleSignOut() {
     setIsSigningOut(true);
@@ -70,11 +78,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
               {displayName}
             </p>
             <p className="truncate text-[0.8rem] text-muted-foreground">
-              {user?.role === "admin"
-                ? "Admin"
-                : user?.role === "recruiter" || user?.role === "enterprise_admin"
-                  ? "Recruiter"
-                  : "User"}
+              {roleLabel}
             </p>
           </div>
         </button>
@@ -89,7 +93,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
             {user?.email} ·{" "}
             <span className="capitalize font-medium">
-              {user?.role ?? "user"}
+              {roleLabel}
             </span>
           </p>
         </div>

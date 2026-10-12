@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 
 import { postApiV1AuthLogin } from "@/api/generated";
 import { authClient } from "@/auth/auth-client";
+// import { dashboardPathForRole } from "@/auth/roles";
 import { authKeys } from "@/auth/use-session";
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";

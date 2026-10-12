@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router";
 import { LoadingScreen } from "@/components/common/loading-screen";
+// import { dashboardPathForRole, type ProtectedRole } from "./roles";
 import { useSession } from "./use-session";
 
 type ProtectedRouteProps = {
