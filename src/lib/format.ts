@@ -33,7 +33,7 @@ const TIME_FORMATTER = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hour1
 const DATE_TIME_FORMATTER = new Intl.DateTimeFormat("en-GB", { day: "numeric", hour: "2-digit", hour12: false, minute: "2-digit", month: "short", timeZone: ICT, year: "numeric" });
 const DAY_DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: ICT, year: "numeric" });
 const WEEKDAY_FORMATTER = new Intl.DateTimeFormat("en-GB", { timeZone: ICT, weekday: "long" });
-const MS_PER_DAY = 86_400_000;
+export const MS_PER_DAY = 86_400_000;
 
 const validDate = (value?: string) => {
   const date = value ? new Date(value) : null;
@@ -64,4 +64,12 @@ export function ictDayHeading(value: string, now = new Date()): { date: string; 
   const key = ictDayKey(value);
   const kind = key === ictDayKey(now) ? "today" : key === ictDayKey(new Date(now.getTime() - MS_PER_DAY)) ? "yesterday" : "weekday";
   return { date: date ? DAY_DATE_FORMATTER.format(date) : "—", kind, weekday: date ? WEEKDAY_FORMATTER.format(date) : "—" };
+}
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** "12 Mar 2025" from a date-only "2025-03-12", with no time-zone shift. */
+export function formatCalendarDate(value: string): string {
+  const [year, month, day] = value.split("-").map(Number);
+  return `${day} ${MONTHS[month - 1]} ${year}`;
 }

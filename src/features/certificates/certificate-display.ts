@@ -1,12 +1,5 @@
+export { formatCalendarDate } from "@/lib/format";
 import type { CertificateLink } from "@/api/generated/types.gen";
-
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-/** "12 Mar 2025" from a date-only "2025-03-12", without any time-zone shift. */
-export function formatCalendarDate(value: string): string {
-  const [year, month, day] = value.split("-").map(Number);
-  return `${day} ${MONTHS[month - 1]} ${year}`;
-}
 
 /** Today as "YYYY-MM-DD" in the viewer's own calendar. */
 export function todayIso(now = new Date()): string {
