@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 export function StepActions({ backDisabled, children, onBack }: { backDisabled?: boolean; children: ReactNode; onBack?: () => void }) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center justify-between gap-3 border-t border-line-muted pt-6">
+    <div className="flex items-center justify-between gap-3">
       {onBack ? (
         <Button className={AUTH_ACTION_CLASS} disabled={backDisabled} onClick={onBack} shape="xl" type="button" variant="outline">
           <ArrowLeft aria-hidden />

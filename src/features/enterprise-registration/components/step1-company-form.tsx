@@ -119,10 +119,9 @@ export function Step1CompanyForm({
   };
 
   return (
-    <SectionCard description={t("enterpriseRegistration.step1.subtitle")} title={t("enterpriseRegistration.step1.title")}>
-      {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
-
-      <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+      <SectionCard description={t("enterpriseRegistration.step1.subtitle")} title={t("enterpriseRegistration.step1.title")}>
+        {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
         <Section title={t("enterpriseRegistration.step1.basic")}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
@@ -233,14 +232,14 @@ export function Step1CompanyForm({
             <Textarea id="short_description" placeholder={t("enterpriseRegistration.step1.pitchPlaceholder")} rows={2} {...register("short_description")} />
           </FormField>
         </Section>
+      </SectionCard>
 
-        <StepActions>
-          <Button className={AUTH_ACTION_CLASS} disabled={isSaving} shape="xl" type="submit">
-            {isSaving ? t("enterpriseRegistration.common.saving") : t("enterpriseRegistration.common.saveContinue")}
-            {isSaving ? null : <ArrowRight aria-hidden />}
-          </Button>
-        </StepActions>
-      </form>
-    </SectionCard>
+      <StepActions>
+        <Button className={AUTH_ACTION_CLASS} disabled={isSaving} shape="xl" type="submit">
+          {isSaving ? t("enterpriseRegistration.common.saving") : t("enterpriseRegistration.common.saveContinue")}
+          {isSaving ? null : <ArrowRight aria-hidden />}
+        </Button>
+      </StepActions>
+    </form>
   );
 }

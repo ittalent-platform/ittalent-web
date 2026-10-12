@@ -128,7 +128,7 @@ export function Step4ReviewForm({
   const row = (label: string, value: React.ReactNode) => <DetailRow label={label} layout="grid" value={value} />;
 
   return (
-    <div className="flex flex-col gap-[18px]">
+    <form className="flex flex-col gap-[18px]" noValidate onSubmit={handleSubmit(onSubmit)}>
       <SectionCard description={t("enterpriseRegistration.step4.subtitle")} title={t("enterpriseRegistration.step4.title")}>
         {null}
       </SectionCard>
@@ -175,24 +175,22 @@ export function Step4ReviewForm({
       </SectionCard>
 
       <SectionCard>
-        <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
-          {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
-          <ConsentCheckbox
-            error={errors.agreed_to_terms?.message}
-            hint={t("enterpriseRegistration.step4.certifyBody")}
-            id="agreed_to_terms"
-            label={t("enterpriseRegistration.step4.certify")}
-            {...register("agreed_to_terms")}
-          />
-
-          <StepActions backDisabled={submitMutation.isPending} onBack={onBack}>
-            <Button className={AUTH_ACTION_CLASS} disabled={submitMutation.isPending} shape="xl" type="submit">
-              <ShieldCheck aria-hidden />
-              {submitMutation.isPending ? t("enterpriseRegistration.step4.submitting") : t("enterpriseRegistration.step4.submit")}
-            </Button>
-          </StepActions>
-        </form>
+        {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
+        <ConsentCheckbox
+          error={errors.agreed_to_terms?.message}
+          hint={t("enterpriseRegistration.step4.certifyBody")}
+          id="agreed_to_terms"
+          label={t("enterpriseRegistration.step4.certify")}
+          {...register("agreed_to_terms")}
+        />
       </SectionCard>
-    </div>
+
+      <StepActions backDisabled={submitMutation.isPending} onBack={onBack}>
+        <Button className={AUTH_ACTION_CLASS} disabled={submitMutation.isPending} shape="xl" type="submit">
+          <ShieldCheck aria-hidden />
+          {submitMutation.isPending ? t("enterpriseRegistration.step4.submitting") : t("enterpriseRegistration.step4.submit")}
+        </Button>
+      </StepActions>
+    </form>
   );
 }

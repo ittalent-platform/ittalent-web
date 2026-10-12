@@ -185,115 +185,117 @@ export function Step3DocumentsForm({
   const busy = isSaving || uploadMutation.isPending;
 
   return (
-    <SectionCard description={t("enterpriseRegistration.step3.subtitle", { mb: MAX_FILE_MB })} title={t("enterpriseRegistration.step3.title")}>
-      {errorMessage ? <InlineBanner tone="error">{errorMessage}</InlineBanner> : null}
+    <div className="flex flex-col gap-6">
+      <SectionCard description={t("enterpriseRegistration.step3.subtitle", { mb: MAX_FILE_MB })} title={t("enterpriseRegistration.step3.title")}>
+        {errorMessage ? <InlineBanner tone="error">{errorMessage}</InlineBanner> : null}
 
-      <div className="rounded-xl border border-border bg-muted/40 p-4 text-[13px]">
-        <span className="font-semibold text-foreground">{t("enterpriseRegistration.step3.requiredTitle")}</span>
-        <ul className="m-0 mt-2 flex list-none flex-col gap-1.5 p-0 text-muted-foreground">
-          <RequirementRow label={t("enterpriseRegistration.step3.brcRequired")} met={hasBusinessLicense} />
-          <RequirementRow
-            label={t(isLegalRepresentative ? "enterpriseRegistration.step3.loaNotRequired" : "enterpriseRegistration.step3.loaRequired")}
-            met={authLetterMet}
-            missing={!authLetterMet}
-          />
-        </ul>
-      </div>
-
-      <div className="flex flex-col gap-4">
-        <div className="w-full sm:w-72">
-          <label className="mb-1 block text-xs font-semibold text-foreground" htmlFor="doc_type_select">
-            {t("enterpriseRegistration.step3.typeLabel")}
-          </label>
-          <Select onValueChange={(val) => setDocType(val as LegalDocumentType)} value={docType}>
-            <SelectTrigger id="doc_type_select">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {legalDocumentTypes.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {t(`enterpriseRegistration.documentTypes.${type}`)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="rounded-xl border border-border bg-muted/40 p-4 text-[13px]">
+          <span className="font-semibold text-foreground">{t("enterpriseRegistration.step3.requiredTitle")}</span>
+          <ul className="m-0 mt-2 flex list-none flex-col gap-1.5 p-0 text-muted-foreground">
+            <RequirementRow label={t("enterpriseRegistration.step3.brcRequired")} met={hasBusinessLicense} />
+            <RequirementRow
+              label={t(isLegalRepresentative ? "enterpriseRegistration.step3.loaNotRequired" : "enterpriseRegistration.step3.loaRequired")}
+              met={authLetterMet}
+              missing={!authLetterMet}
+            />
+          </ul>
         </div>
 
-        <div
-          className={cn(
-            "flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-colors",
-            dragOver ? "border-primary bg-accent" : "border-(--line-dashed) bg-muted/40 hover:border-muted-foreground/50",
-          )}
-          onDragLeave={() => setDragOver(false)}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
-          }}
-          onDrop={handleDrop}
-        >
-          <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <UploadCloud aria-hidden className="size-6" />
+        <div className="flex flex-col gap-4">
+          <div className="w-full sm:w-72">
+            <label className="mb-1 block text-xs font-semibold text-foreground" htmlFor="doc_type_select">
+              {t("enterpriseRegistration.step3.typeLabel")}
+            </label>
+            <Select onValueChange={(val) => setDocType(val as LegalDocumentType)} value={docType}>
+              <SelectTrigger id="doc_type_select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {legalDocumentTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {t(`enterpriseRegistration.documentTypes.${type}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <p className="m-0 mt-3 text-sm font-semibold text-foreground">{t("enterpriseRegistration.step3.dropTitle")}</p>
-          <p className="m-0 mt-1 text-xs text-muted-foreground">{t("enterpriseRegistration.step3.dropHint", { mb: MAX_FILE_MB })}</p>
-          <input
-            accept={ALLOWED_MIME_TYPES.join(",")}
-            className="hidden"
-            onChange={handleFileInputChange}
-            ref={fileInputRef}
-            type="file"
-          />
-          <Button
-            className={`${AUTH_ACTION_CLASS} mt-4`}
-            disabled={uploadMutation.isPending}
-            onClick={() => fileInputRef.current?.click()}
-            shape="xl"
-            type="button"
-            variant="outline"
+
+          <div
+            className={cn(
+              "flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-colors",
+              dragOver ? "border-primary bg-accent" : "border-(--line-dashed) bg-muted/40 hover:border-muted-foreground/50",
+            )}
+            onDragLeave={() => setDragOver(false)}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDrop={handleDrop}
           >
-            {uploadMutation.isPending ? t("enterpriseRegistration.step3.uploading") : t("enterpriseRegistration.step3.select")}
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <h3 className="m-0 text-[13.5px] font-bold text-foreground">{t("enterpriseRegistration.step3.attached", { count: documents.length })}</h3>
-
-        {documents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-(--line-dashed) p-6 text-center text-xs text-muted-foreground">
-            {t("enterpriseRegistration.step3.none")}
+            <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+              <UploadCloud aria-hidden className="size-6" />
+            </div>
+            <p className="m-0 mt-3 text-sm font-semibold text-foreground">{t("enterpriseRegistration.step3.dropTitle")}</p>
+            <p className="m-0 mt-1 text-xs text-muted-foreground">{t("enterpriseRegistration.step3.dropHint", { mb: MAX_FILE_MB })}</p>
+            <input
+              accept={ALLOWED_MIME_TYPES.join(",")}
+              className="hidden"
+              onChange={handleFileInputChange}
+              ref={fileInputRef}
+              type="file"
+            />
+            <Button
+              className={`${AUTH_ACTION_CLASS} mt-4`}
+              disabled={uploadMutation.isPending}
+              onClick={() => fileInputRef.current?.click()}
+              shape="xl"
+              type="button"
+              variant="outline"
+            >
+              {uploadMutation.isPending ? t("enterpriseRegistration.step3.uploading") : t("enterpriseRegistration.step3.select")}
+            </Button>
           </div>
-        ) : (
-          <ul className="m-0 flex list-none flex-col divide-y divide-line-muted rounded-xl border border-border bg-card p-0">
-            {documents.map((doc, idx) => (
-              <li className="flex items-center justify-between gap-3 p-3.5" key={`${doc.file_name}-${idx}`}>
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-(--status-warning-bg) text-(--status-warning-fg)">
-                    <FileText aria-hidden className="size-[18px]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="m-0 truncate text-xs font-semibold text-foreground">{doc.file_name}</p>
-                    <div className="mt-0.5 flex items-center gap-2 text-[11.5px] text-muted-foreground">
-                      <Badge>{t(`enterpriseRegistration.documentTypes.${doc.document_type}`)}</Badge>
-                      <span>{formatBytes(doc.file_size)}</span>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h3 className="m-0 text-[13.5px] font-bold text-foreground">{t("enterpriseRegistration.step3.attached", { count: documents.length })}</h3>
+
+          {documents.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-(--line-dashed) p-6 text-center text-xs text-muted-foreground">
+              {t("enterpriseRegistration.step3.none")}
+            </div>
+          ) : (
+            <ul className="m-0 flex list-none flex-col divide-y divide-line-muted rounded-xl border border-border bg-card p-0">
+              {documents.map((doc, idx) => (
+                <li className="flex items-center justify-between gap-3 p-3.5" key={`${doc.file_name}-${idx}`}>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-(--status-warning-bg) text-(--status-warning-fg)">
+                      <FileText aria-hidden className="size-[18px]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="m-0 truncate text-xs font-semibold text-foreground">{doc.file_name}</p>
+                      <div className="mt-0.5 flex items-center gap-2 text-[11.5px] text-muted-foreground">
+                        <Badge>{t(`enterpriseRegistration.documentTypes.${doc.document_type}`)}</Badge>
+                        <span>{formatBytes(doc.file_size)}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <button
-                  aria-label={t("enterpriseRegistration.step3.remove")}
-                  className="cursor-pointer rounded p-1.5 text-muted-foreground hover:bg-(--status-error-bg) hover:text-destructive"
-                  onClick={() => void handleRemoveDoc(idx)}
-                  title={t("enterpriseRegistration.step3.remove")}
-                  type="button"
-                >
-                  <Trash2 aria-hidden className="size-4" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                  <button
+                    aria-label={t("enterpriseRegistration.step3.remove")}
+                    className="cursor-pointer rounded p-1.5 text-muted-foreground hover:bg-(--status-error-bg) hover:text-destructive"
+                    onClick={() => void handleRemoveDoc(idx)}
+                    title={t("enterpriseRegistration.step3.remove")}
+                    type="button"
+                  >
+                    <Trash2 aria-hidden className="size-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </SectionCard>
 
       <StepActions backDisabled={busy} onBack={onBack}>
         <Button className={AUTH_ACTION_CLASS} disabled={busy} onClick={handleProceed} shape="xl" type="button">
@@ -301,6 +303,6 @@ export function Step3DocumentsForm({
           <ArrowRight aria-hidden />
         </Button>
       </StepActions>
-    </SectionCard>
+    </div>
   );
 }

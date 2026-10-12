@@ -81,10 +81,9 @@ export function Step2RepresentativeForm({
   };
 
   return (
-    <SectionCard description={t("enterpriseRegistration.step2.subtitle")} title={t("enterpriseRegistration.step2.title")}>
-      {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
-
-      <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+      <SectionCard description={t("enterpriseRegistration.step2.subtitle")} title={t("enterpriseRegistration.step2.title")}>
+        {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField error={errors.full_name?.message} htmlFor="full_name" label={t("enterpriseRegistration.step2.fullName")} required>
             <Input aria-invalid={Boolean(errors.full_name)} id="full_name" placeholder={t("enterpriseRegistration.step2.fullNamePlaceholder")} {...register("full_name")} />
@@ -117,14 +116,14 @@ export function Step2RepresentativeForm({
             <span className="font-semibold">{t("enterpriseRegistration.step2.delegateTitle")}</span> {t("enterpriseRegistration.step2.delegateBody")}
           </InlineBanner>
         ) : null}
+      </SectionCard>
 
-        <StepActions backDisabled={isSaving} onBack={onBack}>
-          <Button className={AUTH_ACTION_CLASS} disabled={isSaving} shape="xl" type="submit">
-            {isSaving ? t("enterpriseRegistration.common.saving") : t("enterpriseRegistration.common.saveContinue")}
-            {isSaving ? null : <ArrowRight aria-hidden />}
-          </Button>
-        </StepActions>
-      </form>
-    </SectionCard>
+      <StepActions backDisabled={isSaving} onBack={onBack}>
+        <Button className={AUTH_ACTION_CLASS} disabled={isSaving} shape="xl" type="submit">
+          {isSaving ? t("enterpriseRegistration.common.saving") : t("enterpriseRegistration.common.saveContinue")}
+          {isSaving ? null : <ArrowRight aria-hidden />}
+        </Button>
+      </StepActions>
+    </form>
   );
 }
