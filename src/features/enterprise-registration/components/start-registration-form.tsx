@@ -68,23 +68,21 @@ export function StartRegistrationForm({
   };
 
   return (
-    <div className="w-full max-w-[460px] rounded-2xl border border-border bg-card p-8 shadow-xs">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">
+    <div className="flex w-full flex-col gap-[22px]">
+      <div className="flex flex-col gap-2.5">
+        <h1 className="font-heading text-2xl font-semibold tracking-[-0.01em] text-foreground sm:text-[30px]">
           Register your company
-        </h2>
-        <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+        </h1>
+        <p className="text-[14.5px] leading-[1.6] text-muted-foreground">
           Start with your work email. We&apos;ll send a link to confirm it. You won&apos;t need a password until your company is approved.
         </p>
       </div>
 
       {serverError && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{serverError}</InlineBanner>
-        </div>
+        <InlineBanner tone="error">{serverError}</InlineBanner>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[18px]">
         <FormField
           htmlFor="representative_name"
           label="Full name"
@@ -94,6 +92,7 @@ export function StartRegistrationForm({
           <Input
             id="representative_name"
             placeholder="Đỗ Minh Châu"
+            className="h-[46px] rounded-xl border-border bg-card px-[15px] text-[14px]"
             {...register("representative_name")}
           />
         </FormField>
@@ -109,13 +108,14 @@ export function StartRegistrationForm({
             id="corporate_email"
             type="email"
             placeholder="chau.do@lumenlogistics.vn"
+            className="h-[46px] rounded-xl border-border bg-card px-[15px] text-[14px]"
             {...register("corporate_email")}
           />
         </FormField>
 
         <Button
           type="submit"
-          className="mt-2 w-full"
+          className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
           disabled={isSubmitting || startMutation.isPending}
         >
           {isSubmitting || startMutation.isPending
@@ -124,13 +124,13 @@ export function StartRegistrationForm({
         </Button>
       </form>
 
-      <div className="mt-6 flex flex-col gap-2.5 border-t border-border pt-5 text-[13px] text-muted-foreground">
+      <div className="flex flex-col gap-2 pt-1 text-[13.5px] text-muted-foreground">
         <div>
           Started a registration before?{" "}
           <button
             type="button"
             onClick={onContinueLaterClick}
-            className="font-semibold text-primary hover:underline"
+            className="font-bold text-primary hover:underline"
           >
             Continue it
           </button>
@@ -139,7 +139,7 @@ export function StartRegistrationForm({
           Already work at a company on ITTalent?{" "}
           <Link
             to="/login"
-            className="font-semibold text-primary hover:underline"
+            className="font-bold text-primary hover:underline"
           >
             Employer sign in
           </Link>

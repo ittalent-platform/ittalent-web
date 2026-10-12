@@ -32,57 +32,58 @@ export function RegistrationCheckEmail({
   };
 
   return (
-    <div className="w-full max-w-[460px] rounded-2xl border border-border bg-card p-8 shadow-xs">
-      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-(--status-warning-bg) text-(--status-warning-fg)">
+    <div className="flex w-full flex-col gap-[22px]">
+      <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px] bg-(--status-peach-bg) text-(--status-peach-fg)">
         <Mail className="h-7 w-7" />
+      </span>
+
+      <div className="flex flex-col gap-2.5">
+        <h1 className="font-heading text-2xl font-semibold tracking-[-0.01em] text-foreground sm:text-[30px]">
+          Check your email
+        </h1>
+        <p className="text-[14.5px] leading-[1.6] text-muted-foreground">
+          We sent a confirmation link to{" "}
+          <strong className="font-semibold text-foreground">{email}</strong>.
+        </p>
       </div>
-
-      <h2 className="text-2xl font-bold tracking-tight text-foreground">
-        Check your email
-      </h2>
-
-      <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-        We sent a confirmation link to{" "}
-        <span className="font-semibold text-foreground">{email}</span>.
-      </p>
 
       {/* 3-step numbered card */}
-      <div className="mt-6 flex flex-col gap-3 rounded-xl border border-border bg-background/50 p-4 text-left">
-        <div className="flex items-start gap-3">
-          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-muted-foreground">
+      <ol className="m-0 flex list-none flex-col gap-3 rounded-[14px] border border-border bg-card p-[16px_18px] text-left">
+        <li className="flex items-start gap-3">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
             1
           </span>
-          <span className="text-[13px] text-foreground">
+          <span className="pt-0.5 text-[13.5px] leading-[1.55] text-foreground/90">
             Open the email from <strong>ITTalent</strong>.
           </span>
-        </div>
+        </li>
 
-        <div className="flex items-start gap-3">
-          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-muted-foreground">
+        <li className="flex items-start gap-3">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
             2
           </span>
-          <span className="text-[13px] text-foreground">
+          <span className="pt-0.5 text-[13.5px] leading-[1.55] text-foreground/90">
             Select <strong>Confirm work email</strong>. The link works once and expires in 24 hours.
           </span>
-        </div>
+        </li>
 
-        <div className="flex items-start gap-3">
-          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-[11px] font-semibold text-muted-foreground">
+        <li className="flex items-start gap-3">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
             3
           </span>
-          <span className="text-[13px] text-foreground">
+          <span className="pt-0.5 text-[13.5px] leading-[1.55] text-foreground/90">
             You land on your registration draft. No password needed.
           </span>
-        </div>
-      </div>
+        </li>
+      </ol>
 
       {/* Action buttons */}
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <Button
           type="button"
           variant="outline"
           onClick={onChangeEmail}
-          className="w-full"
+          className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
         >
           Change email
         </Button>
@@ -91,16 +92,16 @@ export function RegistrationCheckEmail({
           type="button"
           disabled={cooldown > 0 || isResending}
           onClick={handleResend}
-          className="w-full"
+          className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
         >
           {isResending ? (
             <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
           ) : null}
-          {cooldown > 0 ? `Resend email (${cooldown}s)` : "Resend email"}
+          {cooldown > 0 ? `Resend (${cooldown}s)` : "Resend email"}
         </Button>
       </div>
 
-      <p className="mt-6 text-[12.5px] leading-relaxed text-muted-foreground">
+      <p className="text-[12.5px] leading-[1.55] text-muted-foreground">
         Can&apos;t find it? Check Spam or Promotions. Resend is limited to 3 times per 24 hours, one minute apart.
       </p>
     </div>

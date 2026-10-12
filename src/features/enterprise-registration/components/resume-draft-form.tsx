@@ -38,23 +38,25 @@ export function ResumeDraftForm({
 
   if (isSubmitted) {
     return (
-      <div className="w-full max-w-[460px] rounded-2xl border border-border bg-card p-8 text-center shadow-xs">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-(--status-success-bg) text-(--status-success-fg)">
+      <div className="flex w-full flex-col gap-[22px]">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--status-success-bg) text-(--status-success-fg)">
           <CheckCircle2 className="h-7 w-7" />
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">
-          Resume link sent
-        </h2>
-        <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-          If an active registration exists for{" "}
-          <span className="font-semibold text-foreground">{email}</span>, we have emailed
-          a link to resume your draft.
-        </p>
+        <div className="flex flex-col gap-2.5">
+          <h1 className="font-heading text-2xl font-semibold tracking-[-0.01em] text-foreground sm:text-[30px]">
+            Resume link sent
+          </h1>
+          <p className="text-[14.5px] leading-[1.6] text-muted-foreground">
+            If an active registration exists for{" "}
+            <strong className="font-semibold text-foreground">{email}</strong>, we have emailed
+            a link to resume your draft.
+          </p>
+        </div>
         <Button
           type="button"
           variant="outline"
           onClick={onBack}
-          className="mt-6 w-full"
+          className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
         >
           Return to registration
         </Button>
@@ -63,23 +65,21 @@ export function ResumeDraftForm({
   }
 
   return (
-    <div className="w-full max-w-[460px] rounded-2xl border border-border bg-card p-8 shadow-xs">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">
+    <div className="flex w-full flex-col gap-[22px]">
+      <div className="flex flex-col gap-2.5">
+        <h1 className="font-heading text-2xl font-semibold tracking-[-0.01em] text-foreground sm:text-[30px]">
           Continue your registration
-        </h2>
-        <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+        </h1>
+        <p className="text-[14.5px] leading-[1.6] text-muted-foreground">
           Enter the work email you registered with. We&apos;ll send a link that opens your draft or shows its review status.
         </p>
       </div>
 
       {error && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{error}</InlineBanner>
-        </div>
+        <InlineBanner tone="error">{error}</InlineBanner>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
         <FormField
           htmlFor="resume_email"
           label="Work email"
@@ -92,24 +92,29 @@ export function ResumeDraftForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="chau.do@lumenlogistics.vn"
+            className="h-[46px] rounded-xl border-border bg-card px-[15px] text-[14px]"
           />
         </FormField>
 
-        <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
+        >
           {isSubmitting ? "Sending link..." : "Send link"}
         </Button>
       </form>
 
-      <p className="mt-5 text-[12.5px] leading-relaxed text-muted-foreground">
+      <p className="text-[12.5px] leading-[1.55] text-muted-foreground">
         For your privacy we show the same message whether or not this email has a registration.
       </p>
 
-      <div className="mt-6 border-t border-border pt-5 text-[13px] text-muted-foreground">
+      <div className="pt-1 text-[13.5px] text-muted-foreground">
         New here?{" "}
         <button
           type="button"
           onClick={onBack}
-          className="font-semibold text-primary hover:underline"
+          className="font-bold text-primary hover:underline"
         >
           Register your company
         </button>
