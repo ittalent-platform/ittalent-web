@@ -16,10 +16,11 @@ import { Input } from "@/components/ui/input";
 
 import { loginSchema, type LoginFormValues } from "./login.schema";
 import { forgotPasswordPath } from "./password-reset";
-import { getAuthErrorMessage, safeInternalPath } from "./auth-utils";
+import { safeInternalPath } from "./auth-utils";
 import { PasswordField } from "./password-field";
 import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
+import { requestErrorMessage } from "@/api/request-error";
 
 interface SubmitAlertState {
   variant: "error" | "warning";
@@ -74,7 +75,7 @@ export function LoginPage() {
         navigate("/", { replace: true });
       }
     } catch (error) {
-      const rawMessage = getAuthErrorMessage(error, t("auth.login.errorFallback"));
+      const rawMessage = requestErrorMessage(error, t("auth.login.errorFallback"));
       const lower = rawMessage.toLowerCase();
 
       if (
@@ -126,7 +127,7 @@ export function LoginPage() {
       <div className="flex h-full flex-1 items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-10">
         <div className="flex w-full max-w-[420px] flex-col gap-[22px]">
           <div className="flex flex-col gap-2">
-            <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[30px] font-semibold tracking-[-0.01em] text-foreground">
+            <h1 className="m-0 itt-display text-[30px] font-semibold tracking-[-0.01em] text-foreground">
               {t("auth.login.title")}
             </h1>
 
@@ -198,7 +199,7 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <div className="flex items-center gap-3 text-[12.5px] text-(--fg-faint)">
+          <div className="flex items-center gap-3 text-[12.5px] text-fg-faint">
             <div className="h-px flex-1 bg-(--border-faint)" />
             <span>{t("auth.login.newHere")}</span>
             <div className="h-px flex-1 bg-(--border-faint)" />

@@ -15,7 +15,7 @@ export function AuthHeroCopy({ tone = "candidate" }: { tone?: AuthHeroTone }) {
       <BrandLogo tone={employer ? "brand" : "inverse"} wordmarkClassName={employer ? "text-white" : undefined} />
 
       <div className="mt-22 flex flex-col gap-4.5">
-        <h2 className="m-0 font-['Space_Grotesk',sans-serif] text-[46px] font-semibold leading-[1.06] tracking-[-0.015em]">
+        <h2 className="m-0 itt-display text-[46px] font-semibold leading-[1.06] tracking-[-0.015em]">
           {t(key("title1"))}
           <br />
           {t(key("title2"))}

@@ -14,12 +14,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { registerSchema, type RegisterFormValues } from "./register.schema";
-import { getAuthErrorMessage } from "./auth-utils";
 import { getPasswordRules } from "./password-rules";
 import { PasswordField } from "./password-field";
 import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
 import { CheckEmailScreen } from "./check-email-screen";
+import { requestErrorMessage } from "@/api/request-error";
 
 function PasswordRules({ password, confirmPassword }: { password: string; confirmPassword: string }) {
   const { t } = useTranslation();
@@ -37,7 +37,7 @@ function PasswordRules({ password, confirmPassword }: { password: string; confir
             className={[
               "rounded-full px-2.5 py-1 text-[11.5px] font-medium transition-all duration-200",
               active ? "scale-[1.02] bg-(--status-success-bg) text-(--status-success-fg)" : "",
-              invalid ? "bg-(--danger-bg) text-(--danger-fg)" : "",
+              invalid ? "bg-danger-bg text-danger" : "",
               !touched ? "bg-(--surface-4) text-muted-foreground" : "",
             ].join(" ")}
           >
@@ -95,7 +95,7 @@ export function RegisterPage() {
         setDeliveryFailed(true);
       }
     } catch (error) {
-      setSubmitError(getAuthErrorMessage(error, t("auth.register.errorFallback")));
+      setSubmitError(requestErrorMessage(error, t("auth.register.errorFallback")));
     }
   }
 
@@ -110,7 +110,7 @@ export function RegisterPage() {
       <div className="flex h-full flex-1 items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-10">
           <div className="flex w-full max-w-[440px] flex-col gap-[22px]">
           <div className="flex flex-col gap-2">
-              <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[30px] font-semibold tracking-[-0.01em] text-foreground">
+              <h1 className="m-0 itt-display text-[30px] font-semibold tracking-[-0.01em] text-foreground">
                 {t("auth.register.title")}
               </h1>
               <p className="m-0 text-[14.5px] leading-[1.55] text-muted-foreground">{t("auth.register.subtitle")}</p>
@@ -219,11 +219,11 @@ export function RegisterPage() {
                         }}
                         i18nKey="auth.register.terms"
                       />{" "}
-                      <span className="text-(--field-error)">*</span>
+                      <span className="text-field-error">*</span>
                     </label>
                   </div>
                   {errors.termsAccepted ? (
-                    <p className="text-[12.5px] text-(--danger-fg)" role="alert">
+                    <p className="text-[12.5px] text-danger" role="alert">
                       {errors.termsAccepted.message}
                     </p>
                   ) : null}

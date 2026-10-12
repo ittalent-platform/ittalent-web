@@ -83,7 +83,7 @@ export function DocumentsPage() {
   };
   const items = query.data?.items ?? [];
   return (
-    <main className="mx-auto flex w-full max-w-[1264px] flex-col gap-5 px-4 pb-12 pt-8 sm:px-6">
+    <>
       <PageHeader description={t("documents.subtitle")} title={t("documents.title")} />
       <div
         className={cn(
@@ -121,7 +121,7 @@ export function DocumentsPage() {
             </SelectContent>
           </Select>
           <Button
-            className="h-11 px-[22px] text-sm font-semibold"
+            className="font-semibold" size="xl"
             disabled={upload.isPending}
             onClick={() => input.current?.click()}
             shape="pill"
@@ -219,6 +219,6 @@ export function DocumentsPage() {
           totalPages={query.data.totalPages}
         />
       ) : null}
-    </main>
+    </>
   );
 }

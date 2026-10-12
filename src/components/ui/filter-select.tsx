@@ -233,7 +233,7 @@ export function FilterMultiSelect<T extends string>({
       <DropdownMenuPrimitive.Trigger asChild>
         <button
           className={cn(
-            "inline-flex flex-[0_0_auto] cursor-pointer items-center gap-[7px] rounded-lg border border-solid border-(--border-strong) bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none data-[state=open]:border-primary",
+            "inline-flex flex-[0_0_auto] cursor-pointer items-center gap-[7px] rounded-lg border border-solid border-border-strong bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none data-[state=open]:border-primary",
             size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 pl-[15px] pr-[17px] py-px text-[13.5px]",
             values.length > 0 && "border-primary font-semibold text-primary",
             className,
@@ -296,7 +296,7 @@ export function FilterMultiSelect<T extends string>({
             >
               <span
                 className={cn(
-                  "grid size-4 shrink-0 place-items-center rounded border border-(--border-strong) text-[10px] leading-none",
+                  "grid size-4 shrink-0 place-items-center rounded border border-border-strong text-[10px] leading-none",
                   values.includes(option.value) && "border-primary bg-primary text-primary-foreground",
                 )}
               >

@@ -11,8 +11,6 @@ export type UserEmailFilter = (typeof USER_EMAIL_FILTERS)[number];
 export const USER_FILTER_PARAM = { company: "company", created: "created", email: "email", role: "role", status: "status" } as const;
 export const COMPANY_ID_PATTERN = /^[0-9a-fA-F]{24}$/;
 export const USER_SEARCH_RANGE = { max: 100, min: 2 } as const;
-export const HTTP_BAD_REQUEST = 400;
-export const HTTP_FORBIDDEN = 403;
 /** Where the 403 state sends the person (the public home; their role dashboard redirects from there). */
 export const FORBIDDEN_HOME_PATH = "/";
 /** An unverified, inactive account older than this missed its verification window. */
@@ -38,8 +36,7 @@ export type UserFormStatus = (typeof USER_FORM_STATUSES)[number];
 
 export const ENTERPRISES_PAGE_SIZE = 50;
 /** Same bounds as the API for every reason (suspend, reopen, emergency suspend, cancel invitation, role change). */
-export const REASON_MIN_LENGTH = 10;
-export const REASON_MAX_LENGTH = 500;
+export { REASON_MAX_LENGTH, REASON_MIN_LENGTH } from "@/components/common/reason-field";
 
 export const FULL_NAME_HINT_RANGE = { max: 100, min: 2 } as const;
 export const USERNAME_HINT_RANGE = { max: 30, min: 3 } as const;

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 
 import { UserDialogHeader } from "./user-dialog-header";
 import { useRequestEmailChangeMutation } from "./users.queries";
+import { HTTP_CONFLICT } from "@/api/http-status";
 
 export function ChangeUserEmailDialog({ onOpenChange, open, user }: { onOpenChange: (open: boolean) => void; open: boolean; user: UserDto }) {
   const { t } = useTranslation();
@@ -49,7 +50,7 @@ export function ChangeUserEmailDialog({ onOpenChange, open, user }: { onOpenChan
       });
       close();
     } catch (error) {
-      setFailure((error as { status?: number }).status === 409 ? t("adminUsers.statusActions.conflict") : error instanceof Error ? error.message : t("state.error"));
+      setFailure((error as { status?: number }).status === HTTP_CONFLICT ? t("adminUsers.statusActions.conflict") : error instanceof Error ? error.message : t("state.error"));
     }
   }
 

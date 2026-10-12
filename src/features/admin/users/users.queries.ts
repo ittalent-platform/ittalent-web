@@ -14,6 +14,7 @@ import {
   postApiV1UsersByIdInvitationDeliveries,
 } from "@/api/generated";
 import { client } from "@/api/client";
+import { unwrap } from "@/api/request-error";
 import type {
   CancelInvitationRequest,
   CreateAdminUserRequest,
@@ -27,6 +28,7 @@ import type {
 
 import { HISTORY_PAGE_SIZE, HISTORY_PREVIEW_SIZE } from "./user-history.constants";
 import { ENTERPRISES_PAGE_SIZE, type UserSortField, type UserSortOrder } from "./users.constants";
+import { HTTP_NOT_FOUND } from "@/api/http-status";
 
 export type UsersListParams = {
   enabled?: boolean;
@@ -56,14 +58,6 @@ export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
 
 export type AccountListResponse = { items: UserDto[]; total: number; page: number; limit: number; totalPages: number };
 
-function throwApiError(error: unknown, status: number | undefined, fallback: string): never {
-  const message = typeof error === "object" && error && "message" in error && typeof error.message === "string"
-    ? error.message
-    : fallback;
-  const code = typeof error === "object" && error && "code" in error && typeof error.code === "string" ? error.code : undefined;
-  throw Object.assign(new Error(message), { status, ...(code ? { code } : {}) });
-}
-
 export function useUsersListQuery(params: UsersListParams) {
   const { enabled = true, limit = DEFAULT_PAGE_SIZE, ...queryParams } = params;
 
@@ -72,35 +66,25 @@ export function useUsersListQuery(params: UsersListParams) {
     placeholderData: keepPreviousData,
     queryKey: usersKeys.list({ ...queryParams, limit }),
     queryFn: async () => {
-      try {
-        const result = await client.get<{ 200: AccountListResponse }>({
-          url: "/api/v1/users",
-          query: {
-            limit,
-            page: queryParams.page,
-            ...(queryParams.search ? { search: queryParams.search } : {}),
-            ...(queryParams.role?.length ? { role: queryParams.role.join(",") } : {}),
-            ...(queryParams.emailVerified !== undefined ? { emailVerified: String(queryParams.emailVerified) } : {}),
-            ...(queryParams.enterpriseId?.length ? { enterpriseId: queryParams.enterpriseId.join(",") } : {}),
-            ...(queryParams.sortBy ? { sortBy: queryParams.sortBy } : {}),
-            ...(queryParams.sortOrder ? { sortOrder: queryParams.sortOrder } : {}),
-            ...(queryParams.status?.length ? { status: queryParams.status.join(",") } : {}),
-          },
-        });
+      const empty = { items: [] as UserDto[], total: 0, page: 1, limit, totalPages: 0 };
+      const result = await client.get<{ 200: AccountListResponse }>({
+        url: "/api/v1/users",
+        query: {
+          limit,
+          page: queryParams.page,
+          ...(queryParams.search ? { search: queryParams.search } : {}),
+          ...(queryParams.role?.length ? { role: queryParams.role.join(",") } : {}),
+          ...(queryParams.emailVerified !== undefined ? { emailVerified: String(queryParams.emailVerified) } : {}),
+          ...(queryParams.enterpriseId?.length ? { enterpriseId: queryParams.enterpriseId.join(",") } : {}),
+          ...(queryParams.sortBy ? { sortBy: queryParams.sortBy } : {}),
+          ...(queryParams.sortOrder ? { sortOrder: queryParams.sortOrder } : {}),
+          ...(queryParams.status?.length ? { status: queryParams.status.join(",") } : {}),
+        },
+      });
 
-        if (result.error) {
-          throw Object.assign(result.error as object, { status: result.response?.status });
-        }
-
-        return result.data ?? { items: [] as UserDto[], total: 0, page: 1, limit, totalPages: 0 };
-      } catch (err) {
-        // If the backend has not yet implemented the list endpoint (404), return empty list gracefully
-        const error = err as { status?: number };
-        if (error.status === 404) {
-          return { items: [] as UserDto[], total: 0, page: 1, limit, totalPages: 0 };
-        }
-        throw err;
-      }
+      // A backend without the list endpoint yet (404) shows an empty list instead of an error.
+      if (result.response?.status === HTTP_NOT_FOUND) return empty;
+      return unwrap(result, "Unable to load accounts") ?? empty;
     },
   });
 }
@@ -110,14 +94,12 @@ export function useActiveEnterprisesQuery(keyword: string, page: number, enabled
     enabled,
     queryKey: usersKeys.enterprises(keyword, page),
     queryFn: async () => {
-      const result = await getApiV1Enterprises({ query: {
+      return unwrap(await getApiV1Enterprises({ query: {
         status: "active",
         page,
         limit: ENTERPRISES_PAGE_SIZE,
         ...(keyword.trim() ? { keyword: keyword.trim() } : {}),
-      } });
-      if (result.error || !result.data) throwApiError(result.error, result.response?.status, "Unable to load active companies");
-      return result.data;
+      } }), "Unable to load active companies");
     },
   });
 }
@@ -126,9 +108,7 @@ export function useCreateUserMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (body: CreateAdminUserRequest) => {
-      const result = await postApiV1Users({ body });
-      if (result.error || !result.data) throwApiError(result.error, result.response?.status, "Unable to create the account");
-      return result.data;
+      return unwrap(await postApiV1Users({ body }), "Unable to create the account");
     },
     onSuccess: ({ user }) => {
       queryClient.setQueryData(usersKeys.detail(user.id), user);
@@ -142,9 +122,7 @@ export function useUserInvitationQuery(userId: string, enabled: boolean) {
     enabled,
     queryKey: usersKeys.invitation(userId),
     queryFn: async () => {
-      const result = await getApiV1UsersByIdInvitation({ path: { id: userId } });
-      if (result.error) throwApiError(result.error, result.response?.status, "Unable to load invitation status");
-      return result.data ?? null;
+      return (unwrap(await getApiV1UsersByIdInvitation({ path: { id: userId } }), "Unable to load invitation status")) ?? null;
     },
   });
 }
@@ -156,9 +134,7 @@ function historyQuery(filters: HistoryFilters) {
 }
 
 async function fetchHistory(userId: string, query: NonNullable<GetApiV1UsersByIdHistoryData["query"]>) {
-  const result = await getApiV1UsersByIdHistory({ path: { id: userId }, query });
-  if (result.error || !result.data) throwApiError(result.error, result.response?.status, "Unable to load account history");
-  return result.data;
+  return unwrap(await getApiV1UsersByIdHistory({ path: { id: userId }, query }), "Unable to load account history");
 }
 
 /** One page of history, e.g. the five most recent items on the detail page. */
@@ -186,9 +162,7 @@ export function useRequestEmailChangeMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, body }: { id: string; body: { newEmail: string; expectedVersion: number } }) => {
-      const result = await postApiV1UsersByIdEmailChangeRequests({ path: { id }, body });
-      if (result.error || !result.data) throwApiError(result.error, result.response?.status, "Unable to request an email change");
-      return result.data;
+      return unwrap(await postApiV1UsersByIdEmailChangeRequests({ path: { id }, body }), "Unable to request an email change");
     },
     onSuccess: (_data, { id }) => {
       void queryClient.invalidateQueries({ queryKey: usersKeys.detail(id) });
@@ -211,25 +185,19 @@ function useAccountMutation<TBody>(
 
 export function useUpdateUserStatusMutation() {
   return useAccountMutation<UpdateUserStatusRequest>(async (id, body) => {
-    const result = await patchApiV1UsersByIdStatus({ path: { id }, body });
-    if (result.error || !result.data) throwApiError(result.error, result.response?.status, "Unable to change account status");
-    return result.data;
+    return unwrap(await patchApiV1UsersByIdStatus({ path: { id }, body }), "Unable to change account status");
   });
 }
 
 export function useEmergencySuspendUserMutation() {
   return useAccountMutation<EmergencyUserSuspensionRequest>(async (id, body) => {
-    const result = await patchApiV1UsersByIdEmergencySuspension({ path: { id }, body });
-    if (result.error || !result.data) throwApiError(result.error, result.response?.status, "Unable to suspend the account");
-    return result.data;
+    return unwrap(await patchApiV1UsersByIdEmergencySuspension({ path: { id }, body }), "Unable to suspend the account");
   });
 }
 
 export function useUpdateUserRoleMutation() {
   return useAccountMutation<UpdateUserRoleRequest>(async (id, body) => {
-    const result = await patchApiV1UsersByIdRole({ path: { id }, body });
-    if (result.error || !result.data) throwApiError(result.error, result.response?.status, "Unable to change account role");
-    return result.data;
+    return unwrap(await patchApiV1UsersByIdRole({ path: { id }, body }), "Unable to change account role");
   });
 }
 
@@ -237,9 +205,7 @@ export function useCancelInvitationMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, body }: { id: string; body: CancelInvitationRequest }) => {
-      const result = await patchApiV1UsersByIdInvitation({ path: { id }, body });
-      if (result.error || !result.data) throwApiError(result.error, result.response?.status, "Unable to cancel invitation");
-      return result.data;
+      return unwrap(await patchApiV1UsersByIdInvitation({ path: { id }, body }), "Unable to cancel invitation");
     },
     onSuccess: (_data, { id }) => {
       void queryClient.invalidateQueries({ queryKey: usersKeys.detail(id) });
@@ -253,9 +219,7 @@ export function useResendInvitationMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const result = await postApiV1UsersByIdInvitationDeliveries({ path: { id } });
-      if (result.error || !result.data) throwApiError(result.error, result.response?.status, "Unable to send the invitation");
-      return result.data;
+      return unwrap(await postApiV1UsersByIdInvitationDeliveries({ path: { id } }), "Unable to send the invitation");
     },
     onSuccess: (_data, id) => {
       void queryClient.invalidateQueries({ queryKey: usersKeys.detail(id) });

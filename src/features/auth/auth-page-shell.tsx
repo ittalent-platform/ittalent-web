@@ -6,7 +6,7 @@ import { AUTH_ASIDE_WIDTH_CLASS, AUTH_EMPLOYER_ASIDE_WIDTH_CLASS, HERO_RINGS, ty
 
 export function AuthPageShell({ aside, children, tone = "candidate" }: { aside: ReactNode; children: ReactNode; tone?: AuthHeroTone }) {
   return (
-    <div className={cn("flex min-h-screen w-full bg-(--app-canvas)", tone === "employer" && "itt-hero-employer")}>
+    <div className={cn("flex min-h-screen w-full bg-canvas", tone === "employer" && "itt-hero-employer")}>
       <div className={cn("grid min-h-screen w-full grid-cols-1", tone === "employer" ? AUTH_EMPLOYER_ASIDE_WIDTH_CLASS : AUTH_ASIDE_WIDTH_CLASS)}>
         <aside className="relative hidden flex-col overflow-hidden bg-[var(--hero-candidate-bg)] px-14 py-11 text-white lg:flex">
           <div aria-hidden="true" className="itt-hero-rings pointer-events-none absolute inset-x-0 bottom-0 select-none">
@@ -32,7 +32,7 @@ export function AuthPageShell({ aside, children, tone = "candidate" }: { aside: 
           </div>
         </aside>
 
-        <main className="flex min-h-screen flex-col overflow-y-auto bg-(--app-canvas)">
+        <main className="flex min-h-screen flex-col overflow-y-auto bg-canvas">
           <div className="flex items-center bg-[var(--hero-candidate-bg)] px-6 py-5 text-white lg:hidden">
             <BrandLogo tone="inverse" />
           </div>

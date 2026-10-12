@@ -53,7 +53,7 @@ function getToastStyles(tone: ToastTone) {
         dismiss: "text-(--status-warning-fg)/75 hover:text-(--status-warning-fg)",
         icon: "text-(--status-warning-fg)",
         message: "text-(--status-warning-fg)",
-        note: "text-(--fg-faint)",
+        note: "text-fg-faint",
         title: "text-(--status-warning-fg)",
       };
     case "error":
@@ -63,7 +63,7 @@ function getToastStyles(tone: ToastTone) {
         dismiss: "text-muted-foreground hover:text-foreground",
         icon: "text-muted-foreground",
         message: "text-(--status-neutral-fg)",
-        note: "text-(--fg-faint)",
+        note: "text-fg-faint",
         title: "text-muted-foreground",
       };
   }

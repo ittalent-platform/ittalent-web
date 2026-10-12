@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { BriefcaseBusiness, ChevronDown, FileText, LogOut, Users } from "lucide-react";
+import { Award, BriefcaseBusiness, ChevronDown, FileText, LogOut, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
-// import { canManageJobPostings } from "@/auth/roles";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +15,7 @@ import { useToast } from "@/components/toast/toast-provider";
 import { getLogoutSuccessToast } from "@/features/auth/logout-toast";
 import { APPLICATIONS_PATH } from "@/config/routes";
 import { cn } from "@/lib/utils";
+import { PersonAvatar } from "@/components/common/person-avatar";
 
 export function UserMenu({ collapsed = false, compactOnMobile = false, variant = "sidebar" }: { collapsed?: boolean; compactOnMobile?: boolean; variant?: "pill" | "sidebar" }) {
   const { t } = useTranslation();
@@ -27,7 +27,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
 
   const user = session?.user;
   const displayName = user?.username ?? user?.email ?? "User";
-  const initials = displayName.slice(0, 2).toUpperCase();
+  const avatarName = user?.fullName?.trim() || displayName;
   const roleLabel =
     user?.role === "admin"
       ? t("roles.admin")
@@ -58,33 +58,27 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
             className="flex h-10 cursor-pointer items-center gap-1.5 rounded-full pl-1 pr-2 text-muted-foreground outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-primary/40"
             type="button"
           >
-            <span className="grid size-[34px] place-items-center rounded-full bg-(--status-info-bg) text-[12.5px] font-bold text-(--status-info-fg)">{initials}</span>
+            <PersonAvatar className="size-[34px] bg-(--status-info-bg) text-[12.5px] text-(--status-info-fg)" name={avatarName} />
             <ChevronDown aria-hidden className="size-3.5" />
           </button>
         ) : (
         <button
           aria-label={t("nav.accountMenu", { name: displayName })}
           className={cn(
-            "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 pb-1 text-left text-white outline-none transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-primary/40",
+            "flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 pb-1 text-left text-sidebar-foreground outline-none transition hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-primary/40",
             collapsed && "lg:justify-center lg:px-0",
             compactOnMobile && "max-sm:justify-center max-sm:px-0",
           )}
           type="button"
         >
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-(--status-peach-bg) text-sm font-bold text-(--status-peach-fg)">
-            {initials}
-          </div>
+          <PersonAvatar className="size-9 text-sm" name={avatarName} tone="peach" />
 
           <div className={cn("min-w-0 flex-1", collapsed && "lg:hidden", compactOnMobile && "max-sm:hidden")}>
             <p className="truncate text-[0.95rem] font-semibold">
               {displayName}
             </p>
             <p className="truncate text-[0.8rem] text-muted-foreground">
-              {user?.role === "admin"
-                ? "Admin"
-                : user?.role === "recruiter" || user?.role === "enterprise_admin"
-                  ? "Recruiter"
-                  : "User"}
+              {roleLabel}
             </p>
           </div>
         </button>
@@ -134,6 +128,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           </DropdownMenuItem>
         ) : null}
         {user?.role === "user" ? <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate(APPLICATIONS_PATH)}><BriefcaseBusiness className="size-4" />{t("applications.title")}</DropdownMenuItem> : null}
+        {user?.role === "user" ? <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate("/certificates")}><Award className="size-4" />{t("certificates.title")}</DropdownMenuItem> : null}
 
         <DropdownMenuItem
           className="gap-2.5 px-4 py-2.5 text-sm font-semibold cursor-pointer text-destructive focus:text-destructive"

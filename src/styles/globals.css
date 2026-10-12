@@ -33,7 +33,17 @@
   --line-dashed: #c9c7c1;
   --surface-readonly: #f6f5f1;
   --surface-subtle: #fbfaf8;
+  --brand: #f2470c;
+  --slate-faint: #6f6f76;
   --slate-subtle: #737379;
+  --link-hover: #8f2904;
+  --field-error: #d92d20;
+  --ember-wash: #fde8e0;
+  --status-blocked-border: #d9ccf3;
+  --mkt-on-dark: #c9cacf;
+  --mkt-on-dark-muted: #9a9a9f;
+  --mkt-on-dark-soft: #e7e7ea;
+  --mkt-on-dark-nav: #d8d8dc;
   --chart-1: oklch(0.6404 0.2153 35.9003);
   --chart-2: oklch(0.8231 0.0995 30.7543);
   --chart-3: oklch(0.7336 0.1758 50.5517);
@@ -116,7 +126,6 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   --tracking-normal: 0em;
   --spacing: 0.27rem;
-  --line-muted: #efede8;
   --logo-1: #1c6b3f;
   --logo-2: #2a55a8;
   --logo-3: #8a4b06;
@@ -186,7 +195,6 @@
   --shadow-xl:
     0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
-  --line-muted: #2e2e32;
   --logo-1: #1c6b3f;
   --logo-2: #2a55a8;
   --logo-3: #8a4b06;
@@ -241,6 +249,49 @@
   --color-destructive-border: var(--destructive-border);
   --color-notification: var(--notification-badge);
   --color-brand: var(--brand);
+  --color-border-strong: var(--border-strong);
+  --color-danger: var(--danger-fg);
+  --color-danger-bg: var(--danger-bg);
+  --color-field-error: var(--field-error);
+  --color-overlay: var(--overlay);
+  --color-fg-faint: var(--fg-faint);
+  --color-mkt-canvas: var(--app-canvas);
+  --color-mkt-ink: var(--foreground);
+  --color-mkt-ink-2: var(--status-neutral-fg);
+  --color-mkt-muted: var(--muted-foreground);
+  --color-mkt-subtle: var(--slate-subtle);
+  --color-mkt-label: var(--slate-faint);
+  --color-mkt-line: var(--border);
+  --color-mkt-line-strong: var(--input);
+  --color-mkt-line-soft: var(--line-muted);
+  --color-mkt-chip: var(--status-neutral-bg);
+  --color-mkt-check: var(--status-disabled-fg);
+  --color-mkt-accent: var(--primary);
+  --color-mkt-accent-hover: var(--fg-link);
+  --color-mkt-accent-dark: var(--link-hover);
+  --color-mkt-brand: var(--brand);
+  --color-mkt-accent-tint: var(--accent);
+  --color-mkt-accent-border: var(--primary-border);
+  --color-mkt-accent-soft: var(--ember-wash);
+  --color-mkt-blue-bg: var(--status-info-bg);
+  --color-mkt-blue-fg: var(--status-info-fg);
+  --color-mkt-danger: var(--danger-fg);
+  --color-mkt-danger-bg: var(--danger-bg);
+  --color-mkt-field-error: var(--field-error);
+  --color-mkt-amber-bg: var(--status-warning-bg);
+  --color-mkt-amber-border: var(--status-warning-border);
+  --color-mkt-amber-fg: var(--status-warning-fg);
+  --color-mkt-green-bg: var(--status-success-bg);
+  --color-mkt-green-fg: var(--status-success-fg);
+  --color-mkt-green-border: var(--status-success-border);
+  --color-mkt-blue-border: var(--status-info-border);
+  --color-mkt-violet-bg: var(--status-blocked-bg);
+  --color-mkt-violet-fg: var(--status-blocked-fg);
+  --color-mkt-violet-border: var(--status-blocked-border);
+  --color-mkt-on-dark: var(--mkt-on-dark);
+  --color-mkt-on-dark-muted: var(--mkt-on-dark-muted);
+  --color-mkt-on-dark-soft: var(--mkt-on-dark-soft);
+  --color-mkt-on-dark-nav: var(--mkt-on-dark-nav);
   --color-logo-1: var(--logo-1);
   --color-logo-2: var(--logo-2);
   --color-logo-3: var(--logo-3);
@@ -296,9 +347,7 @@
   --border-strong: #dedcd6;
   --primary: #f2470c;
   --primary-600: #d9400a;
-  --link-hover: #8f2904;
   --fg-link: #b33305;
-  --brand: #f2470c;
   --primary-50: #fdf3ea;
   --primary-100: #fbe4d3;
   --primary-300: #efa370;
@@ -332,7 +381,6 @@
   --info-fg: #2a55a8;
   --info-bg: #e4ecfb;
   --info-border: #c7d6f3;
-  --field-error: #d92d20;
   font-family: var(--font-sans);
 }
 
@@ -409,8 +457,6 @@
   --status-error-bg: #fbe9e7;
   --status-error-fg: #b42318;
   --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  /* Ember CTA: the darker #d73c03 fill keeps white 14px/600 labels above 4.5:1 (DESIGN.md "Ember-Is-Not-Text"). */
-  --primary: #d73c03;
   --brand: #f2470c;
   --fg-link: #b33305;
   --line-muted: #efede8;
@@ -432,94 +478,50 @@
   --logo-6: #6941c6;
 }
 
-.candidate-root.dark {
-  --fg-link: #f6c9b6;
-  --line-muted: #2e2e32;
-  --line-dashed: #4a4a50;
-  --surface-readonly: #26262a;
-  --surface-subtle: #222226;
-  --slate-subtle: #9a9a9f;
-  --destructive: #f4a399;
-  --destructive-solid: #c62a1c;
-  --destructive-border: #5a2a25;
-  --app-canvas: #19191c;
-  --background: #19191c;
-  --card: #222226;
-  --popover: #222226;
-  --foreground: #f4f2ee;
-  --muted: #2e2e32;
-  --muted-foreground: #9a9a9f;
-  --border: #2e2e32;
-  --border-strong: #3a3a40;
-  --status-neutral-bg: #2e2e32;
-  --status-neutral-fg: #c2c2c6;
-  --status-info-bg: #1a2540;
-  --status-info-fg: #93b2ee;
-  --status-blocked-bg: #2a2140;
-  --status-blocked-fg: #b9a2f0;
-  --status-warning-bg: #33260f;
-  --status-warning-fg: #f3b562;
-  --status-warning-border: #5a4420;
-  --status-success-border: #24503a;
-  --status-toast-accent: #4ade80;
-  --status-success-bg: #16301f;
-  --status-success-fg: #6fd39b;
-  --status-error-bg: #3a1a17;
-  --status-error-fg: #f4a399;
-  --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
-}
-
-/* Candidate workspace tokens come from ittalent-design-system.html. Scope to the
-   applicant shell so marketing and admin screens keep their existing identity. */
-.candidate-root {
+/* The public marketplace keeps its original light palette even inside a dark app shell. */
+.theme-light {
+  color-scheme: light;
+  --font-sans: "Instrument Sans", system-ui, sans-serif;
   --app-canvas: #fafaf8;
-  --background: #ffffff;
-  --card: #ffffff;
-  --popover: #ffffff;
+  --background: #fafaf8;
   --foreground: #19191c;
+  --card: #ffffff;
+  --card-foreground: #19191c;
+  --popover: #ffffff;
+  --popover-foreground: #19191c;
   --muted: #f1efea;
   --muted-foreground: #64646b;
   --border: #e6e4df;
-  --border-strong: #dedcd6;
+  --input: #dedcd6;
   --primary: #f2470c;
   --primary-foreground: #ffffff;
+  --accent: #fef3ee;
+  --accent-foreground: #b33305;
+  --fg-link: #b33305;
+  --link-hover: #8f2904;
+  --line-muted: #efede8;
+  --slate-faint: #6f6f76;
+  --slate-subtle: #737379;
+  --status-disabled-fg: #c2c2c6;
   --status-neutral-bg: #f1efea;
   --status-neutral-fg: #4a4a50;
   --status-info-bg: #e4ecfb;
   --status-info-fg: #2a55a8;
-  --status-blocked-bg: #efe9fb;
-  --status-blocked-fg: #6941c6;
+  --status-info-border: #c9d8f2;
   --status-warning-bg: #fcf3e3;
-  --status-warning-fg: #b45309;
+  --status-warning-fg: #8a4b06;
   --status-warning-border: #f0d9ad;
-  --status-success-border: #bce0cc;
-  --status-toast-accent: #4ade80;
   --status-success-bg: #e8f5ee;
   --status-success-fg: #12764a;
-  --status-error-bg: #fbe9e7;
-  --status-error-fg: #b42318;
-  --app-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  /* Ember CTA: the darker #d73c03 fill keeps white 14px/600 labels above 4.5:1 (DESIGN.md "Ember-Is-Not-Text"). */
-  --primary: #d73c03;
-  --brand: #f2470c;
-  --fg-link: #b33305;
-  --line-muted: #efede8;
-  --line-dashed: #c9c7c1;
-  --surface-readonly: #f6f5f1;
-  --surface-subtle: #fbfaf8;
-  --slate-subtle: #737379;
-  --destructive: #b42318;
-  --destructive-solid: #c62a1c;
-  --destructive-border: #f2c4bc;
-  --notification-badge: #d92d20;
-  --overlay: rgba(25, 25, 28, 0.55);
-  /* Company logo tile palette: a company gets one by hashing its name (see logo-tile.tsx). */
-  --logo-1: #1c6b3f;
-  --logo-2: #2a55a8;
-  --logo-3: #8a4b06;
-  --logo-4: #f2470c;
-  --logo-5: #b42318;
-  --logo-6: #6941c6;
+  --status-success-border: #bce0cc;
+  --status-blocked-bg: #efe9fb;
+  --status-blocked-fg: #6941c6;
+  --status-blocked-border: #d9ccf3;
+  --danger-fg: #b42318;
+  --danger-bg: #fbe9e7;
+  --field-error: #d92d20;
+  --ember-wash: #fde8e0;
+  --primary-border: #f0b4a0;
 }
 
 .candidate-root.dark {
@@ -743,47 +745,6 @@
   max-width: none;
 }
 
-/* Public marketplace (Jobs / Companies) palette */
-@theme {
-  --color-mkt-canvas: #fafaf8;
-  --color-mkt-ink: #19191c;
-  --color-mkt-ink-2: #4a4a50;
-  --color-mkt-muted: #64646b;
-  --color-mkt-subtle: #737379;
-  --color-mkt-label: #6f6f76;
-  --color-mkt-line: #e6e4df;
-  --color-mkt-line-strong: #dedcd6;
-  --color-mkt-line-soft: #efede8;
-  --color-mkt-chip: #f1efea;
-  --color-mkt-check: #c2c2c6;
-  --color-mkt-accent: #d73c03;
-  --color-mkt-accent-hover: #b33305;
-  --color-mkt-accent-dark: #8f2904;
-  --color-mkt-brand: #f2470c;
-  --color-mkt-accent-tint: #fef3ee;
-  --color-mkt-accent-border: #f0b4a0;
-  --color-mkt-accent-soft: #fde8e0;
-  --color-mkt-blue-bg: #e4ecfb;
-  --color-mkt-blue-fg: #2a55a8;
-  --color-mkt-danger: #b42318;
-  --color-mkt-danger-bg: #fbe9e7;
-  --color-mkt-field-error: #d92d20;
-  --color-mkt-on-dark: #c9cacf;
-  --color-mkt-on-dark-muted: #9a9a9f;
-  --color-mkt-on-dark-soft: #e7e7ea;
-  --color-mkt-on-dark-nav: #d8d8dc;
-  --color-mkt-amber-bg: #fcf3e3;
-  --color-mkt-amber-border: #f0d9ad;
-  --color-mkt-amber-fg: #8a4b06;
-  --color-mkt-green-bg: #e8f5ee;
-  --color-mkt-green-fg: #12764a;
-  --color-mkt-green-border: #bce0cc;
-  --color-mkt-blue-border: #c9d8f2;
-  --color-mkt-violet-bg: #efe9fb;
-  --color-mkt-violet-fg: #6941c6;
-  --color-mkt-violet-border: #d9ccf3;
-}
-
 /* Employer auth hero: the dark canvas with Ember rings that brighten toward the centre. */
 .itt-hero-employer {
   --hero-candidate-bg: var(--hero-bg);
@@ -824,4 +785,25 @@
   .itt-ring {
     animation: none;
   }
+}
+
+/* Dark marketplace heroes (Home, Jobs, Companies): a faint dot grid over the ink background. */
+@utility hero-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1.2px, transparent 1.2px);
+  background-size: 26px 26px;
+}
+
+/* The standard white card: every panel, list row group and sidebar card. */
+@utility surface-card {
+  @apply rounded-2xl border border-border bg-card;
+}
+
+/* Marketplace card: always light, on the fixed marketplace palette. */
+@utility market-card {
+  @apply rounded-2xl border border-mkt-line bg-white;
+}
+
+/* Small uppercase label above a group: card eyebrows, filter legends, table heads. */
+@utility eyebrow {
+  @apply text-[11.5px] font-bold tracking-[0.06em] uppercase text-muted-foreground;
 }

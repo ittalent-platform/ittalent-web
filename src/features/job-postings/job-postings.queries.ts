@@ -14,7 +14,7 @@ import {
   patchApiV1JobPostingsByIdRestore,
   postApiV1JobPostings,
 } from "@/api/generated";
-import { requestError } from "@/api/request-error";
+import { requestError, unwrap } from "@/api/request-error";
 import type {
   CreateJobPostingRequest,
   GetApiV1JobPostingsData,
@@ -39,14 +39,6 @@ export const jobPostingKeys = {
   public: (params: JobPostingListParams) =>
     ["job-postings", "public", params] as const,
 };
-
-function unwrap<T>(
-  result: { data?: T; error?: unknown; response?: Response },
-  fallback: string,
-): T {
-  if (!result.error && result.data !== undefined) return result.data;
-  throw requestError(result, fallback);
-}
 
 async function listAdmin(
   params: JobPostingListParams,

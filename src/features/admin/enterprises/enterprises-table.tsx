@@ -28,10 +28,14 @@ import {
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/common/empty-state";
 import { SearchEmptyState } from "@/components/common/search-empty-state";
-import { EnterpriseAvatar, EnterpriseStatusBadge, formatEnterpriseId } from "./enterprise-badges";
+import { LogoTile } from "@/components/common/logo-tile";
+import { EnterpriseStatusBadge, formatEnterpriseId } from "./enterprise-badges";
 import { formatEnterpriseDateTime } from "./enterprises.formatters";
 import type { EnterpriseSummaryDto } from "./enterprises.queries";
 import { getEnterpriseActions, type EnterpriseSortField, type EnterpriseSortOrder } from "./enterprises.constants";
+
+// Header typography comes from TableHeaderRow; cells only keep the tighter padding of this wide table.
+const HEAD_CELL = "px-3.5 xl:px-4 whitespace-nowrap";
 
 type EnterprisesTableProps = {
   items: EnterpriseSummaryDto[];
@@ -120,7 +124,7 @@ export function EnterprisesTable({
       <TableHead className="bg-surface-readonly dark:bg-muted/40 border-b border-border">
         <TableHeaderRow className="hover:bg-transparent">
           {/* ID */}
-          <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap w-[76px]">
+          <TableHeaderCell className={`${HEAD_CELL} w-[76px]`}>
             {onSort ? (
               <SortableHeaderButton
                 active={sortBy === "id"}
@@ -134,7 +138,7 @@ export function EnterprisesTable({
           </TableHeaderCell>
 
           {/* Company / Enterprise */}
-          <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap min-w-[180px]">
+          <TableHeaderCell className={`${HEAD_CELL} min-w-[180px]`}>
             {onSort ? (
               <SortableHeaderButton
                 active={sortBy === "name"}
@@ -149,32 +153,32 @@ export function EnterprisesTable({
           </TableHeaderCell>
 
           {/* Corporate email */}
-          <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap">
+          <TableHeaderCell className={HEAD_CELL}>
             {t("adminEnterprises.table.email", "Corporate email")}
           </TableHeaderCell>
 
           {/* Phone */}
-          <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap">
+          <TableHeaderCell className={HEAD_CELL}>
             {t("adminEnterprises.table.phone", "Phone")}
           </TableHeaderCell>
 
           {/* Industry */}
-          <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap">
+          <TableHeaderCell className={HEAD_CELL}>
             {t("adminEnterprises.table.industry", "Industry")}
           </TableHeaderCell>
 
           {/* Size */}
-          <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap">
+          <TableHeaderCell className={HEAD_CELL}>
             {t("adminEnterprises.table.size", "Size")}
           </TableHeaderCell>
 
           {/* Status */}
-          <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap">
+          <TableHeaderCell className={HEAD_CELL}>
             {t("adminEnterprises.table.status", "Status")}
           </TableHeaderCell>
 
           {/* Created */}
-          <TableHeaderCell className="px-3.5 xl:px-4 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap">
+          <TableHeaderCell className={HEAD_CELL}>
             {onSort ? (
               <SortableHeaderButton
                 active={sortBy === "createdAt"}
@@ -213,7 +217,7 @@ export function EnterprisesTable({
               {/* Company Column: Avatar + Name + City underneath */}
               <TableCell className="px-3.5 xl:px-4 py-3 align-middle min-w-[180px]">
                 <Link to={detailPath} className="flex min-w-0 items-center gap-3 no-underline group/link">
-                  <EnterpriseAvatar name={ent.name} logoUrl={ent.logoUrl} size="md" />
+                  <LogoTile logoUrl={ent.logoUrl ?? undefined} name={ent.name} />
                   <div className="flex flex-col min-w-0">
                     <span className="font-bold text-[13.5px] text-foreground group-hover/link:text-primary transition truncate">
                       {ent.name}

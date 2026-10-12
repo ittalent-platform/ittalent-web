@@ -1,10 +1,11 @@
+import { CandidateAccountLayout } from "@/components/layout/candidate-account-layout";
+import { CertificatesPage } from "@/features/certificates/certificates-page";
 import { lazy, Suspense } from "react";
 import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
 import { JOB_POSTING_MANAGER_ROLES } from "@/auth/roles";
 import { AppLayout } from "@/components/layout/admin-layout";
-import { PublicLayout } from "@/components/layout/public-layout";
 import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
@@ -82,11 +83,6 @@ const RecruiterEditJobPostingPage = lazy(() =>
     default: m.RecruiterEditJobPostingPage,
   })),
 );
-const JobsPage = lazy(() =>
-  import("@/features/public-site/jobs-page").then((m) => ({
-    default: m.JobsPage,
-  })),
-);
 const DocumentsPage = lazy(() =>
   import("@/features/documents/documents-page").then((m) => ({
     default: m.DocumentsPage,
@@ -141,12 +137,6 @@ const EnterpriseDetailPage = lazy(() =>
 
 export const appRoutes = [
   {
-    element: <PublicLayout />,
-    children: [
-      { path: "/jobs", element: <JobsPage /> },
-    ],
-  },
-  {
     element: <MarketplaceLayout />,
     children: [
       { path: "/", element: <HomePage /> },
@@ -172,6 +162,7 @@ export const appRoutes = [
           { path: "/documents", element: <DocumentsPage /> },
           { path: "/my-applications", element: <ApplicationsPage /> },
           { path: "/my-applications/:id", element: <ApplicationDetailPage /> },
+          { element: <CandidateAccountLayout />, children: [{ path: "/certificates", element: <CertificatesPage /> }] },
         ],
       },
     ],

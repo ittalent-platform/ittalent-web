@@ -6,8 +6,10 @@ import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { useToast } from "@/components/toast/toast-provider";
 import { Textarea } from "@/components/ui/textarea";
 import { applicationDisplayId } from "./application-formatters";
-import { HTTP_CONFLICT, MAX_REASON_LENGTH } from "./applications.constants";
-import { requestStatus, useWithdrawApplications, type WithdrawInput } from "./applications.queries";
+import { MAX_REASON_LENGTH } from "./applications.constants";
+import { useWithdrawApplications, type WithdrawInput } from "./applications.queries";
+import { HTTP_CONFLICT } from "@/api/http-status";
+import { requestStatus } from "@/api/request-error";
 
 export type WithdrawTarget = { id: string; jobTitle: string; companyName: string; version?: number; isReapplication?: boolean };
 

@@ -37,7 +37,7 @@ export function AuthFormHeader({ description, title }: { description?: ReactNode
 export function AuthCenteredCard({ children }: { children: ReactNode }) {
   return (
     <main className="grid min-h-screen place-items-center bg-background px-5 py-10">
-      <div className="flex w-full max-w-[440px] flex-col gap-6 rounded-2xl border border-border bg-card p-8">
+      <div className="flex w-full max-w-[440px] flex-col gap-6 surface-card p-8">
         <BrandLogo />
         {children}
       </div>
@@ -46,15 +46,3 @@ export function AuthCenteredCard({ children }: { children: ReactNode }) {
 }
 
 /** Grey label/value box: the label on the left, the value bold on the right. */
-export function AuthFactsBox({ rows }: { rows: { label: string; value: ReactNode }[] }) {
-  return (
-    <dl className="flex flex-col gap-2.5 rounded-xl border border-border bg-(--status-neutral-bg)/60 px-4 py-3.5 text-[13.5px]">
-      {rows.map((row) => (
-        <div className="flex items-baseline justify-between gap-4" key={row.label}>
-          <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
-          <dd className="min-w-0 text-right font-semibold break-all text-foreground">{row.value}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-}

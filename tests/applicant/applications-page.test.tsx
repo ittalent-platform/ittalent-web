@@ -24,7 +24,7 @@ const summary: ApplicationListResponse["items"][number] = {
   status: "submitted", reviewStage: null, submittedDocuments: [], canWithdraw: true, submittedAt: "2026-09-01T10:00:00.000Z", latestStatusAt: "2026-09-02T10:00:00.000Z", withdrawnAt: null,
 };
 const list: ApplicationListResponse = { items: [summary], total: 1, totalPages: 1, page: 1, limit: 10, statusCounts: { submitted: 1, under_review: 0, interviewing: 0, offered: 0, hired: 0, rejected: 0, withdrawn: 0 } };
-const detail: ApplicationDetailDto = { ...summary, message: null, withdrawalReason: null, attachments: [], version: 0, createdAt: summary.submittedAt, updatedAt: summary.latestStatusAt };
+const detail: ApplicationDetailDto = { ...summary, message: null, withdrawalReason: null, attachments: [], certificates: [], version: 0, createdAt: summary.submittedAt, updatedAt: summary.latestStatusAt };
 const history: ApplicationHistoryResponse = { items: [{ status: "submitted", reviewStage: null, actorRole: "candidate", occurredAt: summary.submittedAt }], page: 1, limit: 100, total: 1, totalPages: 1 };
 
 function renderApp(initial: string) {
@@ -223,5 +223,26 @@ describe("Candidate My Applications", () => {
     fireEvent.dragStart(card, { dataTransfer });
     fireEvent.drop(screen.getByRole("region", { name: "Withdrawn" }), { dataTransfer });
     expect(screen.getByRole("alertdialog", { name: "Withdraw this application?" })).toBeInTheDocument();
+  });
+
+  it("lists the certificate copies sent with the application, opening each link in a new tab", () => {
+    vi.mocked(applicationQueries.useApplication).mockReturnValue({
+      data: { ...detail, certificates: [{ id: "c1", version: 2, name: "AWS Certified Solutions Architect", url: "https://www.credly.com/badges/7f3c", issuer: "Amazon Web Services", issuedDate: "2025-03-12", expiryDate: "2028-03-12" }] },
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof applicationQueries.useApplication>);
+    renderApp(`/my-applications/${id}`);
+    const card = screen.getByRole("region", { name: "Certificates" });
+    expect(within(card).getByText("AWS Certified Solutions Architect")).toBeInTheDocument();
+    expect(within(card).getByText("Amazon Web Services · Issued 12 Mar 2025 · expires 12 Mar 2028")).toBeInTheDocument();
+    const link = within(card).getByRole("link", { name: "Open AWS Certified Solutions Architect in a new tab" });
+    expect(link).toHaveAttribute("href", "https://www.credly.com/badges/7f3c");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  it("shows no certificates card when none were sent", () => {
+    renderApp(`/my-applications/${id}`);
+    expect(screen.queryByRole("region", { name: "Certificates" })).not.toBeInTheDocument();
   });
 });
