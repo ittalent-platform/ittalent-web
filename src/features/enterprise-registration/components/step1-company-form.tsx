@@ -279,7 +279,7 @@ export function Step1CompanyForm({
           type="button"
           variant="outline"
           disabled={isSaving}
-          className="h-11 rounded-xl px-5 text-[14px] font-semibold"
+          className="h-12 min-w-[120px] rounded-xl px-5 text-[14px] font-semibold"
           onClick={async () => {
             const values = control._formValues;
             try {
@@ -310,7 +310,7 @@ export function Step1CompanyForm({
         <Button
           type="submit"
           disabled={isSaving}
-          className="h-11 rounded-xl px-6 text-[14px] font-semibold"
+          className="h-12 min-w-[140px] rounded-xl px-6 text-[14.5px] font-semibold"
         >
           {isSaving ? "Saving..." : "Continue"}
         </Button>

@@ -317,7 +317,7 @@ export function Step4ReviewForm({
             type="button"
             variant="outline"
             onClick={onBack}
-            className="h-11 rounded-xl px-5 text-[14px] font-semibold"
+            className="h-12 min-w-[100px] rounded-xl px-5 text-[14px] font-semibold"
           >
             Back
           </Button>
@@ -330,14 +330,14 @@ export function Step4ReviewForm({
               onClick={async () => {
                 if (draft) await saveDraft({ version: draft.version });
               }}
-              className="h-11 rounded-xl px-5 text-[14px] font-semibold"
+              className="h-12 min-w-[120px] rounded-xl px-5 text-[14px] font-semibold"
             >
               Save draft
             </Button>
             <Button
               type="submit"
               disabled={submitMutation.isPending}
-              className="h-11 rounded-xl px-6 text-[14px] font-semibold"
+              className="h-12 min-w-[180px] rounded-xl px-7 text-[14.5px] font-semibold"
             >
               {submitMutation.isPending ? "Submitting..." : "Submit registration"}
             </Button>
