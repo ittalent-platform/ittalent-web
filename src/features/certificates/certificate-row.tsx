@@ -7,7 +7,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-import { formatCalendarDate, isExpired, isInsecureLink, linkHost } from "./certificate-display";
+import { isExpired, isInsecureLink, linkHost } from "./certificate-display";
+import { formatCalendarDate } from "@/lib/format";
 
 type CertificateRowProps = {
   certificate: CertificateLink;

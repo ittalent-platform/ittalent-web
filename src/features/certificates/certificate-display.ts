@@ -1,4 +1,3 @@
-export { formatCalendarDate } from "@/lib/format";
 import type { CertificateLink } from "@/api/generated/types.gen";
 
 /** Today as "YYYY-MM-DD" in the viewer's own calendar. */
