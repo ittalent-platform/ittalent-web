@@ -139,7 +139,7 @@ export function Step4ReviewForm({
 
       {/* Card 1: Company Review Card */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-7">
-        <div className="flex items-center justify-between border-b border-border pb-4">
+        <div className="flex items-center justify-between">
           <h3 className="text-base font-bold text-foreground">Company</h3>
           <Button
             type="button"
@@ -184,7 +184,7 @@ export function Step4ReviewForm({
 
       {/* Card 2: Representative Review Card */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-7">
-        <div className="flex items-center justify-between border-b border-border pb-4">
+        <div className="flex items-center justify-between">
           <h3 className="text-base font-bold text-foreground">Representative</h3>
           <Button
             type="button"
@@ -233,7 +233,7 @@ export function Step4ReviewForm({
 
       {/* Card 3: Documents Review Card */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-7">
-        <div className="flex items-center justify-between border-b border-border pb-4">
+        <div className="flex items-center justify-between">
           <h3 className="text-base font-bold text-foreground">Documents</h3>
           <Button
             type="button"
