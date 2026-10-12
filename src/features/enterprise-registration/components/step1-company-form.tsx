@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
+import { SectionCard } from "@/components/common/section-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AUTH_ACTION_CLASS } from "@/features/auth/auth-status.constants";
+import {
+  DEFAULT_COMPANY_SIZE,
+  DEFAULT_COUNTRY,
+  INDUSTRY_OPTIONS,
+} from "@/features/enterprise-registration/enterprise-registration.constants";
 import {
   step1CompanyDetailsSchema,
   type Step1CompanyDetailsFormData,
@@ -20,27 +30,28 @@ import {
 } from "@/features/enterprise-registration/enterprise-registration.schemas";
 import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
 
-const INDUSTRY_OPTIONS = [
-  "Software & IT Services",
-  "Fintech & Banking",
-  "E-commerce & Retail",
-  "Healthcare & Biotech",
-  "Education & Edtech",
-  "Telecommunications",
-  "Gaming & Entertainment",
-  "Logistics & Supply Chain",
-  "Artificial Intelligence & Data",
-  "Hardware & Electronics",
-  "Other",
-] as const;
+import { StepActions } from "./step-actions";
+
+const OPTIONAL_CLASS = "text-[12.5px] font-normal text-muted-foreground";
+
+function Section({ children, title }: { children: React.ReactNode; title: string }) {
+  return (
+    <div className="flex flex-col gap-4 border-t border-line-muted pt-6 first:border-t-0 first:pt-0">
+      <h3 className="m-0 text-[13.5px] font-bold text-foreground">{title}</h3>
+      {children}
+    </div>
+  );
+}
 
 export function Step1CompanyForm({
   onNext,
 }: {
   onNext: () => void;
 }) {
+  const { t } = useTranslation();
   const { draft, saveDraft, isSaving } = useRegistrationWizard();
   const [serverError, setServerError] = useState<string | null>(null);
+  const optional = <span className={OPTIONAL_CLASS}>{t("enterpriseRegistration.common.optional")}</span>;
 
   const rawCompany = (draft?.company_data || {}) as Record<string, unknown>;
   const rawAddress = (rawCompany.address || {}) as Record<string, unknown>;
@@ -52,13 +63,13 @@ export function Step1CompanyForm({
     registration_number: (rawCompany.registration_number as string) || "",
     website: (rawCompany.website as string) || "",
     industry: (rawCompany.industry as string) || "",
-    company_size: (rawCompany.company_size as (typeof companySizeOptions)[number]) || "11-50",
+    company_size: (rawCompany.company_size as (typeof companySizeOptions)[number]) || DEFAULT_COMPANY_SIZE,
     address: {
       street: (rawAddress.street as string) || "",
       city: (rawAddress.city as string) || "",
       district: (rawAddress.district as string) || "",
       state_province: (rawAddress.state_province as string) || "",
-      country: (rawAddress.country as string) || "Vietnam",
+      country: (rawAddress.country as string) || DEFAULT_COUNTRY,
       postal_code: (rawAddress.postal_code as string) || "",
     },
     short_description: (rawCompany.short_description as string) || "",
@@ -103,116 +114,67 @@ export function Step1CompanyForm({
       onNext();
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
-      setServerError(errorObj.message || "Failed to save company details. Please try again.");
+      setServerError(errorObj.message || t("enterpriseRegistration.step1.saveFailed"));
     }
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Company Details
-        </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Provide verified business entity information matching your official registration certificate.
-        </p>
-      </div>
+    <SectionCard description={t("enterpriseRegistration.step1.subtitle")} title={t("enterpriseRegistration.step1.title")}>
+      {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
 
-      {serverError && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{serverError}</InlineBanner>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Section 1: Identification */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-foreground">Basic Information</h3>
+      <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+        <Section title={t("enterpriseRegistration.step1.basic")}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
-              htmlFor="company_name"
-              label="Company display / trading name"
-              required
-              hint="The commercial name shown on job boards"
               error={errors.name?.message}
+              hint={t("enterpriseRegistration.step1.nameHint")}
+              htmlFor="company_name"
+              label={t("enterpriseRegistration.step1.name")}
+              required
             >
-              <Input
-                id="company_name"
-                placeholder="e.g. VNG Corporation"
-                {...register("name")}
-              />
+              <Input aria-invalid={Boolean(errors.name)} id="company_name" placeholder={t("enterpriseRegistration.step1.namePlaceholder")} {...register("name")} />
             </FormField>
 
             <FormField
-              htmlFor="legal_name"
-              label="Official registered legal name"
-              hint="As registered on your business license"
               error={errors.legal_name?.message}
+              hint={t("enterpriseRegistration.step1.legalNameHint")}
+              htmlFor="legal_name"
+              label={t("enterpriseRegistration.step1.legalName")}
             >
-              <Input
-                id="legal_name"
-                placeholder="e.g. Công ty Cổ phần VNG"
-                {...register("legal_name")}
-              />
+              <Input id="legal_name" placeholder={t("enterpriseRegistration.step1.legalNamePlaceholder")} {...register("legal_name")} />
             </FormField>
-          </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
-              htmlFor="tax_code"
-              label="Tax identification number (Mã số thuế)"
-              required
-              hint="10 or 13 numeric digits"
               error={errors.tax_code?.message}
+              hint={t("enterpriseRegistration.step1.taxCodeHint")}
+              htmlFor="tax_code"
+              label={t("enterpriseRegistration.step1.taxCode")}
+              required
             >
-              <Input
-                id="tax_code"
-                placeholder="e.g. 0303886515"
-                {...register("tax_code")}
-              />
+              <Input aria-invalid={Boolean(errors.tax_code)} id="tax_code" placeholder={t("enterpriseRegistration.step1.taxCodePlaceholder")} {...register("tax_code")} />
             </FormField>
 
-            <FormField
-              htmlFor="website"
-              label="Company website"
-              hint="https://example.com"
-              error={errors.website?.message}
-            >
-              <Input
-                id="website"
-                type="url"
-                placeholder="https://company.com"
-                {...register("website")}
-              />
+            <FormField error={errors.website?.message} htmlFor="website" label={t("enterpriseRegistration.step1.website")} labelAddon={optional}>
+              <Input aria-invalid={Boolean(errors.website)} id="website" placeholder={t("enterpriseRegistration.step1.websitePlaceholder")} type="url" {...register("website")} />
             </FormField>
           </div>
-        </div>
+        </Section>
 
-        {/* Section 2: Industry & Organization */}
-        <div className="space-y-4 border-t border-line-muted pt-6">
-          <h3 className="text-sm font-semibold text-foreground">Industry & Organization</h3>
+        <Section title={t("enterpriseRegistration.step1.industrySection")}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              htmlFor="industry"
-              label="Primary industry"
-              required
-              error={errors.industry?.message}
-            >
+            <FormField error={errors.industry?.message} htmlFor="industry" label={t("enterpriseRegistration.step1.industry")} required>
               <Controller
                 control={control}
                 name="industry"
                 render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger id="industry">
-                      <SelectValue placeholder="Select industry..." />
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger aria-invalid={Boolean(errors.industry)} id="industry">
+                      <SelectValue placeholder={t("enterpriseRegistration.step1.industryPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {INDUSTRY_OPTIONS.map((item) => (
-                        <SelectItem key={item} value={item}>
-                          {item}
+                        <SelectItem key={item.key} value={item.value}>
+                          {t(`enterpriseRegistration.industries.${item.key}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -221,27 +183,19 @@ export function Step1CompanyForm({
               />
             </FormField>
 
-            <FormField
-              htmlFor="company_size"
-              label="Company size"
-              required
-              error={errors.company_size?.message}
-            >
+            <FormField error={errors.company_size?.message} htmlFor="company_size" label={t("enterpriseRegistration.step1.size")} required>
               <Controller
                 control={control}
                 name="company_size"
                 render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger id="company_size">
-                      <SelectValue placeholder="Select size..." />
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger aria-invalid={Boolean(errors.company_size)} id="company_size">
+                      <SelectValue placeholder={t("enterpriseRegistration.step1.sizePlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {companySizeOptions.map((opt) => (
-                        <SelectItem key={opt} value={opt}>
-                          {opt} employees
+                      {companySizeOptions.map((size) => (
+                        <SelectItem key={size} value={size}>
+                          {t("enterpriseRegistration.step1.sizeOption", { size })}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -250,81 +204,43 @@ export function Step1CompanyForm({
               />
             </FormField>
           </div>
-        </div>
+        </Section>
 
-        {/* Section 3: Headquarters Location */}
-        <div className="space-y-4 border-t border-line-muted pt-6">
-          <h3 className="text-sm font-semibold text-foreground">Headquarters Address</h3>
-          <FormField
-            htmlFor="street"
-            label="Street address"
-            required
-            error={errors.address?.street?.message}
-          >
-            <Input
-              id="street"
-              placeholder="e.g. 182 Le Dai Hanh, Ward 15, District 11"
-              {...register("address.street")}
-            />
+        <Section title={t("enterpriseRegistration.step1.hq")}>
+          <FormField error={errors.address?.street?.message} htmlFor="street" label={t("enterpriseRegistration.step1.street")} required>
+            <Input aria-invalid={Boolean(errors.address?.street)} id="street" placeholder={t("enterpriseRegistration.step1.streetPlaceholder")} {...register("address.street")} />
           </FormField>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              htmlFor="city"
-              label="Province / City"
-              required
-              error={errors.address?.city?.message}
-            >
-              <Input
-                id="city"
-                placeholder="e.g. Ho Chi Minh City"
-                {...register("address.city")}
-              />
+            <FormField error={errors.address?.city?.message} htmlFor="city" label={t("enterpriseRegistration.step1.city")} required>
+              <Input aria-invalid={Boolean(errors.address?.city)} id="city" placeholder={t("enterpriseRegistration.step1.cityPlaceholder")} {...register("address.city")} />
             </FormField>
 
-            <FormField
-              htmlFor="country"
-              label="Country"
-              required
-              error={errors.address?.country?.message}
-            >
-              <Input
-                id="country"
-                defaultValue="Vietnam"
-                {...register("address.country")}
-              />
+            <FormField error={errors.address?.country?.message} htmlFor="country" label={t("enterpriseRegistration.step1.country")} required>
+              <Input aria-invalid={Boolean(errors.address?.country)} id="country" {...register("address.country")} />
             </FormField>
           </div>
-        </div>
+        </Section>
 
-        {/* Section 4: Overview */}
-        <div className="space-y-4 border-t border-line-muted pt-6">
-          <h3 className="text-sm font-semibold text-foreground">Company Overview</h3>
+        <Section title={t("enterpriseRegistration.step1.overview")}>
           <FormField
-            htmlFor="short_description"
-            label="Short elevator pitch (optional)"
-            hint="A quick 1-2 sentence overview of what your company builds"
             error={errors.short_description?.message}
+            hint={t("enterpriseRegistration.step1.pitchHint")}
+            htmlFor="short_description"
+            label={t("enterpriseRegistration.step1.pitch")}
+            labelAddon={optional}
           >
-            <Textarea
-              id="short_description"
-              rows={2}
-              placeholder="e.g. Leading digital entertainment and cloud platform provider in Southeast Asia."
-              {...register("short_description")}
-            />
+            <Textarea id="short_description" placeholder={t("enterpriseRegistration.step1.pitchPlaceholder")} rows={2} {...register("short_description")} />
           </FormField>
-        </div>
+        </Section>
 
-        <div className="flex items-center justify-end gap-3 border-t border-line-muted pt-6">
-          <Button
-            type="submit"
-            disabled={isSaving}
-            className="min-w-[140px]"
-          >
-            {isSaving ? "Saving..." : "Save & Continue →"}
+        <StepActions>
+          <Button className={AUTH_ACTION_CLASS} disabled={isSaving} shape="xl" type="submit">
+            {isSaving ? t("enterpriseRegistration.common.saving") : t("enterpriseRegistration.common.saveContinue")}
+            {isSaving ? null : <ArrowRight aria-hidden />}
           </Button>
-        </div>
+        </StepActions>
       </form>
-    </div>
+    </SectionCard>
   );
 }

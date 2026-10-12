@@ -1,15 +1,23 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
+import { SectionCard } from "@/components/common/section-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AUTH_ACTION_CLASS } from "@/features/auth/auth-status.constants";
 import {
   step2RepresentativeSchema,
   type Step2RepresentativeFormData,
 } from "@/features/enterprise-registration/enterprise-registration.schemas";
 import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
+
+import { ConsentCheckbox } from "./consent-checkbox";
+import { StepActions } from "./step-actions";
 
 export function Step2RepresentativeForm({
   onNext,
@@ -18,6 +26,7 @@ export function Step2RepresentativeForm({
   onNext: () => void;
   onBack: () => void;
 }) {
+  const { t } = useTranslation();
   const {
     draft,
     saveDraft,
@@ -42,7 +51,7 @@ export function Step2RepresentativeForm({
 
   const {
     register,
-    watch,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<Step2RepresentativeFormData>({
@@ -50,7 +59,7 @@ export function Step2RepresentativeForm({
     defaultValues,
   });
 
-  const isLegalRep = watch("is_legal_representative");
+  const isLegalRep = useWatch({ control, name: "is_legal_representative" });
 
   const onSubmit = async (data: Step2RepresentativeFormData) => {
     setServerError(null);
@@ -67,123 +76,55 @@ export function Step2RepresentativeForm({
       onNext();
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
-      setServerError(
-        errorObj.message || "Failed to save representative information. Please try again.",
-      );
+      setServerError(errorObj.message || t("enterpriseRegistration.step2.saveFailed"));
     }
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Authorized Representative
-        </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Specify the representative managing this enterprise workspace on ITTalent.
-        </p>
-      </div>
+    <SectionCard description={t("enterpriseRegistration.step2.subtitle")} title={t("enterpriseRegistration.step2.title")}>
+      {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
 
-      {serverError && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{serverError}</InlineBanner>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField
-            htmlFor="full_name"
-            label="Representative full name"
-            required
-            error={errors.full_name?.message}
-          >
-            <Input
-              id="full_name"
-              placeholder="e.g. Nguyễn Văn A"
-              {...register("full_name")}
-            />
+          <FormField error={errors.full_name?.message} htmlFor="full_name" label={t("enterpriseRegistration.step2.fullName")} required>
+            <Input aria-invalid={Boolean(errors.full_name)} id="full_name" placeholder={t("enterpriseRegistration.step2.fullNamePlaceholder")} {...register("full_name")} />
           </FormField>
 
-          <FormField
-            htmlFor="phone"
-            label="Direct mobile phone"
-            required
-            hint="For urgent verification SMS or calls"
-            error={errors.phone?.message}
-          >
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="+84 901 234 567"
-              {...register("phone")}
-            />
+          <FormField error={errors.phone?.message} hint={t("enterpriseRegistration.step2.phoneHint")} htmlFor="phone" label={t("enterpriseRegistration.step2.phone")} required>
+            <Input aria-invalid={Boolean(errors.phone)} id="phone" placeholder={t("enterpriseRegistration.step2.phonePlaceholder")} type="tel" {...register("phone")} />
           </FormField>
         </div>
 
         <FormField
-          htmlFor="position"
-          label="Job title / position"
-          hint="e.g. Talent Acquisition Director, HR Manager, General Director"
           error={errors.position?.message}
+          hint={t("enterpriseRegistration.step2.positionHint")}
+          htmlFor="position"
+          label={t("enterpriseRegistration.step2.position")}
+          labelAddon={<span className="text-[12.5px] font-normal text-muted-foreground">{t("enterpriseRegistration.common.optional")}</span>}
         >
-          <Input
-            id="position"
-            placeholder="e.g. Head of Talent Acquisition"
-            {...register("position")}
-          />
+          <Input id="position" placeholder={t("enterpriseRegistration.step2.positionPlaceholder")} {...register("position")} />
         </FormField>
 
-        {/* Legal rep authorization checkbox card */}
-        <div className="rounded-xl border border-border bg-muted p-4.5">
-          <div className="flex items-start gap-3">
-            <input
-              id="is_legal_representative"
-              type="checkbox"
-              className="mt-1 size-4.5 shrink-0 accent-primary"
-              {...register("is_legal_representative")}
-            />
-            <div className="space-y-1">
-              <label
-                htmlFor="is_legal_representative"
-                className="cursor-pointer text-[13.5px] font-semibold text-foreground"
-              >
-                I am the legal representative named on the Business License (Người đại diện theo pháp luật)
-              </label>
-              <p className="text-xs text-muted-foreground">
-                If checked, you only need to upload the Business Registration Certificate.
-              </p>
-            </div>
-          </div>
-        </div>
+        <ConsentCheckbox
+          hint={t("enterpriseRegistration.step2.legalRepHint")}
+          id="is_legal_representative"
+          label={t("enterpriseRegistration.step2.legalRep")}
+          {...register("is_legal_representative")}
+        />
 
-        {!isLegalRep && (
-          <div>
-            <InlineBanner tone="warning">
-              <span className="font-semibold">Authorization requirement:</span> Because you are not the primary legal representative listed on official government records, you will be required to upload a signed Letter of Authorization (Giấy ủy quyền) in Step 3.
-            </InlineBanner>
-          </div>
-        )}
+        {!isLegalRep ? (
+          <InlineBanner tone="warning">
+            <span className="font-semibold">{t("enterpriseRegistration.step2.delegateTitle")}</span> {t("enterpriseRegistration.step2.delegateBody")}
+          </InlineBanner>
+        ) : null}
 
-        <div className="flex items-center justify-between gap-3 border-t border-line-muted pt-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onBack}
-            disabled={isSaving}
-          >
-            ← Back
+        <StepActions backDisabled={isSaving} onBack={onBack}>
+          <Button className={AUTH_ACTION_CLASS} disabled={isSaving} shape="xl" type="submit">
+            {isSaving ? t("enterpriseRegistration.common.saving") : t("enterpriseRegistration.common.saveContinue")}
+            {isSaving ? null : <ArrowRight aria-hidden />}
           </Button>
-
-          <Button
-            type="submit"
-            disabled={isSaving}
-            className="min-w-[140px]"
-          >
-            {isSaving ? "Saving..." : "Save & Continue →"}
-          </Button>
-        </div>
+        </StepActions>
       </form>
-    </div>
+    </SectionCard>
   );
 }

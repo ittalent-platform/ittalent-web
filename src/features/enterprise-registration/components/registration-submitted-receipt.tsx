@@ -1,109 +1,54 @@
-import { CheckCircle2, Clock, ArrowRight } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
+
+import { KeyValueBox } from "@/components/common/key-value-box";
+import { StatusPanel } from "@/components/common/status-panel";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AuthStatusCard } from "@/features/auth/auth-status-card";
+import { AUTH_ACTION_CLASS } from "@/features/auth/auth-status.constants";
+import { DEFAULT_SLA_DAYS } from "@/features/enterprise-registration/enterprise-registration.constants";
 import type { SubmissionReceiptResponse } from "@/features/enterprise-registration/enterprise-registration.types";
+import { formatDateTimeIct } from "@/lib/format";
+
+const NEXT_STEP_KEYS = ["next1", "next2", "next3"] as const;
 
 export function RegistrationSubmittedReceipt({
   receipt,
 }: {
   receipt: SubmissionReceiptResponse;
 }) {
-  const formattedDate = receipt.submitted_at
-    ? new Date(receipt.submitted_at).toLocaleString()
-    : "Just now";
+  const { t } = useTranslation();
 
   return (
-    <div className="w-full max-w-[560px] rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-10 text-center">
-      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-(--status-success-bg) text-(--status-success-fg)">
-        <CheckCircle2 className="h-9 w-9" />
-      </div>
-
-      <h2 className="text-2xl font-bold tracking-tight text-foreground">
-        Registration Case Submitted
-      </h2>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Your employer verification intake dossier has been securely recorded and queued for administrative review.
-      </p>
-
-      {/* Case Details Box */}
-      <div className="my-6 rounded-xl border border-border bg-muted p-5 text-left space-y-3">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">Registration Case Code:</span>
-          <span className="font-mono font-bold text-sm text-foreground bg-card border border-border px-2.5 py-1 rounded-md">
-            {receipt.registration_code}
+    <AuthStatusCard>
+      <StatusPanel
+        actions={
+          <Button asChild className={AUTH_ACTION_CLASS} shape="xl">
+            <Link to="/">{t("enterpriseRegistration.receipt.home")}</Link>
+          </Button>
+        }
+        description={t("enterpriseRegistration.receipt.subtitle")}
+        icon={CheckCircle2}
+        steps={NEXT_STEP_KEYS.map((key) => (
+          <span key={key}>
+            <strong className="block font-semibold text-foreground">{t(`enterpriseRegistration.receipt.${key}Title`)}</strong>
+            {t(`enterpriseRegistration.receipt.${key}Body`)}
           </span>
-        </div>
-
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">Intake Status:</span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-(--status-warning-bg) px-2.5 py-0.5 font-semibold text-(--status-warning-fg)">
-            <Clock className="h-3 w-3" /> Under Review
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">Submitted At:</span>
-          <span className="font-medium text-foreground">{formattedDate}</span>
-        </div>
-
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">Estimated Turnaround:</span>
-          <span className="font-medium text-foreground">
-            {receipt.estimated_sla_days || 2} business days
-          </span>
-        </div>
-      </div>
-
-      {/* Review Workflow Timeline Card */}
-      <div className="rounded-xl border border-line-muted bg-card p-5 text-left space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          What happens next?
-        </h3>
-
-        <div className="space-y-3 text-[13px]">
-          <div className="flex items-start gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-(--status-success-bg) text-xs font-bold text-(--status-success-fg)">
-              ✓
-            </div>
-            <div>
-              <p className="font-semibold text-foreground">Corporate Domain & Tax Code Locked</p>
-              <p className="text-xs text-muted-foreground">Claim locks prevent duplicates while under review.</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-(--status-warning-bg) text-xs font-bold text-(--status-warning-fg)">
-              2
-            </div>
-            <div>
-              <p className="font-semibold text-foreground">Compliance Document Verification</p>
-              <p className="text-xs text-muted-foreground">
-                ITTalent staff inspects your Business Registration Certificate against national registers.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
-              3
-            </div>
-            <div>
-              <p className="font-semibold text-foreground">Workspace Invitation Sent</p>
-              <p className="text-xs text-muted-foreground">
-                Upon approval, an email with a secure link to set your enterprise password will be delivered.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-8 flex flex-col gap-3">
-        <Button asChild className="w-full">
-          <Link to="/">
-            Return to Homepage <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
-    </div>
+        ))}
+        title={t("enterpriseRegistration.receipt.title")}
+        tone="success"
+      >
+        <KeyValueBox
+          rows={[
+            { label: t("enterpriseRegistration.receipt.code"), value: <span className="font-mono">{receipt.registration_code}</span> },
+            { label: t("enterpriseRegistration.receipt.status"), value: <Badge variant="warning">{t("enterpriseRegistration.receipt.underReview")}</Badge> },
+            { label: t("enterpriseRegistration.receipt.submittedAt"), value: receipt.submitted_at ? formatDateTimeIct(receipt.submitted_at) : t("enterpriseRegistration.receipt.justNow") },
+            { label: t("enterpriseRegistration.receipt.turnaround"), value: t("enterpriseRegistration.receipt.days", { count: receipt.estimated_sla_days || DEFAULT_SLA_DAYS }) },
+          ]}
+        />
+      </StatusPanel>
+    </AuthStatusCard>
   );
 }

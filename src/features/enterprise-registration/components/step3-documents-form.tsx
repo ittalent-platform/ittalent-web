@@ -1,6 +1,10 @@
 import { useState, useRef } from "react";
-import { FileText, UploadCloud, Trash2 } from "lucide-react";
+import { ArrowRight, Check, FileText, UploadCloud, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import { InlineBanner } from "@/components/common/inline-banner";
+import { SectionCard } from "@/components/common/section-card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -9,20 +13,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AUTH_ACTION_CLASS } from "@/features/auth/auth-status.constants";
 import {
-  DOCUMENT_TYPE_LABELS,
+  BYTES_PER_MB,
+  legalDocumentTypes,
   REGISTRATION_CONFIG,
-  REGISTRATION_MESSAGES,
+  REGISTRATION_MESSAGE_KEYS,
   type LegalDocumentType,
 } from "@/features/enterprise-registration/enterprise-registration.constants";
 import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
 import { useUploadLegalDocumentMutation } from "@/features/enterprise-registration/enterprise-registration.queries";
+import { cn } from "@/lib/utils";
 
-function formatBytes(bytes?: number): string {
-  if (!bytes) return "Unknown size";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+import { StepActions } from "./step-actions";
+
+const BYTES_PER_KB = 1024;
+const MAX_FILE_MB = REGISTRATION_CONFIG.MAX_FILE_SIZE / BYTES_PER_MB;
+const ALLOWED_MIME_TYPES: readonly string[] = REGISTRATION_CONFIG.ALLOWED_DOCUMENT_MIME_TYPES;
+
+/** One line of the "required documents" checklist: green tick when met, red when missing and needed. */
+function RequirementRow({ label, met, missing }: { label: string; met: boolean; missing?: boolean }) {
+  return (
+    <li className="flex items-center gap-2">
+      <span
+        className={cn(
+          "inline-flex size-[18px] shrink-0 items-center justify-center rounded-full",
+          met ? "bg-(--status-success-bg) text-(--status-success-fg)" : missing ? "bg-(--status-error-bg) text-(--status-error-fg)" : "bg-card text-muted-foreground",
+        )}
+      >
+        {met ? <Check aria-hidden className="size-3" strokeWidth={3} /> : <span aria-hidden className="size-1.5 rounded-full bg-current" />}
+      </span>
+      <span className={cn(met && "font-medium text-foreground", missing && !met && "font-medium text-(--danger-fg)")}>{label}</span>
+    </li>
+  );
 }
 
 export function Step3DocumentsForm({
@@ -32,6 +55,7 @@ export function Step3DocumentsForm({
   onNext: () => void;
   onBack: () => void;
 }) {
+  const { t } = useTranslation();
   const {
     registrationId,
     draft,
@@ -56,24 +80,30 @@ export function Step3DocumentsForm({
   const hasAuthLetter = documents.some(
     (d) => d.document_type === "power_of_attorney",
   );
+  const authLetterMet = isLegalRepresentative || hasAuthLetter;
+
+  const formatBytes = (bytes?: number): string => {
+    if (!bytes) return t("enterpriseRegistration.step3.unknownSize");
+    if (bytes < BYTES_PER_KB) return `${bytes} B`;
+    if (bytes < BYTES_PER_MB) return `${(bytes / BYTES_PER_KB).toFixed(1)} KB`;
+    return `${(bytes / BYTES_PER_MB).toFixed(2)} MB`;
+  };
 
   const handleFileProcess = async (file: File) => {
     setErrorMessage(null);
 
-    if (file.type !== "application/pdf") {
-      setErrorMessage("Only PDF documents (.pdf) are accepted for legal verification.");
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      setErrorMessage(t("enterpriseRegistration.step3.onlyPdf"));
       return;
     }
 
     if (file.size > REGISTRATION_CONFIG.MAX_FILE_SIZE) {
-      setErrorMessage(
-        `File size exceeds ${REGISTRATION_CONFIG.MAX_FILE_SIZE / (1024 * 1024)} MB limit.`,
-      );
+      setErrorMessage(t("enterpriseRegistration.step3.tooLarge", { mb: MAX_FILE_MB }));
       return;
     }
 
     if (!registrationId) {
-      setErrorMessage("Registration intake ID is missing. Please restart registration.");
+      setErrorMessage(t("enterpriseRegistration.step3.missingId"));
       return;
     }
 
@@ -97,7 +127,7 @@ export function Step3DocumentsForm({
       }
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
-      setErrorMessage(errorObj.message || "Failed to upload document. Please try again.");
+      setErrorMessage(errorObj.message || t("enterpriseRegistration.step3.uploadFailed"));
     }
   };
 
@@ -145,220 +175,137 @@ export function Step3DocumentsForm({
     setErrorMessage(null);
 
     if (!hasBusinessLicense) {
-      setErrorMessage(REGISTRATION_MESSAGES.MISSING_LEGAL_DOCUMENTS);
+      setErrorMessage(t(REGISTRATION_MESSAGE_KEYS.MISSING_LEGAL_DOCUMENTS));
       return;
     }
 
     if (!isLegalRepresentative && !hasAuthLetter) {
-      setErrorMessage(REGISTRATION_MESSAGES.AUTHORIZATION_LETTER_REQUIRED);
+      setErrorMessage(t(REGISTRATION_MESSAGE_KEYS.AUTHORIZATION_LETTER_REQUIRED));
       return;
     }
 
     onNext();
   };
 
+  const busy = isSaving || uploadMutation.isPending;
+
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Legal Verification Documents
-        </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Upload official legal records (PDF format, up to 5MB each) verifying your enterprise identity.
-        </p>
-      </div>
+    <SectionCard description={t("enterpriseRegistration.step3.subtitle", { mb: MAX_FILE_MB })} title={t("enterpriseRegistration.step3.title")}>
+      {errorMessage ? <InlineBanner tone="error">{errorMessage}</InlineBanner> : null}
 
-      {errorMessage && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{errorMessage}</InlineBanner>
-        </div>
-      )}
-
-      {/* Mandatory Requirements Checklist Callout */}
-      <div className="mb-6 rounded-xl border border-border bg-muted p-4 text-[13px]">
-        <span className="font-semibold text-foreground">Required documents for submission:</span>
-        <ul className="mt-2 space-y-1.5 text-muted-foreground">
-          <li className="flex items-center gap-2">
-            <span
-              className={`inline-flex size-4.5 items-center justify-center rounded-full text-xs font-bold ${
-                hasBusinessLicense
-                  ? "bg-(--status-success-bg) text-(--status-success-fg)"
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {hasBusinessLicense ? "✓" : "1"}
-            </span>
-            <span className={hasBusinessLicense ? "font-medium text-foreground" : ""}>
-              Business Registration Certificate (BRC) — Mandatory
-            </span>
-          </li>
-          <li className="flex items-center gap-2">
-            <span
-              className={`inline-flex size-4.5 items-center justify-center rounded-full text-xs font-bold ${
-                isLegalRepresentative || hasAuthLetter
-                  ? "bg-(--status-success-bg) text-(--status-success-fg)"
-                  : "bg-(--status-error-bg) text-(--status-error-fg)"
-              }`}
-            >
-              {isLegalRepresentative || hasAuthLetter ? "✓" : "2"}
-            </span>
-            <span
-              className={
-                !isLegalRepresentative && !hasAuthLetter
-                  ? "font-medium text-destructive"
-                  : hasAuthLetter
-                    ? "font-medium text-foreground"
-                    : "text-muted-foreground"
-              }
-            >
-              Letter of Authorization (LoA) — {isLegalRepresentative ? "Not required (Legal Rep)" : "Mandatory for delegate"}
-            </span>
-          </li>
+      <div className="rounded-xl border border-border bg-muted/40 p-4 text-[13px]">
+        <span className="font-semibold text-foreground">{t("enterpriseRegistration.step3.requiredTitle")}</span>
+        <ul className="m-0 mt-2 flex list-none flex-col gap-1.5 p-0 text-muted-foreground">
+          <RequirementRow label={t("enterpriseRegistration.step3.brcRequired")} met={hasBusinessLicense} />
+          <RequirementRow
+            label={t(isLegalRepresentative ? "enterpriseRegistration.step3.loaNotRequired" : "enterpriseRegistration.step3.loaRequired")}
+            met={authLetterMet}
+            missing={!authLetterMet}
+          />
         </ul>
       </div>
 
-      {/* Uploader Box */}
-      <div className="space-y-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="w-full sm:w-72">
-            <label htmlFor="doc_type_select" className="mb-1 block text-xs font-semibold text-foreground">
-              Select document type:
-            </label>
-            <Select
-              value={docType}
-              onValueChange={(val) => setDocType(val as LegalDocumentType)}
-            >
-              <SelectTrigger id="doc_type_select">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="business_license">
-                  {DOCUMENT_TYPE_LABELS.business_license}
+      <div className="flex flex-col gap-4">
+        <div className="w-full sm:w-72">
+          <label className="mb-1 block text-xs font-semibold text-foreground" htmlFor="doc_type_select">
+            {t("enterpriseRegistration.step3.typeLabel")}
+          </label>
+          <Select onValueChange={(val) => setDocType(val as LegalDocumentType)} value={docType}>
+            <SelectTrigger id="doc_type_select">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {legalDocumentTypes.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {t(`enterpriseRegistration.documentTypes.${type}`)}
                 </SelectItem>
-                <SelectItem value="power_of_attorney">
-                  {DOCUMENT_TYPE_LABELS.power_of_attorney}
-                </SelectItem>
-                <SelectItem value="tax_registration">
-                  {DOCUMENT_TYPE_LABELS.tax_registration}
-                </SelectItem>
-                <SelectItem value="other">
-                  {DOCUMENT_TYPE_LABELS.other}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div
+          className={cn(
+            "flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-colors",
+            dragOver ? "border-primary bg-accent" : "border-(--line-dashed) bg-muted/40 hover:border-muted-foreground/50",
+          )}
+          onDragLeave={() => setDragOver(false)}
           onDragOver={(e) => {
             e.preventDefault();
             setDragOver(true);
           }}
-          onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
-          className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
-            dragOver
-              ? "border-primary bg-primary/10"
-              : "border-border bg-muted/40 hover:border-muted-foreground/50"
-          }`}
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <UploadCloud className="h-6 w-6" />
+          <div className="flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <UploadCloud aria-hidden className="size-6" />
           </div>
-          <p className="mt-3 text-sm font-semibold text-foreground">
-            Click to upload or drag & drop PDF here
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Supported file type: PDF only (maximum 5MB)
-          </p>
+          <p className="m-0 mt-3 text-sm font-semibold text-foreground">{t("enterpriseRegistration.step3.dropTitle")}</p>
+          <p className="m-0 mt-1 text-xs text-muted-foreground">{t("enterpriseRegistration.step3.dropHint", { mb: MAX_FILE_MB })}</p>
           <input
+            accept={ALLOWED_MIME_TYPES.join(",")}
+            className="hidden"
+            onChange={handleFileInputChange}
             ref={fileInputRef}
             type="file"
-            accept="application/pdf"
-            onChange={handleFileInputChange}
-            className="hidden"
           />
           <Button
-            type="button"
-            variant="outline"
+            className={`${AUTH_ACTION_CLASS} mt-4`}
             disabled={uploadMutation.isPending}
             onClick={() => fileInputRef.current?.click()}
-            className="mt-4"
+            shape="xl"
+            type="button"
+            variant="outline"
           >
-            {uploadMutation.isPending ? "Uploading..." : "Select PDF Document"}
+            {uploadMutation.isPending ? t("enterpriseRegistration.step3.uploading") : t("enterpriseRegistration.step3.select")}
           </Button>
         </div>
       </div>
 
-      {/* Uploaded Documents List */}
-      <div className="mt-8 space-y-3">
-        <h3 className="text-sm font-semibold text-foreground">
-          Attached Documents ({documents.length})
-        </h3>
+      <div className="flex flex-col gap-3">
+        <h3 className="m-0 text-[13.5px] font-bold text-foreground">{t("enterpriseRegistration.step3.attached", { count: documents.length })}</h3>
 
         {documents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
-            No legal documents uploaded yet.
+          <div className="rounded-xl border border-dashed border-(--line-dashed) p-6 text-center text-xs text-muted-foreground">
+            {t("enterpriseRegistration.step3.none")}
           </div>
         ) : (
-          <div className="divide-y divide-line-muted rounded-xl border border-border bg-card">
+          <ul className="m-0 flex list-none flex-col divide-y divide-line-muted rounded-xl border border-border bg-card p-0">
             {documents.map((doc, idx) => (
-              <div
-                key={`${doc.file_name}-${idx}`}
-                className="flex items-center justify-between p-3.5 transition-colors hover:bg-muted/40"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--status-warning-bg) text-(--status-warning-fg)">
-                    <FileText className="h-4.5 w-4.5" />
+              <li className="flex items-center justify-between gap-3 p-3.5" key={`${doc.file_name}-${idx}`}>
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-(--status-warning-bg) text-(--status-warning-fg)">
+                    <FileText aria-hidden className="size-[18px]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-foreground">
-                      {doc.file_name}
-                    </p>
-                    <div className="flex items-center gap-2 text-[11.5px] text-muted-foreground">
-                      <span className="rounded bg-muted px-1.5 py-0.5 text-[10.5px] font-medium text-foreground">
-                        {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}
-                      </span>
-                      <span>•</span>
+                    <p className="m-0 truncate text-xs font-semibold text-foreground">{doc.file_name}</p>
+                    <div className="mt-0.5 flex items-center gap-2 text-[11.5px] text-muted-foreground">
+                      <Badge>{t(`enterpriseRegistration.documentTypes.${doc.document_type}`)}</Badge>
                       <span>{formatBytes(doc.file_size)}</span>
                     </div>
                   </div>
                 </div>
 
                 <button
+                  aria-label={t("enterpriseRegistration.step3.remove")}
+                  className="cursor-pointer rounded p-1.5 text-muted-foreground hover:bg-(--status-error-bg) hover:text-destructive"
+                  onClick={() => void handleRemoveDoc(idx)}
+                  title={t("enterpriseRegistration.step3.remove")}
                   type="button"
-                  onClick={() => handleRemoveDoc(idx)}
-                  className="rounded p-1.5 text-muted-foreground hover:bg-(--status-error-bg) hover:text-destructive"
-                  title="Remove document"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 aria-hidden className="size-4" />
                 </button>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
 
-      {/* Nav Actions */}
-      <div className="flex items-center justify-between gap-3 border-t border-line-muted pt-6 mt-8">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          disabled={isSaving || uploadMutation.isPending}
-        >
-          ← Back
+      <StepActions backDisabled={busy} onBack={onBack}>
+        <Button className={AUTH_ACTION_CLASS} disabled={busy} onClick={handleProceed} shape="xl" type="button">
+          {t("enterpriseRegistration.step3.next")}
+          <ArrowRight aria-hidden />
         </Button>
-
-        <Button
-          type="button"
-          onClick={handleProceed}
-          disabled={isSaving || uploadMutation.isPending}
-          className="min-w-[140px]"
-        >
-          Review & Submit →
-        </Button>
-      </div>
-    </div>
+      </StepActions>
+    </SectionCard>
   );
 }

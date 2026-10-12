@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AuthFormHeader, AuthStatusCard } from "@/features/auth/auth-status-card";
+import { AUTH_FULL_ACTION_CLASS } from "@/features/auth/auth-status.constants";
 import {
   startRegistrationSchema,
   type StartRegistrationFormData,
@@ -15,9 +20,10 @@ export function StartRegistrationForm({
   onSuccess,
   onContinueLaterClick,
 }: {
-  onSuccess: (email: string) => void;
+  onSuccess: (values: StartRegistrationFormData) => void;
   onContinueLaterClick: () => void;
 }) {
+  const { t } = useTranslation();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const startMutation = useStartRegistrationMutation();
@@ -45,108 +51,58 @@ export function StartRegistrationForm({
         representative_phone: data.representative_phone,
         representative_position: data.representative_position || undefined,
       });
-      onSuccess(data.corporate_email);
+      onSuccess(data);
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
-      setServerError(
-        errorObj.message || "Failed to start registration. Please try again.",
-      );
+      setServerError(errorObj.message || t("enterpriseRegistration.start.failed"));
     }
   };
 
+  const pending = isSubmitting || startMutation.isPending;
+
   return (
-    <div className="w-full max-w-[440px] rounded-2xl border border-border bg-card p-8 shadow-xs">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Register your company
-        </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Enter your contact details to start and save your organization intake case.
-        </p>
-      </div>
+    <AuthStatusCard className="flex flex-col gap-[22px]">
+      <AuthFormHeader description={t("enterpriseRegistration.start.subtitle")} title={t("enterpriseRegistration.start.title")} />
 
-      {serverError && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{serverError}</InlineBanner>
-        </div>
-      )}
+      {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <FormField
-          htmlFor="representative_name"
-          label="Your full name"
-          required
-          error={errors.representative_name?.message}
-        >
-          <Input
-            id="representative_name"
-            placeholder="e.g. Hoàng Nam"
-            {...register("representative_name")}
-          />
+      <form className="flex flex-col gap-[22px]" noValidate onSubmit={handleSubmit(onSubmit)}>
+        <FormField error={errors.representative_name?.message} htmlFor="representative_name" label={t("enterpriseRegistration.start.name")} required>
+          <Input aria-invalid={Boolean(errors.representative_name)} id="representative_name" placeholder={t("enterpriseRegistration.start.namePlaceholder")} {...register("representative_name")} />
         </FormField>
 
         <FormField
-          htmlFor="corporate_email"
-          label="Corporate work email"
-          required
-          hint="We will verify your company domain (personal emails not permitted)"
           error={errors.corporate_email?.message}
-        >
-          <Input
-            id="corporate_email"
-            type="email"
-            placeholder="name@company.com"
-            {...register("corporate_email")}
-          />
-        </FormField>
-
-        <FormField
-          htmlFor="representative_phone"
-          label="Contact phone number"
+          hint={t("enterpriseRegistration.start.emailHint")}
+          htmlFor="corporate_email"
+          label={t("enterpriseRegistration.start.email")}
           required
-          error={errors.representative_phone?.message}
         >
-          <Input
-            id="representative_phone"
-            type="tel"
-            placeholder="e.g. 0901234567"
-            {...register("representative_phone")}
-          />
+          <Input aria-invalid={Boolean(errors.corporate_email)} id="corporate_email" placeholder={t("enterpriseRegistration.start.emailPlaceholder")} type="email" {...register("corporate_email")} />
+        </FormField>
+
+        <FormField error={errors.representative_phone?.message} htmlFor="representative_phone" label={t("enterpriseRegistration.start.phone")} required>
+          <Input aria-invalid={Boolean(errors.representative_phone)} id="representative_phone" placeholder={t("enterpriseRegistration.start.phonePlaceholder")} type="tel" {...register("representative_phone")} />
         </FormField>
 
         <FormField
-          htmlFor="representative_position"
-          label="Position in organization"
-          hint="Optional"
           error={errors.representative_position?.message}
+          htmlFor="representative_position"
+          label={t("enterpriseRegistration.start.position")}
+          labelAddon={<span className="text-[12.5px] font-normal text-muted-foreground">{t("enterpriseRegistration.common.optional")}</span>}
         >
-          <Input
-            id="representative_position"
-            placeholder="e.g. Talent Acquisition Director"
-            {...register("representative_position")}
-          />
+          <Input id="representative_position" placeholder={t("enterpriseRegistration.start.positionPlaceholder")} {...register("representative_position")} />
         </FormField>
 
-        <Button
-          type="submit"
-          className="mt-2 w-full"
-          disabled={isSubmitting || startMutation.isPending}
-        >
-          {isSubmitting || startMutation.isPending
-            ? "Sending confirmation link..."
-            : "Continue with work email →"}
+        <Button className={AUTH_FULL_ACTION_CLASS} disabled={pending} shape="xl" type="submit">
+          {pending ? t("enterpriseRegistration.start.submitting") : t("enterpriseRegistration.start.submit")}
+          {pending ? null : <ArrowRight aria-hidden />}
         </Button>
       </form>
 
-      <div className="mt-6 border-t border-line-muted pt-4 text-center">
-        <button
-          type="button"
-          onClick={onContinueLaterClick}
-          className="text-xs font-medium text-primary hover:underline"
-        >
-          Already started? Continue your registration draft →
-        </button>
-      </div>
-    </div>
+      <button className="cursor-pointer self-center text-[13.5px] font-semibold text-fg-link hover:underline" onClick={onContinueLaterClick} type="button">
+        {t("enterpriseRegistration.start.resume")}
+      </button>
+    </AuthStatusCard>
   );
 }

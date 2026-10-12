@@ -1,8 +1,13 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router";
+import { TriangleAlert } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router";
+import { useTranslation } from "react-i18next";
+
 import { LoadingScreen } from "@/components/common/loading-screen";
-import { InlineBanner } from "@/components/common/inline-banner";
+import { StatusPanel } from "@/components/common/status-panel";
 import { Button } from "@/components/ui/button";
+import { AuthCardPage, AuthStatusCard } from "@/features/auth/auth-status-card";
+import { AUTH_ACTION_CLASS } from "@/features/auth/auth-status.constants";
 import { WizardLayout } from "@/features/enterprise-registration/components/wizard-layout";
 import { StartRegistrationForm } from "@/features/enterprise-registration/components/start-registration-form";
 import { RegistrationCheckEmail } from "@/features/enterprise-registration/components/registration-check-email";
@@ -21,109 +26,32 @@ import {
   useEnterpriseRegistrationDetailQuery,
   useStartRegistrationMutation,
 } from "@/features/enterprise-registration/enterprise-registration.queries";
-import type {
-  EnterpriseRegistrationDetail,
-  SubmissionReceiptResponse,
-  WizardStepKey,
-} from "@/features/enterprise-registration/enterprise-registration.types";
+import type { StartRegistrationFormData } from "@/features/enterprise-registration/enterprise-registration.schemas";
+import type { SubmissionReceiptResponse } from "@/features/enterprise-registration/enterprise-registration.types";
 
-const MOCK_PREVIEW_DRAFT: EnterpriseRegistrationDetail = {
-  registration_code: "REG-2026-0491",
-  version: 1,
-  corporate_email: "recruitment@acme-robotics.io",
-  status: "draft",
-  representative: {
-    full_name: "Nguyen Van An",
-    phone: "0912345678",
-    position: "Chief Executive Officer",
-  },
-  company_data: {
-    name: "Acme Robotics Vietnam",
-    legal_name: "Acme Robotics Vietnam Joint Stock Company",
-    tax_code: "0108923412",
-    registration_number: "0108923412",
-    website: "https://acmerobotics.io",
-    industry: "Software & IT Services",
-    company_size: "51-200",
-    description: "Leading enterprise robotics and AI automation software platform in Southeast Asia.",
-    address: {
-      street: "Floor 14, Keangnam Landmark 72, Pham Hung",
-      city: "Hanoi",
-      district: "Nam Tu Liem",
-      country: "Vietnam",
-      postal_code: "100000",
-    },
-  },
-  legal_documents: [
-    {
-      document_type: "business_license",
-      file_name: "enterprise_registration_certificate_acme.pdf",
-      file_url: "https://s3.amazonaws.com/ittalent/acme_license.pdf",
-      file_size: 2450000,
-      uploaded_at: "2026-10-12T08:30:00Z",
-    },
-    {
-      document_type: "tax_registration",
-      file_name: "tax_registration_certificate_2026.pdf",
-      file_url: "https://s3.amazonaws.com/ittalent/acme_tax.pdf",
-      file_size: 1120000,
-      uploaded_at: "2026-10-12T08:31:00Z",
-    },
-  ],
-};
-
-const MOCK_SUBMISSION_RECEIPT: SubmissionReceiptResponse = {
-  registration_code: "ENT-2026-00892",
-  status: "pending_review",
-  version: 1,
-  submitted_at: "2026-10-12T09:00:00Z",
-  estimated_sla_days: 2,
-};
+type View = "start" | "check-email" | "resume-draft" | "wizard";
 
 export function RegisterCompanyPage() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
   const resumeId = searchParams.get("id") || "";
-  const previewParam =
-    searchParams.get("preview") ||
-    searchParams.get("step") ||
-    searchParams.get("view") ||
-    "";
 
-  const isPreviewReceipt = previewParam === "receipt";
-  const isPreviewWizard =
-    previewParam === "step1" ||
-    previewParam === "step2" ||
-    previewParam === "step3" ||
-    previewParam === "step4";
-
-  const [view, setView] = useState<"start" | "check-email" | "resume-draft" | "wizard">(
-    previewParam === "check-email"
-      ? "check-email"
-      : previewParam === "resume-draft"
-        ? "resume-draft"
-        : isPreviewWizard
-          ? "wizard"
-          : "start",
-  );
-  const [contactEmail, setContactEmail] = useState(
-    previewParam === "check-email" ? "recruitment@acme-robotics.io" : "",
-  );
-  const [submissionReceipt, setSubmissionReceipt] = useState<SubmissionReceiptResponse | null>(
-    isPreviewReceipt ? MOCK_SUBMISSION_RECEIPT : null,
-  );
+  const [view, setView] = useState<View>("start");
+  const [contact, setContact] = useState<StartRegistrationFormData | null>(null);
+  const [submissionReceipt, setSubmissionReceipt] = useState<SubmissionReceiptResponse | null>(null);
 
   const verifyEmailQuery = useVerifyRegistrationEmailQuery(token, {
     enabled: Boolean(token),
   });
 
   const resolvedRegistrationId =
-    (token ? verifyEmailQuery.data?.registration_id : null) ||
-    (resumeId || (isPreviewWizard ? "preview-reg-id" : null));
+    (token ? verifyEmailQuery.data?.registration_id : null) || resumeId || null;
 
   const detailQuery = useEnterpriseRegistrationDetailQuery(
     resolvedRegistrationId || "",
-    { enabled: Boolean(resolvedRegistrationId) && !isPreviewWizard },
+    { enabled: Boolean(resolvedRegistrationId) },
   );
 
   const startMutation = useStartRegistrationMutation();
@@ -131,7 +59,6 @@ export function RegisterCompanyPage() {
   const isWizardActive =
     (Boolean(token) && Boolean(verifyEmailQuery.data)) ||
     (Boolean(resumeId) && Boolean(detailQuery.data)) ||
-    isPreviewWizard ||
     view === "wizard";
 
   if (token && verifyEmailQuery.isLoading) {
@@ -140,89 +67,81 @@ export function RegisterCompanyPage() {
 
   if (token && verifyEmailQuery.isError) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-4">
-        <div className="w-full max-w-[440px] rounded-2xl border border-border bg-card p-8 text-center shadow-xs">
-          <div className="mb-4">
-            <InlineBanner tone="error">
-              Verification link has expired or is invalid. Please start registration again.
-            </InlineBanner>
-          </div>
-          <Button
-            type="button"
-            onClick={() => {
-              window.location.href = "/register-company";
-            }}
-            className="w-full"
-          >
-            Start New Registration
-          </Button>
-        </div>
-      </div>
+      <AuthCardPage tone="employer">
+        <AuthStatusCard>
+          <StatusPanel
+            actions={
+              <Button className={AUTH_ACTION_CLASS} onClick={() => navigate("/register-company", { replace: true })} shape="xl" type="button">
+                {t("enterpriseRegistration.verify.restart")}
+              </Button>
+            }
+            description={t("enterpriseRegistration.verify.invalid")}
+            icon={TriangleAlert}
+            title={t("enterpriseRegistration.shell.title")}
+            tone="danger"
+          />
+        </AuthStatusCard>
+      </AuthCardPage>
     );
   }
 
   if (submissionReceipt) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-4 sm:p-8">
+      <AuthCardPage tone="employer">
         <RegistrationSubmittedReceipt receipt={submissionReceipt} />
-      </div>
+      </AuthCardPage>
     );
   }
 
   if (!isWizardActive) {
-    if (view === "start") {
+    if (view === "check-email" && contact) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-background p-4 sm:p-8">
-          <StartRegistrationForm
-            onSuccess={(email) => {
-              setContactEmail(email);
-              setView("check-email");
-            }}
-            onContinueLaterClick={() => setView("resume-draft")}
-          />
-        </div>
-      );
-    }
-
-    if (view === "check-email") {
-      return (
-        <div className="flex min-h-screen items-center justify-center bg-background p-4 sm:p-8">
+        <AuthCardPage tone="employer">
           <RegistrationCheckEmail
-            email={contactEmail}
+            email={contact.corporate_email}
+            onChangeEmail={() => setView("start")}
             onResend={async () => {
-              if (!contactEmail) return;
               await startMutation.mutateAsync({
-                corporate_email: contactEmail,
-                representative_name: "Representative",
-                representative_phone: "0900000000",
+                corporate_email: contact.corporate_email,
+                representative_name: contact.representative_name,
+                representative_phone: contact.representative_phone,
+                representative_position: contact.representative_position || undefined,
               });
             }}
-            onChangeEmail={() => setView("start")}
           />
-        </div>
+        </AuthCardPage>
       );
     }
 
     if (view === "resume-draft") {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-background p-4 sm:p-8">
+        <AuthCardPage tone="employer">
           <ResumeDraftForm onBack={() => setView("start")} />
-        </div>
+        </AuthCardPage>
       );
     }
+
+    return (
+      <AuthCardPage tone="employer">
+        <StartRegistrationForm
+          onContinueLaterClick={() => setView("resume-draft")}
+          onSuccess={(values) => {
+            setContact(values);
+            setView("check-email");
+          }}
+        />
+      </AuthCardPage>
+    );
   }
 
   return (
     <RegistrationWizardProvider
+      initialDraft={detailQuery.data || null}
       initialRegistrationId={resolvedRegistrationId}
-      initialDraft={detailQuery.data || (isPreviewWizard ? MOCK_PREVIEW_DRAFT : null)}
-      initialStep={isPreviewWizard ? (previewParam as WizardStepKey) : "step1"}
     >
       <WizardInner
         onComplete={(receipt) => setSubmissionReceipt(receipt)}
-        onExitToHome={() => {
-          window.location.href = "/";
-        }}
+        onExitToHome={() => navigate("/")}
       />
     </RegistrationWizardProvider>
   );

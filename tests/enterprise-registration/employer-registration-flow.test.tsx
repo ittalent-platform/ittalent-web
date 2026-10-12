@@ -113,7 +113,7 @@ describe("Employer Registration Flow Components", () => {
       await user.click(screen.getByRole("button", { name: /continue with work email/i }));
 
       await waitFor(() => {
-        expect(onSuccess).toHaveBeenCalledWith("hr@corp.vn");
+        expect(onSuccess).toHaveBeenCalledWith(expect.objectContaining({ corporate_email: "hr@corp.vn" }));
       });
     });
   });
@@ -371,7 +371,7 @@ describe("Employer Registration Flow Components", () => {
 
       expect(screen.getByText(/registration case submitted/i)).toBeInTheDocument();
       expect(screen.getByText("REG-20261012-ABC12")).toBeInTheDocument();
-      expect(screen.getByText(/intake status:/i)).toBeInTheDocument();
+      expect(screen.getByText(/intake status/i)).toBeInTheDocument();
       expect(screen.getAllByText(/under review/i).length).toBeGreaterThan(0);
       expect(screen.getByRole("link", { name: /return to homepage/i })).toHaveAttribute("href", "/");
     });

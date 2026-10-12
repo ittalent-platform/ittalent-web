@@ -1,10 +1,20 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, User, FileText, ExternalLink, ShieldCheck } from "lucide-react";
+import { ExternalLink, ShieldCheck } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { DetailRow } from "@/components/common/detail-row";
 import { InlineBanner } from "@/components/common/inline-banner";
+import { SectionCard } from "@/components/common/section-card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DOCUMENT_TYPE_LABELS } from "@/features/enterprise-registration/enterprise-registration.constants";
+import { AUTH_ACTION_CLASS } from "@/features/auth/auth-status.constants";
+import {
+  DEFAULT_COMPANY_SIZE,
+  DEFAULT_COUNTRY,
+  INDUSTRY_OPTIONS,
+} from "@/features/enterprise-registration/enterprise-registration.constants";
 import type { SubmissionReceiptResponse } from "@/features/enterprise-registration/enterprise-registration.types";
 import {
   companySizeOptions,
@@ -14,6 +24,9 @@ import {
 import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
 import { useSubmitRegistrationMutation } from "@/features/enterprise-registration/enterprise-registration.queries";
 
+import { ConsentCheckbox } from "./consent-checkbox";
+import { StepActions } from "./step-actions";
+
 export function Step4ReviewForm({
   onBack,
   onSubmitSuccess,
@@ -21,6 +34,7 @@ export function Step4ReviewForm({
   onBack: () => void;
   onSubmitSuccess: (receipt: SubmissionReceiptResponse) => void;
 }) {
+  const { t } = useTranslation();
   const { registrationId, draft, isLegalRepresentative } =
     useRegistrationWizard();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -46,17 +60,19 @@ export function Step4ReviewForm({
     position: "",
   };
   const documents = draft?.legal_documents || [];
+  const empty = t("enterpriseRegistration.common.empty");
+  const industry = INDUSTRY_OPTIONS.find((option) => option.value === company.industry);
 
   const onSubmit = async () => {
     setServerError(null);
 
     if (!registrationId) {
-      setServerError("Registration ID is missing. Please restart intake.");
+      setServerError(t("enterpriseRegistration.step4.missingId"));
       return;
     }
 
     if (!draft) {
-      setServerError("Registration details not loaded.");
+      setServerError(t("enterpriseRegistration.step4.notLoaded"));
       return;
     }
 
@@ -78,13 +94,13 @@ export function Step4ReviewForm({
             industry: (company.industry as string) || "",
             company_size:
               (company.company_size as (typeof companySizeOptions)[number]) ||
-              "11-50",
+              DEFAULT_COMPANY_SIZE,
             address: {
               street: (address.street as string) || "",
               city: (address.city as string) || "",
               district: (address.district as string) || undefined,
               state_province: (address.state_province as string) || undefined,
-              country: (address.country as string) || "Vietnam",
+              country: (address.country as string) || DEFAULT_COUNTRY,
               postal_code: (address.postal_code as string) || undefined,
             },
             short_description: (company.short_description as string) || undefined,
@@ -105,199 +121,77 @@ export function Step4ReviewForm({
       }
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
-      setServerError(
-        errorObj.message || "Failed to submit enterprise registration. Please review and try again.",
-      );
+      setServerError(errorObj.message || t("enterpriseRegistration.step4.submitFailed"));
     }
   };
 
+  const row = (label: string, value: React.ReactNode) => <DetailRow label={label} layout="grid" value={value} />;
+
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Review & Submit Registration
-        </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Carefully review your organization details and legal documentation before final submission.
-        </p>
-      </div>
+    <div className="flex flex-col gap-[18px]">
+      <SectionCard description={t("enterpriseRegistration.step4.subtitle")} title={t("enterpriseRegistration.step4.title")}>
+        {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
+      </SectionCard>
 
-      {serverError && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{serverError}</InlineBanner>
-        </div>
-      )}
+      <SectionCard title={t("enterpriseRegistration.step4.company")}>
+        <dl className="m-0">
+          {row(t("enterpriseRegistration.step4.tradingName"), String(company.name || empty))}
+          {row(t("enterpriseRegistration.step4.legalName"), String(company.legal_name || empty))}
+          {row(t("enterpriseRegistration.step4.taxCode"), <span className="font-mono">{String(company.tax_code || empty)}</span>)}
+          {row(t("enterpriseRegistration.step4.industry"), industry ? t(`enterpriseRegistration.industries.${industry.key}`) : String(company.industry || empty))}
+          {row(t("enterpriseRegistration.step4.scale"), company.company_size ? t("enterpriseRegistration.step1.sizeOption", { size: String(company.company_size) }) : empty)}
+          {row(t("enterpriseRegistration.step4.website"), String(company.website || empty))}
+          {row(t("enterpriseRegistration.step4.hq"), [address.street, address.city, address.country].filter(Boolean).join(", ") || empty)}
+        </dl>
+      </SectionCard>
 
-      <div className="space-y-6">
-        {/* Section 1: Organization Details */}
-        <div className="rounded-xl border border-border bg-muted p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Building2 className="h-5 w-5 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">
-              Enterprise Details
-            </h3>
-          </div>
+      <SectionCard title={t("enterpriseRegistration.step4.representative")}>
+        <dl className="m-0">
+          {row(t("enterpriseRegistration.step4.fullName"), rep.full_name || empty)}
+          {row(t("enterpriseRegistration.step4.email"), draft?.corporate_email || empty)}
+          {row(t("enterpriseRegistration.step4.phone"), rep.phone || empty)}
+          {row(t("enterpriseRegistration.step4.position"), rep.position || empty)}
+          {row(t("enterpriseRegistration.step4.status"), t(isLegalRepresentative ? "enterpriseRegistration.step4.legalRep" : "enterpriseRegistration.step4.delegate"))}
+        </dl>
+      </SectionCard>
 
-          <div className="grid grid-cols-1 gap-y-3 gap-x-6 text-[13px] sm:grid-cols-2">
-            <div>
-              <span className="text-muted-foreground">Trading / Brand Name:</span>
-              <p className="font-semibold text-foreground">{String(company.name || "—")}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Official Legal Name:</span>
-              <p className="font-semibold text-foreground">{String(company.legal_name || "—")}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Tax Code (Mã số thuế):</span>
-              <p className="font-semibold text-foreground font-mono">{String(company.tax_code || "—")}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Primary Industry:</span>
-              <p className="font-semibold text-foreground">{String(company.industry || "—")}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Company Scale:</span>
-              <p className="font-semibold text-foreground">{String(company.company_size || "—")} employees</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Official Website:</span>
-              <p className="font-semibold text-foreground">{String(company.website || "—")}</p>
-            </div>
-            <div className="sm:col-span-2">
-              <span className="text-muted-foreground">Headquarters Location:</span>
-              <p className="font-semibold text-foreground">
-                {[address.street, address.city, address.country].filter(Boolean).join(", ") || "—"}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 2: Authorized Representative */}
-        <div className="rounded-xl border border-border bg-muted p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <User className="h-5 w-5 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">
-              Authorized Representative
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 gap-y-3 gap-x-6 text-[13px] sm:grid-cols-2">
-            <div>
-              <span className="text-muted-foreground">Full Name:</span>
-              <p className="font-semibold text-foreground">{rep.full_name || "—"}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Corporate Email:</span>
-              <p className="font-semibold text-foreground">{draft?.corporate_email || "—"}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Direct Phone:</span>
-              <p className="font-semibold text-foreground">{rep.phone || "—"}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Position / Title:</span>
-              <p className="font-semibold text-foreground">{rep.position || "—"}</p>
-            </div>
-            <div className="sm:col-span-2">
-              <span className="text-muted-foreground">Representation Status:</span>
-              <p className="font-semibold text-foreground">
-                {isLegalRepresentative
-                  ? "Primary Legal Representative (Người đại diện pháp luật)"
-                  : "Authorized Delegate (Người được ủy quyền)"}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 3: Attached Documents */}
-        <div className="rounded-xl border border-border bg-muted p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <FileText className="h-5 w-5 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">
-              Attached Legal Records ({documents.length})
-            </h3>
-          </div>
-
-          <div className="space-y-2">
-            {documents.map((doc, idx) => (
-              <div
-                key={`${doc.file_name}-${idx}`}
-                className="flex items-center justify-between rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <FileText className="h-4 w-4 text-primary shrink-0" />
-                  <span className="font-semibold text-foreground truncate">
-                    {doc.file_name}
-                  </span>
-                  <span className="rounded bg-muted px-1.5 py-0.5 text-[10.5px] font-medium text-muted-foreground">
-                    {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}
-                  </span>
-                </div>
-                {doc.file_url && (
-                  <a
-                    href={doc.file_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1 text-[11.5px] font-semibold text-primary hover:underline"
-                  >
-                    View <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
+      <SectionCard title={t("enterpriseRegistration.step4.documents", { count: documents.length })}>
+        <ul className="m-0 flex list-none flex-col gap-2 p-0">
+          {documents.map((doc, idx) => (
+            <li className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs" key={`${doc.file_name}-${idx}`}>
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="truncate font-semibold text-foreground">{doc.file_name}</span>
+                <Badge>{t(`enterpriseRegistration.documentTypes.${doc.document_type}`)}</Badge>
               </div>
-            ))}
-          </div>
-        </div>
+              {doc.file_url ? (
+                <a className="inline-flex shrink-0 items-center gap-1 text-[12px] font-semibold text-fg-link hover:underline" href={doc.file_url} rel="noreferrer" target="_blank">
+                  {t("enterpriseRegistration.step4.view")}
+                  <ExternalLink aria-hidden className="size-3" />
+                </a>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
 
-        {/* Section 4: Certification Disclaimer Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pt-2">
-          <div className="rounded-xl border border-border bg-card p-4.5">
-            <div className="flex items-start gap-3">
-              <input
-                id="agreed_to_terms"
-                type="checkbox"
-                className="mt-1 size-4.5 shrink-0 accent-primary"
-                {...register("agreed_to_terms")}
-              />
-              <div className="space-y-1">
-                <label
-                  htmlFor="agreed_to_terms"
-                  className="cursor-pointer text-[13px] font-semibold text-foreground"
-                >
-                  I certify that all provided information is accurate and legally authorized
-                </label>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  By submitting this request, I certify under penalty of law that I am authorized to represent this enterprise, all attached documentation is genuine, and ITTalent may verify this submission with state registries.
-                </p>
-                {errors.agreed_to_terms && (
-                  <p className="mt-1 text-xs font-semibold text-destructive">
-                    {errors.agreed_to_terms.message}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
+      <SectionCard>
+        <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+          <ConsentCheckbox
+            error={errors.agreed_to_terms?.message}
+            hint={t("enterpriseRegistration.step4.certifyBody")}
+            id="agreed_to_terms"
+            label={t("enterpriseRegistration.step4.certify")}
+            {...register("agreed_to_terms")}
+          />
 
-          <div className="flex items-center justify-between gap-3 border-t border-line-muted pt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onBack}
-              disabled={submitMutation.isPending}
-            >
-              ← Back
+          <StepActions backDisabled={submitMutation.isPending} onBack={onBack}>
+            <Button className={AUTH_ACTION_CLASS} disabled={submitMutation.isPending} shape="xl" type="submit">
+              <ShieldCheck aria-hidden />
+              {submitMutation.isPending ? t("enterpriseRegistration.step4.submitting") : t("enterpriseRegistration.step4.submit")}
             </Button>
-
-            <Button
-              type="submit"
-              disabled={submitMutation.isPending}
-              className="min-w-[170px]"
-            >
-              <ShieldCheck className="mr-2 h-4 w-4" />
-              {submitMutation.isPending ? "Submitting..." : "Submit Registration"}
-            </Button>
-          </div>
+          </StepActions>
         </form>
-      </div>
+      </SectionCard>
     </div>
   );
 }
