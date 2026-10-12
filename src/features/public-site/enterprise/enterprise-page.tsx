@@ -19,10 +19,6 @@ import {
   hasUnsafeSearchText,
   INVALID_SEARCH_MESSAGE,
 } from "@/lib/search-validation";
-import {
-  companyInitials,
-  logoPalette,
-} from "@/features/public-site/career/career-format";
 import { StateCard } from "@/features/public-site/career/state-card";
 
 import {
@@ -30,6 +26,7 @@ import {
   getApiV1JobPostings,
   type EnterpriseListResponse,
 } from "@/api/generated";
+import { companyInitials, companyTint, LogoTile } from "@/components/common/logo-tile";
 
 type Enterprise = {
   id: string;
@@ -100,7 +97,6 @@ async function loadOpenJobCounts(): Promise<Record<string, number>> {
   }
   return counts;
 }
-import { EnterpriseLogo } from "./enterprise-logo";
 
 const PAGE_SIZE = 12;
 const KEYWORD_MAX = 100;
@@ -112,13 +108,13 @@ const SORT_OPTIONS: { value: EnterpriseSort; label: string }[] = [
 
 /** Hero tile slots; real company initials are dropped in when available. */
 const HERO_TILES = [
-  { pos: "left-0 top-6", l: "NP", bg: "#e4ecfb", fg: "#2a55a8" },
-  { pos: "left-[100px] top-0", l: "LL", bg: "#fde8e0", fg: "#b33305" },
-  { pos: "left-[200px] top-6", l: "TQ", bg: "#efe9fb", fg: "#6941c6" },
-  { pos: "left-[300px] top-0", l: "MC", bg: "#e8f5ee", fg: "#12764a" },
-  { pos: "left-[50px] top-[116px]", l: "VA", bg: "#fcf3e3", fg: "#b45309" },
-  { pos: "left-[250px] top-[116px]", l: "SH", bg: "#ffffff", fg: "#19191c" },
-  { pos: "left-[336px] top-[100px]", l: "KH", bg: "#e4ecfb", fg: "#2a55a8" },
+  { pos: "left-0 top-6", l: "NP", tone: "bg-mkt-blue-bg text-mkt-blue-fg" },
+  { pos: "left-[100px] top-0", l: "LL", tone: "bg-mkt-accent-soft text-mkt-accent-hover" },
+  { pos: "left-[200px] top-6", l: "TQ", tone: "bg-mkt-violet-bg text-mkt-violet-fg" },
+  { pos: "left-[300px] top-0", l: "MC", tone: "bg-mkt-green-bg text-mkt-green-fg" },
+  { pos: "left-[50px] top-[116px]", l: "VA", tone: "bg-mkt-amber-bg text-mkt-amber-fg" },
+  { pos: "left-[250px] top-[116px]", l: "SH", tone: "bg-white text-mkt-ink" },
+  { pos: "left-[336px] top-[100px]", l: "KH", tone: "bg-mkt-blue-bg text-mkt-blue-fg" },
 ];
 
 
@@ -144,7 +140,7 @@ function CompanyCard({
       onClick={onOpen}
     >
       <div className="flex items-center gap-3.5">
-        <EnterpriseLogo
+        <LogoTile tone="tint"
           className="size-[52px] rounded-xl text-[17px]"
           logoUrl={item.logoUrl}
           name={item.name}
@@ -271,13 +267,7 @@ export function EnterprisePage() {
       HERO_TILES.map((slot, i) => {
         const company = directory?.[i];
         if (!company) return slot;
-        const palette = logoPalette(company.id);
-        return {
-          ...slot,
-          l: companyInitials(company.name),
-          bg: palette.bg,
-          fg: palette.fg,
-        };
+        return { ...slot, l: companyInitials(company.name), tone: companyTint(company.id) };
       }),
     [directory],
   );
@@ -391,7 +381,7 @@ export function EnterprisePage() {
     <main className="flex flex-col">
       {/* Hero */}
       <section
-        className="relative overflow-hidden bg-mkt-ink bg-[radial-gradient(rgba(255,255,255,0.10)_1.2px,transparent_1.2px)] [background-size:26px_26px] px-4 pb-24 pt-[52px] text-white md:px-12"
+        className="relative overflow-hidden bg-mkt-ink hero-dots px-4 pb-24 pt-[52px] text-white md:px-12"
         id="page-hero"
       >
         <div className="absolute -right-40 -top-[300px] size-[640px] rounded-full bg-mkt-brand" />
@@ -420,11 +410,11 @@ export function EnterprisePage() {
             {heroTiles.map((t) => (
               <span
                 className={cn(
-                  "absolute flex size-[84px] items-center justify-center rounded-[22px] font-['Space_Grotesk',sans-serif] text-2xl font-bold shadow-[0_10px_24px_rgba(0,0,0,0.3)]",
+                  "itt-display absolute flex size-[84px] items-center justify-center rounded-[22px] text-2xl font-bold shadow-[0_10px_24px_rgba(0,0,0,0.3)]",
                   t.pos,
+                  t.tone,
                 )}
                 key={t.pos}
-                style={{ background: t.bg, color: t.fg }}
               >
                 {t.l}
               </span>
@@ -623,7 +613,7 @@ export function EnterprisePage() {
                 className="size-[26px] text-mkt-danger"
               />
             }
-            iconBg="#fbe9e7"
+            iconClassName="bg-mkt-danger-bg"
             title="We couldn't load companies"
           >
             <button
@@ -655,7 +645,7 @@ export function EnterprisePage() {
                 />
               )
             }
-            iconBg="#fde8e0"
+            iconClassName="bg-mkt-accent-soft"
             title={
               hasFilters ? "No companies match your filters" : "No companies yet"
             }

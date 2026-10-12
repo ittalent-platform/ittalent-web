@@ -88,15 +88,14 @@ const toEnterprise = (dto: EnterpriseDetailDto): Enterprise => ({
   website: dto.website ?? undefined,
 });
 import {
-  companyInitials,
   EMPLOYMENT_LABELS,
   formatDeadline,
   formatSalaryCard,
   LEVEL_LABELS,
-  logoPalette,
   postedAgo,
 } from "./career-format";
 import { StateCard } from "./state-card";
+import { LogoTile } from "@/components/common/logo-tile";
 
 const h2Class =
   "m-0 font-['Space_Grotesk',sans-serif] text-[21px] font-semibold";
@@ -252,7 +251,7 @@ export function CareerJobPage() {
                 className="size-[26px] text-mkt-danger"
               />
             }
-            iconBg="#fbe9e7"
+            iconClassName="bg-mkt-danger-bg"
             title="We couldn't load this job"
           >
             <div className="flex flex-wrap justify-center gap-2.5">
@@ -289,7 +288,7 @@ export function CareerJobPage() {
                 className="size-[26px] text-mkt-accent-hover"
               />
             }
-            iconBg="#fde8e0"
+            iconClassName="bg-mkt-accent-soft"
             title="This job is no longer available"
           >
             <div className="flex flex-wrap justify-center gap-2.5">
@@ -313,7 +312,6 @@ export function CareerJobPage() {
   }
 
   const companyName = company?.name;
-  const palette = logoPalette(job.enterpriseId ?? companyName);
   const type = job.employment_type
     ? (EMPLOYMENT_LABELS[job.employment_type] ?? job.employment_type)
     : null;
@@ -384,13 +382,7 @@ export function CareerJobPage() {
         </nav>
 
         <div className="flex items-start gap-5">
-          <span
-            aria-hidden="true"
-            className="hidden size-[72px] shrink-0 items-center justify-center rounded-2xl font-['Space_Grotesk',sans-serif] text-[22px] font-bold sm:flex"
-            style={{ background: palette.bg, color: palette.fg }}
-          >
-            {companyInitials(companyName)}
-          </span>
+          <LogoTile className="hidden size-[72px] rounded-2xl text-[22px] sm:grid" name={companyName ?? "?"} seed={job.enterpriseId ?? companyName} tone="tint" />
           <div className="flex min-w-0 flex-1 flex-col gap-2.5">
             <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[26px] font-semibold leading-[1.15] [overflow-wrap:anywhere] md:text-[32px]">
               {job.title}
@@ -593,13 +585,7 @@ export function CareerJobPage() {
               className="flex flex-col gap-4 rounded-2xl border border-mkt-line bg-white p-6"
             >
               <div className="flex items-center gap-3.5">
-                <span
-                  aria-hidden="true"
-                  className="flex size-[52px] shrink-0 items-center justify-center rounded-xl font-['Space_Grotesk',sans-serif] text-[17px] font-bold"
-                  style={{ background: palette.bg, color: palette.fg }}
-                >
-                  {companyInitials(company.name)}
-                </span>
+                <LogoTile className="size-[52px] rounded-xl text-[17px]" name={company.name} seed={job.enterpriseId ?? companyName} tone="tint" />
                 <div className="flex min-w-0 flex-col gap-0.5">
                   <span className="font-['Space_Grotesk',sans-serif] text-[17px] font-semibold">
                     {company.name}

@@ -4,9 +4,9 @@ import { Link } from "react-router";
 
 import { cn } from "@/lib/utils";
 
-import { CompanyMark } from "./company-mark";
 import { ENTERPRISES_PATH, TONE_CLASSES, TONES } from "./home.constants";
 import { useHomeData, type HomeCompany } from "./home.queries";
+import { LogoTile } from "@/components/common/logo-tile";
 
 /** Stable band colour per company. */
 function toneFor(seed: string) {
@@ -32,7 +32,7 @@ function CompanyCard({ company }: { company: HomeCompany }) {
         <div className="absolute bottom-0 right-11 h-[42px] w-20 rounded-t-[40px] bg-mkt-ink/10" />
       </div>
       <div className="relative -mt-[30px] flex flex-col gap-3.5 px-[22px] pb-[22px]">
-        <CompanyMark
+        <LogoTile tone="tint"
           className="size-[60px] rounded-2xl border-4 border-white text-[17px]"
           name={company.name}
           seed={company.id}

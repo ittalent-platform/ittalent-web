@@ -825,3 +825,9 @@
     animation: none;
   }
 }
+
+/* Dark marketplace heroes (Home, Jobs, Companies): a faint dot grid over the ink background. */
+@utility hero-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1.2px, transparent 1.2px);
+  background-size: 26px 26px;
+}

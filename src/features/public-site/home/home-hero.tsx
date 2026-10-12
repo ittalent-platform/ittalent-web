@@ -19,8 +19,8 @@ import {
   SEARCH_PARAM,
   TONE_CLASSES,
 } from "./home.constants";
-import { CompanyMark } from "./company-mark";
 import { useHomeData } from "./home.queries";
+import { LogoTile } from "@/components/common/logo-tile";
 
 export function HomeHero() {
   const { t } = useTranslation();
@@ -51,7 +51,7 @@ export function HomeHero() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-mkt-ink bg-[radial-gradient(rgba(255,255,255,0.10)_1.2px,transparent_1.2px)] bg-[size:26px_26px] px-4 pb-[116px] pt-12 text-white md:px-12 md:pt-[72px]">
+    <section className="relative overflow-hidden bg-mkt-ink hero-dots px-4 pb-[116px] pt-12 text-white md:px-12 md:pt-[72px]">
       <div className="absolute -bottom-[330px] -left-[220px] size-[720px] rounded-full border-[1.5px] border-white/[0.09]" />
       <div className="absolute -bottom-[230px] -left-[120px] size-[520px] rounded-full border-[1.5px] border-white/[0.09]" />
 
@@ -227,7 +227,7 @@ export function HomeHero() {
                 tabIndex={-1}
                 to={`${CAREER_PATH}/${job.slug || job.id}`}
               >
-                <CompanyMark
+                <LogoTile tone="tint"
                   className="size-10 rounded-xl text-sm"
                   name={job.companyName}
                   seed={job.enterpriseId}

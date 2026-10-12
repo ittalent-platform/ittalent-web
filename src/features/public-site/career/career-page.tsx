@@ -110,15 +110,14 @@ async function loadAllEnterprises(): Promise<EnterpriseSummary[]> {
 import { MarketSelect } from "@/components/common/market-select";
 import { StateCard } from "./state-card";
 import {
-  companyInitials,
   EMPLOYMENT_LABELS,
   formatDeadline,
   formatSalaryCard,
   isNewPosting,
   LEVEL_LABELS,
-  logoPalette,
   postedAgo,
 } from "./career-format";
+import { LogoTile } from "@/components/common/logo-tile";
 
 const PAGE_SIZE = 12;
 const KEYWORD_MAX = 100;
@@ -150,44 +149,37 @@ const HERO_CHIPS = [
   {
     className: "left-[10px] top-[20px]",
     label: "React",
-    bg: "#e4ecfb",
-    fg: "#2a55a8",
+    tone: "bg-mkt-blue-bg text-mkt-blue-fg",
   },
   {
     className: "left-[140px] top-0",
     label: "Java",
-    bg: "#fde8e0",
-    fg: "#b33305",
+    tone: "bg-mkt-accent-soft text-mkt-accent-hover",
   },
   {
     className: "left-[250px] top-[34px]",
     label: "DevOps",
-    bg: "#efe9fb",
-    fg: "#6941c6",
+    tone: "bg-mkt-violet-bg text-mkt-violet-fg",
   },
   {
     className: "left-[60px] top-[88px]",
     label: "QA Automation",
-    bg: "#fcf3e3",
-    fg: "#b45309",
+    tone: "bg-mkt-amber-bg text-mkt-amber-fg",
   },
   {
     className: "left-[250px] top-[110px]",
     label: "Data Engineer",
-    bg: "#e8f5ee",
-    fg: "#12764a",
+    tone: "bg-mkt-green-bg text-mkt-green-fg",
   },
   {
     className: "left-[20px] top-[156px]",
     label: "Flutter",
-    bg: "#ffffff",
-    fg: "#19191c",
+    tone: "bg-white text-mkt-ink",
   },
   {
     className: "left-[150px] top-[168px]",
     label: "Go",
-    bg: "#e4ecfb",
-    fg: "#2a55a8",
+    tone: "bg-mkt-blue-bg text-mkt-blue-fg",
   },
 ];
 
@@ -266,7 +258,6 @@ function JobCard({
   companyName?: string;
   onOpen: () => void;
 }) {
-  const palette = logoPalette(job.enterpriseId ?? companyName);
   const type = job.employment_type
     ? (EMPLOYMENT_LABELS[job.employment_type] ?? job.employment_type)
     : null;
@@ -281,13 +272,7 @@ function JobCard({
       className="flex min-w-0 cursor-pointer flex-col gap-4 rounded-2xl border border-mkt-line bg-white px-[22px] py-5 transition-colors hover:border-mkt-line-strong sm:flex-row sm:gap-[18px]"
       onClick={onOpen}
     >
-      <span
-        aria-hidden="true"
-        className="flex size-[52px] shrink-0 items-center justify-center rounded-xl font-['Space_Grotesk',sans-serif] text-base font-bold"
-        style={{ background: palette.bg, color: palette.fg }}
-      >
-        {companyInitials(companyName)}
-      </span>
+      <LogoTile className="size-[52px] rounded-xl text-base" name={companyName ?? "?"} seed={job.enterpriseId ?? companyName} tone="tint" />
 
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex min-w-0 items-baseline gap-3">
@@ -630,7 +615,7 @@ export function CareerPage() {
     <main className="flex flex-col">
       {/* Hero */}
       <section
-        className="relative overflow-hidden bg-mkt-ink bg-[radial-gradient(rgba(255,255,255,0.10)_1.2px,transparent_1.2px)] [background-size:26px_26px] px-4 pb-24 pt-[52px] text-white md:px-12"
+        className="relative overflow-hidden bg-mkt-ink hero-dots px-4 pb-24 pt-[52px] text-white md:px-12"
         id="page-hero"
       >
         <div className="absolute -right-40 -top-[300px] size-[640px] rounded-full bg-mkt-brand" />
@@ -657,9 +642,9 @@ export function CareerPage() {
                 className={cn(
                   "absolute flex h-9 items-center rounded-full px-4 text-sm font-semibold shadow-[0_10px_24px_rgba(0,0,0,0.3)]",
                   chip.className,
+                  chip.tone,
                 )}
                 key={chip.label}
-                style={{ background: chip.bg, color: chip.fg }}
               >
                 {chip.label}
               </span>
@@ -910,7 +895,7 @@ export function CareerPage() {
                   className="size-[26px] text-mkt-danger"
                 />
               }
-              iconBg="#fbe9e7"
+              iconClassName="bg-mkt-danger-bg"
               title="We couldn't load jobs"
             >
               <button
@@ -935,7 +920,7 @@ export function CareerPage() {
                   className="size-[26px] text-mkt-accent-hover"
                 />
               }
-              iconBg="#fde8e0"
+              iconClassName="bg-mkt-accent-soft"
               title="No jobs match your filters"
             >
               {chips.length > 0 ? (

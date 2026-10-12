@@ -11,13 +11,13 @@ import {
   LEVEL_LABELS,
   postedAgo,
 } from "@/features/public-site/career/career-format";
-import { CompanyMark } from "./company-mark";
 import {
   CAREER_PATH,
   ENTERPRISES_PATH,
   SKELETON_CARD_COUNT,
 } from "./home.constants";
 import { useHomeData, type HomeJob } from "./home.queries";
+import { LogoTile } from "@/components/common/logo-tile";
 
 const chip =
   "flex h-6 items-center rounded-full bg-mkt-chip px-2.5 text-[12px] font-semibold text-mkt-ink-2";
@@ -40,7 +40,7 @@ function JobCard({ job }: { job: HomeJob }) {
   return (
     <article className="flex flex-col gap-3.5 rounded-2xl border border-mkt-line bg-white p-[22px]">
       <div className="flex items-center gap-3">
-        <CompanyMark
+        <LogoTile tone="tint"
           className="size-11 rounded-xl text-[15px]"
           name={job.companyName}
           seed={job.enterpriseId}

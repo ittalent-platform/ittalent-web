@@ -31,7 +31,7 @@ import {
   type JobPosting,
 } from "@/api/generated";
 import { slideKey, useSlidingIndicator } from "@/hooks/use-sliding-indicator";
-import { EnterpriseLogo } from "./enterprise-logo";
+import { LogoTile } from "@/components/common/logo-tile";
 
 type Enterprise = {
   id: string;
@@ -285,7 +285,7 @@ export function EnterpriseDetailPage() {
               className="size-[26px] text-mkt-danger"
             />
           }
-          iconBg="#fbe9e7"
+          iconClassName="bg-mkt-danger-bg"
           title="We couldn't load this company"
         >
           <div className="flex flex-wrap justify-center gap-2.5">
@@ -320,7 +320,7 @@ export function EnterpriseDetailPage() {
               className="size-[26px] text-mkt-accent-hover"
             />
           }
-          iconBg="#fde8e0"
+          iconClassName="bg-mkt-accent-soft"
           title="Company not found"
         >
           <Link
@@ -399,7 +399,7 @@ export function EnterpriseDetailPage() {
         {/* The logo is pulled up over the banner with a negative margin; the
             name block is never pulled up, so it always starts below the banner. */}
         <div className="flex flex-wrap items-end gap-[22px] px-4 pb-7 md:px-[80px]">
-          <EnterpriseLogo
+          <LogoTile tone="tint"
             className="relative z-10 -mt-11 size-[112px] rounded-[20px] border-4 border-white text-[32px] shadow-[0_2px_8px_rgba(0,0,0,0.07)]"
             logoUrl={enterprise.logoUrl}
             name={enterprise.name}

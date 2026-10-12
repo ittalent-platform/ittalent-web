@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { cn } from "@/lib/utils";
 
 // Static class names so Tailwind can see them; the palette itself lives in globals.css (--logo-n).
@@ -34,12 +36,30 @@ function toneIndex(seed: string, count: number): number {
   return hash % count;
 }
 
-/** Company mark: initials on a deterministic colour (`tint` matches the marketplace marks, `solid` the admin screens). Every job is shown with its company (DESIGN.md). */
-export function LogoTile({ name, size = "md", tone = "solid", className }: { name: string; size?: LogoTileSize; tone?: "solid" | "tint"; className?: string }) {
-  const colour = tone === "tint" ? TINT_TONES[toneIndex(name, TINT_TONES.length)] : cn("text-white", LOGO_TONES[toneIndex(name, LOGO_TONES.length)]);
+/** The tint classes (bg + fg) a company always gets, e.g. for hand-placed decorative tiles. */
+export function companyTint(seed: string): string {
+  return TINT_TONES[toneIndex(seed, TINT_TONES.length)];
+}
+
+type LogoTileProps = {
+  className?: string;
+  /** Shown instead of the initials when it loads. */
+  logoUrl?: string;
+  name: string;
+  /** Keeps a company's colour stable everywhere (its id); defaults to the name. */
+  seed?: string;
+  size?: LogoTileSize;
+  tone?: "solid" | "tint";
+};
+
+/** Company mark: initials on a deterministic colour (`tint` matches the marketplace marks, `solid` the admin screens), or the company's logo. Every job is shown with its company (DESIGN.md). */
+export function LogoTile({ className, logoUrl, name, seed = name, size = "md", tone = "solid" }: LogoTileProps) {
+  const [failed, setFailed] = useState(false);
+  const showLogo = Boolean(logoUrl) && !failed;
+  const colour = showLogo ? "bg-card" : tone === "tint" ? companyTint(seed) : cn("text-white", LOGO_TONES[toneIndex(seed, LOGO_TONES.length)]);
   return (
-    <span aria-hidden className={cn("itt-display grid shrink-0 place-items-center font-bold", colour, LOGO_SIZES[size], className)}>
-      {companyInitials(name)}
+    <span aria-hidden={!showLogo} className={cn("itt-display grid shrink-0 place-items-center overflow-hidden font-bold", colour, LOGO_SIZES[size], className)}>
+      {showLogo ? <img alt={`${name} logo`} className="size-full object-contain p-2" loading="lazy" onError={() => setFailed(true)} src={logoUrl} /> : companyInitials(name)}
     </span>
   );
 }
