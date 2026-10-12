@@ -21,6 +21,8 @@ import {
   ALL_OPTION,
   DEFAULT_SORT,
   JOB_EMPLOYMENT_TYPES,
+  JOB_PUBLICATION_STATUSES,
+  JOB_RECRUITMENT_STATUSES,
   JOB_LEVELS,
   JOB_LIST_DEFAULT_LIMIT,
   LIST_PARAMS,
@@ -49,6 +51,18 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
 
   const type = searchParams.get(LIST_PARAMS.type) ?? ALL_OPTION;
   const level = searchParams.get(LIST_PARAMS.level) ?? ALL_OPTION;
+  const requestedPublicationStatus = searchParams.get(
+    LIST_PARAMS.publicationStatus,
+  );
+  const publicationStatus = JOB_PUBLICATION_STATUSES.find(
+    (status) => status === requestedPublicationStatus,
+  );
+  const requestedRecruitmentStatus = searchParams.get(
+    LIST_PARAMS.recruitmentStatus,
+  );
+  const recruitmentStatus = JOB_RECRUITMENT_STATUSES.find(
+    (status) => status === requestedRecruitmentStatus,
+  );
   const requestedSort = searchParams.get(
     LIST_PARAMS.sortBy,
   ) as JobSortBy | null;
@@ -65,7 +79,11 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
 
   const basePath = `/${actor}/job-postings`;
   const hasFilters =
-    search !== "" || type !== ALL_OPTION || level !== ALL_OPTION;
+    search !== "" ||
+    type !== ALL_OPTION ||
+    level !== ALL_OPTION ||
+    Boolean(publicationStatus) ||
+    Boolean(recruitmentStatus);
   const params: JobPostingListParams = {
     page,
     limit,
@@ -74,6 +92,8 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(type !== ALL_OPTION ? { employment_type: type } : {}),
     ...(level !== ALL_OPTION ? { level } : {}),
+    ...(publicationStatus ? { publication_status: publicationStatus } : {}),
+    ...(recruitmentStatus ? { recruitment_status: recruitmentStatus } : {}),
   };
   const query = useJobPostingList(actor, params);
   const total = query.data?.total ?? 0;
@@ -121,6 +141,8 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
       search: null,
       [LIST_PARAMS.type]: null,
       [LIST_PARAMS.level]: null,
+      [LIST_PARAMS.publicationStatus]: null,
+      [LIST_PARAMS.recruitmentStatus]: null,
     });
   const filterLabel = (label: string) =>
     `${label}: ${t("jobPostings.toolbar.all")}`;
@@ -188,6 +210,50 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
             placeholder={filterLabel(t("jobPostings.toolbar.level"))}
             value={level}
           />
+          <FilterSelect
+            onChange={(value) =>
+              set(
+                LIST_PARAMS.publicationStatus,
+                value === ALL_OPTION ? null : value,
+              )
+            }
+            options={[
+              {
+                label: filterLabel(t("jobPostings.toolbar.publicationStatus")),
+                value: ALL_OPTION,
+              },
+              ...JOB_PUBLICATION_STATUSES.map((value) => ({
+                label: t(`jobPostings.publicationStatus.${value}`),
+                value,
+              })),
+            ]}
+            placeholder={filterLabel(
+              t("jobPostings.toolbar.publicationStatus"),
+            )}
+            value={publicationStatus ?? ALL_OPTION}
+          />
+          <FilterSelect
+            onChange={(value) =>
+              set(
+                LIST_PARAMS.recruitmentStatus,
+                value === ALL_OPTION ? null : value,
+              )
+            }
+            options={[
+              {
+                label: filterLabel(t("jobPostings.toolbar.recruitmentStatus")),
+                value: ALL_OPTION,
+              },
+              ...JOB_RECRUITMENT_STATUSES.map((value) => ({
+                label: t(`jobPostings.recruitmentStatus.${value}`),
+                value,
+              })),
+            ]}
+            placeholder={filterLabel(
+              t("jobPostings.toolbar.recruitmentStatus"),
+            )}
+            value={recruitmentStatus ?? ALL_OPTION}
+          />
           {hasFilters ? (
             <Button
               className="h-10 px-3 text-xs font-semibold text-muted-foreground hover:text-foreground"
@@ -208,7 +274,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
           title={t("jobPostings.loadFailed")}
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xs">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
           <JobPostingTable
             basePath={basePath}
             canManage={actor === "recruiter"}

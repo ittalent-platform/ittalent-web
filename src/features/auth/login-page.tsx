@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 
 import { postApiV1AuthLogin } from "@/api/generated";
 import { authClient } from "@/auth/auth-client";
+import { dashboardPathForRole } from "@/auth/roles";
 import { authKeys } from "@/auth/use-session";
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
@@ -59,13 +60,7 @@ export function LoginPage() {
       // Replace any earlier "signed out" session result, or ProtectedRoute would send the user straight back here.
       queryClient.setQueryData(authKeys.me(), result.data.user);
 
-      if (result.data.user.role === "admin") {
-        navigate("/admin/users", { replace: true });
-      } else if (result.data.user.role === "recruiter") {
-        navigate("/recruiter/job-postings", { replace: true });
-      } else {
-        navigate("/", { replace: true });
-      }
+      navigate(dashboardPathForRole(result.data.user.role), { replace: true });
     } catch (error) {
       const rawMessage = getAuthErrorMessage(error, t("auth.login.errorFallback"));
       const lower = rawMessage.toLowerCase();

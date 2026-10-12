@@ -120,8 +120,12 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
 
     await page.getByRole("button", { name: /^Submitted:/ }).click();
     await page.getByRole("menuitem", { name: "Custom range" }).click();
-    await page.getByLabel("From", { exact: true }).fill("2000-01-01");
-    await page.getByLabel("To", { exact: true }).fill("2000-12-31");
+    await page.getByRole("button", { name: "From", exact: true }).click();
+    await page.getByRole("button", { name: "Today", exact: true }).click();
+    await expect(page).toHaveURL(/from=\d{4}-\d{2}-\d{2}/);
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: "To", exact: true }).click();
+    await page.getByRole("button", { name: "Today", exact: true }).click();
     await expect(
       page.getByRole("heading", { name: "No matching applications" }),
     ).toBeVisible();

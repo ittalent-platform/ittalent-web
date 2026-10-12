@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3001"
+      "url": "http://localhost:3000"
     }
   ],
   "components": {
@@ -795,6 +795,7 @@
             "enum": [
               "draft",
               "published",
+              "closed",
               "archived"
             ]
           },
@@ -807,6 +808,15 @@
           },
           "applicationCount": {
             "type": "integer"
+          },
+          "publishedAt": {
+            "type": "string"
+          },
+          "closedAt": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "type": "string"
           },
           "expiresAt": {
             "type": "string"
@@ -840,6 +850,14 @@
             "type": "string",
             "minLength": 5,
             "maxLength": 150
+          },
+          "publication_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ],
+            "default": "published"
           },
           "location": {
             "type": "string",
@@ -901,13 +919,7 @@
           }
         },
         "required": [
-          "title",
-          "location",
-          "employment_type",
-          "description",
-          "requirements",
-          "benefits",
-          "expires_at"
+          "title"
         ],
         "additionalProperties": false
       },
@@ -980,6 +992,13 @@
             "type": "integer",
             "nullable": true,
             "minimum": 1
+          },
+          "publication_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ]
           }
         },
         "additionalProperties": false
@@ -1006,6 +1025,25 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 100
+          },
+          "enterprise_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "publication_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ]
+          },
+          "recruitment_status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "closed"
+            ]
           },
           "sort_by": {
             "type": "string",
@@ -1118,6 +1156,7 @@
                   "enum": [
                     "draft",
                     "published",
+                    "closed",
                     "archived"
                   ]
                 },
@@ -1130,6 +1169,15 @@
                 },
                 "applicationCount": {
                   "type": "integer"
+                },
+                "publishedAt": {
+                  "type": "string"
+                },
+                "closedAt": {
+                  "type": "string"
+                },
+                "archivedAt": {
+                  "type": "string"
                 },
                 "expiresAt": {
                   "type": "string"
@@ -1154,6 +1202,73 @@
                 "recruitmentStatus",
                 "createdAt",
                 "updatedAt"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "JobPostingHistory": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "create",
+                    "update",
+                    "delete",
+                    "publish",
+                    "draft",
+                    "close",
+                    "reopen",
+                    "archive",
+                    "restore"
+                  ]
+                },
+                "actorUserId": {
+                  "type": "string"
+                },
+                "occurredAt": {
+                  "type": "string"
+                },
+                "changedFields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "action",
+                "actorUserId",
+                "occurredAt"
               ]
             }
           },
@@ -1324,6 +1439,10 @@
                     "type": "string"
                   },
                   "default": []
+                },
+                "openRoleCount": {
+                  "type": "number",
+                  "default": 0
                 },
                 "status": {
                   "type": "string"
@@ -3410,6 +3529,40 @@
           {
             "schema": {
               "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterprise_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "required": false,
+            "name": "publication_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed"
+              ]
+            },
+            "required": false,
+            "name": "recruitment_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
               "enum": [
                 "created_at",
                 "title",
@@ -3476,8 +3629,8 @@
         "tags": [
           "Job Postings"
         ],
-        "summary": "Create and publish a job posting for the authenticated recruiter enterprise",
-        "description": "Saving always publishes: the posting is Published and Open. There is no status field and sending one is rejected. The enterprise is derived from the session and must be Active. The deadline is a date (YYYY-MM-DD) meaning the end of that day in Asia/Ho_Chi_Minh and must be today or later.",
+        "summary": "Create a job posting for the assigned enterprise",
+        "description": "Recruiters and enterprise administrators use their server-side User.enterprise_id assignment. Defaults to Published for backward compatibility. Send publication_status=draft to save an incomplete internal draft. Published postings require all public fields and an Active enterprise.",
         "security": [
           {
             "bearerAuth": []
@@ -3516,12 +3669,50 @@
         }
       }
     },
+    "/api/v1/job-postings/{id}/public": {
+      "get": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Get a published, still-open job posting (public)",
+        "description": "Not found for drafts, archived or expired postings, postings being deleted and postings of enterprises that are not Active.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid job posting ID"
+          },
+          "404": {
+            "description": "Job posting not found, not published, or no longer open"
+          }
+        }
+      }
+    },
     "/api/v1/recruiter/job-postings": {
       "get": {
         "tags": [
           "Job Postings"
         ],
-        "summary": "List the recruiter's enterprise job postings",
+        "summary": "List job postings for the assigned enterprise",
         "security": [
           {
             "bearerAuth": []
@@ -3566,6 +3757,40 @@
             },
             "required": false,
             "name": "level",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterprise_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "required": false,
+            "name": "publication_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed"
+              ]
+            },
+            "required": false,
+            "name": "recruitment_status",
             "in": "query"
           },
           {
@@ -3619,7 +3844,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated job postings for the recruiter enterprise",
+            "description": "Paginated job postings for the enterprise assigned to the recruiter or enterprise administrator",
             "content": {
               "application/json": {
                 "schema": {
@@ -3690,6 +3915,40 @@
             },
             "required": false,
             "name": "level",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "enterprise_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "required": false,
+            "name": "publication_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed"
+              ]
+            },
+            "required": false,
+            "name": "recruitment_status",
             "in": "query"
           },
           {
@@ -3769,7 +4028,7 @@
         "tags": [
           "Job Postings"
         ],
-        "summary": "Get a job posting for management (recruiter of the owning enterprise, or admin read-only)",
+        "summary": "Get a job posting for management (recruiter or enterprise administrator of the owning enterprise, or platform admin read-only)",
         "security": [
           {
             "bearerAuth": []
@@ -3815,8 +4074,8 @@
         "tags": [
           "Job Postings"
         ],
-        "summary": "Update a job posting for management",
-        "description": "Recruiters of the owning enterprise only. Omit a field to leave it unchanged; send null to clear salary_min, salary_max, level or openings. Publication status, enterprise ownership and application data cannot be changed and are rejected. Archived postings (legacy data) cannot be edited.",
+        "summary": "Update, publish, or move a job posting to draft",
+        "description": "Recruiters and enterprise administrators of the owning enterprise only. publication_status accepts draft or published. Publishing validates all required public fields; archived postings must be restored first.",
         "security": [
           {
             "bearerAuth": []
@@ -3865,6 +4124,9 @@
           },
           "404": {
             "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Archived posting cannot be edited"
           }
         }
       },
@@ -3873,7 +4135,7 @@
           "Job Postings"
         ],
         "summary": "Delete a job posting for management",
-        "description": "Recruiters of the owning enterprise only. Hard-removes the posting in any state, and only while no application has ever been recorded for it.",
+        "description": "Recruiters and enterprise administrators of the owning enterprise only. Hard-removes the posting in any state, and only while no application has ever been recorded for it.",
         "security": [
           {
             "bearerAuth": []
@@ -3908,6 +4170,266 @@
           },
           "409": {
             "description": "Cannot delete job posting because applications already exist (or it is already being deleted)"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/close": {
+      "patch": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Close an open published job posting",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Closed job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Invalid lifecycle transition"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/reopen": {
+      "patch": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Reopen a closed job posting",
+        "description": "The enterprise must be Active and the deadline must still be in the future.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reopened job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Invalid lifecycle transition or expired deadline"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/archive": {
+      "patch": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Archive a closed job posting",
+        "description": "Idempotent when the posting is already archived.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archived job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Only a closed posting can be archived"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/restore": {
+      "patch": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Restore an archived job posting as closed",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restored closed job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Only an archived posting can be restored"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/history": {
+      "get": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "View job posting audit history",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated job posting history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPostingHistory"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
           }
         }
       }
@@ -3963,6 +4485,7 @@
                 "user",
                 "admin",
                 "recruiter",
+                "enterprise_admin",
                 "applicant",
                 "interviewer"
               ]

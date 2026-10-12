@@ -5,6 +5,7 @@ import { BriefcaseBusiness, ChevronDown, FileText, LogOut, Users } from "lucide-
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
+import { canManageJobPostings } from "@/auth/roles";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +28,14 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
   const user = session?.user;
   const displayName = user?.username ?? user?.email ?? "User";
   const initials = displayName.slice(0, 2).toUpperCase();
+  const roleLabel =
+    user?.role === "admin"
+      ? t("roles.admin")
+      : user?.role === "enterprise_admin"
+        ? t("roles.enterpriseAdmin")
+        : user?.role === "recruiter"
+          ? t("roles.recruiter")
+          : t("roles.user");
 
   function handleSignOut() {
     setIsSigningOut(true);
@@ -71,11 +80,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
               {displayName}
             </p>
             <p className="truncate text-[0.8rem] text-muted-foreground">
-              {user?.role === "admin"
-                ? "Admin"
-                : user?.role === "recruiter"
-                  ? "Recruiter"
-                  : "User"}
+              {roleLabel}
             </p>
           </div>
         </button>
@@ -90,7 +95,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
             {user?.email} ·{" "}
             <span className="capitalize font-medium">
-              {user?.role ?? "user"}
+              {roleLabel}
             </span>
           </p>
         </div>
@@ -115,7 +120,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           </DropdownMenuItem>
         ) : null}
 
-        {user?.role === "recruiter" ? (
+        {canManageJobPostings(user?.role) ? (
           <DropdownMenuItem
             className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer"
             onSelect={() => navigate("/recruiter/job-postings")}

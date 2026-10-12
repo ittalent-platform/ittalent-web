@@ -65,3 +65,13 @@ export function formatPostedDate(value: string): string {
     year: "numeric",
   });
 }
+
+export function formatJobDateTime(value: string, locale: string): string {
+  return new Date(value).toLocaleString(locale, {
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}

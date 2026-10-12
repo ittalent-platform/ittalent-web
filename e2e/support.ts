@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { test as base, expect, type Page } from "@playwright/test";
+import { JOB_POSTING_ACCOUNTS } from "./job-posting-data";
 
 export { expect };
 
@@ -59,9 +60,13 @@ export async function signInAs(page: Page, email: string): Promise<void> {
   }, session);
 }
 
-export const test = base.extend<{ candidate: Page }>({
+export const test = base.extend<{ candidate: Page; enterpriseAdmin: Page }>({
   candidate: async ({ page }, provide) => {
     await signInAs(page, ACCOUNTS.demo);
+    await provide(page);
+  },
+  enterpriseAdmin: async ({ page }, provide) => {
+    await signInAs(page, JOB_POSTING_ACCOUNTS.enterpriseAdmin);
     await provide(page);
   },
 });

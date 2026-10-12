@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
+import { JOB_POSTING_MANAGER_ROLES } from "@/auth/roles";
 import { AppLayout } from "@/components/layout/admin-layout";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
@@ -160,7 +161,7 @@ export const appRoutes = [
   },
   {
     path: "/recruiter",
-    element: <ProtectedRoute requiredRole="recruiter" />,
+    element: <ProtectedRoute allowedRoles={JOB_POSTING_MANAGER_ROLES} />,
     children: [
       {
         element: <AppLayout actor="recruiter" />,

@@ -1,18 +1,17 @@
 import { Navigate, Outlet } from "react-router";
 import { LoadingScreen } from "@/components/common/loading-screen";
+import { dashboardPathForRole, type ProtectedRole } from "./roles";
 import { useSession } from "./use-session";
 
 type ProtectedRouteProps = {
-  requiredRole?: "admin" | "recruiter" | "user";
+  requiredRole?: ProtectedRole;
+  allowedRoles?: readonly ProtectedRole[];
 };
 
-function dashboardPathForRole(role: string) {
-  if (role === "admin") return "/admin/users";
-  if (role === "recruiter") return "/recruiter/job-postings";
-  return "/";
-}
-
-export function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
+export function ProtectedRoute({
+  requiredRole,
+  allowedRoles,
+}: ProtectedRouteProps) {
   const { data: session, isPending } = useSession();
 
   if (isPending) {
@@ -23,7 +22,11 @@ export function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
     return <Navigate replace to="/login" />;
   }
 
-  if (requiredRole && session.user.role !== requiredRole) {
+  const permittedRoles = allowedRoles ?? (requiredRole ? [requiredRole] : null);
+  if (
+    permittedRoles &&
+    !permittedRoles.some((role) => role === session.user.role)
+  ) {
     return <Navigate replace to={dashboardPathForRole(session.user.role)} />;
   }
 

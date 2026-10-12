@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteApiV1EnterprisesByEnterpriseIdData, DeleteApiV1EnterprisesByEnterpriseIdErrors, DeleteApiV1EnterprisesByEnterpriseIdResponses, DeleteApiV1JobPostingsByIdData, DeleteApiV1JobPostingsByIdErrors, DeleteApiV1JobPostingsByIdResponses, GetApiV1AdminDocumentsData, GetApiV1AdminDocumentsErrors, GetApiV1AdminDocumentsResponses, GetApiV1AdminJobPostingsData, GetApiV1AdminJobPostingsErrors, GetApiV1AdminJobPostingsResponses, GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1DocumentsData, GetApiV1DocumentsErrors, GetApiV1DocumentsResponses, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesResponses, GetApiV1JobPostingsByIdData, GetApiV1JobPostingsByIdErrors, GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsData, GetApiV1JobPostingsErrors, GetApiV1JobPostingsResponses, GetApiV1MeApplicationsByIdData, GetApiV1MeApplicationsByIdErrors, GetApiV1MeApplicationsByIdHistoryData, GetApiV1MeApplicationsByIdHistoryErrors, GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsData, GetApiV1MeApplicationsErrors, GetApiV1MeApplicationsResponses, GetApiV1RecruiterJobPostingsData, GetApiV1RecruiterJobPostingsErrors, GetApiV1RecruiterJobPostingsResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PatchApiV1EnterprisesByEnterpriseIdData, PatchApiV1EnterprisesByEnterpriseIdErrors, PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdStatusData, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1JobPostingsByIdData, PatchApiV1JobPostingsByIdErrors, PatchApiV1JobPostingsByIdResponses, PatchApiV1MeApplicationsByIdWithdrawData, PatchApiV1MeApplicationsByIdWithdrawErrors, PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1UsersByIdData, PatchApiV1UsersByIdErrors, PatchApiV1UsersByIdResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses, PostApiV1DocumentsData, PostApiV1DocumentsErrors, PostApiV1DocumentsResponses, PostApiV1EnterprisesData, PostApiV1EnterprisesErrors, PostApiV1EnterprisesResponses, PostApiV1JobPostingsData, PostApiV1JobPostingsErrors, PostApiV1JobPostingsResponses, PostApiV1MeApplicationsData, PostApiV1MeApplicationsErrors, PostApiV1MeApplicationsResponses } from './types.gen';
+import type { DeleteApiV1EnterprisesByEnterpriseIdData, DeleteApiV1EnterprisesByEnterpriseIdErrors, DeleteApiV1EnterprisesByEnterpriseIdResponses, DeleteApiV1JobPostingsByIdData, DeleteApiV1JobPostingsByIdErrors, DeleteApiV1JobPostingsByIdResponses, GetApiV1AdminDocumentsData, GetApiV1AdminDocumentsErrors, GetApiV1AdminDocumentsResponses, GetApiV1AdminJobPostingsData, GetApiV1AdminJobPostingsErrors, GetApiV1AdminJobPostingsResponses, GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1DocumentsData, GetApiV1DocumentsErrors, GetApiV1DocumentsResponses, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesResponses, GetApiV1JobPostingsByIdData, GetApiV1JobPostingsByIdErrors, GetApiV1JobPostingsByIdHistoryData, GetApiV1JobPostingsByIdHistoryErrors, GetApiV1JobPostingsByIdHistoryResponses, GetApiV1JobPostingsByIdPublicData, GetApiV1JobPostingsByIdPublicErrors, GetApiV1JobPostingsByIdPublicResponses, GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsData, GetApiV1JobPostingsErrors, GetApiV1JobPostingsResponses, GetApiV1MeApplicationsByIdData, GetApiV1MeApplicationsByIdErrors, GetApiV1MeApplicationsByIdHistoryData, GetApiV1MeApplicationsByIdHistoryErrors, GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsData, GetApiV1MeApplicationsErrors, GetApiV1MeApplicationsResponses, GetApiV1RecruiterJobPostingsData, GetApiV1RecruiterJobPostingsErrors, GetApiV1RecruiterJobPostingsResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PatchApiV1EnterprisesByEnterpriseIdData, PatchApiV1EnterprisesByEnterpriseIdErrors, PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdStatusData, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1JobPostingsByIdArchiveData, PatchApiV1JobPostingsByIdArchiveErrors, PatchApiV1JobPostingsByIdArchiveResponses, PatchApiV1JobPostingsByIdCloseData, PatchApiV1JobPostingsByIdCloseErrors, PatchApiV1JobPostingsByIdCloseResponses, PatchApiV1JobPostingsByIdData, PatchApiV1JobPostingsByIdErrors, PatchApiV1JobPostingsByIdReopenData, PatchApiV1JobPostingsByIdReopenErrors, PatchApiV1JobPostingsByIdReopenResponses, PatchApiV1JobPostingsByIdResponses, PatchApiV1JobPostingsByIdRestoreData, PatchApiV1JobPostingsByIdRestoreErrors, PatchApiV1JobPostingsByIdRestoreResponses, PatchApiV1MeApplicationsByIdWithdrawData, PatchApiV1MeApplicationsByIdWithdrawErrors, PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1UsersByIdData, PatchApiV1UsersByIdErrors, PatchApiV1UsersByIdResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses, PostApiV1DocumentsData, PostApiV1DocumentsErrors, PostApiV1DocumentsResponses, PostApiV1EnterprisesData, PostApiV1EnterprisesErrors, PostApiV1EnterprisesResponses, PostApiV1JobPostingsData, PostApiV1JobPostingsErrors, PostApiV1JobPostingsResponses, PostApiV1MeApplicationsData, PostApiV1MeApplicationsErrors, PostApiV1MeApplicationsResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -165,9 +165,9 @@ export const getApiV1AdminDocuments = <ThrowOnError extends boolean = false>(opt
 export const getApiV1JobPostings = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1JobPostingsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1JobPostingsResponses, GetApiV1JobPostingsErrors, ThrowOnError>({ url: '/api/v1/job-postings', ...options });
 
 /**
- * Create and publish a job posting for the authenticated recruiter enterprise
+ * Create a job posting for the assigned enterprise
  *
- * Saving always publishes: the posting is Published and Open. There is no status field and sending one is rejected. The enterprise is derived from the session and must be Active. The deadline is a date (YYYY-MM-DD) meaning the end of that day in Asia/Ho_Chi_Minh and must be today or later.
+ * Recruiters and enterprise administrators use their server-side User.enterprise_id assignment. Defaults to Published for backward compatibility. Send publication_status=draft to save an incomplete internal draft. Published postings require all public fields and an Active enterprise.
  */
 export const postApiV1JobPostings = <ThrowOnError extends boolean = false>(options: Options<PostApiV1JobPostingsData, ThrowOnError>) => (options.client ?? client).post<PostApiV1JobPostingsResponses, PostApiV1JobPostingsErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -180,7 +180,14 @@ export const postApiV1JobPostings = <ThrowOnError extends boolean = false>(optio
 });
 
 /**
- * List the recruiter's enterprise job postings
+ * Get a published, still-open job posting (public)
+ *
+ * Not found for drafts, archived or expired postings, postings being deleted and postings of enterprises that are not Active.
+ */
+export const getApiV1JobPostingsByIdPublic = <ThrowOnError extends boolean = false>(options: Options<GetApiV1JobPostingsByIdPublicData, ThrowOnError>) => (options.client ?? client).get<GetApiV1JobPostingsByIdPublicResponses, GetApiV1JobPostingsByIdPublicErrors, ThrowOnError>({ url: '/api/v1/job-postings/{id}/public', ...options });
+
+/**
+ * List job postings for the assigned enterprise
  */
 export const getApiV1RecruiterJobPostings = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1RecruiterJobPostingsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1RecruiterJobPostingsResponses, GetApiV1RecruiterJobPostingsErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -200,7 +207,7 @@ export const getApiV1AdminJobPostings = <ThrowOnError extends boolean = false>(o
 /**
  * Delete a job posting for management
  *
- * Recruiters of the owning enterprise only. Hard-removes the posting in any state, and only while no application has ever been recorded for it.
+ * Recruiters and enterprise administrators of the owning enterprise only. Hard-removes the posting in any state, and only while no application has ever been recorded for it.
  */
 export const deleteApiV1JobPostingsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1JobPostingsByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1JobPostingsByIdResponses, DeleteApiV1JobPostingsByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -209,7 +216,7 @@ export const deleteApiV1JobPostingsById = <ThrowOnError extends boolean = false>
 });
 
 /**
- * Get a job posting for management (recruiter of the owning enterprise, or admin read-only)
+ * Get a job posting for management (recruiter or enterprise administrator of the owning enterprise, or platform admin read-only)
  */
 export const getApiV1JobPostingsById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1JobPostingsByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -218,9 +225,9 @@ export const getApiV1JobPostingsById = <ThrowOnError extends boolean = false>(op
 });
 
 /**
- * Update a job posting for management
+ * Update, publish, or move a job posting to draft
  *
- * Recruiters of the owning enterprise only. Omit a field to leave it unchanged; send null to clear salary_min, salary_max, level or openings. Publication status, enterprise ownership and application data cannot be changed and are rejected. Archived postings (legacy data) cannot be edited.
+ * Recruiters and enterprise administrators of the owning enterprise only. publication_status accepts draft or published. Publishing validates all required public fields; archived postings must be restored first.
  */
 export const patchApiV1JobPostingsById = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1JobPostingsByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1JobPostingsByIdResponses, PatchApiV1JobPostingsByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -230,6 +237,55 @@ export const patchApiV1JobPostingsById = <ThrowOnError extends boolean = false>(
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Close an open published job posting
+ */
+export const patchApiV1JobPostingsByIdClose = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1JobPostingsByIdCloseData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1JobPostingsByIdCloseResponses, PatchApiV1JobPostingsByIdCloseErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/job-postings/{id}/close',
+    ...options
+});
+
+/**
+ * Reopen a closed job posting
+ *
+ * The enterprise must be Active and the deadline must still be in the future.
+ */
+export const patchApiV1JobPostingsByIdReopen = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1JobPostingsByIdReopenData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1JobPostingsByIdReopenResponses, PatchApiV1JobPostingsByIdReopenErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/job-postings/{id}/reopen',
+    ...options
+});
+
+/**
+ * Archive a closed job posting
+ *
+ * Idempotent when the posting is already archived.
+ */
+export const patchApiV1JobPostingsByIdArchive = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1JobPostingsByIdArchiveData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1JobPostingsByIdArchiveResponses, PatchApiV1JobPostingsByIdArchiveErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/job-postings/{id}/archive',
+    ...options
+});
+
+/**
+ * Restore an archived job posting as closed
+ */
+export const patchApiV1JobPostingsByIdRestore = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1JobPostingsByIdRestoreData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1JobPostingsByIdRestoreResponses, PatchApiV1JobPostingsByIdRestoreErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/job-postings/{id}/restore',
+    ...options
+});
+
+/**
+ * View job posting audit history
+ */
+export const getApiV1JobPostingsByIdHistory = <ThrowOnError extends boolean = false>(options: Options<GetApiV1JobPostingsByIdHistoryData, ThrowOnError>) => (options.client ?? client).get<GetApiV1JobPostingsByIdHistoryResponses, GetApiV1JobPostingsByIdHistoryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/job-postings/{id}/history',
+    ...options
 });
 
 /**

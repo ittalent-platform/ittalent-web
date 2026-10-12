@@ -1,10 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState, type ReactNode } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { z } from "zod";
 
+import { Callout } from "@/components/common/callout";
+import { FormFieldLabel } from "@/components/common/form-field";
+import { RailCard } from "@/components/common/rail-card";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
@@ -16,8 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FormFieldLabel } from "@/components/common/form-field";
-import { RailCard } from "@/components/common/rail-card";
 import type {
   CreateJobPostingRequest,
   JobPosting,
@@ -36,7 +37,6 @@ import { toDeadlineDate } from "./job-postings.format";
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
 
-// Saving a job always publishes it (no Draft in Sprint 1), so every Published-field is required here.
 function buildSchema(t: Translate, today: string, postingDeadline?: string) {
   const length = (min: number, max: number, key: string) =>
     z
@@ -44,6 +44,14 @@ function buildSchema(t: Translate, today: string, postingDeadline?: string) {
       .trim()
       .min(min, t(key, { min, max }))
       .max(max, t(key, { min, max }));
+  const optionalLength = (min: number, max: number, key: string) =>
+    z
+      .string()
+      .trim()
+      .max(max, t(key, { min, max }))
+      .refine((value) => value.length === 0 || value.length >= min, {
+        message: t(key, { min, max }),
+      });
   return z
     .object({
       title: length(
@@ -51,49 +59,112 @@ function buildSchema(t: Translate, today: string, postingDeadline?: string) {
         JOB_LIMITS.TITLE_MAX,
         "jobPostings.validation.titleLength",
       ),
-      location: length(
+      location: optionalLength(
         JOB_LIMITS.LOCATION_MIN,
         JOB_LIMITS.LOCATION_MAX,
         "jobPostings.validation.locationLength",
       ),
-      employmentType: z.enum(JOB_EMPLOYMENT_TYPES, {
-        error: t("jobPostings.validation.employmentType"),
-      }),
+      employmentType: z.union([z.enum(JOB_EMPLOYMENT_TYPES), z.literal("")]),
       level: z.string().trim().max(JOB_LIMITS.LEVEL_MAX),
       salaryMin: z.string(),
       salaryMax: z.string(),
+      salaryNegotiable: z.boolean(),
       currency: z
         .string()
         .trim()
         .min(1, t("jobPostings.validation.currency"))
         .max(JOB_LIMITS.CURRENCY_MAX),
       openings: z.string(),
-      expiresAt: z
-        .string()
-        .min(1, t("jobPostings.validation.deadlineRequired")),
-      description: length(
+      expiresAt: z.string(),
+      description: optionalLength(
         JOB_LIMITS.CONTENT_MIN,
         JOB_LIMITS.CONTENT_MAX,
         "jobPostings.validation.contentLength",
       ),
-      requirements: length(
+      requirements: optionalLength(
         JOB_LIMITS.CONTENT_MIN,
         JOB_LIMITS.CONTENT_MAX,
         "jobPostings.validation.contentLength",
       ),
-      benefits: length(
+      benefits: optionalLength(
         JOB_LIMITS.CONTENT_MIN,
         JOB_LIMITS.CONTENT_MAX,
         "jobPostings.validation.contentLength",
       ),
+      publicationStatus: z.enum(["draft", "published", "unchanged"]),
     })
     .superRefine((value, ctx) => {
+      if (value.publicationStatus !== "draft") {
+        const requiredFields: Array<{
+          key:
+            | "benefits"
+            | "description"
+            | "employmentType"
+            | "expiresAt"
+            | "location"
+            | "requirements";
+          message: string;
+        }> = [
+          {
+            key: "location",
+            message: t("jobPostings.validation.locationLength", {
+              min: JOB_LIMITS.LOCATION_MIN,
+              max: JOB_LIMITS.LOCATION_MAX,
+            }),
+          },
+          {
+            key: "employmentType",
+            message: t("jobPostings.validation.employmentType"),
+          },
+          {
+            key: "description",
+            message: t("jobPostings.validation.contentLength", {
+              min: JOB_LIMITS.CONTENT_MIN,
+              max: JOB_LIMITS.CONTENT_MAX,
+            }),
+          },
+          {
+            key: "requirements",
+            message: t("jobPostings.validation.contentLength", {
+              min: JOB_LIMITS.CONTENT_MIN,
+              max: JOB_LIMITS.CONTENT_MAX,
+            }),
+          },
+          {
+            key: "benefits",
+            message: t("jobPostings.validation.contentLength", {
+              min: JOB_LIMITS.CONTENT_MIN,
+              max: JOB_LIMITS.CONTENT_MAX,
+            }),
+          },
+          {
+            key: "expiresAt",
+            message: t("jobPostings.validation.deadlineRequired"),
+          },
+        ];
+        for (const field of requiredFields) {
+          if (!value[field.key]) {
+            ctx.addIssue({
+              code: "custom",
+              message: field.message,
+              path: [field.key],
+            });
+          }
+        }
+      }
       const min = value.salaryMin ? Number(value.salaryMin) : undefined;
       const max = value.salaryMax ? Number(value.salaryMax) : undefined;
       if (
-        (min !== undefined && (!Number.isFinite(min) || min < 0)) ||
-        (max !== undefined && (!Number.isFinite(max) || max < 0)) ||
-        (min !== undefined && max !== undefined && min > max)
+        (!value.salaryNegotiable &&
+          min !== undefined &&
+          (!Number.isFinite(min) || min < 0)) ||
+        (!value.salaryNegotiable &&
+          max !== undefined &&
+          (!Number.isFinite(max) || max < 0)) ||
+        (!value.salaryNegotiable &&
+          min !== undefined &&
+          max !== undefined &&
+          min > max)
       ) {
         ctx.addIssue({
           code: "custom",
@@ -127,10 +198,7 @@ function buildSchema(t: Translate, today: string, postingDeadline?: string) {
     });
 }
 
-type Values = Omit<
-  z.infer<ReturnType<typeof buildSchema>>,
-  "employmentType"
-> & { employmentType: string };
+type Values = z.infer<ReturnType<typeof buildSchema>>;
 
 const blank: Values = {
   title: "",
@@ -139,12 +207,14 @@ const blank: Values = {
   level: "",
   salaryMin: "",
   salaryMax: "",
+  salaryNegotiable: false,
   currency: DEFAULT_CURRENCY,
   openings: "",
   expiresAt: "",
   description: "",
   requirements: "",
   benefits: "",
+  publicationStatus: "published",
 };
 
 function valuesFrom(posting?: JobPosting): Values {
@@ -152,16 +222,22 @@ function valuesFrom(posting?: JobPosting): Values {
   return {
     title: posting.title,
     location: posting.location ?? "",
-    employmentType: posting.employmentType ?? "",
+    employmentType: (JOB_EMPLOYMENT_TYPES as readonly string[]).includes(
+      posting.employmentType ?? "",
+    )
+      ? (posting.employmentType as Values["employmentType"])
+      : "",
     level: posting.level ?? "",
     salaryMin: posting.salaryMin?.toString() ?? "",
     salaryMax: posting.salaryMax?.toString() ?? "",
+    salaryNegotiable: posting.salaryNegotiable,
     currency: posting.currency,
     openings: posting.openings?.toString() ?? "",
     expiresAt: posting.expiresAt ? toDeadlineDate(posting.expiresAt) : "",
     description: posting.description ?? "",
     requirements: posting.requirements ?? "",
     benefits: posting.benefits ?? "",
+    publicationStatus: posting.status === "draft" ? "draft" : "unchanged",
   };
 }
 
@@ -169,18 +245,24 @@ function payloadFrom(values: Values): CreateJobPostingRequest {
   const optional = (value: string) => value.trim() || undefined;
   return {
     title: values.title.trim(),
-    location: values.location.trim(),
-    employment_type:
-      values.employmentType as CreateJobPostingRequest["employment_type"],
+    ...(values.publicationStatus === "unchanged"
+      ? {}
+      : { publication_status: values.publicationStatus }),
+    location: optional(values.location),
+    employment_type: values.employmentType || undefined,
     level: optional(values.level),
-    salary_min: values.salaryMin ? Number(values.salaryMin) : undefined,
-    salary_max: values.salaryMax ? Number(values.salaryMax) : undefined,
+    ...(values.salaryNegotiable
+      ? { salary_negotiable: true }
+      : {
+          salary_min: values.salaryMin ? Number(values.salaryMin) : undefined,
+          salary_max: values.salaryMax ? Number(values.salaryMax) : undefined,
+        }),
     currency: values.currency.trim(),
     openings: values.openings ? Number(values.openings) : undefined,
-    expires_at: values.expiresAt,
-    description: values.description.trim(),
-    requirements: values.requirements.trim(),
-    benefits: values.benefits.trim(),
+    expires_at: optional(values.expiresAt),
+    description: optional(values.description),
+    requirements: optional(values.requirements),
+    benefits: optional(values.benefits),
   };
 }
 
@@ -188,9 +270,16 @@ function payloadFrom(values: Values): CreateJobPostingRequest {
 function updatePayloadFrom(values: Values): UpdateJobPostingRequest {
   return {
     ...payloadFrom(values),
+    salary_negotiable: values.salaryNegotiable,
     level: values.level.trim() || null,
-    salary_min: values.salaryMin ? Number(values.salaryMin) : null,
-    salary_max: values.salaryMax ? Number(values.salaryMax) : null,
+    salary_min:
+      !values.salaryNegotiable && values.salaryMin
+        ? Number(values.salaryMin)
+        : null,
+    salary_max:
+      !values.salaryNegotiable && values.salaryMax
+        ? Number(values.salaryMax)
+        : null,
     openings: values.openings ? Number(values.openings) : null,
   };
 }
@@ -245,6 +334,15 @@ export function JobPostingForm({
     resolver: zodResolver(schema) as never,
   });
   useEffect(() => form.reset(valuesFrom(posting)), [form, posting]);
+  const publicationStatus = useWatch({
+    control: form.control,
+    name: "publicationStatus",
+  });
+  const salaryNegotiable = useWatch({
+    control: form.control,
+    name: "salaryNegotiable",
+  });
+  const requiresPublishedFields = publicationStatus !== "draft";
 
   const errorOf = (name: keyof Values) => form.formState.errors[name]?.message;
   const label = (name: keyof Values, text: string, required: boolean) => (
@@ -261,6 +359,7 @@ export function JobPostingForm({
     name: keyof Values,
     text: string,
     options: {
+      disabled?: boolean;
       hint?: string;
       min?: string;
       multiline?: boolean;
@@ -282,6 +381,7 @@ export function JobPostingForm({
         <Input
           aria-invalid={errorOf(name) ? true : undefined}
           className={controlClass}
+          disabled={options.disabled}
           id={name}
           min={options.min}
           type={options.type ?? "text"}
@@ -319,7 +419,7 @@ export function JobPostingForm({
             onValueChange={(value) =>
               field.onChange(value === NO_SELECTION ? "" : value)
             }
-            value={field.value || undefined}
+            value={field.value || NO_SELECTION}
           >
             <SelectTrigger
               aria-invalid={errorOf(name) ? true : undefined}
@@ -357,16 +457,26 @@ export function JobPostingForm({
     min: JOB_LIMITS.CONTENT_MIN,
     max: JOB_LIMITS.CONTENT_MAX,
   });
+  const submit = (values: Values) =>
+    posting
+      ? onUpdate(updatePayloadFrom(values))
+      : onCreate(payloadFrom(values));
+  const submitAs = (status: Values["publicationStatus"]) => {
+    form.setValue("publicationStatus", status);
+    void form.handleSubmit(submit)();
+  };
 
   return (
-    <form
-      noValidate
-      onSubmit={form.handleSubmit((values) =>
-        posting
-          ? onUpdate(updatePayloadFrom(values))
-          : onCreate(payloadFrom(values)),
-      )}
-    >
+    <form noValidate onSubmit={form.handleSubmit(submit)}>
+      {form.formState.submitCount > 0 &&
+      Object.keys(form.formState.errors).length > 0 ? (
+        <Callout
+          className="mb-5"
+          role="alert"
+          title={t("jobPostings.form.fixErrors")}
+          tone="error"
+        />
+      ) : null}
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="flex flex-col gap-[18px]">
           <FormSection
@@ -375,11 +485,13 @@ export function JobPostingForm({
           >
             <div className="grid gap-x-5 gap-y-[18px] md:grid-cols-2">
               {field("title", t("jobPostings.titleLabel"), { required: true })}
-              {field("location", t("jobPostings.location"), { required: true })}
+              {field("location", t("jobPostings.location"), {
+                required: requiresPublishedFields,
+              })}
               {select(
                 "employmentType",
                 t("jobPostings.employmentType"),
-                true,
+                requiresPublishedFields,
                 t("jobPostings.employmentTypePlaceholder"),
                 JOB_EMPLOYMENT_TYPES.map((type) => ({
                   label: t(`jobPostings.employmentTypes.${type}`),
@@ -411,10 +523,12 @@ export function JobPostingForm({
           >
             <div className="grid gap-x-5 gap-y-[18px] md:grid-cols-2">
               {field("salaryMin", t("jobPostings.minimumSalary"), {
+                disabled: salaryNegotiable,
                 min: "0",
                 type: "number",
               })}
               {field("salaryMax", t("jobPostings.maximumSalary"), {
+                disabled: salaryNegotiable,
                 min: "0",
                 type: "number",
               })}
@@ -424,6 +538,34 @@ export function JobPostingForm({
                 type: "number",
               })}
             </div>
+            <Controller
+              control={form.control}
+              name="salaryNegotiable"
+              render={({ field }) => (
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-surface-subtle px-4 py-3.5">
+                  <input
+                    checked={field.value}
+                    className="mt-0.5 size-5 shrink-0 accent-primary"
+                    onChange={(event) => {
+                      field.onChange(event.target.checked);
+                      if (event.target.checked) {
+                        form.setValue("salaryMin", "", { shouldDirty: true });
+                        form.setValue("salaryMax", "", { shouldDirty: true });
+                      }
+                    }}
+                    type="checkbox"
+                  />
+                  <span className="flex flex-col gap-0.5">
+                    <span className="text-[13.5px] font-semibold text-foreground">
+                      {t("jobPostings.salaryNegotiable")}
+                    </span>
+                    <span className="text-[12.5px] text-muted-foreground">
+                      {t("jobPostings.salaryNegotiableHint")}
+                    </span>
+                  </span>
+                </label>
+              )}
+            />
           </FormSection>
 
           <FormSection
@@ -434,17 +576,17 @@ export function JobPostingForm({
               {field("description", t("jobPostings.description"), {
                 hint: contentHint,
                 multiline: true,
-                required: true,
+                required: requiresPublishedFields,
               })}
               {field("requirements", t("jobPostings.requirements"), {
                 hint: contentHint,
                 multiline: true,
-                required: true,
+                required: requiresPublishedFields,
               })}
               {field("benefits", t("jobPostings.benefits"), {
                 hint: contentHint,
                 multiline: true,
-                required: true,
+                required: requiresPublishedFields,
               })}
             </div>
           </FormSection>
@@ -454,7 +596,11 @@ export function JobPostingForm({
             title={t("jobPostings.jobDetails")}
           >
             <div className="flex max-w-xs flex-col gap-2">
-              {label("expiresAt", t("jobPostings.expiryDate"), true)}
+              {label(
+                "expiresAt",
+                t("jobPostings.expiryDate"),
+                requiresPublishedFields,
+              )}
               <Controller
                 control={form.control}
                 name="expiresAt"
@@ -495,23 +641,69 @@ export function JobPostingForm({
             >
               {t("jobPostings.cancel")}
             </Button>
+            {!posting || posting.status === "draft" ? (
+              <Button
+                className="h-11 rounded-xl px-5 text-sm font-semibold"
+                disabled={
+                  isSaving || (Boolean(posting) && !form.formState.isDirty)
+                }
+                onClick={() => submitAs("draft")}
+                type="button"
+                variant="outline"
+              >
+                {isSaving
+                  ? t("state.saving")
+                  : t("jobPostings.save.draftAction")}
+              </Button>
+            ) : null}
             <Button
               className="h-11 rounded-xl px-5 text-sm font-semibold"
               disabled={
-                isSaving || (Boolean(posting) && !form.formState.isDirty)
+                isSaving ||
+                (Boolean(posting) &&
+                  posting?.status !== "draft" &&
+                  !form.formState.isDirty)
+              }
+              onClick={() =>
+                form.setValue(
+                  "publicationStatus",
+                  !posting || posting.status === "draft"
+                    ? "published"
+                    : "unchanged",
+                )
               }
               type="submit"
             >
               {isSaving
                 ? t("state.saving")
                 : posting
-                  ? t("jobPostings.save.action")
-                  : t("jobPostings.create")}
+                  ? posting.status === "draft"
+                    ? t("jobPostings.save.publishAction")
+                    : t("jobPostings.save.action")
+                  : t("jobPostings.save.publishAction")}
             </Button>
           </div>
         </div>
 
         <aside className="flex flex-col gap-4 lg:sticky lg:top-6">
+          <RailCard title={t("jobPostings.form.requiredToPublishTitle")}>
+            <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-[13px] text-foreground/80 dark:text-muted-foreground">
+              {[
+                t("jobPostings.form.requiredTitle"),
+                t("jobPostings.form.requiredBasics"),
+                t("jobPostings.form.requiredContent"),
+                t("jobPostings.form.requiredDeadline"),
+              ].map((item) => (
+                <li className="flex items-start gap-2" key={item}>
+                  <span
+                    aria-hidden
+                    className="mt-[7px] size-1.5 shrink-0 rounded-full bg-primary"
+                  />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </RailCard>
           {posting ? (
             <>
               <RailCard title={t("jobPostings.form.railNotEditableTitle")}>

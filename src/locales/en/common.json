@@ -1,4 +1,10 @@
 {
+  "roles": {
+    "admin": "Admin",
+    "enterpriseAdmin": "Enterprise admin",
+    "recruiter": "Recruiter",
+    "user": "User"
+  },
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
@@ -494,6 +500,8 @@
     "level": "Level",
     "minimumSalary": "Minimum salary",
     "maximumSalary": "Maximum salary",
+    "salaryNegotiable": "Salary is negotiable",
+    "salaryNegotiableHint": "The salary range is cleared and disabled while this is selected.",
     "currency": "Currency",
     "openings": "Openings",
     "expiryDate": "Expiry date",
@@ -510,7 +518,9 @@
       "message": "Your changes have been saved.",
       "failedTitle": "Could not save job posting",
       "noEnterprise": "Your recruiter account has not been assigned to an enterprise yet. Please contact the administrator.",
-      "action": "Save changes"
+      "action": "Save changes",
+      "draftAction": "Save draft",
+      "publishAction": "Publish job"
     },
     "requiredMark": "required",
     "optionalMark": "optional",
@@ -543,6 +553,7 @@
     "publicationStatus": {
       "draft": "Draft",
       "published": "Published",
+      "closed": "Closed",
       "archived": "Archived"
     },
     "applications": "Applications",
@@ -556,6 +567,8 @@
     "toolbar": {
       "type": "Type",
       "level": "Level",
+      "publicationStatus": "Publication",
+      "recruitmentStatus": "Recruitment",
       "all": "All",
       "clear": "Clear filters"
     },
@@ -605,11 +618,30 @@
       "otherEnterprise": "This job posting belongs to another enterprise.",
       "loading": "Loading job posting…",
       "statusCard": "Status",
-      "statusNote": "Saving a job publishes it. It stays open until the end of its deadline day (Vietnam time); move the deadline forward to reopen it.",
+      "statusNote": "Lifecycle actions are available only when the current status allows them. Deadlines use Vietnam time.",
       "applicationsCard": "Applications",
       "applicationCount_one": "{{count}} application",
       "applicationCount_other": "{{count}} applications",
       "applicationNote": "A job that has received any application cannot be deleted.",
+      "deleteBlocked": "Jobs with applications cannot be deleted. Archive this job after closing it instead.",
+      "metaPosted": "Posted {{date}}",
+      "metaCreated": "Created {{date}}",
+      "metaDeadline": "Deadline {{date}}",
+      "metaNoDeadline": "No deadline",
+      "notices": {
+        "draft": {
+          "title": "Draft · candidates cannot see this job",
+          "description": "Complete the required publishing fields, then publish the job when it is ready."
+        },
+        "closed": {
+          "title": "Closed · not accepting new applications",
+          "description": "Existing applications and interviews are kept. Reopen the job or archive it when recruitment is finished."
+        },
+        "archived": {
+          "title": "Archived · read-only",
+          "description": "Restore this job to Closed before editing or reopening it."
+        }
+      },
       "recordCard": "Record"
     },
     "delete": {
@@ -621,14 +653,88 @@
       "doneMessage": "“{{title}}” was permanently removed.",
       "failedTitle": "Could not delete job posting"
     },
+    "lifecycle": {
+      "failedTitle": "Could not change job posting status",
+      "publish": {
+        "action": "Publish",
+        "title": "Publish “{{title}}”?",
+        "description": "The job becomes visible to candidates and starts accepting applications.",
+        "confirm": "Publish job",
+        "doneTitle": "Job published",
+        "doneMessage": "The job is now published."
+      },
+      "draft": {
+        "action": "Move to draft",
+        "title": "Move “{{title}}” to draft?",
+        "description": "The job will no longer be visible to candidates.",
+        "confirm": "Move to draft",
+        "doneTitle": "Moved to draft",
+        "doneMessage": "The job is now a draft."
+      },
+      "close": {
+        "action": "Close",
+        "title": "Close “{{title}}”?",
+        "description": "Candidates will no longer be able to apply until the job is reopened.",
+        "confirm": "Close job",
+        "doneTitle": "Job closed",
+        "doneMessage": "The job is no longer accepting applications."
+      },
+      "reopen": {
+        "action": "Reopen",
+        "title": "Reopen “{{title}}”?",
+        "description": "The job will accept applications again if its deadline and company are valid.",
+        "confirm": "Reopen job",
+        "doneTitle": "Job reopened",
+        "doneMessage": "The job is accepting applications again."
+      },
+      "archive": {
+        "action": "Archive",
+        "title": "Archive “{{title}}”?",
+        "description": "The closed job will move to the archive and become read-only until restored.",
+        "confirm": "Archive job",
+        "doneTitle": "Job archived",
+        "doneMessage": "The job was moved to the archive."
+      },
+      "restore": {
+        "action": "Restore",
+        "title": "Restore “{{title}}”?",
+        "description": "The archived job will return as closed. You can then reopen it.",
+        "confirm": "Restore job",
+        "doneTitle": "Job restored",
+        "doneMessage": "The job was restored as closed."
+      }
+    },
+    "history": {
+      "title": "Activity history",
+      "loadFailed": "Could not load job posting history.",
+      "empty": "No recorded activity yet.",
+      "actor": "User {{id}}",
+      "changedFields": "Changed fields: {{fields}}",
+      "actions": {
+        "create": "Job created",
+        "update": "Job updated",
+        "delete": "Job deleted",
+        "publish": "Job published",
+        "draft": "Moved to draft",
+        "close": "Job closed",
+        "reopen": "Job reopened",
+        "archive": "Job archived",
+        "restore": "Job restored"
+      }
+    },
     "form": {
-      "createDescription": "Saving publishes the job straight away. Fields marked * are required.",
+      "createDescription": "Save an incomplete draft or publish when all required fields are ready.",
       "editDescription": "Changes are recorded in the audit log. Fields marked * are required.",
       "basicDescription": "What candidates see first on the job card.",
       "compensationDescription": "Optional. Leave empty if the salary is not shared.",
       "contentDescription": "Shown as written on the public job page.",
       "railSystemTitle": "Set by the system",
-      "railSystemBody": "Status <strong>Published</strong> and open until the deadline, your company, the creator (you) and the created time. Status is never chosen in this form.",
+      "railSystemBody": "Save a <strong>Draft</strong> while details are incomplete, or publish when the job is ready for candidates.",
+      "requiredToPublishTitle": "Required to publish",
+      "requiredTitle": "A title of 5–150 characters",
+      "requiredBasics": "Job type and location",
+      "requiredContent": "Description, requirements and benefits",
+      "requiredDeadline": "A deadline of today or later",
       "railNotEditableTitle": "Not editable here",
       "railNotEditableBody": "Company and status are set by the system. The job closes at the end of the deadline day and reopens if you move the deadline forward.",
       "railCurrentStatus": "Current status",

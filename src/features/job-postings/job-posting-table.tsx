@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router";
 
 import type { JobPosting } from "@/api/generated/types.gen";
 import { EmptyState } from "@/components/common/empty-state";
+import { LogoTile } from "@/components/common/logo-tile";
 import { SearchEmptyState } from "@/components/common/search-empty-state";
 import {
   DropdownMenu,
@@ -29,16 +30,12 @@ import {
   type JobSortBy,
   type JobSortOrder,
 } from "./job-postings.constants";
-import {
-  formatDeadline,
-  formatSalary,
-  jobDisplayId,
-} from "./job-postings.format";
+import { formatDeadline, formatSalary } from "./job-postings.format";
 
 const headerCell =
   "px-3 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap";
 const bodyCell = "px-3 py-3 align-middle text-[13px] text-foreground";
-const COLUMN_COUNT = 8;
+const COLUMN_COUNT = 6;
 
 type Props = {
   basePath: string;
@@ -111,26 +108,20 @@ export function JobPostingTable({
     <Table className="w-full">
       <TableHead className="bg-surface-readonly dark:bg-muted/40 border-b border-border">
         <TableHeaderRow className="hover:bg-transparent">
-          <TableHeaderCell className={`${headerCell} w-[76px]`}>
-            {sortable("created_at", t("jobPostings.table.id"))}
-          </TableHeaderCell>
-          <TableHeaderCell className={`${headerCell} min-w-[190px]`}>
+          <TableHeaderCell className={`${headerCell} min-w-[310px] pl-[22px]`}>
             {sortable("title", t("jobPostings.table.job"))}
           </TableHeaderCell>
-          <TableHeaderCell className={headerCell}>
-            {t("jobPostings.table.typeLevel")}
+          <TableHeaderCell className={`${headerCell} w-[118px]`}>
+            {t("jobPostings.table.status")}
           </TableHeaderCell>
           <TableHeaderCell className={headerCell}>
             {t("jobPostings.table.salary")}
           </TableHeaderCell>
           <TableHeaderCell className={headerCell}>
-            {t("jobPostings.table.applications")}
-          </TableHeaderCell>
-          <TableHeaderCell className={headerCell}>
             {sortable("expires_at", t("jobPostings.table.deadline"))}
           </TableHeaderCell>
           <TableHeaderCell className={headerCell}>
-            {t("jobPostings.table.status")}
+            {t("jobPostings.table.applications")}
           </TableHeaderCell>
           <TableHeaderCell className="w-12 text-right pr-4">
             <span className="sr-only">{t("jobPostings.table.actions")}</span>
@@ -145,54 +136,49 @@ export function JobPostingTable({
             const detailPath = `${basePath}/${row.id}`;
             return (
               <TableRow
-                className="group/row border-t border-line-muted transition-colors hover:bg-surface-subtle dark:border-border/50 dark:hover:bg-muted/20"
+                className="group/row h-16 border-t border-line-muted transition-colors hover:bg-surface-subtle dark:border-border/50 dark:hover:bg-muted/20"
                 key={row.id}
               >
-                <TableCell className={bodyCell}>
-                  <span className="font-mono text-xs text-muted-foreground whitespace-nowrap">
-                    {jobDisplayId(row.id)}
-                  </span>
-                </TableCell>
-                <TableCell className={`${bodyCell} min-w-[190px]`}>
-                  <Link
-                    className="group/link flex min-w-0 flex-col no-underline"
-                    to={detailPath}
-                  >
-                    <span className="flex min-w-0 flex-col">
-                      <span className="truncate text-[13.5px] font-bold text-foreground transition group-hover/link:text-primary">
-                        {row.title}
+                <TableCell className={`${bodyCell} min-w-[310px] pl-[22px]`}>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <LogoTile name={row.enterprise.name} size="md" />
+                    <Link
+                      className="group/link flex min-w-0 flex-1 flex-col no-underline"
+                      to={detailPath}
+                    >
+                      <span className="flex min-w-0 flex-col">
+                        <span className="truncate text-[14px] font-bold text-foreground transition group-hover/link:text-fg-link">
+                          {row.title}
+                        </span>
+                        <span className="truncate text-[12.5px] text-muted-foreground">
+                          {[
+                            row.enterprise.name,
+                            row.employmentType,
+                            row.level,
+                            row.location,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </span>
                       </span>
-                      <span className="truncate text-[12px] text-muted-foreground">
-                        {[row.enterprise.name, row.location]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </span>
-                    </span>
-                  </Link>
-                </TableCell>
-                <TableCell className={`${bodyCell} whitespace-nowrap`}>
-                  <span className="flex flex-col">
-                    <span>{row.employmentType ?? "—"}</span>
-                    {row.level ? (
-                      <span className="text-[12px] text-muted-foreground">
-                        {row.level}
-                      </span>
-                    ) : null}
-                  </span>
+                    </Link>
+                  </div>
                 </TableCell>
                 <TableCell className={`${bodyCell} whitespace-nowrap`}>
+                  <JobPostingStatusBadge posting={row} />
+                </TableCell>
+                <TableCell
+                  className={`${bodyCell} whitespace-nowrap font-semibold`}
+                >
                   {formatSalary(row, { compact: true })}
-                </TableCell>
-                <TableCell className={bodyCell}>
-                  <span className="font-mono text-xs">
-                    {row.applicationCount ?? "—"}
-                  </span>
                 </TableCell>
                 <TableCell className={`${bodyCell} whitespace-nowrap`}>
                   {formatDeadline(row.expiresAt)}
                 </TableCell>
-                <TableCell className={`${bodyCell} whitespace-nowrap`}>
-                  <JobPostingStatusBadge posting={row} />
+                <TableCell className={bodyCell}>
+                  <span className="font-mono text-xs font-semibold">
+                    {row.applicationCount ?? "—"}
+                  </span>
                 </TableCell>
                 <TableCell className="px-2 py-3 pr-3 text-right align-middle">
                   <DropdownMenu>

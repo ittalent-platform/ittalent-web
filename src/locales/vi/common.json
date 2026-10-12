@@ -1,4 +1,10 @@
 {
+  "roles": {
+    "admin": "Quản trị viên",
+    "enterpriseAdmin": "Quản trị viên doanh nghiệp",
+    "recruiter": "Nhà tuyển dụng",
+    "user": "Người dùng"
+  },
   "actions": {
     "save": "Lưu",
     "cancel": "Huỷ",
@@ -488,6 +494,8 @@
     "level": "Cấp bậc",
     "minimumSalary": "Lương tối thiểu",
     "maximumSalary": "Lương tối đa",
+    "salaryNegotiable": "Mức lương có thể thương lượng",
+    "salaryNegotiableHint": "Khoảng lương sẽ được xóa và khóa khi tùy chọn này được chọn.",
     "currency": "Tiền tệ",
     "openings": "Số lượng tuyển",
     "expiryDate": "Ngày hết hạn",
@@ -504,7 +512,9 @@
       "message": "Các thay đổi của bạn đã được lưu.",
       "failedTitle": "Không lưu được tin tuyển dụng",
       "noEnterprise": "Tài khoản nhà tuyển dụng của bạn chưa được gán vào doanh nghiệp. Vui lòng liên hệ quản trị viên.",
-      "action": "Lưu thay đổi"
+      "action": "Lưu thay đổi",
+      "draftAction": "Lưu bản nháp",
+      "publishAction": "Đăng tin"
     },
     "requiredMark": "bắt buộc",
     "optionalMark": "tùy chọn",
@@ -537,6 +547,7 @@
     "publicationStatus": {
       "draft": "Bản nháp",
       "published": "Đã đăng",
+      "closed": "Đã đóng",
       "archived": "Đã lưu trữ"
     },
     "applications": "Hồ sơ ứng tuyển",
@@ -548,6 +559,8 @@
     "toolbar": {
       "type": "Loại",
       "level": "Cấp bậc",
+      "publicationStatus": "Trạng thái đăng",
+      "recruitmentStatus": "Trạng thái tuyển",
       "all": "Tất cả",
       "clear": "Xóa bộ lọc"
     },
@@ -597,10 +610,29 @@
       "otherEnterprise": "Tin tuyển dụng này thuộc doanh nghiệp khác.",
       "loading": "Đang tải tin tuyển dụng…",
       "statusCard": "Trạng thái",
-      "statusNote": "Lưu là đăng tin ngay. Tin mở đến hết ngày hạn nộp (giờ Việt Nam); dời hạn nộp ra sau để mở lại.",
+      "statusNote": "Thao tác vòng đời chỉ hiển thị khi trạng thái hiện tại cho phép. Hạn nộp dùng giờ Việt Nam.",
       "applicationsCard": "Hồ sơ ứng tuyển",
       "applicationCount_other": "{{count}} hồ sơ",
       "applicationNote": "Tin đã nhận bất kỳ hồ sơ nào thì không thể xóa.",
+      "deleteBlocked": "Không thể xóa tin đã có hồ sơ. Hãy đóng rồi lưu trữ tin này.",
+      "metaPosted": "Đăng ngày {{date}}",
+      "metaCreated": "Tạo ngày {{date}}",
+      "metaDeadline": "Hạn nộp {{date}}",
+      "metaNoDeadline": "Chưa có hạn nộp",
+      "notices": {
+        "draft": {
+          "title": "Bản nháp · ứng viên chưa thể thấy tin này",
+          "description": "Hoàn tất các trường bắt buộc để đăng, rồi đăng tin khi đã sẵn sàng."
+        },
+        "closed": {
+          "title": "Đã đóng · không nhận hồ sơ mới",
+          "description": "Các hồ sơ và lịch phỏng vấn hiện có vẫn được giữ. Hãy mở lại hoặc lưu trữ khi đợt tuyển dụng kết thúc."
+        },
+        "archived": {
+          "title": "Đã lưu trữ · chỉ đọc",
+          "description": "Khôi phục tin về trạng thái Đã đóng trước khi chỉnh sửa hoặc mở lại."
+        }
+      },
       "recordCard": "Bản ghi"
     },
     "delete": {
@@ -612,14 +644,88 @@
       "doneMessage": "“{{title}}” đã bị xóa vĩnh viễn.",
       "failedTitle": "Không xóa được tin tuyển dụng"
     },
+    "lifecycle": {
+      "failedTitle": "Không đổi được trạng thái tin tuyển dụng",
+      "publish": {
+        "action": "Đăng tin",
+        "title": "Đăng “{{title}}”?",
+        "description": "Tin sẽ hiển thị cho ứng viên và bắt đầu nhận hồ sơ.",
+        "confirm": "Đăng tin",
+        "doneTitle": "Đã đăng tin",
+        "doneMessage": "Tin tuyển dụng hiện đã được đăng."
+      },
+      "draft": {
+        "action": "Chuyển thành nháp",
+        "title": "Chuyển “{{title}}” thành bản nháp?",
+        "description": "Tin sẽ không còn hiển thị cho ứng viên.",
+        "confirm": "Chuyển thành nháp",
+        "doneTitle": "Đã chuyển thành nháp",
+        "doneMessage": "Tin tuyển dụng hiện là bản nháp."
+      },
+      "close": {
+        "action": "Đóng tin",
+        "title": "Đóng “{{title}}”?",
+        "description": "Ứng viên sẽ không thể nộp hồ sơ cho đến khi tin được mở lại.",
+        "confirm": "Đóng tin",
+        "doneTitle": "Đã đóng tin",
+        "doneMessage": "Tin không còn nhận hồ sơ."
+      },
+      "reopen": {
+        "action": "Mở lại",
+        "title": "Mở lại “{{title}}”?",
+        "description": "Tin sẽ nhận hồ sơ trở lại nếu hạn nộp và doanh nghiệp vẫn hợp lệ.",
+        "confirm": "Mở lại tin",
+        "doneTitle": "Đã mở lại tin",
+        "doneMessage": "Tin đang nhận hồ sơ trở lại."
+      },
+      "archive": {
+        "action": "Lưu trữ",
+        "title": "Lưu trữ “{{title}}”?",
+        "description": "Tin đã đóng sẽ được chuyển vào kho lưu trữ và chỉ đọc cho đến khi khôi phục.",
+        "confirm": "Lưu trữ tin",
+        "doneTitle": "Đã lưu trữ tin",
+        "doneMessage": "Tin đã được chuyển vào kho lưu trữ."
+      },
+      "restore": {
+        "action": "Khôi phục",
+        "title": "Khôi phục “{{title}}”?",
+        "description": "Tin lưu trữ sẽ trở lại trạng thái đã đóng. Sau đó bạn có thể mở lại.",
+        "confirm": "Khôi phục tin",
+        "doneTitle": "Đã khôi phục tin",
+        "doneMessage": "Tin đã được khôi phục ở trạng thái đóng."
+      }
+    },
+    "history": {
+      "title": "Lịch sử hoạt động",
+      "loadFailed": "Không tải được lịch sử tin tuyển dụng.",
+      "empty": "Chưa có hoạt động nào được ghi nhận.",
+      "actor": "Người dùng {{id}}",
+      "changedFields": "Trường đã đổi: {{fields}}",
+      "actions": {
+        "create": "Đã tạo tin",
+        "update": "Đã cập nhật tin",
+        "delete": "Đã xóa tin",
+        "publish": "Đã đăng tin",
+        "draft": "Đã chuyển thành nháp",
+        "close": "Đã đóng tin",
+        "reopen": "Đã mở lại tin",
+        "archive": "Đã lưu trữ tin",
+        "restore": "Đã khôi phục tin"
+      }
+    },
     "form": {
-      "createDescription": "Lưu là đăng tin ngay. Các trường có dấu * là bắt buộc.",
+      "createDescription": "Lưu bản nháp chưa đầy đủ hoặc đăng khi các trường bắt buộc đã sẵn sàng.",
       "editDescription": "Thay đổi được ghi vào nhật ký kiểm tra. Các trường có dấu * là bắt buộc.",
       "basicDescription": "Phần ứng viên thấy đầu tiên trên thẻ công việc.",
       "compensationDescription": "Tùy chọn. Để trống nếu không công khai mức lương.",
       "contentDescription": "Hiển thị nguyên văn trên trang công việc công khai.",
       "railSystemTitle": "Hệ thống tự đặt",
-      "railSystemBody": "Trạng thái <strong>Đã đăng</strong> và mở đến hết hạn nộp, công ty của bạn, người tạo (bạn) và thời điểm tạo. Trạng thái không được chọn trong biểu mẫu này.",
+      "railSystemBody": "Lưu <strong>Bản nháp</strong> khi thông tin chưa đầy đủ, hoặc đăng khi tin đã sẵn sàng cho ứng viên.",
+      "requiredToPublishTitle": "Bắt buộc để đăng",
+      "requiredTitle": "Tiêu đề từ 5–150 ký tự",
+      "requiredBasics": "Loại công việc và địa điểm",
+      "requiredContent": "Mô tả, yêu cầu và phúc lợi",
+      "requiredDeadline": "Hạn nộp từ hôm nay trở đi",
       "railNotEditableTitle": "Không sửa tại đây",
       "railNotEditableBody": "Công ty và trạng thái do hệ thống đặt. Tin đóng vào cuối ngày hạn nộp và mở lại nếu bạn dời hạn nộp ra sau.",
       "railCurrentStatus": "Trạng thái hiện tại",

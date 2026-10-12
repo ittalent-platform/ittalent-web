@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
@@ -34,6 +34,7 @@ const posting: JobPosting = {
 };
 
 type User = ReturnType<typeof userEvent.setup>;
+const INTERACTIVE_TEST_TIMEOUT = 10_000;
 
 // The selects are Radix comboboxes: open the list, then pick an option.
 async function choose(user: User, name: RegExp, option: string) {
@@ -97,57 +98,95 @@ describe("JobPostingForm", () => {
       location: "Ho Chi Minh City",
     });
     expect(payload).not.toHaveProperty("status");
+    expect(payload).not.toHaveProperty("publication_status");
   });
 
-  it("does not offer a status or draft choice", () => {
-    renderForm();
-    expect(screen.queryByLabelText(/status/i)).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: /draft/i }),
-    ).not.toBeInTheDocument();
-  });
-
-  it("requires every published field before creating and then saves without a status", async () => {
+  it("saves an incomplete job as a draft with only the title required", async () => {
     const { onCreate, user } = renderForm();
-
-    await user.click(
-      screen.getByRole("button", { name: /create job posting/i }),
-    );
-    expect(onCreate).not.toHaveBeenCalled();
-    expect(await screen.findAllByText(/characters/i)).not.toHaveLength(0);
-    expect(screen.getByText(/choose a job type/i)).toBeInTheDocument();
-    expect(screen.getByText(/choose a deadline/i)).toBeInTheDocument();
-
-    await user.type(screen.getByLabelText(/^title/i), "Platform engineer");
-    await user.type(screen.getByLabelText(/^location/i), "Ha Noi");
-    await choose(user, /employment type/i, "Remote");
-    await user.type(
-      screen.getByLabelText(/^description/i),
-      "Own the platform that runs our services.",
-    );
-    await user.type(
-      screen.getByLabelText(/^requirements/i),
-      "Five years of backend experience.",
-    );
-    await user.type(
-      screen.getByLabelText(/^benefits/i),
-      "Health cover and flexible hours.",
-    );
-    const deadline = await pickDeadline(user);
-    await user.click(
-      screen.getByRole("button", { name: /create job posting/i }),
-    );
+    expect(screen.queryByLabelText(/status/i)).not.toBeInTheDocument();
+    await user.type(screen.getByLabelText(/^title/i), "Platform draft");
+    await user.click(screen.getByRole("button", { name: /save draft/i }));
 
     await waitFor(() => expect(onCreate).toHaveBeenCalledTimes(1));
     expect(onCreate.mock.calls[0]?.[0]).toEqual({
-      title: "Platform engineer",
-      location: "Ha Noi",
-      employment_type: "Remote",
       currency: "VND",
-      description: "Own the platform that runs our services.",
-      requirements: "Five years of backend experience.",
-      benefits: "Health cover and flexible hours.",
-      expires_at: deadline,
+      publication_status: "draft",
+      title: "Platform draft",
     });
   });
+
+  it("clears and disables the salary range when salary is negotiable", async () => {
+    const { onCreate } = renderForm();
+    const minimum = screen.getByLabelText(/minimum salary/i);
+    const maximum = screen.getByLabelText(/maximum salary/i);
+
+    fireEvent.change(screen.getByLabelText(/^title/i), {
+      target: { value: "Negotiable role" },
+    });
+    fireEvent.change(minimum, { target: { value: "1000" } });
+    fireEvent.change(maximum, { target: { value: "2000" } });
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: /salary is negotiable/i }),
+    );
+
+    expect(minimum).toBeDisabled();
+    expect(maximum).toBeDisabled();
+    expect(minimum).toHaveValue(null);
+    expect(maximum).toHaveValue(null);
+
+    fireEvent.click(screen.getByRole("button", { name: /save draft/i }));
+    await waitFor(() => expect(onCreate).toHaveBeenCalledTimes(1));
+    expect(onCreate.mock.calls[0]?.[0]).toEqual({
+      currency: "VND",
+      publication_status: "draft",
+      salary_negotiable: true,
+      title: "Negotiable role",
+    });
+  });
+
+  it(
+    "requires every published field before creating and explicitly publishes",
+    async () => {
+      const { onCreate, user } = renderForm();
+
+      await user.click(screen.getByRole("button", { name: /publish job/i }));
+      expect(onCreate).not.toHaveBeenCalled();
+      expect(await screen.findAllByText(/characters/i)).not.toHaveLength(0);
+      expect(screen.getByText(/choose a job type/i)).toBeInTheDocument();
+      expect(screen.getByText(/choose a deadline/i)).toBeInTheDocument();
+
+      fireEvent.change(screen.getByLabelText(/^title/i), {
+        target: { value: "Platform engineer" },
+      });
+      fireEvent.change(screen.getByLabelText(/^location/i), {
+        target: { value: "Ha Noi" },
+      });
+      await choose(user, /employment type/i, "Remote");
+      fireEvent.change(screen.getByLabelText(/^description/i), {
+        target: { value: "Own the platform that runs our services." },
+      });
+      fireEvent.change(screen.getByLabelText(/^requirements/i), {
+        target: { value: "Five years of backend experience." },
+      });
+      fireEvent.change(screen.getByLabelText(/^benefits/i), {
+        target: { value: "Health cover and flexible hours." },
+      });
+      const deadline = await pickDeadline(user);
+      await user.click(screen.getByRole("button", { name: /publish job/i }));
+
+      await waitFor(() => expect(onCreate).toHaveBeenCalledTimes(1));
+      expect(onCreate.mock.calls[0]?.[0]).toEqual({
+        title: "Platform engineer",
+        publication_status: "published",
+        location: "Ha Noi",
+        employment_type: "Remote",
+        currency: "VND",
+        description: "Own the platform that runs our services.",
+        requirements: "Five years of backend experience.",
+        benefits: "Health cover and flexible hours.",
+        expires_at: deadline,
+      });
+    },
+    INTERACTIVE_TEST_TIMEOUT,
+  );
 });
