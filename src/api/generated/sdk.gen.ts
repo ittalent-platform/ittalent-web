@@ -11,6 +11,9 @@ import type {
   DeleteApiV1EnterprisesByEnterpriseIdData,
   DeleteApiV1EnterprisesByEnterpriseIdErrors,
   DeleteApiV1EnterprisesByEnterpriseIdResponses,
+  DeleteApiV1InterviewsByIdData,
+  DeleteApiV1InterviewsByIdErrors,
+  DeleteApiV1InterviewsByIdResponses,
   DeleteApiV1JobPostingsByIdData,
   DeleteApiV1JobPostingsByIdErrors,
   DeleteApiV1JobPostingsByIdResponses,
@@ -48,6 +51,21 @@ import type {
   GetApiV1EnterprisesMyProfileErrors,
   GetApiV1EnterprisesMyProfileResponses,
   GetApiV1EnterprisesResponses,
+  GetApiV1InterviewsApplicationsData,
+  GetApiV1InterviewsApplicationsErrors,
+  GetApiV1InterviewsApplicationsResponses,
+  GetApiV1InterviewsByIdData,
+  GetApiV1InterviewsByIdErrors,
+  GetApiV1InterviewsByIdResponses,
+  GetApiV1InterviewsCalendarData,
+  GetApiV1InterviewsCalendarErrors,
+  GetApiV1InterviewsCalendarResponses,
+  GetApiV1InterviewsData,
+  GetApiV1InterviewsErrors,
+  GetApiV1InterviewsInterviewersData,
+  GetApiV1InterviewsInterviewersErrors,
+  GetApiV1InterviewsInterviewersResponses,
+  GetApiV1InterviewsResponses,
   GetApiV1JobPostingsByIdData,
   GetApiV1JobPostingsByIdErrors,
   GetApiV1JobPostingsByIdHistoryData,
@@ -89,6 +107,12 @@ import type {
   PatchApiV1EnterprisesByEnterpriseIdStatusData,
   PatchApiV1EnterprisesByEnterpriseIdStatusErrors,
   PatchApiV1EnterprisesByEnterpriseIdStatusResponses,
+  PatchApiV1InterviewsByIdData,
+  PatchApiV1InterviewsByIdErrors,
+  PatchApiV1InterviewsByIdResponses,
+  PatchApiV1InterviewsByIdStatusData,
+  PatchApiV1InterviewsByIdStatusErrors,
+  PatchApiV1InterviewsByIdStatusResponses,
   PatchApiV1JobPostingsByIdArchiveData,
   PatchApiV1JobPostingsByIdArchiveErrors,
   PatchApiV1JobPostingsByIdArchiveResponses,
@@ -152,6 +176,9 @@ import type {
   PostApiV1EnterprisesData,
   PostApiV1EnterprisesErrors,
   PostApiV1EnterprisesResponses,
+  PostApiV1InterviewsData,
+  PostApiV1InterviewsErrors,
+  PostApiV1InterviewsResponses,
   PostApiV1JobPostingsData,
   PostApiV1JobPostingsErrors,
   PostApiV1JobPostingsResponses,
@@ -1164,6 +1191,188 @@ export const patchApiV1MeApplicationsByIdWithdraw = <
   >({
     security: [{ scheme: "bearer", type: "http" }],
     url: "/api/v1/me/applications/{id}/withdraw",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * List interviews (List view) with search, filters, sorting and pagination
+ *
+ * Recruiter only: every interview of the recruiter's enterprise. Filters: `status` (one value or a comma-separated list), `mode`, `jobId`, `applicationId`, `interviewerId`, `from`/`to` on the start time, and `search` on the applicant or interviewer name/email and the job title. Sorted by start time, earliest first, by default.
+ */
+export const getApiV1Interviews = <ThrowOnError extends boolean = false>(
+  options?: Options<GetApiV1InterviewsData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetApiV1InterviewsResponses,
+    GetApiV1InterviewsErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/interviews",
+    ...options,
+  });
+
+/**
+ * Schedule an interview
+ *
+ * Recruiter only. Schedules an interview between the applicant of one application and one or more interviewers (active recruiters of the same enterprise), then emails the applicant and every interviewer. The time must be in the future and must not overlap another scheduled interview of the applicant or of any interviewer. An online interview needs a https `meetingLink`, an onsite one a `location`. The application status is not changed.
+ */
+export const postApiV1Interviews = <ThrowOnError extends boolean = false>(
+  options: Options<PostApiV1InterviewsData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    PostApiV1InterviewsResponses,
+    PostApiV1InterviewsErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/interviews",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * List interviews for a date window (Calendar view)
+ *
+ * Same access and filters as the list, but `from` and `to` are required (at most 62 days apart) and every interview overlapping that window is returned, earliest first, without paging. `truncated` is true when more interviews matched than the response holds.
+ */
+export const getApiV1InterviewsCalendar = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetApiV1InterviewsCalendarData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetApiV1InterviewsCalendarResponses,
+    GetApiV1InterviewsCalendarErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/interviews/calendar",
+    ...options,
+  });
+
+/**
+ * Find the applications an interview can be scheduled for
+ *
+ * Recruiter only. The submitted, under review and interviewing applications for the jobs of the recruiter's enterprise, newest first. `search` matches the applicant name/email and the job title; `limit` defaults to 20 (max 50). Feeds the "Select application" field of the Schedule interview dialog.
+ */
+export const getApiV1InterviewsApplications = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetApiV1InterviewsApplicationsData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetApiV1InterviewsApplicationsResponses,
+    GetApiV1InterviewsApplicationsErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/interviews/applications",
+    ...options,
+  });
+
+/**
+ * Find the recruiters who can be added as interviewers
+ *
+ * Recruiter only. The active recruiters of the recruiter's enterprise (the caller included), sorted by name. `search` matches the name, email and username; `limit` defaults to 20 (max 50). Resolves the interviewer emails of the Schedule interview dialog to the ids the create and update endpoints take.
+ */
+export const getApiV1InterviewsInterviewers = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<GetApiV1InterviewsInterviewersData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    GetApiV1InterviewsInterviewersResponses,
+    GetApiV1InterviewsInterviewersErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/interviews/interviewers",
+    ...options,
+  });
+
+/**
+ * Delete an interview
+ *
+ * Recruiter only. A completed interview cannot be deleted. Deleting an interview that was still scheduled emails the participants that it is cancelled.
+ */
+export const deleteApiV1InterviewsById = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteApiV1InterviewsByIdData, ThrowOnError>,
+) =>
+  (options.client ?? client).delete<
+    DeleteApiV1InterviewsByIdResponses,
+    DeleteApiV1InterviewsByIdErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/interviews/{id}",
+    ...options,
+  });
+
+/**
+ * View an interview
+ *
+ * Recruiter only. Includes the applicant, the interviewers, the job and the status history.
+ */
+export const getApiV1InterviewsById = <ThrowOnError extends boolean = false>(
+  options: Options<GetApiV1InterviewsByIdData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetApiV1InterviewsByIdResponses,
+    GetApiV1InterviewsByIdErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/interviews/{id}",
+    ...options,
+  });
+
+/**
+ * Update the information of a scheduled interview
+ *
+ * Recruiter only, and only while the interview is `scheduled`. Send only the fields to change; `null` clears `meetingLink`, `location` or `notes`. A new time must be in the future and overlap nothing else. The participants are emailed the new details, and interviewers who were removed are told it no longer involves them.
+ */
+export const patchApiV1InterviewsById = <ThrowOnError extends boolean = false>(
+  options: Options<PatchApiV1InterviewsByIdData, ThrowOnError>,
+) =>
+  (options.client ?? client).patch<
+    PatchApiV1InterviewsByIdResponses,
+    PatchApiV1InterviewsByIdErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/interviews/{id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+/**
+ * Update the status of a scheduled interview
+ *
+ * Recruiter only. A scheduled interview becomes `completed`, `no_show` or `cancelled`; those statuses are final. `completed` and `no_show` are only accepted once the interview has ended (409 INTERVIEW_NOT_ENDED before). `cancelled` is accepted at any time and emails the participants.
+ */
+export const patchApiV1InterviewsByIdStatus = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<PatchApiV1InterviewsByIdStatusData, ThrowOnError>,
+) =>
+  (options.client ?? client).patch<
+    PatchApiV1InterviewsByIdStatusResponses,
+    PatchApiV1InterviewsByIdStatusErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/api/v1/interviews/{id}/status",
     ...options,
     headers: {
       "Content-Type": "application/json",

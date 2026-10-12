@@ -3541,6 +3541,624 @@
           }
         },
         "required": ["expectedVersion"]
+      },
+      "CreateInterviewRequest": {
+        "type": "object",
+        "properties": {
+          "applicationId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "interviewerIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "minItems": 1,
+            "maxItems": 10
+          },
+          "scheduledAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "minimum": 15,
+            "maximum": 480,
+            "default": 60
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["online", "onsite"]
+          },
+          "meetingLink": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "location": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "notes": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": ["applicationId", "interviewerIds", "scheduledAt", "mode"],
+        "additionalProperties": false
+      },
+      "UpdateInterviewRequest": {
+        "type": "object",
+        "properties": {
+          "interviewerIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "minItems": 1,
+            "maxItems": 10
+          },
+          "scheduledAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "minimum": 15,
+            "maximum": 480
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["online", "onsite"]
+          },
+          "meetingLink": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 2048
+          },
+          "location": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateInterviewStatusRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["completed", "cancelled", "no_show"]
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": ["status"],
+        "additionalProperties": false
+      },
+      "InterviewDetailDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["scheduled", "completed", "cancelled", "no_show"]
+          },
+          "scheduledAt": {
+            "type": "string"
+          },
+          "endsAt": {
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "integer"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["online", "onsite"]
+          },
+          "meetingLink": {
+            "type": "string",
+            "nullable": true
+          },
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "applicationId": {
+            "type": "string"
+          },
+          "job": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": ["id", "title"]
+          },
+          "applicant": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "email": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": ["id", "fullName", "email"]
+          },
+          "interviewers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "fullName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "email": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": ["id", "fullName", "email"]
+            }
+          },
+          "canComplete": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "statusHistory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["scheduled", "completed", "cancelled", "no_show"]
+                },
+                "changedAt": {
+                  "type": "string"
+                },
+                "changedBy": {
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": ["status", "changedAt", "changedBy", "note"]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "scheduledAt",
+          "endsAt",
+          "durationMinutes",
+          "mode",
+          "meetingLink",
+          "location",
+          "notes",
+          "applicationId",
+          "job",
+          "applicant",
+          "interviewers",
+          "canComplete",
+          "createdAt",
+          "updatedAt",
+          "createdBy",
+          "statusHistory"
+        ]
+      },
+      "InterviewListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["scheduled", "completed", "cancelled", "no_show"]
+                },
+                "scheduledAt": {
+                  "type": "string"
+                },
+                "endsAt": {
+                  "type": "string"
+                },
+                "durationMinutes": {
+                  "type": "integer"
+                },
+                "mode": {
+                  "type": "string",
+                  "enum": ["online", "onsite"]
+                },
+                "meetingLink": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "location": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "notes": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "applicationId": {
+                  "type": "string"
+                },
+                "job": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": ["id", "title"]
+                },
+                "applicant": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "fullName": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "email": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": ["id", "fullName", "email"]
+                },
+                "interviewers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "fullName": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "email": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": ["id", "fullName", "email"]
+                  }
+                },
+                "canComplete": {
+                  "type": "boolean"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "status",
+                "scheduledAt",
+                "endsAt",
+                "durationMinutes",
+                "mode",
+                "meetingLink",
+                "location",
+                "notes",
+                "applicationId",
+                "job",
+                "applicant",
+                "interviewers",
+                "canComplete",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": ["items", "page", "limit", "total", "totalPages"]
+      },
+      "InterviewCalendarResponse": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["scheduled", "completed", "cancelled", "no_show"]
+                },
+                "scheduledAt": {
+                  "type": "string"
+                },
+                "endsAt": {
+                  "type": "string"
+                },
+                "durationMinutes": {
+                  "type": "integer"
+                },
+                "mode": {
+                  "type": "string",
+                  "enum": ["online", "onsite"]
+                },
+                "meetingLink": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "location": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "notes": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "applicationId": {
+                  "type": "string"
+                },
+                "job": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": ["id", "title"]
+                },
+                "applicant": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "fullName": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "email": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": ["id", "fullName", "email"]
+                },
+                "interviewers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "fullName": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "email": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    },
+                    "required": ["id", "fullName", "email"]
+                  }
+                },
+                "canComplete": {
+                  "type": "boolean"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "status",
+                "scheduledAt",
+                "endsAt",
+                "durationMinutes",
+                "mode",
+                "meetingLink",
+                "location",
+                "notes",
+                "applicationId",
+                "job",
+                "applicant",
+                "interviewers",
+                "canComplete",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          }
+        },
+        "required": ["from", "to", "total", "truncated", "items"]
+      },
+      "SchedulableApplicationListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "under_review",
+                    "interviewing",
+                    "offered",
+                    "hired",
+                    "rejected",
+                    "withdrawn"
+                  ]
+                },
+                "appliedAt": {
+                  "type": "string"
+                },
+                "job": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": ["id", "title"]
+                },
+                "applicant": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "fullName": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "email": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": ["id", "fullName", "email"]
+                }
+              },
+              "required": ["id", "status", "appliedAt", "job", "applicant"]
+            }
+          }
+        },
+        "required": ["items"]
+      },
+      "InterviewerListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "fullName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "email": {
+                  "type": "string"
+                }
+              },
+              "required": ["id", "fullName", "email"]
+            }
+          }
+        },
+        "required": ["items"]
       }
     },
     "parameters": {}
@@ -4994,8 +5612,7 @@
                 "admin",
                 "recruiter",
                 "enterprise_admin",
-                "applicant",
-                "interviewer"
+                "applicant"
               ]
             },
             "required": false,
@@ -6328,6 +6945,630 @@
           },
           "409": {
             "description": "The application changed after the client read it"
+          }
+        }
+      }
+    },
+    "/api/v1/interviews": {
+      "post": {
+        "tags": ["Interviews"],
+        "summary": "Schedule an interview",
+        "description": "Recruiter only. Schedules an interview between the applicant of one application and one or more interviewers (active recruiters of the same enterprise), then emails the applicant and every interviewer. The time must be in the future and must not overlap another scheduled interview of the applicant or of any interviewer. An online interview needs a https `meetingLink`, an onsite one a `location`. The application status is not changed.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInterviewRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Interview scheduled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, time in the past, or an interviewer is not eligible"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: wrong role, or the account is not assigned to an enterprise"
+          },
+          "404": {
+            "description": "Application not found or not part of the recruiter's enterprise"
+          },
+          "409": {
+            "description": "APPLICATION_NOT_SCHEDULABLE, APPLICANT_UNAVAILABLE, INTERVIEWER_CONFLICT or APPLICANT_CONFLICT"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Interviews"],
+        "summary": "List interviews (List view) with search, filters, sorting and pagination",
+        "description": "Recruiter only: every interview of the recruiter's enterprise. Filters: `status` (one value or a comma-separated list), `mode`, `jobId`, `applicationId`, `interviewerId`, `from`/`to` on the start time, and `search` on the applicant or interviewer name/email and the job title. Sorted by start time, earliest first, by default.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["online", "onsite"]
+            },
+            "required": false,
+            "name": "mode",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "jobId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "applicationId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "interviewerId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["scheduledAt", "createdAt", "status"],
+              "default": "scheduledAt"
+            },
+            "required": false,
+            "name": "sortBy",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "asc"
+            },
+            "required": false,
+            "name": "sortOrder",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated interviews",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or contradictory filter, sort or paging values"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: wrong role, or the account is not assigned to an enterprise"
+          }
+        }
+      }
+    },
+    "/api/v1/interviews/calendar": {
+      "get": {
+        "tags": ["Interviews"],
+        "summary": "List interviews for a date window (Calendar view)",
+        "description": "Same access and filters as the list, but `from` and `to` are required (at most 62 days apart) and every interview overlapping that window is returned, earliest first, without paging. `truncated` is true when more interviews matched than the response holds.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["online", "onsite"]
+            },
+            "required": false,
+            "name": "mode",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "jobId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "applicationId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "interviewerId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Interviews in the window",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewCalendarResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing window, from after to, or a window longer than 62 days"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: wrong role, or the account is not assigned to an enterprise"
+          }
+        }
+      }
+    },
+    "/api/v1/interviews/applications": {
+      "get": {
+        "tags": ["Interviews"],
+        "summary": "Find the applications an interview can be scheduled for",
+        "description": "Recruiter only. The submitted, under review and interviewing applications for the jobs of the recruiter's enterprise, newest first. `search` matches the applicant name/email and the job title; `limit` defaults to 20 (max 50). Feeds the \"Select application\" field of the Schedule interview dialog.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching applications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulableApplicationListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid search or limit"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: wrong role, or the account is not assigned to an enterprise"
+          }
+        }
+      }
+    },
+    "/api/v1/interviews/interviewers": {
+      "get": {
+        "tags": ["Interviews"],
+        "summary": "Find the recruiters who can be added as interviewers",
+        "description": "Recruiter only. The active recruiters of the recruiter's enterprise (the caller included), sorted by name. `search` matches the name, email and username; `limit` defaults to 20 (max 50). Resolves the interviewer emails of the Schedule interview dialog to the ids the create and update endpoints take.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching recruiters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewerListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid search or limit"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: wrong role, or the account is not assigned to an enterprise"
+          }
+        }
+      }
+    },
+    "/api/v1/interviews/{id}": {
+      "get": {
+        "tags": ["Interviews"],
+        "summary": "View an interview",
+        "description": "Recruiter only. Includes the applicant, the interviewers, the job and the status history.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Interview detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid interview ID"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: wrong role, or the account is not assigned to an enterprise"
+          },
+          "404": {
+            "description": "Interview not found, or it belongs to another enterprise"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Interviews"],
+        "summary": "Update the information of a scheduled interview",
+        "description": "Recruiter only, and only while the interview is `scheduled`. Send only the fields to change; `null` clears `meetingLink`, `location` or `notes`. A new time must be in the future and overlap nothing else. The participants are emailed the new details, and interviewers who were removed are told it no longer involves them.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInterviewRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Interview updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, time in the past, or an interviewer is not eligible"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: wrong role, or the account is not assigned to an enterprise"
+          },
+          "404": {
+            "description": "Interview not found, or it belongs to another enterprise"
+          },
+          "409": {
+            "description": "INTERVIEW_NOT_EDITABLE, INTERVIEWER_CONFLICT, APPLICANT_CONFLICT or INTERVIEW_STATE_CHANGED"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Interviews"],
+        "summary": "Delete an interview",
+        "description": "Recruiter only. A completed interview cannot be deleted. Deleting an interview that was still scheduled emails the participants that it is cancelled.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Interview deleted"
+          },
+          "400": {
+            "description": "Invalid interview ID"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: wrong role, or the account is not assigned to an enterprise"
+          },
+          "404": {
+            "description": "Interview not found, or it belongs to another enterprise"
+          },
+          "409": {
+            "description": "INTERVIEW_COMPLETED or INTERVIEW_STATE_CHANGED"
+          }
+        }
+      }
+    },
+    "/api/v1/interviews/{id}/status": {
+      "patch": {
+        "tags": ["Interviews"],
+        "summary": "Update the status of a scheduled interview",
+        "description": "Recruiter only. A scheduled interview becomes `completed`, `no_show` or `cancelled`; those statuses are final. `completed` and `no_show` are only accepted once the interview has ended (409 INTERVIEW_NOT_ENDED before). `cancelled` is accepted at any time and emails the participants.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInterviewStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterviewDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unsupported status or invalid note"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: wrong role, or the account is not assigned to an enterprise"
+          },
+          "404": {
+            "description": "Interview not found, or it belongs to another enterprise"
+          },
+          "409": {
+            "description": "INTERVIEW_STATUS_FINAL, INTERVIEW_NOT_ENDED or INTERVIEW_STATE_CHANGED"
           }
         }
       }
