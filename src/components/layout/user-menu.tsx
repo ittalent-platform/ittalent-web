@@ -73,7 +73,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
             <p className="truncate text-[0.8rem] text-muted-foreground">
               {user?.role === "admin"
                 ? "Admin"
-                : user?.role === "recruiter"
+                : user?.role === "recruiter" || user?.role === "enterprise_admin"
                   ? "Recruiter"
                   : "User"}
             </p>
@@ -115,7 +115,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           </DropdownMenuItem>
         ) : null}
 
-        {user?.role === "recruiter" ? (
+        {user?.role === "recruiter" || user?.role === "enterprise_admin" ? (
           <DropdownMenuItem
             className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer"
             onSelect={() => navigate("/recruiter/job-postings")}

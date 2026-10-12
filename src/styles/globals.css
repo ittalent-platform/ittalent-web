@@ -784,6 +784,20 @@
   --color-mkt-violet-border: #d9ccf3;
 }
 
+/* Employer auth hero: the dark canvas with Ember rings that brighten toward the centre. */
+.itt-hero-employer {
+  --hero-candidate-bg: var(--hero-bg);
+  --hero-ring-1: #241c1a;
+  --hero-ring-2: #301e17;
+  --hero-ring-3: #442213;
+  --hero-ring-4: #612810;
+  --hero-ring-5: #86300f;
+  --hero-ring-6: #b0370c;
+  --hero-ring-7: #d23f0b;
+  --hero-ring-8: #f2470c;
+  --hero-ring-9: #ff6a33;
+}
+
 /* The artwork box keeps the 560 x 520 proportions; ring sizes inside it are cqw. */
 .itt-hero-rings {
   aspect-ratio: 560 / 520;

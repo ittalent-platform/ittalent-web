@@ -19,6 +19,7 @@ export const backendEnv = {
   WEB_URL: E2E_WEB_URL,
   OPENAPI_SERVER_URL: E2E_API_URL,
   NODE_ENV: "development",
+  BREVO_API_KEY: "",
   // Global setup and the sign-in test log in several times per run; the default 5 per minute would fail back-to-back runs.
   LOGIN_RATE_LIMIT_MAX_ATTEMPTS: "1000",
 };

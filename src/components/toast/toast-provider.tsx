@@ -124,7 +124,7 @@ function ToastCard({ toast, onDismiss }: { onDismiss: (id: string) => void; toas
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className={`m-0 line-clamp-2 break-all text-[13px] leading-[1.5] ${styles.message}`} title={toast.message}>{toast.message}</p>
+          <p className={`m-0 line-clamp-3 wrap-anywhere text-[13px] leading-[1.5] ${styles.message}`} title={toast.message}>{toast.message}</p>
           {toast.note ? <p className={`mt-1.5 wrap-anywhere text-[11.5px] leading-[1.45] ${styles.note}`}>{toast.note}</p> : null}
         </div>
 

@@ -32,7 +32,7 @@ function getStatusTone(status?: number) {
   return "error";
 }
 
-function PasswordRuleChips({
+export function PasswordRuleChips({
   confirmPassword,
   password,
 }: {

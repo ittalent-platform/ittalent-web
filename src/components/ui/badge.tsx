@@ -15,6 +15,7 @@ const badgeVariants = cva(
         blocked: "bg-(--status-blocked-bg) text-(--status-blocked-fg)",
         warning: "bg-(--status-warning-bg) text-(--status-warning-fg)",
         info: "bg-(--status-info-bg) text-(--status-info-fg)",
+        inverse: "bg-foreground text-background",
       },
     },
     defaultVariants: {

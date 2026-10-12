@@ -15,6 +15,7 @@ type FilterSelectProps<T extends string> = {
   className?: string
   contentClassName?: string
   onChange: (value: T) => void
+  onSearchChange?: (value: string) => void
   options: FilterSelectOption<T>[]
   placeholder?: string
   /** Custom trigger content, e.g. a muted "Status:" prefix before the emphasised value. */
@@ -29,6 +30,7 @@ export function FilterSelect<T extends string>({
   className,
   contentClassName,
   onChange,
+  onSearchChange,
   options,
   placeholder,
   renderTrigger,
@@ -78,10 +80,12 @@ export function FilterSelect<T extends string>({
             onBlur={() => window.setTimeout(() => setOpen(false), 100)}
             onChange={(event) => {
               setQuery(event.target.value)
+              onSearchChange?.(event.target.value)
               setOpen(true)
             }}
             onFocus={() => {
               setQuery("")
+              onSearchChange?.("")
               setOpen(true)
             }}
             placeholder={selected ? undefined : placeholderLabel}
@@ -109,6 +113,7 @@ export function FilterSelect<T extends string>({
                   event.preventDefault()
                   onChange(option.value)
                   setQuery("")
+                  onSearchChange?.("")
                   setOpen(false)
                 }}
                 type="button"
@@ -179,12 +184,17 @@ export function FilterSelect<T extends string>({
 
 type FilterMultiSelectProps<T extends string> = {
   allLabel?: string
+  /** Shows a search box at the top of the menu; the parent narrows `options` (e.g. with a server query). */
+  onSearchChange?: (query: string) => void
+  searchPlaceholder?: string
   baseLabel?: string
   className?: string
   contentClassName?: string
   onChange: (values: T[]) => void
   options: FilterSelectOption<T>[]
   placeholder?: string
+  /** "Role" renders the trigger as "Role: All", "Role: HR" or "Role: 2". */
+  prefix?: string
   size?: "md" | "sm"
   values: T[]
 }
@@ -195,8 +205,11 @@ export function FilterMultiSelect<T extends string>({
   className,
   contentClassName,
   onChange,
+  onSearchChange,
   options,
   placeholder,
+  prefix,
+  searchPlaceholder,
   size = "md",
   values,
 }: FilterMultiSelectProps<T>) {
@@ -207,25 +220,28 @@ export function FilterMultiSelect<T extends string>({
     ? placeholderLabel
     : values.length === 1
       ? options.find((option) => option.value === values[0])?.label ?? placeholderLabel
-      : `${baseLabelText} (${values.length})`
+      : prefix
+        ? String(values.length)
+        : `${baseLabelText} (${values.length})`
 
   function toggle(value: T) {
     onChange(values.includes(value) ? values.filter((item) => item !== value) : [...values, value])
   }
 
   return (
-    <DropdownMenuPrimitive.Root>
+    <DropdownMenuPrimitive.Root onOpenChange={(open) => { if (!open) onSearchChange?.("") }}>
       <DropdownMenuPrimitive.Trigger asChild>
         <button
           className={cn(
             "inline-flex flex-[0_0_auto] cursor-pointer items-center gap-[7px] rounded-lg border border-solid border-(--border-strong) bg-card font-normal leading-normal tracking-normal text-muted-foreground outline-none data-[state=open]:border-primary",
             size === "sm" ? "h-9 gap-1.5 px-3 text-[13px]" : "h-11 pl-[15px] pr-[17px] py-px text-[13.5px]",
+            values.length > 0 && "border-primary font-semibold text-primary",
             className,
           )}
           type="button"
         >
-          {label}
-          <span className="pb-px text-muted-foreground">▾</span>
+          {prefix ? `${prefix}: ${label}` : label}
+          <span aria-hidden className="pb-px text-[10px]">▾</span>
         </button>
       </DropdownMenuPrimitive.Trigger>
 
@@ -240,6 +256,18 @@ export function FilterMultiSelect<T extends string>({
           collisionPadding={16}
           sideOffset={6}
         >
+          {onSearchChange ? (
+            <div className="sticky top-0 z-10 border-b border-border bg-card p-2">
+              <input
+                aria-label={searchPlaceholder}
+                className="h-9 w-full rounded-md border border-border bg-card px-3 text-[13px] text-foreground outline-none placeholder:text-muted-foreground focus:border-primary"
+                onChange={(event) => onSearchChange(event.target.value)}
+                // Typing must not trigger the menu's own type-ahead or close handling.
+                onKeyDown={(event) => event.stopPropagation()}
+                placeholder={searchPlaceholder}
+              />
+            </div>
+          ) : null}
           <DropdownMenuPrimitive.Item
             className={cn(
               "flex cursor-pointer items-center border-t border-border px-3.5 py-2.5 text-[13.5px] outline-none select-none first:border-t-0 data-[highlighted]:bg-muted",
