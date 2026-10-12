@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 import {
   EMPLOYERS_ANCHOR,
-  LOGIN_PATH,
+  REGISTER_COMPANY_PATH,
   REGISTER_PATH,
   STEP_NUMBERS,
 } from "./home.constants";
@@ -81,7 +81,7 @@ export function HomeHowItWorks() {
           <Steps dark side="employers" />
           <Link
             className="relative mt-1.5 flex h-[46px] items-center self-start rounded-full bg-white px-6 text-sm font-semibold text-mkt-ink hover:bg-mkt-chip"
-            to={LOGIN_PATH}
+            to={REGISTER_COMPANY_PATH}
           >
             {t("home.how.employers.cta")}
           </Link>
