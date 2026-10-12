@@ -89,6 +89,7 @@ export const REGISTRATION_MESSAGE_KEYS = {
 
 /** `value` is what the API stores; `key` picks the translated label (`enterpriseRegistration.industries.*`). */
 export const INDUSTRY_OPTIONS = [
+  { key: "logisticsTech", value: "Logistics technology" },
   { key: "software", value: "Software & IT Services" },
   { key: "fintech", value: "Fintech & Banking" },
   { key: "ecommerce", value: "E-commerce & Retail" },
@@ -96,7 +97,6 @@ export const INDUSTRY_OPTIONS = [
   { key: "education", value: "Education & Edtech" },
   { key: "telecom", value: "Telecommunications" },
   { key: "gaming", value: "Gaming & Entertainment" },
-  { key: "logistics", value: "Logistics & Supply Chain" },
   { key: "ai", value: "Artificial Intelligence & Data" },
   { key: "hardware", value: "Hardware & Electronics" },
   { key: "other", value: "Other" },
@@ -104,6 +104,8 @@ export const INDUSTRY_OPTIONS = [
 
 export const WIZARD_STEPS = ["step1", "step2", "step3", "step4"] as const;
 
+/** The start screen asks only for name and email, but the API requires a phone there; step 2 collects the real one. */
+export const START_PHONE_PLACEHOLDER = "0900000000";
+
 export const DEFAULT_COUNTRY = "Vietnam";
-export const DEFAULT_COMPANY_SIZE = "11-50";
 export const DEFAULT_SLA_DAYS = 2;

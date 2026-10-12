@@ -141,6 +141,11 @@ export const step2RepresentativeSchema = z.object({
     .regex(REGISTRATION_CONFIG.PHONE_REGEX, validationMessage("enterpriseRegistration.validation.phoneInvalid")),
   position: z.string().trim().max(REGISTRATION_CONFIG.POSITION_MAX_LENGTH).optional(),
   is_legal_representative: z.boolean(),
+  legal_representative_name: z
+    .string()
+    .trim()
+    .max(REGISTRATION_CONFIG.REPRESENTATIVE_NAME_MAX_LENGTH)
+    .optional(),
 });
 
 export type Step2RepresentativeFormData = z.infer<typeof step2RepresentativeSchema>;

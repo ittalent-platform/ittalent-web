@@ -12,6 +12,7 @@ import {
 export const CAREER_PATH = "/career";
 export const ENTERPRISES_PATH = "/enterprises";
 export const REGISTER_PATH = "/register";
+export const REGISTER_COMPANY_PATH = "/register-company";
 export const LOGIN_PATH = "/login";
 /** Section id the header/footer "For employers" links scroll to. */
 export const EMPLOYERS_ANCHOR = "employers";

@@ -1,15 +1,13 @@
 import { useState } from "react";
-import { TriangleAlert } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 
 import { LoadingScreen } from "@/components/common/loading-screen";
-import { StatusPanel } from "@/components/common/status-panel";
+import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
-import { AuthCardPage, AuthStatusCard } from "@/features/auth/auth-status-card";
-import { AUTH_ACTION_CLASS } from "@/features/auth/auth-status.constants";
 import { WizardLayout } from "@/features/enterprise-registration/components/wizard-layout";
-import { StartRegistrationForm } from "@/features/enterprise-registration/components/start-registration-form";
+import { IntakeSplitLayout } from "@/features/enterprise-registration/components/intake-split-layout";
+import { StartRegistrationForm, type StartIntakeFormData } from "@/features/enterprise-registration/components/start-registration-form";
 import { RegistrationCheckEmail } from "@/features/enterprise-registration/components/registration-check-email";
 import { ResumeDraftForm } from "@/features/enterprise-registration/components/resume-draft-form";
 import { Step1CompanyForm } from "@/features/enterprise-registration/components/step1-company-form";
@@ -21,15 +19,15 @@ import {
   RegistrationWizardProvider,
   useRegistrationWizard,
 } from "@/features/enterprise-registration/context/registration-wizard-context";
+import { START_PHONE_PLACEHOLDER } from "@/features/enterprise-registration/enterprise-registration.constants";
 import {
   useVerifyRegistrationEmailQuery,
   useEnterpriseRegistrationDetailQuery,
   useStartRegistrationMutation,
 } from "@/features/enterprise-registration/enterprise-registration.queries";
-import type { StartRegistrationFormData } from "@/features/enterprise-registration/enterprise-registration.schemas";
 import type { SubmissionReceiptResponse } from "@/features/enterprise-registration/enterprise-registration.types";
 
-type View = "start" | "check-email" | "resume-draft" | "wizard";
+type View = "start" | "check-email" | "resume-draft";
 
 export function RegisterCompanyPage() {
   const { t } = useTranslation();
@@ -39,7 +37,7 @@ export function RegisterCompanyPage() {
   const resumeId = searchParams.get("id") || "";
 
   const [view, setView] = useState<View>("start");
-  const [contact, setContact] = useState<StartRegistrationFormData | null>(null);
+  const [contact, setContact] = useState<StartIntakeFormData | null>(null);
   const [submissionReceipt, setSubmissionReceipt] = useState<SubmissionReceiptResponse | null>(null);
 
   const verifyEmailQuery = useVerifyRegistrationEmailQuery(token, {
@@ -58,8 +56,7 @@ export function RegisterCompanyPage() {
 
   const isWizardActive =
     (Boolean(token) && Boolean(verifyEmailQuery.data)) ||
-    (Boolean(resumeId) && Boolean(detailQuery.data)) ||
-    view === "wizard";
+    (Boolean(resumeId) && Boolean(detailQuery.data));
 
   // The wizard seeds its state once, so wait for the saved draft instead of mounting it empty.
   const waitingForDraft = Boolean(resolvedRegistrationId) && detailQuery.isLoading;
@@ -70,36 +67,29 @@ export function RegisterCompanyPage() {
 
   if (token && verifyEmailQuery.isError) {
     return (
-      <AuthCardPage tone="employer">
-        <AuthStatusCard>
-          <StatusPanel
-            actions={
-              <Button className={AUTH_ACTION_CLASS} onClick={() => navigate("/register-company", { replace: true })} shape="xl" type="button">
-                {t("enterpriseRegistration.verify.restart")}
-              </Button>
-            }
-            description={t("enterpriseRegistration.verify.invalid")}
-            icon={TriangleAlert}
-            title={t("enterpriseRegistration.shell.title")}
-            tone="danger"
-          />
-        </AuthStatusCard>
-      </AuthCardPage>
+      <IntakeSplitLayout>
+        <div className="flex w-full flex-col gap-[22px]">
+          <InlineBanner tone="error">{t("enterpriseRegistration.verify.invalid")}</InlineBanner>
+          <Button
+            className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
+            onClick={() => navigate("/register-company", { replace: true })}
+            type="button"
+          >
+            {t("enterpriseRegistration.verify.restart")}
+          </Button>
+        </div>
+      </IntakeSplitLayout>
     );
   }
 
   if (submissionReceipt) {
-    return (
-      <AuthCardPage tone="employer">
-        <RegistrationSubmittedReceipt receipt={submissionReceipt} />
-      </AuthCardPage>
-    );
+    return <RegistrationSubmittedReceipt draft={detailQuery.data} receipt={submissionReceipt} />;
   }
 
   if (!isWizardActive) {
     if (view === "check-email" && contact) {
       return (
-        <AuthCardPage tone="employer">
+        <IntakeSplitLayout>
           <RegistrationCheckEmail
             email={contact.corporate_email}
             onChangeEmail={() => setView("start")}
@@ -107,25 +97,24 @@ export function RegisterCompanyPage() {
               await startMutation.mutateAsync({
                 corporate_email: contact.corporate_email,
                 representative_name: contact.representative_name,
-                representative_phone: contact.representative_phone,
-                representative_position: contact.representative_position || undefined,
+                representative_phone: START_PHONE_PLACEHOLDER,
               });
             }}
           />
-        </AuthCardPage>
+        </IntakeSplitLayout>
       );
     }
 
     if (view === "resume-draft") {
       return (
-        <AuthCardPage tone="employer">
+        <IntakeSplitLayout>
           <ResumeDraftForm onBack={() => setView("start")} />
-        </AuthCardPage>
+        </IntakeSplitLayout>
       );
     }
 
     return (
-      <AuthCardPage tone="employer">
+      <IntakeSplitLayout>
         <StartRegistrationForm
           onContinueLaterClick={() => setView("resume-draft")}
           onSuccess={(values) => {
@@ -133,7 +122,7 @@ export function RegisterCompanyPage() {
             setView("check-email");
           }}
         />
-      </AuthCardPage>
+      </IntakeSplitLayout>
     );
   }
 

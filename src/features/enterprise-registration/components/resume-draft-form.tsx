@@ -1,22 +1,17 @@
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
 
 import { FormField } from "@/components/common/form-field";
-import { StatusPanel } from "@/components/common/status-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AuthFormHeader, AuthStatusCard } from "@/features/auth/auth-status-card";
-import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS } from "@/features/auth/auth-status.constants";
 import { corporateEmailSchema } from "@/features/enterprise-registration/enterprise-registration.schemas";
 
 const STRONG = { strong: <strong className="font-semibold text-foreground" /> };
+const ACTION_CLASS = "h-12 w-full rounded-xl text-[14.5px] font-semibold";
+const TITLE_CLASS = "font-heading text-2xl font-semibold tracking-[-0.01em] text-foreground sm:text-[30px]";
 
-export function ResumeDraftForm({
-  onBack,
-}: {
-  onBack: () => void;
-}) {
+export function ResumeDraftForm({ onBack }: { onBack: () => void }) {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -38,27 +33,31 @@ export function ResumeDraftForm({
 
   if (isSubmitted) {
     return (
-      <AuthStatusCard>
-        <StatusPanel
-          actions={
-            <Button className={AUTH_ACTION_CLASS} onClick={onBack} shape="xl" type="button" variant="outline">
-              {t("enterpriseRegistration.resume.returnToRegistration")}
-            </Button>
-          }
-          description={<Trans components={STRONG} i18nKey="enterpriseRegistration.resume.sentBody" values={{ email }} />}
-          icon={CheckCircle2}
-          title={t("enterpriseRegistration.resume.sentTitle")}
-          tone="success"
-        />
-      </AuthStatusCard>
+      <div className="flex w-full flex-col gap-[22px]">
+        <div className="flex size-14 items-center justify-center rounded-2xl bg-(--status-success-bg) text-(--status-success-fg)">
+          <CheckCircle2 aria-hidden className="size-7" />
+        </div>
+        <div className="flex flex-col gap-2.5">
+          <h1 className={TITLE_CLASS}>{t("enterpriseRegistration.resume.sentTitle")}</h1>
+          <p className="text-[14.5px] leading-[1.6] text-muted-foreground">
+            <Trans components={STRONG} i18nKey="enterpriseRegistration.resume.sentBody" values={{ email }} />
+          </p>
+        </div>
+        <Button className={ACTION_CLASS} onClick={onBack} type="button" variant="outline">
+          {t("enterpriseRegistration.resume.returnToRegistration")}
+        </Button>
+      </div>
     );
   }
 
   return (
-    <AuthStatusCard className="flex flex-col gap-[22px]">
-      <AuthFormHeader description={t("enterpriseRegistration.resume.subtitle")} title={t("enterpriseRegistration.resume.title")} />
+    <div className="flex w-full flex-col gap-[22px]">
+      <div className="flex flex-col gap-2.5">
+        <h1 className={TITLE_CLASS}>{t("enterpriseRegistration.resume.title")}</h1>
+        <p className="text-[14.5px] leading-[1.6] text-muted-foreground">{t("enterpriseRegistration.resume.subtitle")}</p>
+      </div>
 
-      <form className="flex flex-col gap-[22px]" noValidate onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-[18px]" noValidate onSubmit={handleSubmit}>
         <FormField error={error} htmlFor="resume_email" label={t("enterpriseRegistration.resume.email")} required>
           <Input
             aria-invalid={Boolean(error)}
@@ -70,16 +69,17 @@ export function ResumeDraftForm({
           />
         </FormField>
 
-        <Button className={AUTH_FULL_ACTION_CLASS} shape="xl" type="submit">
+        <Button className={ACTION_CLASS} type="submit">
           {t("enterpriseRegistration.resume.submit")}
-          <ArrowRight aria-hidden />
         </Button>
       </form>
 
-      <button className="inline-flex cursor-pointer items-center gap-1.5 self-center text-[13.5px] font-semibold text-fg-link hover:underline" onClick={onBack} type="button">
-        <ArrowLeft aria-hidden className="size-3.5" />
-        {t("enterpriseRegistration.resume.back")}
-      </button>
-    </AuthStatusCard>
+      <div className="pt-1 text-[13.5px] text-muted-foreground">
+        {t("enterpriseRegistration.resume.newPrompt")}{" "}
+        <button className="cursor-pointer font-bold text-fg-link hover:underline" onClick={onBack} type="button">
+          {t("enterpriseRegistration.resume.newLink")}
+        </button>
+      </div>
+    </div>
   );
 }
