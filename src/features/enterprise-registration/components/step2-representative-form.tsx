@@ -103,23 +103,21 @@ export function Step2RepresentativeForm({
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Representative
-        </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          You will become the company&apos;s first Enterprise admin after approval.
-        </p>
-      </div>
-
-      {serverError && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{serverError}</InlineBanner>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <section className="rounded-2xl border border-border bg-card p-6 sm:p-7 flex flex-col gap-5">
+        <div>
+          <h2 className="text-[15px] font-bold tracking-tight text-foreground">
+            Representative
+          </h2>
+          <p className="mt-1 text-[13.5px] text-muted-foreground">
+            You will become the company&apos;s first Enterprise admin after approval.
+          </p>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {serverError && (
+          <InlineBanner tone="error">{serverError}</InlineBanner>
+        )}
+
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {/* Row 1: Full name (left) | Work email with Verified pill (right) */}
           <FormField
@@ -274,27 +272,28 @@ export function Step2RepresentativeForm({
           </div>
         )}
 
-        {/* Footer actions */}
-        <div className="flex items-center justify-between border-t border-border pt-6">
-          <Button type="button" variant="outline" onClick={onBack}>
-            Back
-          </Button>
+      </section>
 
-          <div className="flex items-center gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isSaving}
-              onClick={handleSaveDraftOnly}
-            >
-              Save draft
-            </Button>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving ? "Saving..." : "Continue"}
-            </Button>
-          </div>
+      {/* Footer actions on background */}
+      <div className="flex items-center justify-between pt-1">
+        <Button type="button" variant="outline" onClick={onBack}>
+          Back
+        </Button>
+
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSaving}
+            onClick={handleSaveDraftOnly}
+          >
+            Save draft
+          </Button>
+          <Button type="submit" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Continue"}
+          </Button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }

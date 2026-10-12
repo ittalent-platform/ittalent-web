@@ -102,20 +102,18 @@ export function Step1CompanyForm({
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Company details
-        </h2>
-      </div>
-
-      {serverError && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{serverError}</InlineBanner>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <section className="rounded-2xl border border-border bg-card p-6 sm:p-7 flex flex-col gap-5">
+        <div>
+          <h2 className="text-[15px] font-bold tracking-tight text-foreground">
+            Company details
+          </h2>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {serverError && (
+          <InlineBanner tone="error">{serverError}</InlineBanner>
+        )}
+
         {/* Field Grid matching Screen 13 layout */}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {/* Row 1: Legal name (left) | Trading name (right) */}
@@ -273,14 +271,45 @@ export function Step1CompanyForm({
             </FormField>
           </div>
         </div>
+      </section>
 
-        {/* Action button */}
-        <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={isSaving}>
-            {isSaving ? "Saving..." : "Continue"}
-          </Button>
-        </div>
-      </form>
-    </div>
+      {/* Action buttons on background */}
+      <div className="flex items-center justify-end gap-3 pt-1">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isSaving}
+          onClick={async () => {
+            const values = control._formValues;
+            try {
+              await saveDraft({
+                company_data: {
+                  legal_name: values.legal_name,
+                  name: values.name,
+                  tax_code: values.tax_code,
+                  website: values.website || undefined,
+                  industry: values.industry,
+                  company_size: values.company_size,
+                  address: {
+                    street: values.address?.street,
+                    city: values.address?.city || "Hà Nội",
+                    country: values.address?.country || "Vietnam",
+                  },
+                },
+                version: draft?.version,
+              });
+            } catch (err: unknown) {
+              const errorObj = err as { message?: string };
+              setServerError(errorObj.message || "Failed to save draft.");
+            }
+          }}
+        >
+          Save draft
+        </Button>
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? "Saving..." : "Continue"}
+        </Button>
+      </div>
+    </form>
   );
 }

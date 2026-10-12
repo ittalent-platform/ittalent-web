@@ -124,21 +124,20 @@ export function Step3DocumentsForm({
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Documents
-        </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          An ITTalent admin checks these before approving. Files are private: only reviewers can open them.
-        </p>
-      </div>
-
-      {errorMessage && (
-        <div className="mb-6">
-          <InlineBanner tone="error">{errorMessage}</InlineBanner>
+    <div className="flex flex-col gap-5">
+      <section className="rounded-2xl border border-border bg-card p-6 sm:p-7 flex flex-col gap-5">
+        <div>
+          <h2 className="text-[15px] font-bold tracking-tight text-foreground">
+            Documents
+          </h2>
+          <p className="mt-1 text-[13.5px] text-muted-foreground">
+            An ITTalent admin checks these before approving. Files are private: only reviewers can open them.
+          </p>
         </div>
-      )}
+
+        {errorMessage && (
+          <InlineBanner tone="error">{errorMessage}</InlineBanner>
+        )}
 
       {/* Hidden file input */}
       <input
@@ -354,8 +353,10 @@ export function Step3DocumentsForm({
         </div>
       </div>
 
-      {/* Footer Navigation */}
-      <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
+      </section>
+
+      {/* Footer Navigation on background */}
+      <div className="flex items-center justify-between pt-1">
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
@@ -371,7 +372,7 @@ export function Step3DocumentsForm({
           >
             Save draft
           </Button>
-          <Button type="button" disabled={uploadMutation.isPending} onClick={handleProceed}>
+          <Button type="submit" disabled={uploadMutation.isPending} onClick={handleProceed}>
             Continue
           </Button>
         </div>

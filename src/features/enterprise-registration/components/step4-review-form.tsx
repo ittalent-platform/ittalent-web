@@ -311,8 +311,8 @@ export function Step4ReviewForm({
           )}
         </div>
 
-        {/* Footer Navigation */}
-        <div className="flex items-center justify-between border-t border-border pt-6">
+        {/* Footer Navigation on background */}
+        <div className="flex items-center justify-between pt-1">
           <Button type="button" variant="outline" onClick={onBack}>
             Back
           </Button>
