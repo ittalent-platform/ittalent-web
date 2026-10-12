@@ -95,7 +95,6 @@
       "expiresHint": "Để trống nếu không hết hạn.",
       "suggest": "Gợi ý khi tôi ứng tuyển",
       "suggestHint": "Được tích sẵn trong đơn mới. Bạn vẫn có thể bỏ tích mỗi lần.",
-      "claimNote": "Doanh nghiệp xem đây là thông tin do bạn tự khai. ITTalent không xác minh chứng chỉ.",
       "add": "Thêm chứng chỉ",
       "adding": "Đang thêm…",
       "save": "Lưu thay đổi",
@@ -182,7 +181,6 @@
       "noneTicked": "Chưa chọn chứng chỉ nào. Chọn những chứng chỉ bạn muốn gửi.",
       "manage": "Quản lý chứng chỉ",
       "open": "Mở {{name}} trong thẻ mới",
-      "copyNote": "Công ty nhận bản sao của những gì bạn chọn, như hiện tại.",
       "unavailable": "Một chứng chỉ bạn chọn đã bị sửa hoặc xoá. Kiểm tra lại danh sách rồi gửi lại."
     },
     "title": "Đơn ứng tuyển của tôi",

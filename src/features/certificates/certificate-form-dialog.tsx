@@ -1,4 +1,4 @@
-import { Info, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -150,7 +150,7 @@ export function CertificateFormDialog({ certificate, onConflict, onOpenChange, o
             </FormField>
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField htmlFor="certificate-issued" label={t("certificates.form.issued")} labelAddon={<span className={OPTIONAL_CLASS}>{t("certificates.form.optional")}</span>}>
-                <DatePicker aria-invalid={Boolean(errors.expiryDate)} clearable id="certificate-issued" onChange={(value) => set("issuedDate", value)} value={values.issuedDate} />
+                <DatePicker clearable id="certificate-issued" onChange={(value) => set("issuedDate", value)} value={values.issuedDate} />
               </FormField>
               <FormField error={fieldError("expiryDate")} hint={errors.expiryDate ? undefined : t("certificates.form.expiresHint")} htmlFor="certificate-expires" label={t("certificates.form.expires")} labelAddon={<span className={OPTIONAL_CLASS}>{t("certificates.form.optional")}</span>}>
                 <DatePicker aria-invalid={Boolean(errors.expiryDate)} clearable id="certificate-expires" onChange={(value) => { set("expiryDate", value); setErrors((current) => ({ ...current, expiryDate: undefined })); }} value={values.expiryDate} />
@@ -165,12 +165,7 @@ export function CertificateFormDialog({ certificate, onConflict, onOpenChange, o
             </label>
           </div>
           <DialogFooter className="justify-between border-t-0 pt-0">
-            {editing ? <span /> : (
-              <p className="flex max-w-[16rem] gap-1.5 text-[12.5px] text-muted-foreground">
-                <Info aria-hidden className="mt-0.5 size-3 shrink-0" />
-                {t("certificates.form.claimNote")}
-              </p>
-            )}
+            <span />
             <div className="flex gap-3">
               <Button className={DIALOG_BUTTON_CLASS} disabled={pending} onClick={() => onOpenChange(false)} type="button" variant="outline">{t("actions.cancel")}</Button>
               <Button className={DIALOG_BUTTON_CLASS} disabled={pending} type="submit">
