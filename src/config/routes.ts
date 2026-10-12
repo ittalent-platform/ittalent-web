@@ -13,3 +13,7 @@ export const ADMIN_USERS_PATH = "/admin/users";
 export function adminUserPath(userId: string): string {
   return `${ADMIN_USERS_PATH}/${userId}`;
 }
+
+export function adminEnterprisePath(enterpriseId: string): string {
+  return `/admin/enterprises/${enterpriseId}`;
+}

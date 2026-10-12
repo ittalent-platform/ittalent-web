@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3001"
+      "url": "http://localhost:3000"
     }
   ],
   "components": {
@@ -99,6 +99,48 @@
               "enterpriseId": {
                 "type": "string",
                 "nullable": true
+              },
+              "enterpriseName": {
+                "type": "string",
+                "nullable": true
+              },
+              "invitation": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "revoked",
+                      "cancelled",
+                      "expired"
+                    ]
+                  },
+                  "deliveryStatus": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "sent",
+                      "failed"
+                    ]
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "sentAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "status",
+                  "deliveryStatus",
+                  "expiresAt"
+                ]
               },
               "createdAt": {
                 "type": "string"
@@ -214,6 +256,48 @@
                 "type": "string",
                 "nullable": true
               },
+              "enterpriseName": {
+                "type": "string",
+                "nullable": true
+              },
+              "invitation": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "revoked",
+                      "cancelled",
+                      "expired"
+                    ]
+                  },
+                  "deliveryStatus": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "sent",
+                      "failed"
+                    ]
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "sentAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "status",
+                  "deliveryStatus",
+                  "expiresAt"
+                ]
+              },
               "createdAt": {
                 "type": "string"
               },
@@ -306,6 +390,48 @@
           "enterpriseId": {
             "type": "string",
             "nullable": true
+          },
+          "enterpriseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "invitation": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "revoked",
+                  "cancelled",
+                  "expired"
+                ]
+              },
+              "deliveryStatus": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "sent",
+                  "failed"
+                ]
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "sentAt": {
+                "type": "string",
+                "nullable": true,
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "status",
+              "deliveryStatus",
+              "expiresAt"
+            ]
           },
           "createdAt": {
             "type": "string"
@@ -807,6 +933,7 @@
             "enum": [
               "draft",
               "published",
+              "closed",
               "archived"
             ]
           },
@@ -819,6 +946,15 @@
           },
           "applicationCount": {
             "type": "integer"
+          },
+          "publishedAt": {
+            "type": "string"
+          },
+          "closedAt": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "type": "string"
           },
           "expiresAt": {
             "type": "string"
@@ -852,6 +988,14 @@
             "type": "string",
             "minLength": 5,
             "maxLength": 150
+          },
+          "publication_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ],
+            "default": "published"
           },
           "location": {
             "type": "string",
@@ -913,13 +1057,7 @@
           }
         },
         "required": [
-          "title",
-          "location",
-          "employment_type",
-          "description",
-          "requirements",
-          "benefits",
-          "expires_at"
+          "title"
         ],
         "additionalProperties": false
       },
@@ -992,6 +1130,13 @@
             "type": "integer",
             "nullable": true,
             "minimum": 1
+          },
+          "publication_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ]
           }
         },
         "additionalProperties": false
@@ -1022,6 +1167,21 @@
           "enterprise_id": {
             "type": "string",
             "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "publication_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ]
+          },
+          "recruitment_status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "closed"
+            ]
           },
           "sort_by": {
             "type": "string",
@@ -1134,6 +1294,7 @@
                   "enum": [
                     "draft",
                     "published",
+                    "closed",
                     "archived"
                   ]
                 },
@@ -1146,6 +1307,15 @@
                 },
                 "applicationCount": {
                   "type": "integer"
+                },
+                "publishedAt": {
+                  "type": "string"
+                },
+                "closedAt": {
+                  "type": "string"
+                },
+                "archivedAt": {
+                  "type": "string"
                 },
                 "expiresAt": {
                   "type": "string"
@@ -1170,6 +1340,73 @@
                 "recruitmentStatus",
                 "createdAt",
                 "updatedAt"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "JobPostingHistory": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "create",
+                    "update",
+                    "delete",
+                    "publish",
+                    "draft",
+                    "close",
+                    "reopen",
+                    "archive",
+                    "restore"
+                  ]
+                },
+                "actorUserId": {
+                  "type": "string"
+                },
+                "occurredAt": {
+                  "type": "string"
+                },
+                "changedFields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "action",
+                "actorUserId",
+                "occurredAt"
               ]
             }
           },
@@ -1232,6 +1469,48 @@
                 "enterpriseId": {
                   "type": "string",
                   "nullable": true
+                },
+                "enterpriseName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "invitation": {
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "accepted",
+                        "revoked",
+                        "cancelled",
+                        "expired"
+                      ]
+                    },
+                    "deliveryStatus": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "sent",
+                        "failed"
+                      ]
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sentAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "deliveryStatus",
+                    "expiresAt"
+                  ]
                 },
                 "createdAt": {
                   "type": "string"
@@ -1312,7 +1591,7 @@
           },
           "reason": {
             "type": "string",
-            "minLength": 1,
+            "minLength": 10,
             "maxLength": 500
           },
           "expectedVersion": {
@@ -1326,6 +1605,188 @@
           "expectedVersion"
         ],
         "additionalProperties": false
+      },
+      "UpdateUserRoleRequest": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "recruiter",
+              "enterprise_admin"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "role",
+          "reason",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "EmergencyUserSuspensionRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "reason",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "UserInvitationStatusResponse": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "revoked",
+              "cancelled",
+              "expired"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "new_account",
+              "enterprise_membership"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "recruiter",
+              "enterprise_admin"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sentAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "deliveryStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "sent",
+              "failed"
+            ]
+          },
+          "deliveryAttempts": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "status",
+          "kind",
+          "role",
+          "expiresAt",
+          "sentAt",
+          "deliveryStatus",
+          "deliveryAttempts"
+        ]
+      },
+      "InvitationPreviewResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "recruiter",
+              "enterprise_admin"
+            ]
+          },
+          "enterpriseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "email",
+          "role",
+          "enterpriseName",
+          "expiresAt"
+        ]
+      },
+      "AcceptedInvitationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role",
+          "status"
+        ]
+      },
+      "InvitationDeliveryResponse": {
+        "type": "object",
+        "properties": {
+          "deliveryStatus": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "failed"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "deliveryStatus",
+          "expiresAt"
+        ]
       },
       "CreateAdminUserRequest": {
         "type": "object",
@@ -1352,7 +1813,8 @@
             "type": "string",
             "enum": [
               "user",
-              "recruiter"
+              "recruiter",
+              "enterprise_admin"
             ]
           },
           "enterpriseId": {
@@ -1404,6 +1866,48 @@
               "enterpriseId": {
                 "type": "string",
                 "nullable": true
+              },
+              "enterpriseName": {
+                "type": "string",
+                "nullable": true
+              },
+              "invitation": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "revoked",
+                      "cancelled",
+                      "expired"
+                    ]
+                  },
+                  "deliveryStatus": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "sent",
+                      "failed"
+                    ]
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "sentAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "status",
+                  "deliveryStatus",
+                  "expiresAt"
+                ]
               },
               "createdAt": {
                 "type": "string"
@@ -1475,7 +1979,7 @@
         ],
         "additionalProperties": false
       },
-      "AcceptExistingAccountInvitationRequest": {
+      "InvitationPreviewQuery": {
         "type": "object",
         "properties": {
           "token": {
@@ -1489,16 +1993,22 @@
         ],
         "additionalProperties": false
       },
-      "InviteExistingUserRequest": {
+      "CancelInvitationRequest": {
         "type": "object",
         "properties": {
-          "enterpriseId": {
+          "reason": {
             "type": "string",
-            "pattern": "^[0-9a-fA-F]{24}$"
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": [
-          "enterpriseId"
+          "reason",
+          "expectedVersion"
         ],
         "additionalProperties": false
       },
@@ -1515,6 +2025,10 @@
                 },
                 "actorId": {
                   "type": "string"
+                },
+                "actorName": {
+                  "type": "string",
+                  "nullable": true
                 },
                 "action": {
                   "type": "string"
@@ -3142,6 +3656,185 @@
         "required": [
           "expectedVersion"
         ]
+      },
+      "CreateCertificateLinkRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string"
+          },
+          "issuer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issuedDate": {
+            "type": "string"
+          },
+          "expiryDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "url"
+        ],
+        "additionalProperties": false
+      },
+      "CertificateLink": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "issuer": {
+            "type": "string",
+            "nullable": true
+          },
+          "issuedDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiryDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url",
+          "issuer",
+          "issuedDate",
+          "expiryDate",
+          "version",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CertificateLinkListQuery": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaginatedCertificateLinks": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "issuer": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "issuedDate": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "expiryDate": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "available"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "url",
+                "issuer",
+                "issuedDate",
+                "expiryDate",
+                "version",
+                "status",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
       }
     },
     "parameters": {}
@@ -3758,6 +4451,31 @@
             "schema": {
               "type": "string",
               "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "required": false,
+            "name": "publication_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed"
+              ]
+            },
+            "required": false,
+            "name": "recruitment_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
                 "created_at",
                 "title",
                 "expires_at"
@@ -3823,8 +4541,8 @@
         "tags": [
           "Job Postings"
         ],
-        "summary": "Create and publish a job posting for the authenticated recruiter enterprise",
-        "description": "Saving always publishes: the posting is Published and Open. There is no status field and sending one is rejected. The enterprise is derived from the session and must be Active. The deadline is a date (YYYY-MM-DD) meaning the end of that day in Asia/Ho_Chi_Minh and must be today or later.",
+        "summary": "Create a job posting for the assigned enterprise",
+        "description": "Recruiters and enterprise administrators use their server-side User.enterprise_id assignment. Defaults to Published for backward compatibility. Send publication_status=draft to save an incomplete internal draft. Published postings require all public fields and an Active enterprise.",
         "security": [
           {
             "bearerAuth": []
@@ -3906,7 +4624,7 @@
         "tags": [
           "Job Postings"
         ],
-        "summary": "List the recruiter's enterprise job postings",
+        "summary": "List job postings for the assigned enterprise",
         "security": [
           {
             "bearerAuth": []
@@ -3966,6 +4684,31 @@
             "schema": {
               "type": "string",
               "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "required": false,
+            "name": "publication_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed"
+              ]
+            },
+            "required": false,
+            "name": "recruitment_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
                 "created_at",
                 "title",
                 "expires_at"
@@ -4013,7 +4756,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated job postings for the recruiter enterprise",
+            "description": "Paginated job postings for the enterprise assigned to the recruiter or enterprise administrator",
             "content": {
               "application/json": {
                 "schema": {
@@ -4099,6 +4842,31 @@
             "schema": {
               "type": "string",
               "enum": [
+                "draft",
+                "published",
+                "archived"
+              ]
+            },
+            "required": false,
+            "name": "publication_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed"
+              ]
+            },
+            "required": false,
+            "name": "recruitment_status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
                 "created_at",
                 "title",
                 "expires_at"
@@ -4172,7 +4940,7 @@
         "tags": [
           "Job Postings"
         ],
-        "summary": "Get a job posting for management (recruiter of the owning enterprise, or admin read-only)",
+        "summary": "Get a job posting for management (recruiter or enterprise administrator of the owning enterprise, or platform admin read-only)",
         "security": [
           {
             "bearerAuth": []
@@ -4218,8 +4986,8 @@
         "tags": [
           "Job Postings"
         ],
-        "summary": "Update a job posting for management",
-        "description": "Recruiters of the owning enterprise only. Omit a field to leave it unchanged; send null to clear salary_min, salary_max, level or openings. Publication status, enterprise ownership and application data cannot be changed and are rejected. Archived postings (legacy data) cannot be edited.",
+        "summary": "Update, publish, or move a job posting to draft",
+        "description": "Recruiters and enterprise administrators of the owning enterprise only. publication_status accepts draft or published. Publishing validates all required public fields; archived postings must be restored first.",
         "security": [
           {
             "bearerAuth": []
@@ -4268,6 +5036,9 @@
           },
           "404": {
             "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Archived posting cannot be edited"
           }
         }
       },
@@ -4276,7 +5047,7 @@
           "Job Postings"
         ],
         "summary": "Delete a job posting for management",
-        "description": "Recruiters of the owning enterprise only. Hard-removes the posting in any state, and only while no application has ever been recorded for it.",
+        "description": "Recruiters and enterprise administrators of the owning enterprise only. Hard-removes the posting in any state, and only while no application has ever been recorded for it.",
         "security": [
           {
             "bearerAuth": []
@@ -4311,6 +5082,388 @@
           },
           "409": {
             "description": "Cannot delete job posting because applications already exist (or it is already being deleted)"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/close": {
+      "patch": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Close an open published job posting",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Closed job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Invalid lifecycle transition"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/reopen": {
+      "patch": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Reopen a closed job posting",
+        "description": "The enterprise must be Active and the deadline must still be in the future.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reopened job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Invalid lifecycle transition or expired deadline"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/archive": {
+      "patch": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Archive a closed job posting",
+        "description": "Idempotent when the posting is already archived.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archived job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Only a closed posting can be archived"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/restore": {
+      "patch": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "Restore an archived job posting as closed",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restored closed job posting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPosting"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Only an archived posting can be restored"
+          }
+        }
+      }
+    },
+    "/api/v1/job-postings/{id}/history": {
+      "get": {
+        "tags": [
+          "Job Postings"
+        ],
+        "summary": "View job posting audit history",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated job posting history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPostingHistory"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller lacks the required role or cannot manage this job posting"
+          },
+          "404": {
+            "description": "Job posting not found"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/role": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Change a company account role between HR and Enterprise Administrator",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRoleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated account role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid account ID or role change"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          },
+          "409": {
+            "description": "Invalid transition, stale version or final Enterprise Administrator"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/emergency-suspension": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Urgently suspend an account with a required audit reason",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmergencyUserSuspensionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account suspended and sessions revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          },
+          "409": {
+            "description": "Platform administrator cannot self-suspend or suspend the final platform administrator"
           }
         }
       }
@@ -4361,14 +5514,20 @@
           },
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "user",
-                "admin",
-                "recruiter",
-                "applicant",
-                "interviewer"
-              ]
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "user",
+                  "admin",
+                  "recruiter",
+                  "enterprise_admin",
+                  "applicant",
+                  "interviewer"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 10
             },
             "required": false,
             "name": "role",
@@ -4376,14 +5535,19 @@
           },
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "active",
-                "inactive",
-                "invited",
-                "suspended",
-                "blocked"
-              ]
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "inactive",
+                  "invited",
+                  "suspended",
+                  "blocked"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 10
             },
             "required": false,
             "name": "status",
@@ -4391,8 +5555,13 @@
           },
           {
             "schema": {
-              "type": "string",
-              "pattern": "^[0-9a-fA-F]{24}$"
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{24}$"
+              },
+              "minItems": 1,
+              "maxItems": 10
             },
             "required": false,
             "name": "enterpriseId",
@@ -4469,7 +5638,7 @@
         "tags": [
           "Users"
         ],
-        "summary": "Create a user or HR account and send an invitation",
+        "summary": "Create a Candidate, HR or Enterprise Administrator account and send an invitation",
         "security": [
           {
             "bearerAuth": []
@@ -4570,7 +5739,7 @@
             "description": "Account not found"
           },
           "409": {
-            "description": "Illegal transition, stale version, or final administrator"
+            "description": "Illegal transition, stale version, final System Administrator, or final Enterprise Administrator"
           }
         }
       }
@@ -4685,12 +5854,55 @@
         }
       }
     },
-    "/api/v1/users/{id}/invitations": {
-      "post": {
+    "/api/v1/users/{id}/invitation": {
+      "get": {
         "tags": [
           "Users"
         ],
-        "summary": "Invite an existing user to join an enterprise as HR",
+        "summary": "Read the latest invitation status for an account",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest invitation delivery and lifecycle state, or null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInvitationStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Cancel an invitation for an account that has not activated",
         "security": [
           {
             "bearerAuth": []
@@ -4712,17 +5924,32 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InviteExistingUserRequest"
+                "$ref": "#/components/schemas/CancelInvitationRequest"
               }
             }
           }
         },
         "responses": {
-          "202": {
-            "description": "Invitation created and delivery attempted"
-          },
-          "400": {
-            "description": "Invalid user ID or enterprise ID"
+          "200": {
+            "description": "Invitation cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
           },
           "401": {
             "description": "Authentication required"
@@ -4730,11 +5957,52 @@
           "403": {
             "description": "Active System Administrator required"
           },
-          "404": {
-            "description": "User or enterprise not found"
+          "409": {
+            "description": "Account is no longer invited or version is stale"
+          },
+          "410": {
+            "description": "No pending invitation exists"
+          }
+        }
+      }
+    },
+    "/api/v1/user-invitations/preview": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Preview the account and company named by an invitation token",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64
+            },
+            "required": true,
+            "name": "token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invitation recipient, role and company",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationPreviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid token format"
           },
           "409": {
-            "description": "User cannot be granted an HR membership"
+            "description": "Account or enterprise state no longer permits acceptance"
+          },
+          "410": {
+            "description": "Invitation is expired, revoked or already used"
           }
         }
       }
@@ -4744,7 +6012,7 @@
         "tags": [
           "Users"
         ],
-        "summary": "Resend a pending new-account invitation",
+        "summary": "Send a replacement invitation for an unaccepted account",
         "security": [
           {
             "bearerAuth": []
@@ -4763,7 +6031,14 @@
         ],
         "responses": {
           "202": {
-            "description": "Invitation replaced and delivery attempted"
+            "description": "Invitation replaced and delivery attempted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationDeliveryResponse"
+                }
+              }
+            }
           },
           "401": {
             "description": "Authentication required"
@@ -4795,53 +6070,20 @@
         },
         "responses": {
           "200": {
-            "description": "Account activated; credentials are now available to the invitee"
+            "description": "Account activated; credentials are now available to the invitee",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedInvitationResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid invitation payload"
           },
           "409": {
             "description": "Account or enterprise state no longer permits acceptance"
-          },
-          "410": {
-            "description": "Invitation is expired, revoked or already used"
-          }
-        }
-      }
-    },
-    "/api/v1/user-invitations/accept-existing": {
-      "post": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Accept an HR invitation as the authenticated existing user",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AcceptExistingAccountInvitationRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Existing account receives the invited HR membership"
-          },
-          "401": {
-            "description": "Authentication required"
-          },
-          "403": {
-            "description": "Invitation belongs to another user"
-          },
-          "409": {
-            "description": "Account cannot accept the invited membership"
           },
           "410": {
             "description": "Invitation is expired, revoked or already used"
@@ -4897,15 +6139,67 @@
               "enum": [
                 "account_invited",
                 "profile_updated",
+                "role_changed",
                 "status_suspended",
                 "status_reopened",
                 "invitation_accepted",
+                "invitation_revoked",
                 "email_change_requested",
                 "email_changed"
               ]
             },
             "required": false,
             "name": "action",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "profile",
+                  "email"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 3
+            },
+            "required": false,
+            "name": "group",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "admin",
+                "self"
+              ]
+            },
+            "required": false,
+            "name": "actor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "to",
             "in": "query"
           }
         ],
@@ -5767,6 +7061,140 @@
           },
           "409": {
             "description": "The application changed after the client read it"
+          }
+        }
+      }
+    },
+    "/api/v1/me/certificate-links": {
+      "post": {
+        "tags": [
+          "Certificate Links"
+        ],
+        "summary": "Create a private certificate link for the current Candidate",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[\\x21-\\x7e]+$",
+              "description": "Unique operation key. Reuse only when retrying the exact same request.",
+              "example": "9c9ccf4b-2f18-4b5e-a67d-10de8ea8da02"
+            },
+            "required": true,
+            "description": "Unique operation key. Reuse only when retrying the exact same request.",
+            "name": "Idempotency-Key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCertificateLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Previously committed request replayed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateLink"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Certificate link created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or missing Idempotency-Key"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active verified Candidate account required"
+          },
+          "409": {
+            "description": "Duplicate URL or idempotency key reused with different content"
+          },
+          "503": {
+            "description": "Certificate link storage unavailable"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Certificate Links"
+        ],
+        "summary": "List the current Candidate’s private certificate links",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stable page of available owned links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedCertificateLinks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active verified Candidate account required"
+          },
+          "503": {
+            "description": "Certificate link storage unavailable"
           }
         }
       }

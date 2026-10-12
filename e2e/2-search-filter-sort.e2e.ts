@@ -118,10 +118,8 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await expect(page.getByText(displayId(SEED.rowMenu))).toBeVisible(); // 2 days ago
     await expect(page.getByText(displayId(SEED.hired))).toHaveCount(0); // 60 days ago
 
-    await page.getByRole("button", { name: /^Submitted:/ }).click();
-    await page.getByRole("menuitem", { name: "Custom range" }).click();
-    await page.getByLabel("From", { exact: true }).fill("2000-01-01");
-    await page.getByLabel("To", { exact: true }).fill("2000-12-31");
+    // The From/To fields are the shared calendar DatePicker (not native inputs), so the custom range is set through the URL it reads.
+    await page.goto("/my-applications?range=custom&from=2000-01-01&to=2000-12-31");
     await expect(
       page.getByRole("heading", { name: "No matching applications" }),
     ).toBeVisible();

@@ -16,7 +16,7 @@ const TONE_CLASS: Record<StatusPanelTone, string> = {
 };
 
 /**
- * Left-aligned outcome block for a full auth screen: a 64px rounded icon tile, a Space Grotesk title, an explanation,
+ * Centred outcome block for a full auth screen: a 64px rounded icon tile, a Space Grotesk title, an explanation,
  * optional numbered steps, banners (children), an action row, a note and a footer line.
  */
 export function StatusPanel({
@@ -46,10 +46,10 @@ export function StatusPanel({
 }) {
   return (
     <div className={cn("flex w-full flex-col gap-[22px]", className)}>
-      <span className={cn("flex size-16 items-center justify-center self-start rounded-[18px]", TONE_CLASS[tone])}>
+      <span className={cn("flex size-16 items-center justify-center self-center rounded-[18px]", TONE_CLASS[tone])}>
         <Icon aria-hidden className={cn("size-7", iconClassName)} strokeWidth={2} />
       </span>
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-2.5 text-center">
         <h1 className="itt-display text-[30px] font-semibold tracking-[-0.01em] text-foreground">{title}</h1>
         {description ? <p className="text-[14.5px] leading-[1.6] text-(--status-neutral-fg)">{description}</p> : null}
       </div>

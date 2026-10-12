@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 
 import { loginSchema, type LoginFormValues } from "./login.schema";
 import { forgotPasswordPath } from "./password-reset";
-import { getAuthErrorMessage } from "./auth-utils";
+import { getAuthErrorMessage, safeInternalPath } from "./auth-utils";
 import { PasswordField } from "./password-field";
 import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
@@ -59,9 +59,15 @@ export function LoginPage() {
       // Replace any earlier "signed out" session result, or ProtectedRoute would send the user straight back here.
       queryClient.setQueryData(authKeys.me(), result.data.user);
 
+      const next = searchParams.get("next");
+      if (next) {
+        navigate(safeInternalPath(next, "/"), { replace: true });
+        return;
+      }
+
       if (result.data.user.role === "admin") {
         navigate("/admin/users", { replace: true });
-      } else if (result.data.user.role === "recruiter") {
+      } else if (result.data.user.role === "recruiter" || result.data.user.role === "enterprise_admin") {
         navigate("/recruiter/job-postings", { replace: true });
       } else {
         navigate("/", { replace: true });

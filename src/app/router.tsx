@@ -32,6 +32,12 @@ const ResetPasswordPage = lazy(() =>
     default: m.ResetPasswordPage,
   })),
 );
+const AcceptInvitationPage = lazy(() =>
+  import("@/features/auth/accept-invitation-page").then((m) => ({ default: m.AcceptInvitationPage })),
+);
+const ConfirmEmailChangePage = lazy(() =>
+  import("@/features/auth/confirm-email-change-page").then((m) => ({ default: m.ConfirmEmailChangePage })),
+);
 const UsersPage = lazy(() =>
   import("@/features/admin/users/users-page").then((m) => ({
     default: m.UsersPage,
@@ -41,6 +47,9 @@ const AdminUserDetailPage = lazy(() =>
   import("@/features/admin/users/user-detail-page").then((m) => ({
     default: m.AdminUserDetailPage,
   })),
+);
+const AdminUserHistoryPage = lazy(() =>
+  import("@/features/admin/users/user-history-page").then((m) => ({ default: m.AdminUserHistoryPage })),
 );
 const JobPostingsPage = lazy(() =>
   import("@/features/admin/job-postings/job-postings-pages").then((m) => ({
@@ -149,6 +158,8 @@ export const appRoutes = [
   { path: "/verify-email", element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
+  { path: "/accept-invitation", element: <AcceptInvitationPage /> },
+  { path: "/confirm-email-change", element: <ConfirmEmailChangePage /> },
   {
     element: <ProtectedRoute requiredRole="user" />,
     children: [
@@ -172,6 +183,7 @@ export const appRoutes = [
           { index: true, element: <Navigate replace to="/admin/users" /> },
           { path: "users", element: <UsersPage /> },
           { path: "users/:userId", element: <AdminUserDetailPage /> },
+          { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
           { path: "enterprises/new", element: <EnterpriseFormPage /> },
           { path: "enterprises/:enterpriseId", element: <AdminEnterpriseDetailPage /> },
@@ -187,7 +199,7 @@ export const appRoutes = [
   },
   {
     path: "/recruiter",
-    element: <ProtectedRoute requiredRole="recruiter" />,
+    element: <ProtectedRoute requiredRoles={["recruiter", "enterprise_admin"]} />,
     children: [
       {
         element: <AppLayout actor="recruiter" />,

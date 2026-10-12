@@ -22,6 +22,9 @@ function PopoverContent({ align = "end", className, sideOffset = 8, ...props }: 
         )}
         collisionPadding={16}
         data-slot="popover-content"
+        // The portal sits outside an open Dialog, whose scroll lock would swallow the wheel/touch scroll of long lists.
+        onTouchMove={(event) => event.stopPropagation()}
+        onWheel={(event) => event.stopPropagation()}
         sideOffset={sideOffset}
         {...props}
       />

@@ -42,3 +42,7 @@ export const HERO_RINGS = Array.from({ length: RING_COUNT }, (_, index) => {
 });
 
 export const AUTH_ASIDE_WIDTH_CLASS = "lg:grid-cols-[720px_1fr]";
+// Employer screens (invitation, email change) use the narrower dark hero of the employer design.
+export const AUTH_EMPLOYER_ASIDE_WIDTH_CLASS = "lg:grid-cols-[560px_1fr]";
+
+export type AuthHeroTone = "candidate" | "employer";

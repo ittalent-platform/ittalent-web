@@ -28,17 +28,18 @@ const toneDotClass: Record<TimelineTone, string> = {
 
 const DEFAULT_MAX_VISIBLE = 5;
 
-function TimelineList({ entries, formatDate }: { entries: TimelineEntry[]; formatDate: (iso: string) => string }) {
+/** Dots (one per entry, coloured by tone) joined by a thin vertical line; bold title, muted "date · by who" below. */
+export function TimelineList({ entries, formatDate }: { entries: TimelineEntry[]; formatDate: (iso: string) => string }) {
   const { t } = useTranslation();
   const [messageEntry, setMessageEntry] = useState<TimelineEntry | null>(null);
   return (
-    <><ul className="flex flex-col">
+    <><ul className="flex flex-col" data-testid="timeline">
       {entries.map((entry, index) => (
-        <li className="flex min-w-0 gap-3 pb-5 last:pb-0" key={`${entry.label}-${entry.atIso}-${index}`}>
-          <div className="relative flex w-3 shrink-0 flex-col items-center">
-            <span className={cn("z-10 mt-1 size-3 shrink-0 rounded-full", toneDotClass[entry.tone])} />
+        <li className="flex min-w-0 gap-3 pb-4 last:pb-0" key={`${entry.label}-${entry.atIso}-${index}`}>
+          <div className="relative flex w-2.5 shrink-0 flex-col items-center">
+            <span aria-hidden data-tone={entry.tone} className={cn("z-10 mt-[5px] size-2.5 shrink-0 rounded-full", toneDotClass[entry.tone])} />
             {index < entries.length - 1 ? (
-              <span className="absolute top-4 -bottom-5 left-1/2 w-px -translate-x-1/2 bg-border" />
+              <span aria-hidden data-testid="timeline-line" className="absolute top-[19px] -bottom-5 left-1/2 w-px -translate-x-1/2 bg-border" />
             ) : null}
           </div>
           <div className="min-w-0">
