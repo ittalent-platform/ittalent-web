@@ -58,7 +58,14 @@ export function useEmployeesListQuery(params: EmployeesListParams) {
           page: queryParams.page,
           ...(queryParams.search ? { search: queryParams.search } : {}),
           ...(queryParams.status && queryParams.status !== "all"
-            ? { status: queryParams.status }
+            ? {
+                status:
+                  queryParams.status === "inactive"
+                    ? ["inactive", "invited"]
+                    : queryParams.status === "suspended"
+                      ? ["suspended", "blocked"]
+                      : [queryParams.status],
+              }
             : {}),
           ...(beSortBy ? { sortBy: beSortBy } : {}),
           ...(queryParams.sortOrder

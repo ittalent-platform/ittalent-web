@@ -285,14 +285,17 @@ export function RecruiterEmployeesPage() {
               ))
             ) : isError ? (
               <TableRow>
-                <TableCell className="h-40 text-center text-sm text-destructive">
+                <TableCell
+                  colSpan={6}
+                  className="h-40 text-center text-sm text-destructive"
+                >
                   Failed to load employees list. Please check your connection
                   and try again.
                 </TableCell>
               </TableRow>
             ) : employees.length === 0 ? (
               <TableRow>
-                <TableCell className="h-48 text-center">
+                <TableCell colSpan={6} className="h-48 text-center">
                   <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                     <UsersIcon className="size-8 text-muted-foreground/50" />
                     <p className="text-sm font-medium text-foreground">
@@ -361,7 +364,7 @@ export function RecruiterEmployeesPage() {
                     }
                   >
                     {/* Employee avatar & name */}
-                    <TableCell>
+                    <TableCell className="max-w-[280px]">
                       <div className="flex items-center gap-3">
                         <div
                           className={`flex size-9 shrink-0 items-center justify-center rounded-full font-semibold text-xs ${colorClass}`}
@@ -384,12 +387,15 @@ export function RecruiterEmployeesPage() {
                     </TableCell>
 
                     {/* Department */}
-                    <TableCell className="text-xs text-foreground">
+                    <TableCell
+                      className="text-xs text-foreground truncate max-w-[160px]"
+                      title={department}
+                    >
                       {department}
                     </TableCell>
 
                     {/* Phone */}
-                    <TableCell className="text-xs text-muted-foreground font-mono">
+                    <TableCell className="text-xs text-muted-foreground font-mono whitespace-nowrap">
                       {phone}
                     </TableCell>
 

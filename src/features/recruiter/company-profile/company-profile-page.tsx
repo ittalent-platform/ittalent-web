@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import {
+  Briefcase,
   Building2,
   Camera,
   Clock,
   Edit,
   ExternalLink,
+  Image as ImageIcon,
   MapPin,
   Sparkles,
 } from "lucide-react";
@@ -29,6 +31,7 @@ export function RecruiterCompanyProfilePage() {
     data: enterprise,
     isLoading,
     isError,
+    refetch,
   } = useMyEnterpriseProfileQuery();
 
   if (isLoading) {
@@ -61,6 +64,16 @@ export function RecruiterCompanyProfilePage() {
           Your account is not currently affiliated with an enterprise workspace.
           Please contact your organization administrator.
         </p>
+        <div className="mt-4 flex justify-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void refetch()}
+            className="text-xs"
+          >
+            Retry
+          </Button>
+        </div>
       </div>
     );
   }
@@ -87,6 +100,11 @@ export function RecruiterCompanyProfilePage() {
   const fullAddressStr = [address?.street, address?.city, address?.country]
     .filter(Boolean)
     .join(", ");
+
+  const firstBranch = enterprise.branches?.[0];
+  const branchAddressStr = firstBranch
+    ? [firstBranch.street, firstBranch.city, firstBranch.country].filter(Boolean).join(", ")
+    : "Tầng 8, 81 Nguyễn Chí Thanh, Đống Đa, Hà Nội, Vietnam";
 
   return (
     <div className="space-y-6">
@@ -163,15 +181,17 @@ export function RecruiterCompanyProfilePage() {
               </Badge>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
-              <span>{enterprise.industry || "Technology"}</span>
-              <span>•</span>
               <span>
-                {enterprise.companySize
-                  ? `${enterprise.companySize} employees`
-                  : "201–500 employees"}
+                {[
+                  enterprise.industry || "Technology",
+                  enterprise.companySize
+                    ? `${enterprise.companySize} employees`
+                    : "201–500 employees",
+                  enterprise.address?.city || "Hồ Chí Minh",
+                ]
+                  .filter(Boolean)
+                  .join(" • ")}
               </span>
-              <span>•</span>
-              <span>{enterprise.address?.city || "Hồ Chí Minh"}</span>
               {enterprise.website ? (
                 <>
                   <span>•</span>
@@ -219,14 +239,19 @@ export function RecruiterCompanyProfilePage() {
 
       {/* Profile Details Sections */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left Column (2/3): About, Culture & Benefits */}
+        {/* Left Column (2/3): About, Culture & Benefits, Media Gallery, Addresses */}
         <div className="space-y-6 lg:col-span-2">
           {/* About Card */}
           <Card className="shadow-xs">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">About</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-2">
+              {enterprise.shortDescription ? (
+                <p className="text-sm font-semibold text-foreground">
+                  {enterprise.shortDescription}
+                </p>
+              ) : null}
               <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                 {enterprise.description ||
                   `${enterprise.name} provides cutting-edge digital technology solutions and enterprise software. Our team delivers high-impact systems with a customer-first focus.`}
@@ -242,45 +267,103 @@ export function RecruiterCompanyProfilePage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-5 text-sm">
-              <div className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Benefits & Perks
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {benefitsList.map((benefit, i) => (
-                    <Badge
-                      key={i}
-                      variant="neutral"
-                      className="rounded-lg px-2.5 py-1 text-xs font-normal"
-                    >
-                      {benefit}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                {enterprise.cultureSummary ||
+                  "Small squads, weekly demos and a written-first culture."}
+              </p>
 
-              <div className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Tech stack
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {techStackList.map((tech, i) => (
-                    <Badge
-                      key={i}
-                      variant="neutral"
-                      className="rounded-lg border-border px-2.5 py-1 text-xs font-mono text-foreground"
-                    >
-                      {tech}
-                    </Badge>
-                  ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Benefits & Perks
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {(enterprise.benefits?.length ? enterprise.benefits : benefitsList).map((benefit, i) => (
+                      <Badge
+                        key={i}
+                        variant="neutral"
+                        className="rounded-lg px-2.5 py-1 text-xs font-normal"
+                      >
+                        {benefit}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Tech stack
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {(enterprise.techStack?.length ? enterprise.techStack : techStackList).map((tech, i) => (
+                      <Badge
+                        key={i}
+                        variant="neutral"
+                        className="rounded-lg border-border px-2.5 py-1 text-xs font-mono text-foreground"
+                      >
+                        {tech}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 pt-2 border-t border-border/60 text-xs text-muted-foreground">
                 <Clock className="size-4 text-primary" />
                 <span>
-                  Working days: <strong>Monday – Friday</strong>
+                  Working days:{" "}
+                  <strong className="text-foreground">
+                    {(enterprise as unknown as { working_days?: string }).working_days || "Monday – Friday"}
+                  </strong>
                 </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Media Gallery */}
+          <Card className="shadow-xs">
+            <CardHeader className="pb-3 flex flex-row items-center justify-between">
+              <CardTitle className="text-base font-semibold">
+                Media gallery
+              </CardTitle>
+              <span className="text-xs text-muted-foreground">
+                {enterprise.mediaGallery?.length || 3} of 10
+              </span>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-3">
+                {enterprise.mediaGallery?.length ? (
+                  enterprise.mediaGallery.map((imgUrl, i) => (
+                    <div
+                      key={i}
+                      className="h-28 overflow-hidden rounded-xl border border-border bg-muted/40"
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`Gallery ${i + 1}`}
+                        className="size-full object-cover"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <div className="flex h-28 flex-col justify-end rounded-xl border border-border bg-gradient-to-br from-amber-500/10 to-orange-500/20 p-2.5 text-xs font-medium text-foreground">
+                      <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <ImageIcon className="size-3" /> Office space
+                      </span>
+                    </div>
+                    <div className="flex h-28 flex-col justify-end rounded-xl border border-border bg-gradient-to-br from-blue-500/10 to-indigo-500/20 p-2.5 text-xs font-medium text-foreground">
+                      <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <ImageIcon className="size-3" /> Team meeting
+                      </span>
+                    </div>
+                    <div className="flex h-28 flex-col justify-end rounded-xl border border-border bg-gradient-to-br from-emerald-500/10 to-teal-500/20 p-2.5 text-xs font-medium text-foreground">
+                      <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <ImageIcon className="size-3" /> Community event
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -293,36 +376,161 @@ export function RecruiterCompanyProfilePage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              <div className="flex items-start gap-3 rounded-lg border border-border/80 bg-muted/20 p-3.5">
-                <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-foreground">
-                      Headquarters
-                    </span>
-                    <Badge variant="neutral" className="text-[10px] py-0">
-                      Main office
-                    </Badge>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3 rounded-xl border border-border/80 bg-muted/20 p-3.5">
+                  <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-xs text-foreground">
+                        Headquarters
+                      </span>
+                      <Badge variant="neutral" className="text-[10px] py-0">
+                        Main office
+                      </Badge>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                      {fullAddressStr ||
+                        "12 Tôn Đản, Phường 13, Quận 4, Hồ Chí Minh, Vietnam"}
+                    </p>
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    {fullAddressStr ||
-                      "12 Tôn Đản, Phường 13, Quận 4, Hồ Chí Minh, Vietnam"}
-                  </p>
+                </div>
+
+                <div className="flex items-start gap-3 rounded-xl border border-border/80 bg-muted/20 p-3.5">
+                  <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+                  <div>
+                    <span className="font-semibold text-xs text-foreground">
+                      Branch office
+                    </span>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                      {branchAddressStr}
+                    </p>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Right Column (1/3): Legal & Contact Info */}
+        {/* Right Column (1/3): Business, Contact, Job Postings, Legal */}
         <div className="space-y-6">
+          {/* Business Card */}
+          <Card className="shadow-xs">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold">Business</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2.5 text-xs">
+              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                <span className="text-muted-foreground">Industry</span>
+                <span className="font-semibold text-foreground">
+                  {enterprise.industry || "Information Technology"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                <span className="text-muted-foreground">Sub-industries</span>
+                <span className="font-semibold text-foreground text-right">
+                  {enterprise.subIndustries?.length
+                    ? enterprise.subIndustries.join(", ")
+                    : "Payments, Digital banking, Cloud"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                <span className="text-muted-foreground">Company type</span>
+                <span className="font-semibold text-foreground">
+                  {(enterprise as unknown as { company_type?: string }).company_type ||
+                    enterprise.companyType ||
+                    "Product"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Founded year</span>
+                <span className="font-semibold text-foreground">
+                  {enterprise.foundedYear ? `${enterprise.foundedYear}` : "Established"}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Card */}
+          <Card className="shadow-xs">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold">Contact</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2.5 text-xs">
+              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                <span className="text-muted-foreground">Corporate email</span>
+                <span className="font-semibold text-foreground truncate max-w-[180px]">
+                  {enterprise.email}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                <span className="text-muted-foreground">Phone</span>
+                <span className="font-mono font-semibold text-foreground">
+                  {enterprise.phone || "—"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                <span className="text-muted-foreground">Website</span>
+                {enterprise.website ? (
+                  <a
+                    href={
+                      enterprise.website.startsWith("http")
+                        ? enterprise.website
+                        : `https://${enterprise.website}`
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-primary hover:underline truncate max-w-[180px]"
+                  >
+                    {enterprise.website}
+                  </a>
+                ) : (
+                  <span className="font-medium text-muted-foreground">—</span>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Social</span>
+                <span className="font-semibold text-primary">
+                  LinkedIn · Facebook · GitHub
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Job Postings Card */}
+          <Card className="shadow-xs">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+              <CardTitle className="text-base font-semibold">
+                Job postings
+              </CardTitle>
+              <Link
+                to="/recruiter/job-postings"
+                className="text-xs font-semibold text-primary hover:underline"
+              >
+                Manage
+              </Link>
+            </CardHeader>
+            <CardContent className="text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Active openings</span>
+                <Badge
+                  variant="neutral"
+                  className="rounded-full px-2.5 py-0.5 font-semibold text-xs"
+                >
+                  <Briefcase className="mr-1 size-3" />
+                  {enterprise.activeJobsCount ?? 0} active
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Legal & Corporate Card */}
           <Card className="shadow-xs">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
                 Legal & Corporate
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3.5 text-xs">
+            <CardContent className="space-y-3 text-xs">
               <div className="space-y-1 border-b border-border/60 pb-2.5">
                 <span className="text-muted-foreground">
                   Legal corporate name
@@ -338,43 +546,19 @@ export function RecruiterCompanyProfilePage() {
                   Tax identification code
                 </span>
                 <p className="font-mono font-semibold text-foreground">
-                  {enterprise.taxCode || "0312 345 678"}
+                  {enterprise.taxCode || "9999999999"}
                 </p>
               </div>
 
-              <div className="space-y-1 border-b border-border/60 pb-2.5">
-                <span className="text-muted-foreground">Corporate email</span>
-                <p className="font-medium text-foreground">
-                  {enterprise.email}
-                </p>
-              </div>
-
-              <div className="space-y-1 border-b border-border/60 pb-2.5">
-                <span className="text-muted-foreground">Phone number</span>
+              <div className="space-y-1">
+                <span className="text-muted-foreground">
+                  Registration number
+                </span>
                 <p className="font-mono font-medium text-foreground">
-                  {enterprise.phone}
+                  {(enterprise as unknown as { registration_number?: string })
+                    .registration_number || "REG-VN-031234"}
                 </p>
               </div>
-
-              {enterprise.website ? (
-                <div className="space-y-1">
-                  <span className="text-muted-foreground">
-                    Official website
-                  </span>
-                  <a
-                    href={
-                      enterprise.website.startsWith("http")
-                        ? enterprise.website
-                        : `https://${enterprise.website}`
-                    }
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block font-medium text-primary hover:underline truncate"
-                  >
-                    {enterprise.website}
-                  </a>
-                </div>
-              ) : null}
             </CardContent>
           </Card>
 
