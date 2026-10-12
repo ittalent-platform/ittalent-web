@@ -92,7 +92,7 @@ export function ResumeDraftForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="chau.do@lumenlogistics.vn"
-            className="h-[46px] rounded-xl border-border bg-card px-[15px] text-[14px]"
+            className="h-12 rounded-xl border-border bg-card px-[15px] text-[14px]"
           />
         </FormField>
 

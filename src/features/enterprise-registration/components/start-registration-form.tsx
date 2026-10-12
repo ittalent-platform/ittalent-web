@@ -92,7 +92,7 @@ export function StartRegistrationForm({
           <Input
             id="representative_name"
             placeholder="Đỗ Minh Châu"
-            className="h-[46px] rounded-xl border-border bg-card px-[15px] text-[14px]"
+            className="h-12 rounded-xl border-border bg-card px-[15px] text-[14px]"
             {...register("representative_name")}
           />
         </FormField>
@@ -108,7 +108,7 @@ export function StartRegistrationForm({
             id="corporate_email"
             type="email"
             placeholder="chau.do@lumenlogistics.vn"
-            className="h-[46px] rounded-xl border-border bg-card px-[15px] text-[14px]"
+            className="h-12 rounded-xl border-border bg-card px-[15px] text-[14px]"
             {...register("corporate_email")}
           />
         </FormField>
