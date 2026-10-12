@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { BriefcaseBusiness, ChevronDown, FileText, LogOut, Users } from "lucide-react";
+import { Award, BriefcaseBusiness, ChevronDown, FileText, LogOut, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
@@ -125,6 +125,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           </DropdownMenuItem>
         ) : null}
         {user?.role === "user" ? <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate(APPLICATIONS_PATH)}><BriefcaseBusiness className="size-4" />{t("applications.title")}</DropdownMenuItem> : null}
+        {user?.role === "user" ? <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate("/certificates")}><Award className="size-4" />{t("certificates.title")}</DropdownMenuItem> : null}
 
         <DropdownMenuItem
           className="gap-2.5 px-4 py-2.5 text-sm font-semibold cursor-pointer text-destructive focus:text-destructive"

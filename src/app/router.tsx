@@ -1,3 +1,5 @@
+import { CandidateAccountLayout } from "@/components/layout/candidate-account-layout";
+import { CertificatesPage } from "@/features/certificates/certificates-page";
 import { lazy, Suspense } from "react";
 import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
 
@@ -169,6 +171,7 @@ export const appRoutes = [
           { path: "/documents", element: <DocumentsPage /> },
           { path: "/my-applications", element: <ApplicationsPage /> },
           { path: "/my-applications/:id", element: <ApplicationDetailPage /> },
+          { element: <CandidateAccountLayout />, children: [{ path: "/certificates", element: <CertificatesPage /> }] },
         ],
       },
     ],

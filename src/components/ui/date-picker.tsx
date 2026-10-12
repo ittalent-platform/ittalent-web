@@ -111,8 +111,8 @@ export function DatePicker({
         <button
           aria-invalid={invalid}
           className={cn(
-            "flex h-[46px] w-full min-w-0 cursor-pointer items-center justify-between gap-3 rounded-xl border border-border bg-card pl-3.5 pr-4.5 text-left text-[13.5px] text-foreground outline-none transition-colors",
-            "focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20 aria-invalid:border-destructive",
+            "flex h-[46px] w-full min-w-0 cursor-pointer items-center justify-between gap-3 rounded-md border border-(--border-muted) bg-card px-3.5 text-left text-sm text-foreground outline-none transition-colors",
+            "focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 data-[state=open]:border-primary data-[state=open]:ring-2 data-[state=open]:ring-primary/20 aria-invalid:border-(--field-error) aria-invalid:focus-visible:ring-(--field-error)/20",
             className,
           )}
           id={id}

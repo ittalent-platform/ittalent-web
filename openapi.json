@@ -3610,6 +3610,14 @@
           "message": {
             "type": "string",
             "maxLength": 1000
+          },
+          "certificateLinkIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "maxItems": 20
           }
         },
         "required": [
@@ -3816,6 +3824,47 @@
               ]
             }
           },
+          "certificates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "issuer": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "issuedDate": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "expiryDate": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "version",
+                "name",
+                "url",
+                "issuer",
+                "issuedDate",
+                "expiryDate"
+              ]
+            }
+          },
           "version": {
             "type": "number"
           },
@@ -3843,6 +3892,7 @@
           "message",
           "withdrawalReason",
           "attachments",
+          "certificates",
           "version",
           "createdAt",
           "updatedAt"
@@ -4672,14 +4722,17 @@
         "properties": {
           "name": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "maxLength": 200
           },
           "url": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 2048
           },
           "issuer": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "maxLength": 200
           },
           "issuedDate": {
             "type": "string"
@@ -4728,6 +4781,12 @@
               "available"
             ]
           },
+          "suggested": {
+            "type": "boolean"
+          },
+          "sentCount": {
+            "type": "integer"
+          },
           "createdAt": {
             "type": "string"
           },
@@ -4744,6 +4803,8 @@
           "expiryDate",
           "version",
           "status",
+          "suggested",
+          "sentCount",
           "createdAt",
           "updatedAt"
         ]
@@ -4761,6 +4822,11 @@
             "minimum": 1,
             "maximum": 100,
             "default": 20
+          },
+          "search": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
           }
         },
         "additionalProperties": false
@@ -4804,6 +4870,12 @@
                     "available"
                   ]
                 },
+                "suggested": {
+                  "type": "boolean"
+                },
+                "sentCount": {
+                  "type": "integer"
+                },
                 "createdAt": {
                   "type": "string"
                 },
@@ -4820,6 +4892,8 @@
                 "expiryDate",
                 "version",
                 "status",
+                "suggested",
+                "sentCount",
                 "createdAt",
                 "updatedAt"
               ]
@@ -4836,6 +4910,9 @@
           },
           "totalPages": {
             "type": "integer"
+          },
+          "suggestedTotal": {
+            "type": "integer"
           }
         },
         "required": [
@@ -4843,8 +4920,48 @@
           "page",
           "limit",
           "total",
-          "totalPages"
+          "totalPages",
+          "suggestedTotal"
         ]
+      },
+      "UpdateCertificateLinkRequest": {
+        "type": "object",
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "issuer": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "issuedDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiryDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "suggested": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expectedVersion"
+        ],
+        "additionalProperties": false
       }
     },
     "parameters": {}
@@ -8662,6 +8779,16 @@
             "required": false,
             "name": "limit",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
           }
         ],
         "responses": {
@@ -8683,6 +8810,123 @@
           },
           "403": {
             "description": "Active verified Candidate account required"
+          },
+          "503": {
+            "description": "Certificate link storage unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/me/certificate-links/{id}": {
+      "patch": {
+        "tags": [
+          "Certificate Links"
+        ],
+        "summary": "Update an owned certificate link or its \"suggest on apply\" flag",
+        "description": "Metadata changes bump the version; a suggested-only change keeps it. Applications already sent keep their own copy.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCertificateLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated certificate link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields or expiry before issued date"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active verified Candidate account required"
+          },
+          "404": {
+            "description": "Certificate link not found"
+          },
+          "409": {
+            "description": "VERSION_CONFLICT or DUPLICATE_CERTIFICATE_URL"
+          },
+          "503": {
+            "description": "Certificate link storage unavailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Certificate Links"
+        ],
+        "summary": "Delete an owned certificate link",
+        "description": "Applications already sent keep their own copy of the certificate.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "required": true,
+            "name": "expectedVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Certificate link deleted"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active verified Candidate account required"
+          },
+          "404": {
+            "description": "Certificate link not found"
+          },
+          "409": {
+            "description": "VERSION_CONFLICT"
           },
           "503": {
             "description": "Certificate link storage unavailable"

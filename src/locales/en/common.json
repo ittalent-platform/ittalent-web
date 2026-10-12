@@ -1,4 +1,110 @@
 {
+  "accountNav": {
+    "label": "Account sections",
+    "jobSearch": "Job search",
+    "myApplications": "My applications",
+    "myProfile": "My profile",
+    "documents": "Documents",
+    "certificates": "Certificates"
+  },
+  "certificates": {
+    "title": "Certificates",
+    "add": "Add certificate",
+    "suggestedSummary_one": "<b>{{count}} certificate</b> is suggested when you apply",
+    "suggestedSummary_other": "<b>{{count}} certificates</b> are suggested when you apply",
+    "opensInNewTab": "(opens in a new tab)",
+    "notHttps": "Not HTTPS",
+    "noIssuer": "No issuer",
+    "issuedOn": "Issued {{date}}",
+    "expiresOn": "Expires {{date}}",
+    "expiredOn": "Expired {{date}}",
+    "noExpiry": "No expiry",
+    "expired": "Expired",
+    "version": "Version {{version}}",
+    "suggestOnApply": "Suggest on apply",
+    "suggestFor": "Suggest {{name}} when I apply",
+    "actionsFor": "Actions for {{name}}",
+    "edit": "Edit",
+    "openLink": "Open link",
+    "deleteMenu": "Delete…",
+    "pageGone": "That page doesn't exist. Showing the first page of your certificates.",
+    "search": {
+      "placeholder": "Search name, issuer or link",
+      "tooLong": "Use up to {{max}} characters.",
+      "results_one": "{{count}} result for “{{term}}”",
+      "results_other": "{{count}} results for “{{term}}”",
+      "clear": "Clear search",
+      "noMatch": "No certificates match “{{term}}”",
+      "noMatchDescription": "Try another word or clear the search."
+    },
+    "empty": {
+      "title": "No certificates yet",
+      "description": "Add links to certificates you've earned. You choose which ones to send when you apply."
+    },
+    "errors": {
+      "loadTitle": "Your certificates didn't load",
+      "loadDescription": "Check your connection and try again.",
+      "retry": "Try again",
+      "switchFailed": "Couldn't update this certificate. Nothing changed. Please try again.",
+      "deleteFailed": "Couldn't delete the certificate. It's still in your list. Please try again."
+    },
+    "access": {
+      "title": "Sign in again to see your certificates",
+      "description": "Your session or account access changed.",
+      "signIn": "Sign in"
+    },
+    "toast": {
+      "suggested": "Will be suggested when you apply.",
+      "unsuggested": "Won't be suggested when you apply.",
+      "added": "{{name}} added.",
+      "saved": "{{name}} saved.",
+      "deleted": "{{name}} deleted. Sent copies are kept."
+    },
+    "delete": {
+      "title": "Delete this certificate?",
+      "description": "<b>{{name}}</b> is removed from your list and won't be suggested on new applications.",
+      "sentNote_one": "The application you already sent keeps its copy. Companies can still see it there.",
+      "sentNote_other": "The {{count}} applications you already sent keep their copy. Companies can still see it there.",
+      "keep": "Keep it",
+      "confirm": "Delete"
+    },
+    "conflict": {
+      "title": "This certificate changed somewhere else",
+      "description": "It was edited or deleted in another tab. Load the latest version, then make your change again.",
+      "loadLatest": "Load latest"
+    },
+    "form": {
+      "addTitle": "Add certificate",
+      "editTitle": "Edit certificate",
+      "addDescription": "Private to you. Add a link to where the certificate can be seen.",
+      "editDescription": "Version {{version}} · last changed {{date}}.",
+      "sentNote_one": "Sent with 1 application. It keeps the version it was sent with; your changes apply to new applications only.",
+      "sentNote_other": "Sent with {{count}} applications. They keep the version they were sent with; your changes apply to new applications only.",
+      "name": "Certificate name",
+      "namePlaceholder": "e.g. AWS Certified Solutions Architect",
+      "url": "Link",
+      "urlHint": "A page that shows the certificate. ITTalent doesn't open or check it.",
+      "issuer": "Issuer",
+      "optional": "optional",
+      "issued": "Issued",
+      "expires": "Expires",
+      "expiresHint": "Leave empty if it doesn't expire.",
+      "suggest": "Suggest it when I apply",
+      "suggestHint": "Pre-ticked on new applications. You can still untick it each time.",
+      "add": "Add certificate",
+      "adding": "Adding…",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "errors": {
+        "name": "Name the certificate.",
+        "url": "Use a web link that starts with https:// (or http://).",
+        "dates": "The expiry date must be after the issued date.",
+        "duplicate": "You already added this link.",
+        "saveFailed": "Couldn't save the certificate. Nothing was added. Please try again.",
+        "updateFailed": "Couldn't update this certificate. Nothing changed. Please try again."
+      }
+    }
+  },
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
@@ -56,6 +162,26 @@
     "viewMessageFor": "View message for {{label}}"
   },
   "applications": {
+    "certificates": {
+      "title": "Certificates",
+      "open": "Open",
+      "openLabel": "Open {{name}} in a new tab",
+      "issued": "Issued {{date}}",
+      "expires": "expires {{date}}",
+      "note": "Your own claim, not verified by ITTalent. The linked page may have changed since."
+    },
+    "applyCertificates": {
+      "title": "Certificates",
+      "optional": "optional",
+      "tickedFromSuggestions_one": "{{count}} ticked from your suggestions. Untick any, or send none.",
+      "tickedFromSuggestions_other": "{{count}} ticked from your suggestions. Untick any, or send none.",
+      "ticked_one": "{{count}} ticked. Untick any, or send none.",
+      "ticked_other": "{{count}} ticked. Untick any, or send none.",
+      "noneTicked": "None ticked. Tick any you want to send.",
+      "manage": "Manage certificates",
+      "open": "Open {{name}} in a new tab",
+      "unavailable": "A certificate you ticked was changed or deleted. Check the list and send again."
+    },
     "title": "My applications",
     "browse": "Browse jobs",
     "subtitle_one": "{{count}} application",

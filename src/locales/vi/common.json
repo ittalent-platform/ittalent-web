@@ -1,4 +1,110 @@
 {
+  "accountNav": {
+    "label": "Mục tài khoản",
+    "jobSearch": "Tìm việc",
+    "myApplications": "Đơn ứng tuyển của tôi",
+    "myProfile": "Hồ sơ của tôi",
+    "documents": "Tài liệu",
+    "certificates": "Chứng chỉ"
+  },
+  "certificates": {
+    "title": "Chứng chỉ",
+    "add": "Thêm chứng chỉ",
+    "suggestedSummary_one": "<b>{{count}} chứng chỉ</b> được gợi ý khi bạn ứng tuyển",
+    "suggestedSummary_other": "<b>{{count}} chứng chỉ</b> được gợi ý khi bạn ứng tuyển",
+    "opensInNewTab": "(mở trong tab mới)",
+    "notHttps": "Không phải HTTPS",
+    "noIssuer": "Chưa có đơn vị cấp",
+    "issuedOn": "Cấp ngày {{date}}",
+    "expiresOn": "Hết hạn {{date}}",
+    "expiredOn": "Đã hết hạn {{date}}",
+    "noExpiry": "Không hết hạn",
+    "expired": "Hết hạn",
+    "version": "Phiên bản {{version}}",
+    "suggestOnApply": "Gợi ý khi ứng tuyển",
+    "suggestFor": "Gợi ý {{name}} khi tôi ứng tuyển",
+    "actionsFor": "Thao tác cho {{name}}",
+    "edit": "Sửa",
+    "openLink": "Mở liên kết",
+    "deleteMenu": "Xoá…",
+    "pageGone": "Trang đó không tồn tại. Đang hiển thị trang đầu tiên.",
+    "search": {
+      "placeholder": "Tìm theo tên, đơn vị cấp hoặc liên kết",
+      "tooLong": "Tối đa {{max}} ký tự.",
+      "results_one": "{{count}} kết quả cho “{{term}}”",
+      "results_other": "{{count}} kết quả cho “{{term}}”",
+      "clear": "Xoá tìm kiếm",
+      "noMatch": "Không có chứng chỉ khớp “{{term}}”",
+      "noMatchDescription": "Thử từ khác hoặc xoá tìm kiếm."
+    },
+    "empty": {
+      "title": "Chưa có chứng chỉ",
+      "description": "Thêm liên kết tới các chứng chỉ bạn đã đạt. Bạn tự chọn gửi chứng chỉ nào khi ứng tuyển."
+    },
+    "errors": {
+      "loadTitle": "Không tải được chứng chỉ",
+      "loadDescription": "Kiểm tra kết nối rồi thử lại.",
+      "retry": "Thử lại",
+      "switchFailed": "Không cập nhật được chứng chỉ. Chưa có gì thay đổi. Vui lòng thử lại.",
+      "deleteFailed": "Không xoá được chứng chỉ. Chứng chỉ vẫn còn trong danh sách. Vui lòng thử lại."
+    },
+    "access": {
+      "title": "Đăng nhập lại để xem chứng chỉ",
+      "description": "Phiên đăng nhập hoặc quyền truy cập đã thay đổi.",
+      "signIn": "Đăng nhập"
+    },
+    "toast": {
+      "suggested": "Sẽ được gợi ý khi bạn ứng tuyển.",
+      "unsuggested": "Sẽ không được gợi ý khi bạn ứng tuyển.",
+      "added": "Đã thêm {{name}}.",
+      "saved": "Đã lưu {{name}}.",
+      "deleted": "Đã xoá {{name}}. Các bản đã gửi vẫn được giữ."
+    },
+    "delete": {
+      "title": "Xoá chứng chỉ này?",
+      "description": "<b>{{name}}</b> sẽ bị xoá khỏi danh sách và không được gợi ý cho đơn mới.",
+      "sentNote_one": "Đơn bạn đã gửi vẫn giữ bản sao. Doanh nghiệp vẫn xem được ở đó.",
+      "sentNote_other": "{{count}} đơn bạn đã gửi vẫn giữ bản sao. Doanh nghiệp vẫn xem được ở đó.",
+      "keep": "Giữ lại",
+      "confirm": "Xoá"
+    },
+    "conflict": {
+      "title": "Chứng chỉ đã thay đổi ở nơi khác",
+      "description": "Chứng chỉ đã được sửa hoặc xoá ở tab khác. Tải bản mới nhất rồi thao tác lại.",
+      "loadLatest": "Tải bản mới nhất"
+    },
+    "form": {
+      "addTitle": "Thêm chứng chỉ",
+      "editTitle": "Sửa chứng chỉ",
+      "addDescription": "Chỉ mình bạn thấy. Thêm liên kết tới trang hiển thị chứng chỉ.",
+      "editDescription": "Phiên bản {{version}} · sửa lần cuối {{date}}.",
+      "sentNote_one": "Đã gửi kèm 1 đơn. Đơn đó giữ phiên bản lúc gửi; thay đổi của bạn chỉ áp dụng cho đơn mới.",
+      "sentNote_other": "Đã gửi kèm {{count}} đơn. Các đơn đó giữ phiên bản lúc gửi; thay đổi của bạn chỉ áp dụng cho đơn mới.",
+      "name": "Tên chứng chỉ",
+      "namePlaceholder": "VD: AWS Certified Solutions Architect",
+      "url": "Liên kết",
+      "urlHint": "Trang hiển thị chứng chỉ. ITTalent không mở hay kiểm tra trang này.",
+      "issuer": "Đơn vị cấp",
+      "optional": "không bắt buộc",
+      "issued": "Ngày cấp",
+      "expires": "Ngày hết hạn",
+      "expiresHint": "Để trống nếu không hết hạn.",
+      "suggest": "Gợi ý khi tôi ứng tuyển",
+      "suggestHint": "Được tích sẵn trong đơn mới. Bạn vẫn có thể bỏ tích mỗi lần.",
+      "add": "Thêm chứng chỉ",
+      "adding": "Đang thêm…",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu…",
+      "errors": {
+        "name": "Nhập tên chứng chỉ.",
+        "url": "Dùng liên kết web bắt đầu bằng https:// (hoặc http://).",
+        "dates": "Ngày hết hạn phải sau ngày cấp.",
+        "duplicate": "Bạn đã thêm liên kết này rồi.",
+        "saveFailed": "Không lưu được chứng chỉ. Chưa có gì được thêm. Vui lòng thử lại.",
+        "updateFailed": "Không cập nhật được chứng chỉ. Chưa có gì thay đổi. Vui lòng thử lại."
+      }
+    }
+  },
   "actions": {
     "save": "Lưu",
     "cancel": "Huỷ",
@@ -55,6 +161,24 @@
     "viewMessageFor": "Xem tin nhắn của {{label}}"
   },
   "applications": {
+    "certificates": {
+      "title": "Chứng chỉ",
+      "open": "Mở",
+      "openLabel": "Mở {{name}} trong thẻ mới",
+      "issued": "Cấp ngày {{date}}",
+      "expires": "hết hạn {{date}}",
+      "note": "Đây là thông tin bạn tự khai, ITTalent không xác minh. Trang liên kết có thể đã thay đổi."
+    },
+    "applyCertificates": {
+      "title": "Chứng chỉ",
+      "optional": "không bắt buộc",
+      "tickedFromSuggestions_other": "Đã chọn {{count}} chứng chỉ được gợi ý. Bỏ chọn bất kỳ, hoặc không gửi chứng chỉ nào.",
+      "ticked_other": "Đã chọn {{count}} chứng chỉ. Bỏ chọn bất kỳ, hoặc không gửi chứng chỉ nào.",
+      "noneTicked": "Chưa chọn chứng chỉ nào. Chọn những chứng chỉ bạn muốn gửi.",
+      "manage": "Quản lý chứng chỉ",
+      "open": "Mở {{name}} trong thẻ mới",
+      "unavailable": "Một chứng chỉ bạn chọn đã bị sửa hoặc xoá. Kiểm tra lại danh sách rồi gửi lại."
+    },
     "title": "Đơn ứng tuyển của tôi",
     "browse": "Tìm việc làm",
     "subtitle_other": "{{count}} đơn ứng tuyển",
