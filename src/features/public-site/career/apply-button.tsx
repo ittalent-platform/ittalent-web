@@ -186,7 +186,6 @@ export function ApplyButton({ companyName, deadline, jobId, jobTitle }: ApplyBut
           </div>
 
           <DialogFooter className="flex-row items-center justify-end gap-2 border-t border-mkt-line p-4 px-6">
-            {certificateItems.length ? <p className="m-0 mr-auto min-w-0 text-[12px] leading-snug text-mkt-muted">{t("applications.applyCertificates.copyNote")}</p> : null}
             <button
               className="h-11 shrink-0 rounded-full px-5 text-[13.5px] font-semibold text-mkt-ink-2 hover:text-mkt-ink"
               disabled={apply.isPending}

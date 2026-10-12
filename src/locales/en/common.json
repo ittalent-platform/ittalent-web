@@ -91,7 +91,6 @@
       "expiresHint": "Leave empty if it doesn't expire.",
       "suggest": "Suggest it when I apply",
       "suggestHint": "Pre-ticked on new applications. You can still untick it each time.",
-      "claimNote": "Companies see this as your own claim. ITTalent doesn't verify certificates.",
       "add": "Add certificate",
       "adding": "Adding…",
       "save": "Save changes",
@@ -181,7 +180,6 @@
       "noneTicked": "None ticked. Tick any you want to send.",
       "manage": "Manage certificates",
       "open": "Open {{name}} in a new tab",
-      "copyNote": "The company gets a copy of what you tick, as it is now.",
       "unavailable": "A certificate you ticked was changed or deleted. Check the list and send again."
     },
     "title": "My applications",
