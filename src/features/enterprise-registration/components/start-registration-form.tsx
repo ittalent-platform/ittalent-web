@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import {
   startRegistrationSchema,
   type StartRegistrationFormData,
-} from "../enterprise-registration.schemas";
-import { useStartRegistrationMutation } from "../enterprise-registration.queries";
+} from "@/features/enterprise-registration/enterprise-registration.schemas";
+import { useStartRegistrationMutation } from "@/features/enterprise-registration/enterprise-registration.queries";
 
 export function StartRegistrationForm({
   onSuccess,
@@ -55,12 +55,12 @@ export function StartRegistrationForm({
   };
 
   return (
-    <div className="w-full max-w-[440px] rounded-2xl border border-[#e6e4df] bg-[#ffffff] p-8 shadow-xs">
+    <div className="w-full max-w-[440px] rounded-2xl border border-border bg-card p-8 shadow-xs">
       <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-[#19191c]">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
           Register your company
         </h2>
-        <p className="mt-1 text-[13.5px] text-[#64646b]">
+        <p className="mt-1 text-[13.5px] text-muted-foreground">
           Enter your contact details to start and save your organization intake case.
         </p>
       </div>
@@ -138,11 +138,11 @@ export function StartRegistrationForm({
         </Button>
       </form>
 
-      <div className="mt-6 border-t border-[#efede8] pt-4 text-center">
+      <div className="mt-6 border-t border-line-muted pt-4 text-center">
         <button
           type="button"
           onClick={onContinueLaterClick}
-          className="text-xs font-medium text-[#b33305] hover:text-[#8f2904]"
+          className="text-xs font-medium text-primary hover:underline"
         >
           Already started? Continue your registration draft →
         </button>

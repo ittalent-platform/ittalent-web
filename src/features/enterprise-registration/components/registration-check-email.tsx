@@ -32,18 +32,18 @@ export function RegistrationCheckEmail({
   };
 
   return (
-    <div className="w-full max-w-[440px] rounded-2xl border border-[#e6e4df] bg-[#ffffff] p-8 text-center shadow-xs">
-      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#fde8e0] text-[#f2470c]">
+    <div className="w-full max-w-[440px] rounded-2xl border border-border bg-card p-8 text-center shadow-xs">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-(--status-warning-bg) text-(--status-warning-fg)">
         <Mail className="h-7 w-7" />
       </div>
 
-      <h2 className="text-xl font-bold tracking-tight text-[#19191c]">
+      <h2 className="text-xl font-bold tracking-tight text-foreground">
         Check your work email
       </h2>
 
-      <p className="mt-2 text-[13.5px] leading-relaxed text-[#64646b]">
+      <p className="mt-2 text-[13.5px] leading-relaxed text-muted-foreground">
         We sent a verification link to{" "}
-        <span className="font-semibold text-[#19191c]">{email}</span>. Click the link
+        <span className="font-semibold text-foreground">{email}</span>. Click the link
         to verify your corporate email and start your registration draft.
       </p>
 
@@ -64,13 +64,13 @@ export function RegistrationCheckEmail({
         <button
           type="button"
           onClick={onChangeEmail}
-          className="flex items-center justify-center gap-1.5 text-xs font-medium text-[#64646b] hover:text-[#19191c]"
+          className="flex items-center justify-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Use a different email address
         </button>
       </div>
 
-      <div className="mt-6 border-t border-[#efede8] pt-4 text-xs text-[#737379]">
+      <div className="mt-6 border-t border-line-muted pt-4 text-xs text-muted-foreground">
         Tip: If you don't see the email within 2 minutes, check your spam or junk folder.
       </div>
     </div>

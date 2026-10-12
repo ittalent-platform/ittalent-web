@@ -14,9 +14,9 @@ import {
   REGISTRATION_CONFIG,
   REGISTRATION_MESSAGES,
   type LegalDocumentType,
-} from "../enterprise-registration.constants";
-import { useRegistrationWizard } from "../context/registration-wizard-context";
-import { useUploadLegalDocumentMutation } from "../enterprise-registration.queries";
+} from "@/features/enterprise-registration/enterprise-registration.constants";
+import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
+import { useUploadLegalDocumentMutation } from "@/features/enterprise-registration/enterprise-registration.queries";
 
 function formatBytes(bytes?: number): string {
   if (!bytes) return "Unknown size";
@@ -158,12 +158,12 @@ export function Step3DocumentsForm({
   };
 
   return (
-    <div className="rounded-2xl border border-[#e6e4df] bg-[#ffffff] p-6 shadow-xs sm:p-8">
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
       <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-[#19191c]">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
           Legal Verification Documents
         </h2>
-        <p className="mt-1 text-[13.5px] text-[#64646b]">
+        <p className="mt-1 text-[13.5px] text-muted-foreground">
           Upload official legal records (PDF format, up to 5MB each) verifying your enterprise identity.
         </p>
       </div>
@@ -175,20 +175,20 @@ export function Step3DocumentsForm({
       )}
 
       {/* Mandatory Requirements Checklist Callout */}
-      <div className="mb-6 rounded-xl border border-[#e6e4df] bg-[#faf9f5] p-4 text-[13px]">
-        <span className="font-semibold text-[#19191c]">Required documents for submission:</span>
-        <ul className="mt-2 space-y-1.5 text-[#64646b]">
+      <div className="mb-6 rounded-xl border border-border bg-muted p-4 text-[13px]">
+        <span className="font-semibold text-foreground">Required documents for submission:</span>
+        <ul className="mt-2 space-y-1.5 text-muted-foreground">
           <li className="flex items-center gap-2">
             <span
               className={`inline-flex size-4.5 items-center justify-center rounded-full text-xs font-bold ${
                 hasBusinessLicense
-                  ? "bg-[#e8f5ee] text-[#12764a]"
-                  : "bg-[#f1efe9] text-[#737379]"
+                  ? "bg-(--status-success-bg) text-(--status-success-fg)"
+                  : "bg-muted text-muted-foreground"
               }`}
             >
               {hasBusinessLicense ? "✓" : "1"}
             </span>
-            <span className={hasBusinessLicense ? "font-medium text-[#19191c]" : ""}>
+            <span className={hasBusinessLicense ? "font-medium text-foreground" : ""}>
               Business Registration Certificate (BRC) — Mandatory
             </span>
           </li>
@@ -196,8 +196,8 @@ export function Step3DocumentsForm({
             <span
               className={`inline-flex size-4.5 items-center justify-center rounded-full text-xs font-bold ${
                 isLegalRepresentative || hasAuthLetter
-                  ? "bg-[#e8f5ee] text-[#12764a]"
-                  : "bg-[#feeceb] text-[#d93829]"
+                  ? "bg-(--status-success-bg) text-(--status-success-fg)"
+                  : "bg-(--status-error-bg) text-(--status-error-fg)"
               }`}
             >
               {isLegalRepresentative || hasAuthLetter ? "✓" : "2"}
@@ -205,10 +205,10 @@ export function Step3DocumentsForm({
             <span
               className={
                 !isLegalRepresentative && !hasAuthLetter
-                  ? "font-medium text-[#d93829]"
+                  ? "font-medium text-destructive"
                   : hasAuthLetter
-                    ? "font-medium text-[#19191c]"
-                    : "text-[#737379]"
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground"
               }
             >
               Letter of Authorization (LoA) — {isLegalRepresentative ? "Not required (Legal Rep)" : "Mandatory for delegate"}
@@ -221,7 +221,7 @@ export function Step3DocumentsForm({
       <div className="space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="w-full sm:w-72">
-            <label htmlFor="doc_type_select" className="mb-1 block text-xs font-semibold text-[#19191c]">
+            <label htmlFor="doc_type_select" className="mb-1 block text-xs font-semibold text-foreground">
               Select document type:
             </label>
             <Select
@@ -258,17 +258,17 @@ export function Step3DocumentsForm({
           onDrop={handleDrop}
           className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
             dragOver
-              ? "border-[#f2470c] bg-[#fff5f2]"
-              : "border-[#d8d6d0] bg-[#faf9f5] hover:border-[#b8b6af]"
+              ? "border-primary bg-primary/10"
+              : "border-border bg-muted/40 hover:border-muted-foreground/50"
           }`}
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f4f2ec] text-[#64646b]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
             <UploadCloud className="h-6 w-6" />
           </div>
-          <p className="mt-3 text-sm font-semibold text-[#19191c]">
+          <p className="mt-3 text-sm font-semibold text-foreground">
             Click to upload or drag & drop PDF here
           </p>
-          <p className="mt-1 text-xs text-[#737379]">
+          <p className="mt-1 text-xs text-muted-foreground">
             Supported file type: PDF only (maximum 5MB)
           </p>
           <input
@@ -292,31 +292,31 @@ export function Step3DocumentsForm({
 
       {/* Uploaded Documents List */}
       <div className="mt-8 space-y-3">
-        <h3 className="text-sm font-semibold text-[#19191c]">
+        <h3 className="text-sm font-semibold text-foreground">
           Attached Documents ({documents.length})
         </h3>
 
         {documents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-[#e6e4df] p-6 text-center text-xs text-[#737379]">
+          <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
             No legal documents uploaded yet.
           </div>
         ) : (
-          <div className="divide-y divide-[#efede8] rounded-xl border border-[#e6e4df] bg-[#ffffff]">
+          <div className="divide-y divide-line-muted rounded-xl border border-border bg-card">
             {documents.map((doc, idx) => (
               <div
                 key={`${doc.file_name}-${idx}`}
-                className="flex items-center justify-between p-3.5 transition-colors hover:bg-[#faf9f5]"
+                className="flex items-center justify-between p-3.5 transition-colors hover:bg-muted/40"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#fde8e0] text-[#f2470c]">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--status-warning-bg) text-(--status-warning-fg)">
                     <FileText className="h-4.5 w-4.5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-[#19191c]">
+                    <p className="truncate text-xs font-semibold text-foreground">
                       {doc.file_name}
                     </p>
-                    <div className="flex items-center gap-2 text-[11.5px] text-[#737379]">
-                      <span className="rounded bg-[#efede8] px-1.5 py-0.5 text-[10.5px] font-medium text-[#19191c]">
+                    <div className="flex items-center gap-2 text-[11.5px] text-muted-foreground">
+                      <span className="rounded bg-muted px-1.5 py-0.5 text-[10.5px] font-medium text-foreground">
                         {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}
                       </span>
                       <span>•</span>
@@ -328,7 +328,7 @@ export function Step3DocumentsForm({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc(idx)}
-                  className="rounded p-1.5 text-[#737379] hover:bg-[#feeceb] hover:text-[#d93829]"
+                  className="rounded p-1.5 text-muted-foreground hover:bg-(--status-error-bg) hover:text-destructive"
                   title="Remove document"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -340,7 +340,7 @@ export function Step3DocumentsForm({
       </div>
 
       {/* Nav Actions */}
-      <div className="flex items-center justify-between gap-3 border-t border-[#efede8] pt-6 mt-8">
+      <div className="flex items-center justify-between gap-3 border-t border-line-muted pt-6 mt-8">
         <Button
           type="button"
           variant="outline"

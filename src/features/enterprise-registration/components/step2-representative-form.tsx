@@ -8,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import {
   step2RepresentativeSchema,
   type Step2RepresentativeFormData,
-} from "../enterprise-registration.schemas";
-import { useRegistrationWizard } from "../context/registration-wizard-context";
+} from "@/features/enterprise-registration/enterprise-registration.schemas";
+import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
 
 export function Step2RepresentativeForm({
   onNext,
@@ -74,12 +74,12 @@ export function Step2RepresentativeForm({
   };
 
   return (
-    <div className="rounded-2xl border border-[#e6e4df] bg-[#ffffff] p-6 shadow-xs sm:p-8">
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
       <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-[#19191c]">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
           Authorized Representative
         </h2>
-        <p className="mt-1 text-[13.5px] text-[#64646b]">
+        <p className="mt-1 text-[13.5px] text-muted-foreground">
           Specify the representative managing this enterprise workspace on ITTalent.
         </p>
       </div>
@@ -135,22 +135,22 @@ export function Step2RepresentativeForm({
         </FormField>
 
         {/* Legal rep authorization checkbox card */}
-        <div className="rounded-xl border border-[#e6e4df] bg-[#faf9f5] p-4.5">
+        <div className="rounded-xl border border-border bg-muted p-4.5">
           <div className="flex items-start gap-3">
             <input
               id="is_legal_representative"
               type="checkbox"
-              className="mt-1 size-4.5 shrink-0 accent-[#f2470c]"
+              className="mt-1 size-4.5 shrink-0 accent-primary"
               {...register("is_legal_representative")}
             />
             <div className="space-y-1">
               <label
                 htmlFor="is_legal_representative"
-                className="cursor-pointer text-[13.5px] font-semibold text-[#19191c]"
+                className="cursor-pointer text-[13.5px] font-semibold text-foreground"
               >
                 I am the legal representative named on the Business License (Người đại diện theo pháp luật)
               </label>
-              <p className="text-xs text-[#64646b]">
+              <p className="text-xs text-muted-foreground">
                 If checked, you only need to upload the Business Registration Certificate.
               </p>
             </div>
@@ -165,7 +165,7 @@ export function Step2RepresentativeForm({
           </div>
         )}
 
-        <div className="flex items-center justify-between gap-3 border-t border-[#efede8] pt-6">
+        <div className="flex items-center justify-between gap-3 border-t border-line-muted pt-6">
           <Button
             type="button"
             variant="outline"

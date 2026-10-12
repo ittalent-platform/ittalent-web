@@ -4,7 +4,7 @@ import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { corporateEmailSchema } from "../enterprise-registration.schemas";
+import { corporateEmailSchema } from "@/features/enterprise-registration/enterprise-registration.schemas";
 
 export function ResumeDraftForm({
   onBack,
@@ -39,16 +39,16 @@ export function ResumeDraftForm({
 
   if (isSubmitted) {
     return (
-      <div className="w-full max-w-[440px] rounded-2xl border border-[#e6e4df] bg-[#ffffff] p-8 text-center shadow-xs">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#e8f5ee] text-[#12764a]">
+      <div className="w-full max-w-[440px] rounded-2xl border border-border bg-card p-8 text-center shadow-xs">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-(--status-success-bg) text-(--status-success-fg)">
           <CheckCircle2 className="h-7 w-7" />
         </div>
-        <h2 className="text-xl font-bold tracking-tight text-[#19191c]">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
           Resume link sent
         </h2>
-        <p className="mt-2 text-[13.5px] text-[#64646b]">
+        <p className="mt-2 text-[13.5px] text-muted-foreground">
           If an active registration exists for{" "}
-          <span className="font-semibold text-[#19191c]">{email}</span>, we have emailed
+          <span className="font-semibold text-foreground">{email}</span>, we have emailed
           a resume link.
         </p>
         <Button
@@ -64,12 +64,12 @@ export function ResumeDraftForm({
   }
 
   return (
-    <div className="w-full max-w-[440px] rounded-2xl border border-[#e6e4df] bg-[#ffffff] p-8 shadow-xs">
+    <div className="w-full max-w-[440px] rounded-2xl border border-border bg-card p-8 shadow-xs">
       <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-[#19191c]">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
           Continue your registration
         </h2>
-        <p className="mt-1 text-[13.5px] text-[#64646b]">
+        <p className="mt-1 text-[13.5px] text-muted-foreground">
           Enter your registered work email to receive a secure link to resume your draft.
         </p>
       </div>
@@ -101,11 +101,11 @@ export function ResumeDraftForm({
         </Button>
       </form>
 
-      <div className="mt-6 border-t border-[#efede8] pt-4 text-center">
+      <div className="mt-6 border-t border-line-muted pt-4 text-center">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[#64646b] hover:text-[#19191c]"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Back to new registration
         </button>

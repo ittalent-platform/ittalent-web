@@ -17,8 +17,8 @@ import {
   step1CompanyDetailsSchema,
   type Step1CompanyDetailsFormData,
   companySizeOptions,
-} from "../enterprise-registration.schemas";
-import { useRegistrationWizard } from "../context/registration-wizard-context";
+} from "@/features/enterprise-registration/enterprise-registration.schemas";
+import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
 
 const INDUSTRY_OPTIONS = [
   "Software & IT Services",
@@ -108,12 +108,12 @@ export function Step1CompanyForm({
   };
 
   return (
-    <div className="rounded-2xl border border-[#e6e4df] bg-[#ffffff] p-6 shadow-xs sm:p-8">
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
       <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-[#19191c]">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">
           Company Details
         </h2>
-        <p className="mt-1 text-[13.5px] text-[#64646b]">
+        <p className="mt-1 text-[13.5px] text-muted-foreground">
           Provide verified business entity information matching your official registration certificate.
         </p>
       </div>
@@ -127,7 +127,7 @@ export function Step1CompanyForm({
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Section 1: Identification */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-[#19191c]">Basic Information</h3>
+          <h3 className="text-sm font-semibold text-foreground">Basic Information</h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               htmlFor="company_name"
@@ -189,8 +189,8 @@ export function Step1CompanyForm({
         </div>
 
         {/* Section 2: Industry & Organization */}
-        <div className="space-y-4 border-t border-[#efede8] pt-6">
-          <h3 className="text-sm font-semibold text-[#19191c]">Industry & Organization</h3>
+        <div className="space-y-4 border-t border-line-muted pt-6">
+          <h3 className="text-sm font-semibold text-foreground">Industry & Organization</h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               htmlFor="industry"
@@ -253,8 +253,8 @@ export function Step1CompanyForm({
         </div>
 
         {/* Section 3: Headquarters Location */}
-        <div className="space-y-4 border-t border-[#efede8] pt-6">
-          <h3 className="text-sm font-semibold text-[#19191c]">Headquarters Address</h3>
+        <div className="space-y-4 border-t border-line-muted pt-6">
+          <h3 className="text-sm font-semibold text-foreground">Headquarters Address</h3>
           <FormField
             htmlFor="street"
             label="Street address"
@@ -298,8 +298,8 @@ export function Step1CompanyForm({
         </div>
 
         {/* Section 4: Overview */}
-        <div className="space-y-4 border-t border-[#efede8] pt-6">
-          <h3 className="text-sm font-semibold text-[#19191c]">Company Overview</h3>
+        <div className="space-y-4 border-t border-line-muted pt-6">
+          <h3 className="text-sm font-semibold text-foreground">Company Overview</h3>
           <FormField
             htmlFor="short_description"
             label="Short elevator pitch (optional)"
@@ -315,7 +315,7 @@ export function Step1CompanyForm({
           </FormField>
         </div>
 
-        <div className="flex items-center justify-end gap-3 border-t border-[#efede8] pt-6">
+        <div className="flex items-center justify-end gap-3 border-t border-line-muted pt-6">
           <Button
             type="submit"
             disabled={isSaving}

@@ -32,6 +32,13 @@ const ResetPasswordPage = lazy(() =>
     default: m.ResetPasswordPage,
   })),
 );
+const RegisterCompanyPage = lazy(() =>
+  import("@/features/enterprise-registration/pages/register-company-page").then(
+    (m) => ({
+      default: m.RegisterCompanyPage,
+    }),
+  ),
+);
 const UsersPage = lazy(() =>
   import("@/features/admin/users/users-page").then((m) => ({
     default: m.UsersPage,
@@ -146,6 +153,7 @@ export const appRoutes = [
   },
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
+  { path: "/register-company", element: <RegisterCompanyPage /> },
   { path: "/verify-email", element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },

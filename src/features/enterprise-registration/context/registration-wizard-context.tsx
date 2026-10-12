@@ -8,8 +8,8 @@ import type {
   EnterpriseRegistrationDetail,
   SaveEnterpriseRegistrationDraftRequest,
   WizardStepKey,
-} from "../enterprise-registration.types";
-import { useSaveRegistrationDraftMutation } from "../enterprise-registration.queries";
+} from "@/features/enterprise-registration/enterprise-registration.types";
+import { useSaveRegistrationDraftMutation } from "@/features/enterprise-registration/enterprise-registration.queries";
 
 interface RegistrationWizardContextType {
   registrationId: string | null;
