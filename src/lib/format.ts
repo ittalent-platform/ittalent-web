@@ -55,3 +55,19 @@ export function formatCalendarDate(value: string): string {
   const [year, month, day] = value.split("-").map(Number);
   return `${day} ${MONTHS[month - 1]} ${year}`;
 }
+
+const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ["day", MS_PER_DAY],
+  ["hour", 3_600_000],
+  ["minute", 60_000],
+];
+
+/** "2 minutes ago" in the given language; anything under a minute reads as "now". */
+export function formatTimeAgo(value: string | undefined, locale: string, now = Date.now()): string {
+  const date = validDate(value);
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  if (!date) return formatter.format(0, "second");
+  const elapsed = Math.max(0, now - date.getTime());
+  const [unit, size] = RELATIVE_UNITS.find(([, ms]) => elapsed >= ms) ?? ["second", 1000];
+  return formatter.format(-Math.floor(elapsed / size), unit);
+}

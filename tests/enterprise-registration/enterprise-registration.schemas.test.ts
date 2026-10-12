@@ -7,7 +7,8 @@ import {
   step2RepresentativeSchema,
   step3DocumentsSchema,
 } from "@/features/enterprise-registration/enterprise-registration.schemas";
-import { REGISTRATION_MESSAGES } from "@/features/enterprise-registration/enterprise-registration.constants";
+import i18n from "@/i18n";
+import { REGISTRATION_MESSAGE_KEYS } from "@/features/enterprise-registration/enterprise-registration.constants";
 
 describe("enterprise-registration schemas", () => {
   describe("startRegistrationSchema & corporate email policy (BR-39)", () => {
@@ -22,7 +23,7 @@ describe("enterprise-registration schemas", () => {
         expect(res.success).toBe(false);
         if (!res.success) {
           const err = res.error.issues.find((i) => i.path.includes("corporate_email"));
-          expect(err?.message).toBe(REGISTRATION_MESSAGES.PERSONAL_EMAIL_REJECTED);
+          expect(err?.message).toBe(i18n.t(REGISTRATION_MESSAGE_KEYS.PERSONAL_EMAIL_REJECTED));
         }
       }
     });

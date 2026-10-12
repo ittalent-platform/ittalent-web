@@ -1,7 +1,7 @@
 import { CandidateAccountLayout } from "@/components/layout/candidate-account-layout";
 import { CertificatesPage } from "@/features/certificates/certificates-page";
 import { lazy, Suspense } from "react";
-import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
+import { Navigate, createBrowserRouter, RouterProvider, useLocation } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
 import { AppLayout } from "@/components/layout/admin-layout";
@@ -32,6 +32,13 @@ const ResetPasswordPage = lazy(() =>
   import("@/features/auth/reset-password-page").then((m) => ({
     default: m.ResetPasswordPage,
   })),
+);
+const RegisterCompanyPage = lazy(() =>
+  import("@/features/enterprise-registration/pages/register-company-page").then(
+    (m) => ({
+      default: m.RegisterCompanyPage,
+    }),
+  ),
 );
 const AcceptInvitationPage = lazy(() =>
   import("@/features/auth/accept-invitation-page").then((m) => ({ default: m.AcceptInvitationPage })),
@@ -145,6 +152,9 @@ export const appRoutes = [
   },
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
+  { path: "/register-company", element: <RegisterCompanyPage /> },
+  // The confirmation email links here (APP_BASE_URL/enterprise-registration/verify?token=...).
+  { path: "/enterprise-registration/verify", element: <RedirectKeepingSearch to="/register-company" /> },
   { path: "/verify-email", element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
@@ -221,6 +231,12 @@ export const appRoutes = [
     element: <Navigate replace to="/" />,
   },
 ];
+
+/** Sends an old or emailed path to its current page, keeping the query string (e.g. the verification token). */
+function RedirectKeepingSearch({ to }: { to: string }) {
+  const { search } = useLocation();
+  return <Navigate replace to={{ pathname: to, search }} />;
+}
 
 const router = createBrowserRouter(appRoutes);
 

@@ -61,7 +61,7 @@ export function MarketplaceFooter() {
 
         <div className="flex flex-col gap-3 text-[13.5px]">
           <div className={colTitle}>FOR EMPLOYERS</div>
-          <Link className={link} to="/#employers">
+          <Link className={link} to="/register-company">
             Register your company
           </Link>
           <Link className={link} to="/#employers">
