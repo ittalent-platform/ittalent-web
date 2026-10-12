@@ -36,6 +36,3 @@ docs/
 e2e/.auth/
 playwright-report/
 test-results/
-
-# Local design mockups
-home/

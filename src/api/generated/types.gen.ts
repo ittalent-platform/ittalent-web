@@ -26,9 +26,6 @@ export type RegisterResponse = {
     status: string;
     emailVerified: boolean;
     enterpriseId: string | null;
-    statusReason?: string | null;
-    statusUpdatedAt?: string | null;
-    statusUpdatedBy?: string | null;
     createdAt?: string;
     updatedAt?: string;
   };
@@ -59,9 +56,6 @@ export type AuthResponse = {
     status: string;
     emailVerified: boolean;
     enterpriseId: string | null;
-    statusReason?: string | null;
-    statusUpdatedAt?: string | null;
-    statusUpdatedBy?: string | null;
     createdAt?: string;
     updatedAt?: string;
   };
@@ -86,9 +80,6 @@ export type UserDto = {
   status: string;
   emailVerified: boolean;
   enterpriseId: string | null;
-  statusReason?: string | null;
-  statusUpdatedAt?: string | null;
-  statusUpdatedBy?: string | null;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -365,9 +356,6 @@ export type UserListResponse = {
     status: string;
     emailVerified: boolean;
     enterpriseId: string | null;
-    statusReason?: string | null;
-    statusUpdatedAt?: string | null;
-    statusUpdatedBy?: string | null;
     createdAt?: string;
     updatedAt?: string;
   }>;
@@ -380,32 +368,7 @@ export type UserListResponse = {
 export type UpdateUserRequest = {
   fullName?: string;
   phone?: string | null;
-  role?: "admin" | "user" | "recruiter" | "interviewer" | "enterprise_admin";
-};
-
-export type CreateEmployeeRequest = {
-  fullName: string;
-  email: string;
-  phone?: string | null;
-  role?: "recruiter" | "interviewer" | "admin" | "user" | "enterprise_admin";
-  enterpriseId?: string;
-  status?: "active" | "inactive";
-};
-
-export type UpdateUserStatusRequest = {
-  status: "active" | "suspended" | "inactive";
-  reason?: string;
-};
-
-export type UserHistoryResponse = {
-  items: Array<{
-    id: string;
-    action: string;
-    description: string;
-    timestamp: string;
-    actorId?: string | null;
-    actorName?: string | null;
-  }>;
+  role?: "admin" | "user";
 };
 
 export type EnterpriseListResponse = {
@@ -844,9 +807,6 @@ export type AcceptInvitationResponse = {
     status: string;
     emailVerified: boolean;
     enterpriseId: string | null;
-    statusReason?: string | null;
-    statusUpdatedAt?: string | null;
-    statusUpdatedBy?: string | null;
     createdAt?: string;
     updatedAt?: string;
   };
@@ -1870,7 +1830,6 @@ export type GetApiV1UsersData = {
       | "interviewer";
     status?: "active" | "inactive" | "suspended" | "blocked";
     emailVerified?: "true" | "false";
-    enterpriseId?: string;
     sortBy?: "createdAt" | "id" | "name" | "username" | "email";
     sortOrder?: "asc" | "desc";
   };
@@ -1879,7 +1838,7 @@ export type GetApiV1UsersData = {
 
 export type GetApiV1UsersErrors = {
   /**
-   * Invalid query parameters
+   * Invalid page, limit, search, role or status
    */
   400: unknown;
   /**
@@ -1887,140 +1846,24 @@ export type GetApiV1UsersErrors = {
    */
   401: unknown;
   /**
-   * Insufficient permissions
+   * Caller is not a System Administrator
    */
   403: unknown;
   /**
-   * Storage unavailable
+   * Account storage unavailable, retry later
    */
   503: unknown;
 };
 
 export type GetApiV1UsersResponses = {
   /**
-   * Paginated user/employee accounts
+   * One page of user accounts (empty items when nothing matches)
    */
   200: UserListResponse;
 };
 
 export type GetApiV1UsersResponse =
   GetApiV1UsersResponses[keyof GetApiV1UsersResponses];
-
-export type CreateEmployeeData = {
-  body: CreateEmployeeRequest;
-  path?: never;
-  query?: never;
-  url: "/api/v1/users";
-};
-
-export type CreateEmployeeErrors = {
-  /**
-   * Validation error on input fields
-   */
-  400: unknown;
-  /**
-   * Authentication required
-   */
-  401: unknown;
-  /**
-   * Insufficient permissions
-   */
-  403: unknown;
-  /**
-   * Corporate email is already registered
-   */
-  409: unknown;
-  /**
-   * Account storage unavailable
-   */
-  503: unknown;
-};
-
-export type CreateEmployeeResponses = {
-  /**
-   * Employee account created successfully
-   */
-  201: UserDto;
-};
-
-export type CreateEmployeeResponse =
-  CreateEmployeeResponses[keyof CreateEmployeeResponses];
-
-export type GetUserHistoryData = {
-  body?: never;
-  path: {
-    id: string;
-  };
-  query?: never;
-  url: "/api/v1/users/{id}/history";
-};
-
-export type GetUserHistoryErrors = {
-  /**
-   * Invalid user ID format
-   */
-  400: unknown;
-  /**
-   * Authentication required
-   */
-  401: unknown;
-  /**
-   * Insufficient permissions
-   */
-  403: unknown;
-  /**
-   * User not found
-   */
-  404: unknown;
-};
-
-export type GetUserHistoryResponses = {
-  /**
-   * Employee audit history events
-   */
-  200: UserHistoryResponse;
-};
-
-export type GetUserHistoryResponse =
-  GetUserHistoryResponses[keyof GetUserHistoryResponses];
-
-export type UpdateUserStatusData = {
-  body: UpdateUserStatusRequest;
-  path: {
-    id: string;
-  };
-  query?: never;
-  url: "/api/v1/users/{id}/status";
-};
-
-export type UpdateUserStatusErrors = {
-  /**
-   * Invalid status transition or missing reason
-   */
-  400: unknown;
-  /**
-   * Authentication required
-   */
-  401: unknown;
-  /**
-   * Cannot suspend own account or cross-tenant forbidden
-   */
-  403: unknown;
-  /**
-   * User not found
-   */
-  404: unknown;
-};
-
-export type UpdateUserStatusResponses = {
-  /**
-   * Status updated successfully
-   */
-  200: UserDto;
-};
-
-export type UpdateUserStatusResponse =
-  UpdateUserStatusResponses[keyof UpdateUserStatusResponses];
 
 export type GetApiV1UsersByIdData = {
   body?: never;
@@ -2041,7 +1884,7 @@ export type GetApiV1UsersByIdErrors = {
    */
   401: unknown;
   /**
-   * Insufficient permissions
+   * Caller is not a System Administrator
    */
   403: unknown;
   /**
@@ -2079,7 +1922,7 @@ export type PatchApiV1UsersByIdErrors = {
    */
   401: unknown;
   /**
-   * Self-role change blocked or unauthorized
+   * Administrator role required or self-role change blocked
    */
   403: unknown;
   /**

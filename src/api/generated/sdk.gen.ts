@@ -8,9 +8,6 @@ import {
 } from "./client";
 import { client } from "./client.gen";
 import type {
-  CreateEmployeeData,
-  CreateEmployeeErrors,
-  CreateEmployeeResponses,
   DeleteApiV1EnterprisesByEnterpriseIdData,
   DeleteApiV1EnterprisesByEnterpriseIdErrors,
   DeleteApiV1EnterprisesByEnterpriseIdResponses,
@@ -83,9 +80,6 @@ import type {
   GetApiV1UsersResponses,
   GetHealthData,
   GetHealthResponses,
-  GetUserHistoryData,
-  GetUserHistoryErrors,
-  GetUserHistoryResponses,
   PatchApiV1EnterpriseRegistrationsByIdDraftData,
   PatchApiV1EnterpriseRegistrationsByIdDraftErrors,
   PatchApiV1EnterpriseRegistrationsByIdDraftResponses,
@@ -164,9 +158,6 @@ import type {
   PostApiV1MeApplicationsData,
   PostApiV1MeApplicationsErrors,
   PostApiV1MeApplicationsResponses,
-  UpdateUserStatusData,
-  UpdateUserStatusErrors,
-  UpdateUserStatusResponses,
 } from "./types.gen";
 
 export type Options<
@@ -669,9 +660,9 @@ export const getApiV1JobPostingsByIdHistory = <
   });
 
 /**
- * List and search employee accounts
+ * List user accounts
  *
- * Retrieves paginated user accounts. Scoped to caller enterprise if recruiter, or global for system admin (UC-13, UC-16).
+ * System Administrator only (UC-USER-01). Newest first (createdAt desc, id desc). `search` matches username or email as literal, case-insensitive text. Only allow-listed fields are returned.
  */
 export const getApiV1Users = <ThrowOnError extends boolean = false>(
   options?: Options<GetApiV1UsersData, ThrowOnError>,
@@ -687,71 +678,9 @@ export const getApiV1Users = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Create employee account
+ * Get user by ID
  *
- * Provisions a new staff or recruiter account under authorized enterprise tenancy (UC-10).
- */
-export const createEmployee = <ThrowOnError extends boolean = false>(
-  options: Options<CreateEmployeeData, ThrowOnError>,
-) =>
-  (options.client ?? client).post<
-    CreateEmployeeResponses,
-    CreateEmployeeErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/api/v1/users",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
-
-/**
- * View employee account history
- *
- * Retrieves audit trail and lifecycle modification events for the employee (UC-15).
- */
-export const getUserHistory = <ThrowOnError extends boolean = false>(
-  options: Options<GetUserHistoryData, ThrowOnError>,
-) =>
-  (options.client ?? client).get<
-    GetUserHistoryResponses,
-    GetUserHistoryErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/api/v1/users/{id}/history",
-    ...options,
-  });
-
-/**
- * Update employee account status
- *
- * Suspends or activates an employee account with audit logging (UC-12). Self-suspension is blocked.
- */
-export const updateUserStatus = <ThrowOnError extends boolean = false>(
-  options: Options<UpdateUserStatusData, ThrowOnError>,
-) =>
-  (options.client ?? client).patch<
-    UpdateUserStatusResponses,
-    UpdateUserStatusErrors,
-    ThrowOnError
-  >({
-    security: [{ scheme: "bearer", type: "http" }],
-    url: "/api/v1/users/{id}/status",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
-
-/**
- * Get employee by ID
- *
- * Retrieves employee details with tenancy boundary verification (UC-14).
+ * System Administrator only (UC-USER-02). Own-profile reads use GET /auth/me.
  */
 export const getApiV1UsersById = <ThrowOnError extends boolean = false>(
   options: Options<GetApiV1UsersByIdData, ThrowOnError>,
@@ -767,9 +696,9 @@ export const getApiV1UsersById = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Update employee information
+ * Edit a user account
  *
- * Updates employee details; email is immutable; self-role change blocked (UC-11).
+ * System Administrator only. Updates only fullName, phone, and role; null or an empty phone clears the stored number. An administrator cannot change their own role.
  */
 export const patchApiV1UsersById = <ThrowOnError extends boolean = false>(
   options: Options<PatchApiV1UsersByIdData, ThrowOnError>,
