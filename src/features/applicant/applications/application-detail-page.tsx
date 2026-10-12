@@ -15,6 +15,7 @@ import { Stepper } from "@/components/common/stepper";
 import { Timeline, type TimelineEntry } from "@/components/common/timeline";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ApplicationCertificates } from "./application-certificates";
 import { ApplicationStatusBadge } from "./application-status-badge";
 import { applicationDisplayId, formatDate, formatDateTime, jobFacts } from "./application-formatters";
 import { APPLICATIONS_PATH, ATTACHMENT_KIND, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, NEXT_STEP_TEXT, PIPELINE_STEPS, TIMELINE_TONES } from "./applications.constants";
@@ -134,6 +135,8 @@ export function ApplicationDetailPage() {
               <DetailRow label={t("applications.jobDetails")} layout="grid" value={t("applications.jobSnapshotDescription")} />
             </dl>
           </section>
+
+          <ApplicationCertificates certificates={application.certificates ?? []} />
         </div>
 
         <aside className="flex min-w-0 flex-col gap-4">

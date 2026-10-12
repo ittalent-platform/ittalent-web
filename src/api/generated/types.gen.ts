@@ -702,6 +702,7 @@ export type CreateApplicationRequest = {
     cvId: string;
     coverLetterId?: string;
     message?: string;
+    certificateLinkIds?: Array<string>;
 };
 
 export type ApplicationDto = {
@@ -747,6 +748,15 @@ export type ApplicationDetailDto = {
         mimeType: string;
         size: number;
         submittedAt: string;
+    }>;
+    certificates: Array<{
+        id: string;
+        version: number;
+        name: string;
+        url: string;
+        issuer: string | null;
+        issuedDate: string | null;
+        expiryDate: string | null;
     }>;
     version: number;
     createdAt: string;
@@ -826,6 +836,8 @@ export type CertificateLink = {
     expiryDate: string | null;
     version: number;
     status: 'available';
+    suggested: boolean;
+    sentCount: number;
     createdAt: string;
     updatedAt: string;
 };
@@ -833,6 +845,7 @@ export type CertificateLink = {
 export type CertificateLinkListQuery = {
     page?: number;
     limit?: number;
+    search?: string;
 };
 
 export type PaginatedCertificateLinks = {
@@ -845,6 +858,8 @@ export type PaginatedCertificateLinks = {
         expiryDate: string | null;
         version: number;
         status: 'available';
+        suggested: boolean;
+        sentCount: number;
         createdAt: string;
         updatedAt: string;
     }>;
@@ -852,6 +867,17 @@ export type PaginatedCertificateLinks = {
     limit: number;
     total: number;
     totalPages: number;
+    suggestedTotal: number;
+};
+
+export type UpdateCertificateLinkRequest = {
+    expectedVersion: number;
+    name?: string;
+    url?: string;
+    issuer?: string | null;
+    issuedDate?: string | null;
+    expiryDate?: string | null;
+    suggested?: boolean;
 };
 
 export type GetHealthData = {
@@ -2689,6 +2715,7 @@ export type GetApiV1MeCertificateLinksData = {
     query?: {
         page?: number;
         limit?: number;
+        search?: string;
     };
     url: '/api/v1/me/certificate-links';
 };
@@ -2769,3 +2796,91 @@ export type PostApiV1MeCertificateLinksResponses = {
 };
 
 export type PostApiV1MeCertificateLinksResponse = PostApiV1MeCertificateLinksResponses[keyof PostApiV1MeCertificateLinksResponses];
+
+export type DeleteApiV1MeCertificateLinksByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query: {
+        expectedVersion: number;
+    };
+    url: '/api/v1/me/certificate-links/{id}';
+};
+
+export type DeleteApiV1MeCertificateLinksByIdErrors = {
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active verified Candidate account required
+     */
+    403: unknown;
+    /**
+     * Certificate link not found
+     */
+    404: unknown;
+    /**
+     * VERSION_CONFLICT
+     */
+    409: unknown;
+    /**
+     * Certificate link storage unavailable
+     */
+    503: unknown;
+};
+
+export type DeleteApiV1MeCertificateLinksByIdResponses = {
+    /**
+     * Certificate link deleted
+     */
+    204: void;
+};
+
+export type DeleteApiV1MeCertificateLinksByIdResponse = DeleteApiV1MeCertificateLinksByIdResponses[keyof DeleteApiV1MeCertificateLinksByIdResponses];
+
+export type PatchApiV1MeCertificateLinksByIdData = {
+    body: UpdateCertificateLinkRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/me/certificate-links/{id}';
+};
+
+export type PatchApiV1MeCertificateLinksByIdErrors = {
+    /**
+     * Invalid fields or expiry before issued date
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active verified Candidate account required
+     */
+    403: unknown;
+    /**
+     * Certificate link not found
+     */
+    404: unknown;
+    /**
+     * VERSION_CONFLICT or DUPLICATE_CERTIFICATE_URL
+     */
+    409: unknown;
+    /**
+     * Certificate link storage unavailable
+     */
+    503: unknown;
+};
+
+export type PatchApiV1MeCertificateLinksByIdResponses = {
+    /**
+     * Updated certificate link
+     */
+    200: CertificateLink;
+};
+
+export type PatchApiV1MeCertificateLinksByIdResponse = PatchApiV1MeCertificateLinksByIdResponses[keyof PatchApiV1MeCertificateLinksByIdResponses];
