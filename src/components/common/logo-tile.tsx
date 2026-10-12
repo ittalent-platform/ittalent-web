@@ -2,6 +2,14 @@ import { cn } from "@/lib/utils";
 
 // Static class names so Tailwind can see them; the palette itself lives in globals.css (--logo-n).
 const LOGO_TONES = ["bg-(--logo-1)", "bg-(--logo-2)", "bg-(--logo-3)", "bg-(--logo-4)", "bg-(--logo-5)", "bg-(--logo-6)"] as const;
+// Same five pairs and hash as the marketplace Jobs / Companies marks, so a company keeps one colour everywhere.
+const TINT_TONES = [
+  "bg-mkt-accent-soft text-mkt-accent-hover",
+  "bg-mkt-green-bg text-mkt-green-fg",
+  "bg-mkt-blue-bg text-mkt-blue-fg",
+  "bg-mkt-chip text-mkt-ink-2",
+  "bg-mkt-violet-bg text-mkt-violet-fg",
+] as const;
 const LOGO_SIZES = {
   sm: "size-[22px] rounded-md text-[7px]",
   md: "size-9 rounded-[10px] text-xs",
@@ -20,16 +28,17 @@ export function companyInitials(name: string): string {
   return (initials.length >= INITIALS_LENGTH ? initials : (words[0] ?? "").slice(0, INITIALS_LENGTH)).slice(0, INITIALS_LENGTH).toUpperCase();
 }
 
-function toneIndex(seed: string): number {
+function toneIndex(seed: string, count: number): number {
   let hash = 0;
   for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return hash % LOGO_TONES.length;
+  return hash % count;
 }
 
-/** Company mark: initials on a deterministic colour. Every job is shown with its company (DESIGN.md). */
-export function LogoTile({ name, size = "md", className }: { name: string; size?: LogoTileSize; className?: string }) {
+/** Company mark: initials on a deterministic colour (`tint` matches the marketplace marks, `solid` the admin screens). Every job is shown with its company (DESIGN.md). */
+export function LogoTile({ name, size = "md", tone = "solid", className }: { name: string; size?: LogoTileSize; tone?: "solid" | "tint"; className?: string }) {
+  const colour = tone === "tint" ? TINT_TONES[toneIndex(name, TINT_TONES.length)] : cn("text-white", LOGO_TONES[toneIndex(name, LOGO_TONES.length)]);
   return (
-    <span aria-hidden className={cn("itt-display grid shrink-0 place-items-center font-bold text-white", LOGO_TONES[toneIndex(name)], LOGO_SIZES[size], className)}>
+    <span aria-hidden className={cn("itt-display grid shrink-0 place-items-center font-bold", colour, LOGO_SIZES[size], className)}>
       {companyInitials(name)}
     </span>
   );

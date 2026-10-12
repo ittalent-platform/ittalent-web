@@ -35,10 +35,10 @@ export function ApplicationsTable({ items, locale, onWithdraw, onSort, sortBy, s
           const detailPath = `${APPLICATIONS_PATH}/${item.id}`;
           return (
             <TableRow className="hover:bg-surface-subtle" key={item.id}>
-              <TableCell><span className="itt-mono text-xs text-muted-foreground">{displayId}</span></TableCell>
-              <TableCell>
+              <TableCell className="whitespace-nowrap"><span className="itt-mono text-xs text-muted-foreground">{displayId}</span></TableCell>
+              <TableCell className="max-w-[280px]">
                 <Link className="flex min-w-0 items-center gap-3 text-foreground" to={detailPath}>
-                  <LogoTile name={item.job.companyName} />
+                  <LogoTile tone="tint" name={item.job.companyName} />
                   <span className="flex min-w-0 flex-col gap-0.5">
                     <span className="truncate text-[13.5px] font-bold">{item.job.title}</span>
                     <span className="truncate text-[12.5px] text-muted-foreground">{jobFacts(item.job, true)}</span>

@@ -126,6 +126,8 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await page.waitForLoadState("networkidle");
     await page.getByRole("button", { name: "To", exact: true }).click();
     await page.getByRole("button", { name: "Today", exact: true }).click();
+    // The From/To fields are the shared calendar DatePicker (not native inputs), so the custom range is set through the URL it reads.
+    await page.goto("/my-applications?range=custom&from=2000-01-01&to=2000-12-31");
     await expect(
       page.getByRole("heading", { name: "No matching applications" }),
     ).toBeVisible();

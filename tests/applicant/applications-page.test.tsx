@@ -187,7 +187,7 @@ describe("Candidate My Applications", () => {
   it("offers Apply again only for a withdrawn first application (BR-APP-008)", () => {
     vi.mocked(applicationQueries.useApplication).mockReturnValue({ data: { ...detail, status: "withdrawn", canWithdraw: false, canApplyAgain: true, withdrawnAt: detail.submittedAt }, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplication>);
     renderApp(`/my-applications/${id}`);
-    expect(screen.getByRole("link", { name: "Apply again" })).toHaveAttribute("href", `/jobs/${detail.jobId}`);
+    expect(screen.getByRole("link", { name: "Apply again" })).toHaveAttribute("href", `/career/${detail.jobId}`);
   });
 
   it("warns that a reapplication cannot be applied for again when withdrawing it (UC-MYAPP-04 Assumption 2)", () => {

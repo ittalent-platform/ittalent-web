@@ -5,14 +5,10 @@ import { ProtectedRoute } from "@/auth/protected-route";
 import { JOB_POSTING_MANAGER_ROLES } from "@/auth/roles";
 import { AppLayout } from "@/components/layout/admin-layout";
 import { PublicLayout } from "@/components/layout/public-layout";
+import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
-
-const LandingPage = lazy(() =>
-  import("@/features/public-site/landing-page").then((m) => ({
-    default: m.LandingPage,
-  })),
-);
+import { HomePage } from "@/features/public-site/home/home-page";
 
 const LoginPage = lazy(() =>
   import("@/features/auth/login-page").then((m) => ({ default: m.LoginPage })),
@@ -37,6 +33,12 @@ const ResetPasswordPage = lazy(() =>
     default: m.ResetPasswordPage,
   })),
 );
+const AcceptInvitationPage = lazy(() =>
+  import("@/features/auth/accept-invitation-page").then((m) => ({ default: m.AcceptInvitationPage })),
+);
+const ConfirmEmailChangePage = lazy(() =>
+  import("@/features/auth/confirm-email-change-page").then((m) => ({ default: m.ConfirmEmailChangePage })),
+);
 const UsersPage = lazy(() =>
   import("@/features/admin/users/users-page").then((m) => ({
     default: m.UsersPage,
@@ -46,6 +48,9 @@ const AdminUserDetailPage = lazy(() =>
   import("@/features/admin/users/user-detail-page").then((m) => ({
     default: m.AdminUserDetailPage,
   })),
+);
+const AdminUserHistoryPage = lazy(() =>
+  import("@/features/admin/users/user-history-page").then((m) => ({ default: m.AdminUserHistoryPage })),
 );
 const JobPostingsPage = lazy(() =>
   import("@/features/admin/job-postings/job-postings-pages").then((m) => ({
@@ -113,17 +118,42 @@ const EnterpriseFormPage = lazy(() =>
   })),
 );
 
+const CareerPage = lazy(() =>
+  import("@/features/public-site/career/career-page").then((m) => ({
+    default: m.CareerPage,
+  })),
+);
+const CareerJobPage = lazy(() =>
+  import("@/features/public-site/career/career-job-page").then((m) => ({
+    default: m.CareerJobPage,
+  })),
+);
+const EnterprisePage = lazy(() =>
+  import("@/features/public-site/enterprise/enterprise-page").then((m) => ({
+    default: m.EnterprisePage,
+  })),
+);
+const EnterpriseDetailPage = lazy(() =>
+  import("@/features/public-site/enterprise/enterprise-detail-page").then((m) => ({
+    default: m.EnterpriseDetailPage,
+  })),
+);
+
 export const appRoutes = [
   {
     element: <PublicLayout />,
     children: [
-      { path: "/", element: <LandingPage /> },
       { path: "/jobs", element: <JobsPage /> },
-      {
-        path: "/documents",
-        element: <ProtectedRoute requiredRole="user" />,
-        children: [{ index: true, element: <DocumentsPage /> }],
-      },
+    ],
+  },
+  {
+    element: <MarketplaceLayout />,
+    children: [
+      { path: "/", element: <HomePage /> },
+      { path: "/career", element: <CareerPage /> },
+      { path: "/career/:slug", element: <CareerJobPage /> },
+      { path: "/enterprises", element: <EnterprisePage /> },
+      { path: "/enterprises/:id", element: <EnterpriseDetailPage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },
@@ -131,12 +161,15 @@ export const appRoutes = [
   { path: "/verify-email", element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
+  { path: "/accept-invitation", element: <AcceptInvitationPage /> },
+  { path: "/confirm-email-change", element: <ConfirmEmailChangePage /> },
   {
     element: <ProtectedRoute requiredRole="user" />,
     children: [
       {
         element: <CandidateLayout />,
         children: [
+          { path: "/documents", element: <DocumentsPage /> },
           { path: "/my-applications", element: <ApplicationsPage /> },
           { path: "/my-applications/:id", element: <ApplicationDetailPage /> },
         ],
@@ -153,6 +186,7 @@ export const appRoutes = [
           { index: true, element: <Navigate replace to="/admin/users" /> },
           { path: "users", element: <UsersPage /> },
           { path: "users/:userId", element: <AdminUserDetailPage /> },
+          { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
           { path: "enterprises/new", element: <EnterpriseFormPage /> },
           {

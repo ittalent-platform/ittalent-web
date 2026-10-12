@@ -40,7 +40,7 @@ export function ApplicationCard({ application, locale, selected, dragging, onTog
         to={`${APPLICATIONS_PATH}/${application.id}`}
       >
         <span className="itt-mono text-[11.5px] text-muted-foreground">{displayId}</span>
-        <span className="flex items-center gap-2"><LogoTile name={application.job.companyName} size="sm" /><span className="text-[12.5px] font-semibold text-foreground/80">{application.job.companyName}</span></span>
+        <span className="flex items-center gap-2"><LogoTile tone="tint" name={application.job.companyName} size="sm" /><span className="text-[12.5px] font-semibold text-foreground/80">{application.job.companyName}</span></span>
         {application.reappliedFrom || application.reappliedAs ? <span className="flex"><ReapplyTag application={application} interactive={false} /></span> : null}
         <span className="text-sm font-semibold leading-snug">{application.job.title}</span>
         <span className="-mt-1.5 text-[12.5px] text-muted-foreground">{jobFacts(application.job)}</span>

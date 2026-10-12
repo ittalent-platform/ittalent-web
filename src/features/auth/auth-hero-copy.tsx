@@ -3,28 +3,32 @@ import { Link } from "react-router";
 
 import { BrandLogo } from "@/components/layout/brand-logo";
 
-/** Aside content shared by the candidate sign-in and sign-up screens. */
-export function AuthHeroCopy() {
+import type { AuthHeroTone } from "./auth-hero.constants";
+
+/** Aside content of the auth screens: candidate sign-in/sign-up, or the employer copy on invitation screens. */
+export function AuthHeroCopy({ tone = "candidate" }: { tone?: AuthHeroTone }) {
   const { t } = useTranslation();
+  const employer = tone === "employer";
+  const key = (name: string) => (employer ? `auth.hero.employer.${name}` : `auth.hero.${name}`);
   return (
     <>
-      <BrandLogo tone="inverse" />
+      <BrandLogo tone={employer ? "brand" : "inverse"} wordmarkClassName={employer ? "text-white" : undefined} />
 
       <div className="mt-22 flex flex-col gap-4.5">
         <h2 className="m-0 font-['Space_Grotesk',sans-serif] text-[46px] font-semibold leading-[1.06] tracking-[-0.015em]">
-          {t("auth.hero.title1")}
+          {t(key("title1"))}
           <br />
-          {t("auth.hero.title2")}
+          {t(key("title2"))}
         </h2>
 
-        <p className="m-0 max-w-[400px] text-[15.5px] leading-[1.6] text-white/90">{t("auth.hero.body")}</p>
+        <p className="m-0 max-w-[400px] text-[15.5px] leading-[1.6] text-white/90">{t(key("body"))}</p>
 
         <div className="mt-1.5 text-sm">
           <Link
             className="font-semibold text-white underline underline-offset-4 decoration-white/50 hover:text-white"
-            to="/employer"
+            to={employer ? "/login" : "/employer"}
           >
-            {t("auth.hero.employers")}
+            {t(employer ? "auth.hero.employer.candidate" : "auth.hero.employers")}
           </Link>
         </div>
       </div>

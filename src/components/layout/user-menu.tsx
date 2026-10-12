@@ -5,7 +5,7 @@ import { BriefcaseBusiness, ChevronDown, FileText, LogOut, Users } from "lucide-
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
-import { canManageJobPostings } from "@/auth/roles";
+// import { canManageJobPostings } from "@/auth/roles";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,7 +80,11 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
               {displayName}
             </p>
             <p className="truncate text-[0.8rem] text-muted-foreground">
-              {roleLabel}
+              {user?.role === "admin"
+                ? "Admin"
+                : user?.role === "recruiter" || user?.role === "enterprise_admin"
+                  ? "Recruiter"
+                  : "User"}
             </p>
           </div>
         </button>
@@ -120,7 +124,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           </DropdownMenuItem>
         ) : null}
 
-        {canManageJobPostings(user?.role) ? (
+        {user?.role === "recruiter" || user?.role === "enterprise_admin" ? (
           <DropdownMenuItem
             className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer"
             onSelect={() => navigate("/recruiter/job-postings")}

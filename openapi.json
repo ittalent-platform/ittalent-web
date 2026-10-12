@@ -100,11 +100,57 @@
                 "type": "string",
                 "nullable": true
               },
+              "enterpriseName": {
+                "type": "string",
+                "nullable": true
+              },
+              "invitation": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "revoked",
+                      "cancelled",
+                      "expired"
+                    ]
+                  },
+                  "deliveryStatus": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "sent",
+                      "failed"
+                    ]
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "sentAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "status",
+                  "deliveryStatus",
+                  "expiresAt"
+                ]
+              },
               "createdAt": {
                 "type": "string"
               },
               "updatedAt": {
                 "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0
               }
             },
             "required": [
@@ -210,11 +256,57 @@
                 "type": "string",
                 "nullable": true
               },
+              "enterpriseName": {
+                "type": "string",
+                "nullable": true
+              },
+              "invitation": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "revoked",
+                      "cancelled",
+                      "expired"
+                    ]
+                  },
+                  "deliveryStatus": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "sent",
+                      "failed"
+                    ]
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "sentAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "status",
+                  "deliveryStatus",
+                  "expiresAt"
+                ]
+              },
               "createdAt": {
                 "type": "string"
               },
               "updatedAt": {
                 "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0
               }
             },
             "required": [
@@ -299,11 +391,57 @@
             "type": "string",
             "nullable": true
           },
+          "enterpriseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "invitation": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "revoked",
+                  "cancelled",
+                  "expired"
+                ]
+              },
+              "deliveryStatus": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "sent",
+                  "failed"
+                ]
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "sentAt": {
+                "type": "string",
+                "nullable": true,
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "status",
+              "deliveryStatus",
+              "expiresAt"
+            ]
+          },
           "createdAt": {
             "type": "string"
           },
           "updatedAt": {
             "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": [
@@ -1332,11 +1470,57 @@
                   "type": "string",
                   "nullable": true
                 },
+                "enterpriseName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "invitation": {
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "accepted",
+                        "revoked",
+                        "cancelled",
+                        "expired"
+                      ]
+                    },
+                    "deliveryStatus": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "sent",
+                        "failed"
+                      ]
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "sentAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "deliveryStatus",
+                    "expiresAt"
+                  ]
+                },
                 "createdAt": {
                   "type": "string"
                 },
                 "updatedAt": {
                   "type": "string"
+                },
+                "version": {
+                  "type": "integer",
+                  "minimum": 0
                 }
               },
               "required": [
@@ -1385,14 +1569,14 @@
             "type": "string",
             "nullable": true
           },
-          "role": {
-            "type": "string",
-            "enum": [
-              "admin",
-              "user"
-            ]
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
           }
         },
+        "required": [
+          "expectedVersion"
+        ],
         "additionalProperties": false
       },
       "EnterpriseListResponse": {
@@ -2398,6 +2582,1016 @@
           "message"
         ]
       },
+      "StartEnterpriseRegistrationRequest": {
+        "type": "object",
+        "properties": {
+          "corporate_email": {
+            "type": "string",
+            "format": "email"
+          },
+          "representative_name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "representative_phone": {
+            "type": "string",
+            "pattern": "^[+]?[0-9\\s().-]{8,20}$"
+          },
+          "representative_position": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "corporate_email",
+          "representative_name",
+          "representative_phone"
+        ]
+      },
+      "StartEnterpriseRegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "message",
+          "email"
+        ]
+      },
+      "VerifyEnterpriseRegistrationEmailResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "registration_id": {
+            "type": "string"
+          },
+          "registration_code": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "corporate_email": {
+            "type": "string",
+            "format": "email"
+          },
+          "representative": {
+            "type": "object",
+            "properties": {
+              "full_name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "position": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "full_name",
+              "phone"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "registration_id",
+          "registration_code",
+          "status",
+          "version",
+          "corporate_email",
+          "representative"
+        ]
+      },
+      "SaveEnterpriseRegistrationDraftRequest": {
+        "type": "object",
+        "properties": {
+          "representative": {
+            "type": "object",
+            "properties": {
+              "full_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^[+]?[0-9\\s().-]{8,20}$"
+              },
+              "position": {
+                "type": "string",
+                "maxLength": 100
+              }
+            }
+          },
+          "company_data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "maxLength": 150
+              },
+              "legal_name": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "tax_code": {
+                "type": "string"
+              },
+              "registration_number": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "website": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "industry": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "sub_industries": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "company_size": {
+                "type": "string",
+                "enum": [
+                  "1-10",
+                  "11-50",
+                  "51-200",
+                  "201-500",
+                  "501-1000",
+                  "1000+"
+                ]
+              },
+              "company_type": {
+                "type": "string",
+                "enum": [
+                  "Product",
+                  "Outsourcing",
+                  "IT Service",
+                  "Consulting",
+                  "Agency",
+                  "Hybrid",
+                  "Other"
+                ]
+              },
+              "founded_year": {
+                "type": "integer",
+                "minimum": 1800,
+                "maximum": 2026
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "street": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "city": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "district": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "state_province": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "country": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "postal_code": {
+                    "type": "string",
+                    "maxLength": 20
+                  }
+                }
+              },
+              "short_description": {
+                "type": "string",
+                "maxLength": 300
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 3000
+              }
+            }
+          },
+          "legal_documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "document_type": {
+                  "type": "string",
+                  "enum": [
+                    "business_license",
+                    "tax_registration",
+                    "power_of_attorney",
+                    "other"
+                  ]
+                },
+                "file_name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "file_url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "file_size": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "exclusiveMinimum": true
+                }
+              },
+              "required": [
+                "document_type",
+                "file_name",
+                "file_url"
+              ]
+            }
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          }
+        }
+      },
+      "UploadLegalDocumentFormRequest": {
+        "type": "object",
+        "properties": {
+          "document_type": {
+            "type": "string",
+            "enum": [
+              "business_license",
+              "tax_registration",
+              "power_of_attorney",
+              "other"
+            ]
+          },
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "Legal registration PDF document (business license, tax registration, power of attorney)"
+          }
+        },
+        "required": [
+          "document_type",
+          "file"
+        ]
+      },
+      "LegalDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "document_type": {
+            "type": "string",
+            "enum": [
+              "business_license",
+              "tax_registration",
+              "power_of_attorney",
+              "other"
+            ]
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          },
+          "file_size": {
+            "type": "number"
+          },
+          "uploaded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ]
+          }
+        },
+        "required": [
+          "document_type",
+          "file_name",
+          "file_url"
+        ]
+      },
+      "SubmitEnterpriseRegistrationRequest": {
+        "type": "object",
+        "properties": {
+          "representative": {
+            "type": "object",
+            "properties": {
+              "full_name": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 100
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^[+]?[0-9\\s().-]{8,20}$"
+              },
+              "position": {
+                "type": "string",
+                "maxLength": 100
+              }
+            },
+            "required": [
+              "full_name",
+              "phone"
+            ]
+          },
+          "company_data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 150
+              },
+              "legal_name": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "tax_code": {
+                "type": "string",
+                "pattern": "^[0-9]{10,13}$"
+              },
+              "registration_number": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "website": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "industry": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 100
+              },
+              "sub_industries": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "company_size": {
+                "type": "string",
+                "enum": [
+                  "1-10",
+                  "11-50",
+                  "51-200",
+                  "201-500",
+                  "501-1000",
+                  "1000+"
+                ]
+              },
+              "company_type": {
+                "type": "string",
+                "enum": [
+                  "Product",
+                  "Outsourcing",
+                  "IT Service",
+                  "Consulting",
+                  "Agency",
+                  "Hybrid",
+                  "Other"
+                ]
+              },
+              "founded_year": {
+                "type": "integer",
+                "minimum": 1800,
+                "maximum": 2026
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "street": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "city": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "district": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "state_province": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "country": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "postal_code": {
+                    "type": "string",
+                    "maxLength": 20
+                  }
+                },
+                "required": [
+                  "street",
+                  "city",
+                  "country"
+                ]
+              },
+              "short_description": {
+                "type": "string",
+                "maxLength": 300
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 3000
+              }
+            },
+            "required": [
+              "name",
+              "tax_code",
+              "industry",
+              "company_size",
+              "address"
+            ]
+          },
+          "legal_documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "document_type": {
+                  "type": "string",
+                  "enum": [
+                    "business_license",
+                    "tax_registration",
+                    "power_of_attorney",
+                    "other"
+                  ]
+                },
+                "file_name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "file_url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "file_size": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "exclusiveMinimum": true
+                }
+              },
+              "required": [
+                "document_type",
+                "file_name",
+                "file_url"
+              ]
+            },
+            "minItems": 1
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          }
+        },
+        "required": [
+          "representative",
+          "company_data",
+          "legal_documents",
+          "version"
+        ]
+      },
+      "SubmissionReceiptResponse": {
+        "type": "object",
+        "properties": {
+          "registration_code": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "submitted_at": {
+            "type": "string"
+          },
+          "estimated_sla_days": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "registration_code",
+          "status",
+          "version",
+          "submitted_at",
+          "estimated_sla_days"
+        ]
+      },
+      "PaginatedEnterpriseRegistrationSummary": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "registration_code": {
+                  "type": "string"
+                },
+                "corporate_email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "company_name": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "tax_code": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "representative_name": {
+                  "type": "string"
+                },
+                "representative_phone": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "number"
+                },
+                "created_at": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "submitted_at": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "registration_code",
+                "corporate_email",
+                "company_name",
+                "tax_code",
+                "representative_name",
+                "representative_phone",
+                "status",
+                "version",
+                "created_at",
+                "submitted_at"
+              ]
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "EnterpriseRegistrationDetail": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "registration_code": {
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "corporate_email": {
+            "type": "string"
+          },
+          "representative": {
+            "type": "object",
+            "properties": {
+              "full_name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "position": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "full_name",
+              "phone"
+            ]
+          },
+          "company_data": {
+            "type": "object",
+            "additionalProperties": {
+              "nullable": true
+            }
+          },
+          "legal_documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "document_type": {
+                  "type": "string",
+                  "enum": [
+                    "business_license",
+                    "tax_registration",
+                    "power_of_attorney",
+                    "other"
+                  ]
+                },
+                "file_name": {
+                  "type": "string"
+                },
+                "file_url": {
+                  "type": "string"
+                },
+                "file_size": {
+                  "type": "number"
+                },
+                "uploaded_at": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "document_type",
+                "file_name",
+                "file_url"
+              ]
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "pending_review",
+              "under_review",
+              "approved",
+              "rejected"
+            ]
+          },
+          "claim_locks": {
+            "type": "object",
+            "properties": {
+              "tax_code": {
+                "type": "string"
+              },
+              "corporate_email": {
+                "type": "string"
+              },
+              "locked_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                ]
+              }
+            }
+          },
+          "review": {
+            "type": "object",
+            "properties": {
+              "reviewed_by": {
+                "type": "string"
+              },
+              "reviewed_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                ]
+              },
+              "decision": {
+                "type": "string",
+                "enum": [
+                  "approved",
+                  "rejected"
+                ]
+              },
+              "rejection_reason": {
+                "type": "string"
+              },
+              "checklist": {
+                "type": "object",
+                "properties": {
+                  "tax_code_verified": {
+                    "type": "boolean"
+                  },
+                  "legal_representative_verified": {
+                    "type": "boolean"
+                  },
+                  "documents_verified": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "created_enterprise_id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ]
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ]
+          }
+        },
+        "required": [
+          "registration_code",
+          "version",
+          "corporate_email",
+          "representative",
+          "status"
+        ]
+      },
+      "AdminDecisionRequest": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "rejected"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "rejection_reason": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "checklist": {
+            "type": "object",
+            "properties": {
+              "tax_code_verified": {
+                "type": "boolean"
+              },
+              "legal_representative_verified": {
+                "type": "boolean"
+              },
+              "documents_verified": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "tax_code_verified",
+              "legal_representative_verified",
+              "documents_verified"
+            ]
+          }
+        },
+        "required": [
+          "decision",
+          "version"
+        ]
+      },
+      "AdminDecisionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "registration_code": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "enterprise_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "registration_code",
+          "status",
+          "version"
+        ]
+      },
+      "AcceptInvitationRequest": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 64,
+            "pattern": "[A-Z]"
+          },
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 30,
+            "pattern": "^[a-zA-Z0-9_]+$"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "AcceptInvitationResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "username": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
+              "role": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "emailVerified": {
+                "type": "boolean"
+              },
+              "enterpriseId": {
+                "type": "string",
+                "nullable": true
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "email",
+              "username",
+              "fullName",
+              "phone",
+              "role",
+              "status",
+              "emailVerified",
+              "enterpriseId"
+            ]
+          },
+          "tokens": {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string"
+              },
+              "refreshToken": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "accessToken",
+              "refreshToken"
+            ]
+          }
+        },
+        "required": [
+          "message",
+          "user",
+          "tokens"
+        ]
+      },
       "CreateApplicationRequest": {
         "type": "object",
         "properties": {
@@ -2922,6 +4116,734 @@
         },
         "required": [
           "expectedVersion"
+        ]
+      },
+      "UpdateUserStatusRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "suspended",
+              "active"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "status",
+          "reason",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateUserRoleRequest": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "recruiter",
+              "enterprise_admin"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "role",
+          "reason",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "EmergencyUserSuspensionRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "reason",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "UserInvitationStatusResponse": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "revoked",
+              "cancelled",
+              "expired"
+            ]
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "new_account",
+              "enterprise_membership"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "recruiter",
+              "enterprise_admin"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sentAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "deliveryStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "sent",
+              "failed"
+            ]
+          },
+          "deliveryAttempts": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "status",
+          "kind",
+          "role",
+          "expiresAt",
+          "sentAt",
+          "deliveryStatus",
+          "deliveryAttempts"
+        ]
+      },
+      "InvitationPreviewResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "recruiter",
+              "enterprise_admin"
+            ]
+          },
+          "enterpriseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "email",
+          "role",
+          "enterpriseName",
+          "expiresAt"
+        ]
+      },
+      "AcceptedInvitationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role",
+          "status"
+        ]
+      },
+      "InvitationDeliveryResponse": {
+        "type": "object",
+        "properties": {
+          "deliveryStatus": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "failed"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "deliveryStatus",
+          "expiresAt"
+        ]
+      },
+      "CreateAdminUserRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 30,
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "phone": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "recruiter",
+              "enterprise_admin"
+            ]
+          },
+          "enterpriseId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        },
+        "required": [
+          "email",
+          "username",
+          "fullName",
+          "role"
+        ],
+        "additionalProperties": false
+      },
+      "CreateAdminUserResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "username": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
+              "role": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "emailVerified": {
+                "type": "boolean"
+              },
+              "enterpriseId": {
+                "type": "string",
+                "nullable": true
+              },
+              "enterpriseName": {
+                "type": "string",
+                "nullable": true
+              },
+              "invitation": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "revoked",
+                      "cancelled",
+                      "expired"
+                    ]
+                  },
+                  "deliveryStatus": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "sent",
+                      "failed"
+                    ]
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "sentAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "status",
+                  "deliveryStatus",
+                  "expiresAt"
+                ]
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "version": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "id",
+              "email",
+              "username",
+              "fullName",
+              "phone",
+              "role",
+              "status",
+              "emailVerified",
+              "enterpriseId"
+            ]
+          },
+          "invitation": {
+            "type": "object",
+            "properties": {
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deliveryStatus": {
+                "type": "string",
+                "enum": [
+                  "sent",
+                  "failed"
+                ]
+              }
+            },
+            "required": [
+              "expiresAt",
+              "deliveryStatus"
+            ]
+          }
+        },
+        "required": [
+          "user",
+          "invitation"
+        ]
+      },
+      "AcceptNewAccountInvitationRequest": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 64,
+            "pattern": "[A-Z]"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "InvitationPreviewQuery": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "additionalProperties": false
+      },
+      "CancelInvitationRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "reason",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "UserAuditHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "actorId": {
+                  "type": "string"
+                },
+                "actorName": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "action": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "string",
+                  "enum": [
+                    "success"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "changes": {
+                  "type": "object",
+                  "nullable": true,
+                  "additionalProperties": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "occurredAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "actorId",
+                "action",
+                "result",
+                "reason",
+                "changes",
+                "version",
+                "occurredAt"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "RequestUserEmailChange": {
+        "type": "object",
+        "properties": {
+          "newEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "newEmail",
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
+      "ConfirmUserEmailChange": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 64,
+            "maxLength": 64
+          },
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "token",
+          "currentPassword"
+        ],
+        "additionalProperties": false
+      },
+      "CreateCertificateLinkRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string"
+          },
+          "issuer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issuedDate": {
+            "type": "string"
+          },
+          "expiryDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "url"
+        ],
+        "additionalProperties": false
+      },
+      "CertificateLink": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "issuer": {
+            "type": "string",
+            "nullable": true
+          },
+          "issuedDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiryDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url",
+          "issuer",
+          "issuedDate",
+          "expiryDate",
+          "version",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CertificateLinkListQuery": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaginatedCertificateLinks": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "issuer": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "issuedDate": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "expiryDate": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "available"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "url",
+                "issuer",
+                "issuedDate",
+                "expiryDate",
+                "version",
+                "status",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
         ]
       }
     },
@@ -4480,15 +6402,20 @@
           },
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "user",
-                "admin",
-                "recruiter",
-                "enterprise_admin",
-                "applicant",
-                "interviewer"
-              ]
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "user",
+                  "admin",
+                  "recruiter",
+                  "enterprise_admin",
+                  "applicant",
+                  "interviewer"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 10
             },
             "required": false,
             "name": "role",
@@ -4496,16 +6423,36 @@
           },
           {
             "schema": {
-              "type": "string",
-              "enum": [
-                "active",
-                "inactive",
-                "suspended",
-                "blocked"
-              ]
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "inactive",
+                  "invited",
+                  "suspended",
+                  "blocked"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 10
             },
             "required": false,
             "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{24}$"
+              },
+              "minItems": 1,
+              "maxItems": 10
+            },
+            "required": false,
+            "name": "enterpriseId",
             "in": "query"
           },
           {
@@ -4574,6 +6521,54 @@
             "description": "Account storage unavailable, retry later"
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Create a Candidate, HR or Enterprise Administrator account and send an invitation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created; invitation delivery result is included",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAdminUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid role, user fields, or company context"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "409": {
+            "description": "Email or username already exists"
+          },
+          "503": {
+            "description": "Account storage unavailable"
+          }
+        }
       }
     },
     "/api/v1/users/{id}": {
@@ -4583,7 +6578,7 @@
         ],
         "operationId": "patchApiV1UsersById",
         "summary": "Edit a user account",
-        "description": "System Administrator only. Updates only fullName, phone, and role; null or an empty phone clears the stored number. An administrator cannot change their own role.",
+        "description": "System Administrator only. Updates only fullName and phone using expectedVersion; null or an empty phone clears the stored number. Role and email changes use separate flows.",
         "security": [
           {
             "bearerAuth": []
@@ -4984,6 +6979,38 @@
         }
       }
     },
+    "/api/v1/enterprises/my-profile": {
+      "get": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "View authenticated user enterprise profile",
+        "description": "Returns the full enterprise profile for the authenticated recruiter or owner (UC-17).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enterprise detailed profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseDetailDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Enterprise not found or user is not affiliated with an enterprise"
+          }
+        }
+      }
+    },
     "/api/v1/enterprises/{enterpriseId}/status": {
       "patch": {
         "tags": [
@@ -5038,6 +7065,455 @@
           },
           "404": {
             "description": "Enterprise not found"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprise-registrations/start": {
+      "post": {
+        "tags": [
+          "Enterprise Registrations"
+        ],
+        "summary": "Initiate enterprise registration intake",
+        "description": "Validates corporate email and representative credentials, creates an intake draft, and dispatches a 24-hour verification magic link.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartEnterpriseRegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Magic link dispatched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartEnterpriseRegistrationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid corporate email format or blocked personal/public webmail domain"
+          },
+          "409": {
+            "description": "Corporate email or tax code is already registered or currently locked in active review"
+          },
+          "429": {
+            "description": "Rate limit exceeded for registration initiation attempts"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprise-registrations/verify-email": {
+      "get": {
+        "tags": [
+          "Enterprise Registrations"
+        ],
+        "summary": "Verify corporate email via magic link token",
+        "description": "Validates the single-use 24-hour magic link token, transitions registration status to verified draft, and activates multi-step wizard session.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 16
+            },
+            "required": true,
+            "name": "token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Corporate email verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEnterpriseRegistrationEmailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, expired, or revoked verification token"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprise-registrations/invitations/accept": {
+      "post": {
+        "tags": [
+          "Enterprise Registrations"
+        ],
+        "summary": "Accept onboarding invitation and provision enterprise administrator account",
+        "description": "Redeems 7-day single-use onboarding invitation token, provisions active recruiter/enterprise_admin user with password (or links existing account), and issues JWT session tokens.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invitation accepted and account onboarding complete",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptInvitationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid, expired, or already redeemed invitation token"
+          },
+          "401": {
+            "description": "Invalid password for existing representative account"
+          },
+          "409": {
+            "description": "Username already taken"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprise-registrations": {
+      "get": {
+        "tags": [
+          "Enterprise Registrations"
+        ],
+        "summary": "List enterprise registrations for administrative review",
+        "description": "Returns a paginated list of enterprise registrations with optional status and search filters. Accessible only to System Administrators.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "pending_review",
+                "under_review",
+                "approved",
+                "rejected"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated enterprise registration summaries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedEnterpriseRegistrationSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination or filter parameters"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: administrative privilege required"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprise-registrations/{id}": {
+      "get": {
+        "tags": [
+          "Enterprise Registrations"
+        ],
+        "summary": "Inspect enterprise registration case detail and snapshot",
+        "description": "Retrieves complete registration case document including representative profile, company data, legal documents, claim locks, and review outcome.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enterprise registration case details and snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseRegistrationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid registration identifier format"
+          },
+          "404": {
+            "description": "Registration case not found"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprise-registrations/{id}/draft": {
+      "patch": {
+        "tags": [
+          "Enterprise Registrations"
+        ],
+        "summary": "Save enterprise registration wizard draft",
+        "description": "Incrementally persists draft company details, representative information, and legal documents. Enforces optimistic concurrency control via version matching.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveEnterpriseRegistrationDraftRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registration draft updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnterpriseRegistrationDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed on draft fields"
+          },
+          "404": {
+            "description": "Registration case not found"
+          },
+          "409": {
+            "description": "Version mismatch or registration case is no longer editable"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprise-registrations/{id}/documents": {
+      "post": {
+        "tags": [
+          "Enterprise Registrations"
+        ],
+        "summary": "Upload legal PDF verification document",
+        "description": "Accepts multipart/form-data upload containing a legal document (business license, tax registration, power of attorney). Verifies file size (max 5MB) and PDF magic header bytes.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadLegalDocumentFormRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Legal document uploaded and recorded on draft successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LegalDocumentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing document file, non-PDF format, or exceeded 5MB size limit"
+          },
+          "404": {
+            "description": "Registration case not found"
+          },
+          "409": {
+            "description": "Registration case already submitted and locked against modifications"
+          },
+          "503": {
+            "description": "Cloud storage service unconfigured or unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprise-registrations/{id}/submit": {
+      "post": {
+        "tags": [
+          "Enterprise Registrations"
+        ],
+        "summary": "Submit enterprise registration for administrative review",
+        "description": "Validates full company profile, representative credentials, and mandatory business license document. Locks exclusive claims on tax code and corporate email, advancing case to pending_review.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitEnterpriseRegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enterprise registration submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionReceiptResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Incomplete company profile or missing mandatory business license document"
+          },
+          "404": {
+            "description": "Registration case not found"
+          },
+          "409": {
+            "description": "Version mismatch or exclusive tax code/corporate email claim collision"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprise-registrations/{id}/decision": {
+      "post": {
+        "tags": [
+          "Enterprise Registrations"
+        ],
+        "summary": "Process administrative review decision",
+        "description": "Admin approves or rejects case. Approval instantiates an active Enterprise entity and emails a 7-day invitation link. Rejection records mandatory explanation (>=20 chars), releases claims, and emails the applicant.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminDecisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Administrative decision processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminDecisionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Incomplete verification checklist or rejection explanation shorter than 20 characters"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden: administrative privilege required"
+          },
+          "404": {
+            "description": "Registration case not found"
+          },
+          "409": {
+            "description": "Case is not awaiting decision or optimistic concurrency version mismatch"
           }
         }
       }
@@ -5415,6 +7891,801 @@
           },
           "409": {
             "description": "The application changed after the client read it"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/role": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Change a company account role between HR and Enterprise Administrator",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRoleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated account role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid account ID or role change"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          },
+          "409": {
+            "description": "Invalid transition, stale version or final Enterprise Administrator"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/emergency-suspension": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Urgently suspend an account with a required audit reason",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmergencyUserSuspensionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account suspended and sessions revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          },
+          "409": {
+            "description": "Platform administrator cannot self-suspend or suspend the final platform administrator"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/status": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Suspend or reopen a user account",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated account status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status transition input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          },
+          "409": {
+            "description": "Illegal transition, stale version, final System Administrator, or final Enterprise Administrator"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/invitation": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Read the latest invitation status for an account",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest invitation delivery and lifecycle state, or null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInvitationStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Cancel an invitation for an account that has not activated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelInvitationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invitation cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "409": {
+            "description": "Account is no longer invited or version is stale"
+          },
+          "410": {
+            "description": "No pending invitation exists"
+          }
+        }
+      }
+    },
+    "/api/v1/user-invitations/preview": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Preview the account and company named by an invitation token",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 64,
+              "maxLength": 64
+            },
+            "required": true,
+            "name": "token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invitation recipient, role and company",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationPreviewResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid token format"
+          },
+          "409": {
+            "description": "Account or enterprise state no longer permits acceptance"
+          },
+          "410": {
+            "description": "Invitation is expired, revoked or already used"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/invitation-deliveries": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Send a replacement invitation for an unaccepted account",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Invitation replaced and delivery attempted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationDeliveryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "410": {
+            "description": "No resendable invitation exists"
+          }
+        }
+      }
+    },
+    "/api/v1/user-invitations/accept": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Accept a new-account invitation and set a password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptNewAccountInvitationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account activated; credentials are now available to the invitee",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedInvitationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid invitation payload"
+          },
+          "409": {
+            "description": "Account or enterprise state no longer permits acceptance"
+          },
+          "410": {
+            "description": "Invitation is expired, revoked or already used"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/history": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Read safe paginated user account history",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "account_invited",
+                "profile_updated",
+                "role_changed",
+                "status_suspended",
+                "status_reopened",
+                "invitation_accepted",
+                "invitation_revoked",
+                "email_change_requested",
+                "email_changed"
+              ]
+            },
+            "required": false,
+            "name": "action",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "profile",
+                  "email"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 3
+            },
+            "required": false,
+            "name": "group",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "admin",
+                "self"
+              ]
+            },
+            "required": false,
+            "name": "actor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Append-only account history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAuditHistoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid account ID or pagination/filter input"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "Account not found"
+          },
+          "503": {
+            "description": "History store unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/email-change-requests": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Request a user email change; the account owner must confirm it",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestUserEmailChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Request saved; email delivery was attempted"
+          },
+          "400": {
+            "description": "Invalid email or version"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Active System Administrator required"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "409": {
+            "description": "Email is already used or account version is stale"
+          }
+        }
+      }
+    },
+    "/api/v1/user-email-changes/confirm": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Confirm a requested email change as the account owner",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmUserEmailChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email changed; old sessions and pending identity tokens are invalidated"
+          },
+          "400": {
+            "description": "Invalid confirmation payload"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Request belongs to another user or current password is invalid"
+          },
+          "409": {
+            "description": "Email conflict or stale account version"
+          },
+          "410": {
+            "description": "Request is expired, revoked or already completed"
+          },
+          "429": {
+            "description": "Too many failed confirmation attempts for this account or IP"
+          }
+        }
+      }
+    },
+    "/api/v1/me/certificate-links": {
+      "post": {
+        "tags": [
+          "Certificate Links"
+        ],
+        "summary": "Create a private certificate link for the current Candidate",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[\\x21-\\x7e]+$",
+              "description": "Unique operation key. Reuse only when retrying the exact same request.",
+              "example": "9c9ccf4b-2f18-4b5e-a67d-10de8ea8da02"
+            },
+            "required": true,
+            "description": "Unique operation key. Reuse only when retrying the exact same request.",
+            "name": "Idempotency-Key",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCertificateLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Previously committed request replayed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateLink"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Certificate link created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or missing Idempotency-Key"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active verified Candidate account required"
+          },
+          "409": {
+            "description": "Duplicate URL or idempotency key reused with different content"
+          },
+          "503": {
+            "description": "Certificate link storage unavailable"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Certificate Links"
+        ],
+        "summary": "List the current Candidate’s private certificate links",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stable page of available owned links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedCertificateLinks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active verified Candidate account required"
+          },
+          "503": {
+            "description": "Certificate link storage unavailable"
           }
         }
       }

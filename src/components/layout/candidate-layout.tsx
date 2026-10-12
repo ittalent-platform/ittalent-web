@@ -1,6 +1,7 @@
 import { Outlet } from "react-router";
 
 import { BrandLogo } from "./brand-logo";
+import { MarketplaceFooter } from "./marketplace-footer";
 import { MainNav } from "./main-nav";
 import { NotificationBell } from "./notification-bell";
 import { UserMenu } from "./user-menu";
@@ -23,6 +24,7 @@ export function CandidateLayout() {
       <div className="flex-1">
         <Outlet />
       </div>
+      <MarketplaceFooter />
     </div>
   );
 }

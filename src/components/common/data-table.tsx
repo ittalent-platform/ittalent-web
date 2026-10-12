@@ -49,6 +49,7 @@ export function DataTable<T>({
   isLoading,
   onRowClick,
   onSort,
+  rowClassName,
   rowKey,
   rows,
   skeletonRows = 5,
@@ -60,6 +61,7 @@ export function DataTable<T>({
   isLoading?: boolean;
   onRowClick?: (row: T) => void;
   onSort?: (key: string) => void;
+  rowClassName?: (row: T) => string | undefined;
   rowKey: (row: T) => string;
   rows: T[];
   skeletonRows?: number;
@@ -101,7 +103,7 @@ export function DataTable<T>({
         ) : (
           rows.map((row) => (
             <TableRow
-              className={onRowClick ? "cursor-pointer" : undefined}
+              className={cn(onRowClick && "cursor-pointer", rowClassName?.(row))}
               key={rowKey(row)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
             >
