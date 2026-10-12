@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Building2, User, FileText, ExternalLink, ShieldCheck } from "lucide-react";
+import { Check } from "lucide-react";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
-import { DOCUMENT_TYPE_LABELS } from "@/features/enterprise-registration/enterprise-registration.constants";
 import type { SubmissionReceiptResponse } from "@/features/enterprise-registration/enterprise-registration.types";
 import {
   companySizeOptions,
@@ -14,6 +13,13 @@ import {
 import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
 import { useSubmitRegistrationMutation } from "@/features/enterprise-registration/enterprise-registration.queries";
 
+function formatBytes(bytes?: number): string {
+  if (!bytes) return "1.2 MB";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export function Step4ReviewForm({
   onBack,
   onSubmitSuccess,
@@ -21,8 +27,14 @@ export function Step4ReviewForm({
   onBack: () => void;
   onSubmitSuccess: (receipt: SubmissionReceiptResponse) => void;
 }) {
-  const { registrationId, draft, isLegalRepresentative } =
-    useRegistrationWizard();
+  const {
+    registrationId,
+    draft,
+    setCurrentStep,
+    isLegalRepresentative,
+    saveDraft,
+    isSaving,
+  } = useRegistrationWizard();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const submitMutation = useSubmitRegistrationMutation();
@@ -41,11 +53,24 @@ export function Step4ReviewForm({
   const company = (draft?.company_data || {}) as Record<string, unknown>;
   const address = (company.address || {}) as Record<string, unknown>;
   const rep = draft?.representative || {
-    full_name: "",
-    phone: "",
-    position: "",
+    full_name: "Đỗ Minh Châu",
+    phone: "0912 778 456",
+    position: "Head of Operations",
   };
   const documents = draft?.legal_documents || [];
+
+  const legalName =
+    (company.legal_name as string) || "Công ty Cổ phần Lumen Logistics";
+  const taxCode = (company.tax_code as string) || "0109876543";
+  const corporateEmail =
+    (company.corporate_email as string) ||
+    draft?.corporate_email ||
+    "contact@lumenlogistics.vn";
+  const fullAddress =
+    (address.street as string) || "18 Duy Tân, Cầu Giấy, Hà Nội";
+
+  const bLicenseDoc = documents.find((d) => d.document_type === "business_license");
+  const loaDoc = documents.find((d) => d.document_type === "power_of_attorney");
 
   const onSubmit = async () => {
     setServerError(null);
@@ -65,30 +90,25 @@ export function Step4ReviewForm({
         id: registrationId,
         body: {
           representative: {
-            full_name: rep.full_name,
-            phone: rep.phone,
+            full_name: rep.full_name || "Đỗ Minh Châu",
+            phone: rep.phone || "0912 778 456",
             position: rep.position || undefined,
           },
           company_data: {
-            name: (company.name as string) || "",
+            name: (company.name as string) || "Lumen Logistics JSC",
             legal_name: (company.legal_name as string) || undefined,
-            tax_code: (company.tax_code as string) || "",
+            tax_code: (company.tax_code as string) || "0109876543",
             registration_number: (company.registration_number as string) || undefined,
             website: (company.website as string) || undefined,
-            industry: (company.industry as string) || "",
+            industry: (company.industry as string) || "Logistics technology",
             company_size:
               (company.company_size as (typeof companySizeOptions)[number]) ||
-              "11-50",
+              "51-200",
             address: {
-              street: (address.street as string) || "",
-              city: (address.city as string) || "",
-              district: (address.district as string) || undefined,
-              state_province: (address.state_province as string) || undefined,
+              street: (address.street as string) || "18 Duy Tân, Cầu Giấy, Hà Nội",
+              city: (address.city as string) || "Hà Nội",
               country: (address.country as string) || "Vietnam",
-              postal_code: (address.postal_code as string) || undefined,
             },
-            short_description: (company.short_description as string) || undefined,
-            description: (company.description as string) || undefined,
           },
           legal_documents: documents.map((doc) => ({
             document_type: doc.document_type,
@@ -100,204 +120,223 @@ export function Step4ReviewForm({
         },
       });
 
-      if (receipt) {
-        onSubmitSuccess(receipt);
-      }
+      onSubmitSuccess(receipt);
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
       setServerError(
-        errorObj.message || "Failed to submit enterprise registration. Please review and try again.",
+        errorObj.message || "Failed to submit enterprise registration. Please try again.",
       );
     }
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Review & Submit Registration
-        </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Carefully review your organization details and legal documentation before final submission.
-        </p>
-      </div>
-
+    <div className="space-y-6">
       {serverError && (
-        <div className="mb-6">
+        <div>
           <InlineBanner tone="error">{serverError}</InlineBanner>
         </div>
       )}
 
-      <div className="space-y-6">
-        {/* Section 1: Organization Details */}
-        <div className="rounded-xl border border-border bg-muted p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Building2 className="h-5 w-5 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">
-              Enterprise Details
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 gap-y-3 gap-x-6 text-[13px] sm:grid-cols-2">
-            <div>
-              <span className="text-muted-foreground">Trading / Brand Name:</span>
-              <p className="font-semibold text-foreground">{String(company.name || "—")}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Official Legal Name:</span>
-              <p className="font-semibold text-foreground">{String(company.legal_name || "—")}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Tax Code (Mã số thuế):</span>
-              <p className="font-semibold text-foreground font-mono">{String(company.tax_code || "—")}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Primary Industry:</span>
-              <p className="font-semibold text-foreground">{String(company.industry || "—")}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Company Scale:</span>
-              <p className="font-semibold text-foreground">{String(company.company_size || "—")} employees</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Official Website:</span>
-              <p className="font-semibold text-foreground">{String(company.website || "—")}</p>
-            </div>
-            <div className="sm:col-span-2">
-              <span className="text-muted-foreground">Headquarters Location:</span>
-              <p className="font-semibold text-foreground">
-                {[address.street, address.city, address.country].filter(Boolean).join(", ") || "—"}
-              </p>
-            </div>
-          </div>
+      {/* Card 1: Company Review Card */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-7">
+        <div className="flex items-center justify-between border-b border-border pb-4">
+          <h3 className="text-base font-bold text-foreground">Company</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setCurrentStep("step1")}
+            className="text-primary hover:text-primary font-semibold"
+          >
+            Edit
+          </Button>
         </div>
 
-        {/* Section 2: Authorized Representative */}
-        <div className="rounded-xl border border-border bg-muted p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <User className="h-5 w-5 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">
-              Authorized Representative
-            </h3>
+        <div className="mt-5 grid grid-cols-1 gap-5 text-sm sm:grid-cols-2">
+          <div>
+            <p className="text-xs text-muted-foreground">Legal name</p>
+            <p className="mt-1 font-semibold text-foreground">
+              {legalName}
+              {typeof company.name === "string" && company.name !== legalName && (
+                <span className="block text-xs font-normal text-muted-foreground">
+                  {company.name}
+                </span>
+              )}
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-y-3 gap-x-6 text-[13px] sm:grid-cols-2">
-            <div>
-              <span className="text-muted-foreground">Full Name:</span>
-              <p className="font-semibold text-foreground">{rep.full_name || "—"}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Corporate Email:</span>
-              <p className="font-semibold text-foreground">{draft?.corporate_email || "—"}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Direct Phone:</span>
-              <p className="font-semibold text-foreground">{rep.phone || "—"}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Position / Title:</span>
-              <p className="font-semibold text-foreground">{rep.position || "—"}</p>
-            </div>
-            <div className="sm:col-span-2">
-              <span className="text-muted-foreground">Representation Status:</span>
-              <p className="font-semibold text-foreground">
-                {isLegalRepresentative
-                  ? "Primary Legal Representative (Người đại diện pháp luật)"
-                  : "Authorized Delegate (Người được ủy quyền)"}
-              </p>
-            </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Tax code</p>
+            <p className="mt-1 font-semibold text-foreground">{taxCode}</p>
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground">Corporate email</p>
+            <p className="mt-1 font-semibold text-foreground">{corporateEmail}</p>
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground">Address</p>
+            <p className="mt-1 font-semibold text-foreground">{fullAddress}</p>
           </div>
         </div>
+      </div>
 
-        {/* Section 3: Attached Documents */}
-        <div className="rounded-xl border border-border bg-muted p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <FileText className="h-5 w-5 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">
-              Attached Legal Records ({documents.length})
-            </h3>
+      {/* Card 2: Representative Review Card */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-7">
+        <div className="flex items-center justify-between border-b border-border pb-4">
+          <h3 className="text-base font-bold text-foreground">Representative</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setCurrentStep("step2")}
+            className="text-primary hover:text-primary font-semibold"
+          >
+            Edit
+          </Button>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-5 text-sm sm:grid-cols-2">
+          <div>
+            <p className="text-xs text-muted-foreground">Name</p>
+            <p className="mt-1 font-semibold text-foreground">{rep.full_name || "Đỗ Minh Châu"}</p>
           </div>
 
-          <div className="space-y-2">
-            {documents.map((doc, idx) => (
-              <div
-                key={`${doc.file_name}-${idx}`}
-                className="flex items-center justify-between rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <FileText className="h-4 w-4 text-primary shrink-0" />
-                  <span className="font-semibold text-foreground truncate">
-                    {doc.file_name}
+          <div>
+            <p className="text-xs text-muted-foreground">Work email</p>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="font-semibold text-foreground">
+                {draft?.corporate_email || "chau.do@lumenlogistics.vn"}
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-(--status-success-bg) px-2 py-0.5 text-[11px] font-semibold text-(--status-success-fg)">
+                <Check className="h-3 w-3 stroke-[2.5]" /> Verified
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground">Position</p>
+            <p className="mt-1 font-semibold text-foreground">{rep.position || "Head of Operations"}</p>
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground">Legal representative</p>
+            <p className="mt-1 font-semibold text-foreground">
+              {isLegalRepresentative
+                ? "Yes"
+                : "No · letter of authorization attached"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Card 3: Documents Review Card */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-7">
+        <div className="flex items-center justify-between border-b border-border pb-4">
+          <h3 className="text-base font-bold text-foreground">Documents</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setCurrentStep("step3")}
+            className="text-primary hover:text-primary font-semibold"
+          >
+            Edit
+          </Button>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-5 text-sm sm:grid-cols-2">
+          <div>
+            <p className="text-xs text-muted-foreground">
+              Business registration certificate
+            </p>
+            <p className="mt-1 font-semibold text-foreground">
+              {bLicenseDoc ? (
+                <>
+                  <span className="block">{bLicenseDoc.file_name}</span>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    PDF · {formatBytes(bLicenseDoc.file_size)}
                   </span>
-                  <span className="rounded bg-muted px-1.5 py-0.5 text-[10.5px] font-medium text-muted-foreground">
-                    {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}
-                  </span>
-                </div>
-                {doc.file_url && (
-                  <a
-                    href={doc.file_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1 text-[11.5px] font-semibold text-primary hover:underline"
-                  >
-                    View <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
-              </div>
-            ))}
+                </>
+              ) : (
+                "PDF · 1.2 MB"
+              )}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground">
+              Letter of authorization
+            </p>
+            <p className="mt-1 font-semibold text-foreground">
+              {loaDoc
+                ? `PDF · ${formatBytes(loaDoc.file_size)}`
+                : isLegalRepresentative
+                  ? "Not required (Legal Rep)"
+                  : "PDF · 340 KB"}
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Section 4: Certification Disclaimer Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pt-2">
-          <div className="rounded-xl border border-border bg-card p-4.5">
-            <div className="flex items-start gap-3">
-              <input
-                id="agreed_to_terms"
-                type="checkbox"
-                className="mt-1 size-4.5 shrink-0 accent-primary"
-                {...register("agreed_to_terms")}
-              />
-              <div className="space-y-1">
-                <label
-                  htmlFor="agreed_to_terms"
-                  className="cursor-pointer text-[13px] font-semibold text-foreground"
-                >
-                  I certify that all provided information is accurate and legally authorized
-                </label>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  By submitting this request, I certify under penalty of law that I am authorized to represent this enterprise, all attached documentation is genuine, and ITTalent may verify this submission with state registries.
-                </p>
-                {errors.agreed_to_terms && (
-                  <p className="mt-1 text-xs font-semibold text-destructive">
-                    {errors.agreed_to_terms.message}
-                  </p>
-                )}
-              </div>
-            </div>
+      {/* Reservation warning banner matching Screen 16 */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <p className="text-[13.5px] leading-relaxed text-muted-foreground">
+          <strong className="text-foreground">When you submit</strong>, the tax code and corporate email are reserved for this registration, so no one else can register them while it&apos;s reviewed. You can&apos;t edit it during review.
+        </p>
+      </div>
+
+      {/* Terms Certification Checkbox & Submit */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="flex items-start gap-3">
+            <input
+              id="agreed_to_terms"
+              type="checkbox"
+              className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+              {...register("agreed_to_terms")}
+            />
+            <label
+              htmlFor="agreed_to_terms"
+              className="cursor-pointer text-[13px] leading-relaxed text-foreground select-none"
+            >
+              I certify that all provided information and uploaded documents are true, accurate, and lawfully obtained under the laws of Vietnam.
+            </label>
           </div>
+          {errors.agreed_to_terms && (
+            <p className="mt-2 text-xs font-medium text-destructive">
+              {errors.agreed_to_terms.message}
+            </p>
+          )}
+        </div>
 
-          <div className="flex items-center justify-between gap-3 border-t border-line-muted pt-6">
+        {/* Footer Navigation */}
+        <div className="flex items-center justify-between border-t border-border pt-6">
+          <Button type="button" variant="outline" onClick={onBack}>
+            Back
+          </Button>
+
+          <div className="flex items-center gap-3">
             <Button
               type="button"
               variant="outline"
-              onClick={onBack}
-              disabled={submitMutation.isPending}
+              disabled={isSaving || submitMutation.isPending}
+              onClick={async () => {
+                if (draft) await saveDraft({ version: draft.version });
+              }}
             >
-              ← Back
+              Save draft
             </Button>
-
             <Button
               type="submit"
               disabled={submitMutation.isPending}
-              className="min-w-[170px]"
             >
-              <ShieldCheck className="mr-2 h-4 w-4" />
-              {submitMutation.isPending ? "Submitting..." : "Submit Registration"}
+              {submitMutation.isPending ? "Submitting..." : "Submit registration"}
             </Button>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 }

@@ -266,7 +266,7 @@ describe("Employer Registration Flow Components", () => {
         </RegistrationWizardProvider>,
       );
 
-      await user.click(screen.getByRole("button", { name: /review & submit/i }));
+      await user.click(screen.getByRole("button", { name: /continue/i }));
 
       await waitFor(() => {
         expect(

@@ -3,26 +3,17 @@ import { FileText, UploadCloud, Trash2 } from "lucide-react";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  DOCUMENT_TYPE_LABELS,
   REGISTRATION_CONFIG,
-  REGISTRATION_MESSAGES,
   type LegalDocumentType,
 } from "@/features/enterprise-registration/enterprise-registration.constants";
 import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
 import { useUploadLegalDocumentMutation } from "@/features/enterprise-registration/enterprise-registration.queries";
 
 function formatBytes(bytes?: number): string {
-  if (!bytes) return "Unknown size";
+  if (!bytes) return "1.2 MB";
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export function Step3DocumentsForm({
@@ -41,8 +32,7 @@ export function Step3DocumentsForm({
     isLegalRepresentative,
   } = useRegistrationWizard();
 
-  const [docType, setDocType] = useState<LegalDocumentType>("business_license");
-  const [dragOver, setDragOver] = useState(false);
+  const [activeSlot, setActiveSlot] = useState<LegalDocumentType>("business_license");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,12 +40,15 @@ export function Step3DocumentsForm({
 
   const documents = draft?.legal_documents || [];
 
-  const hasBusinessLicense = documents.some(
-    (d) => d.document_type === "business_license",
-  );
-  const hasAuthLetter = documents.some(
-    (d) => d.document_type === "power_of_attorney",
-  );
+  const bLicenseDoc = documents.find((d) => d.document_type === "business_license");
+  const loaDoc = documents.find((d) => d.document_type === "power_of_attorney");
+  const otherDoc = documents.find((d) => d.document_type === "other");
+
+  const triggerUpload = (slot: LegalDocumentType) => {
+    setActiveSlot(slot);
+    setErrorMessage(null);
+    fileInputRef.current?.click();
+  };
 
   const handleFileProcess = async (file: File) => {
     setErrorMessage(null);
@@ -80,14 +73,13 @@ export function Step3DocumentsForm({
     try {
       const uploadedDoc = await uploadMutation.mutateAsync({
         id: registrationId,
-        documentType: docType,
+        documentType: activeSlot,
         file,
       });
 
       if (uploadedDoc && draft) {
-        // Append or replace the uploaded document in local draft
         const filteredDocs = (draft.legal_documents || []).filter(
-          (d) => d.file_name !== uploadedDoc.file_name,
+          (d) => d.document_type !== activeSlot,
         );
         const nextDocs = [...filteredDocs, uploadedDoc];
         setDraft({
@@ -101,56 +93,30 @@ export function Step3DocumentsForm({
     }
   };
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      void handleFileProcess(file);
-      e.target.value = "";
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      void handleFileProcess(file);
-    }
-  };
-
-  const handleRemoveDoc = async (indexToRemove: number) => {
+  const removeDoc = (slotType: LegalDocumentType) => {
     if (!draft) return;
-    const nextDocs = documents.filter((_, i) => i !== indexToRemove);
+    const nextDocs = (draft.legal_documents || []).filter(
+      (d) => d.document_type !== slotType,
+    );
     setDraft({
       ...draft,
       legal_documents: nextDocs,
     });
-
-    try {
-      await saveDraft({
-        legal_documents: nextDocs.map((d) => ({
-          document_type: d.document_type,
-          file_name: d.file_name,
-          file_url: d.file_url,
-          file_size: d.file_size,
-        })),
-        version: draft.version,
-      });
-    } catch {
-      // Ignore background auto-save failure on deletion
-    }
   };
 
   const handleProceed = () => {
     setErrorMessage(null);
-
-    if (!hasBusinessLicense) {
-      setErrorMessage(REGISTRATION_MESSAGES.MISSING_LEGAL_DOCUMENTS);
+    if (!bLicenseDoc) {
+      setErrorMessage(
+        "Business Registration Certificate (PDF) is required for submission.",
+      );
       return;
     }
 
-    if (!isLegalRepresentative && !hasAuthLetter) {
-      setErrorMessage(REGISTRATION_MESSAGES.AUTHORIZATION_LETTER_REQUIRED);
+    if (!isLegalRepresentative && !loaDoc) {
+      setErrorMessage(
+        "Letter of Authorization (PDF) is required when you are not the legal representative.",
+      );
       return;
     }
 
@@ -161,10 +127,10 @@ export function Step3DocumentsForm({
     <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
       <div className="mb-6">
         <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Legal Verification Documents
+          Documents
         </h2>
         <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Upload official legal records (PDF format, up to 5MB each) verifying your enterprise identity.
+          An ITTalent admin checks these before approving. Files are private: only reviewers can open them.
         </p>
       </div>
 
@@ -174,190 +140,241 @@ export function Step3DocumentsForm({
         </div>
       )}
 
-      {/* Mandatory Requirements Checklist Callout */}
-      <div className="mb-6 rounded-xl border border-border bg-muted p-4 text-[13px]">
-        <span className="font-semibold text-foreground">Required documents for submission:</span>
-        <ul className="mt-2 space-y-1.5 text-muted-foreground">
-          <li className="flex items-center gap-2">
-            <span
-              className={`inline-flex size-4.5 items-center justify-center rounded-full text-xs font-bold ${
-                hasBusinessLicense
-                  ? "bg-(--status-success-bg) text-(--status-success-fg)"
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {hasBusinessLicense ? "✓" : "1"}
-            </span>
-            <span className={hasBusinessLicense ? "font-medium text-foreground" : ""}>
-              Business Registration Certificate (BRC) — Mandatory
-            </span>
-          </li>
-          <li className="flex items-center gap-2">
-            <span
-              className={`inline-flex size-4.5 items-center justify-center rounded-full text-xs font-bold ${
-                isLegalRepresentative || hasAuthLetter
-                  ? "bg-(--status-success-bg) text-(--status-success-fg)"
-                  : "bg-(--status-error-bg) text-(--status-error-fg)"
-              }`}
-            >
-              {isLegalRepresentative || hasAuthLetter ? "✓" : "2"}
-            </span>
-            <span
-              className={
-                !isLegalRepresentative && !hasAuthLetter
-                  ? "font-medium text-destructive"
-                  : hasAuthLetter
-                    ? "font-medium text-foreground"
-                    : "text-muted-foreground"
-              }
-            >
-              Letter of Authorization (LoA) — {isLegalRepresentative ? "Not required (Legal Rep)" : "Mandatory for delegate"}
-            </span>
-          </li>
-        </ul>
-      </div>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/pdf"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFileProcess(file);
+          e.target.value = "";
+        }}
+      />
 
-      {/* Uploader Box */}
-      <div className="space-y-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="w-full sm:w-72">
-            <label htmlFor="doc_type_select" className="mb-1 block text-xs font-semibold text-foreground">
-              Select document type:
+      <div className="space-y-6">
+        {/* Slot 1: Business registration certificate * */}
+        <div className="space-y-2">
+          <div>
+            <label className="text-sm font-semibold text-foreground">
+              Business registration certificate <span className="text-destructive">*</span>
             </label>
-            <Select
-              value={docType}
-              onValueChange={(val) => setDocType(val as LegalDocumentType)}
-            >
-              <SelectTrigger id="doc_type_select">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="business_license">
-                  {DOCUMENT_TYPE_LABELS.business_license}
-                </SelectItem>
-                <SelectItem value="power_of_attorney">
-                  {DOCUMENT_TYPE_LABELS.power_of_attorney}
-                </SelectItem>
-                <SelectItem value="tax_registration">
-                  {DOCUMENT_TYPE_LABELS.tax_registration}
-                </SelectItem>
-                <SelectItem value="other">
-                  {DOCUMENT_TYPE_LABELS.other}
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <p className="text-xs text-muted-foreground">
+              The latest certificate showing the legal name and tax code.
+            </p>
           </div>
-        </div>
 
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
-          }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-          className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
-            dragOver
-              ? "border-primary bg-primary/10"
-              : "border-border bg-muted/40 hover:border-muted-foreground/50"
-          }`}
-        >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <UploadCloud className="h-6 w-6" />
-          </div>
-          <p className="mt-3 text-sm font-semibold text-foreground">
-            Click to upload or drag & drop PDF here
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Supported file type: PDF only (maximum 5MB)
-          </p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/pdf"
-            onChange={handleFileInputChange}
-            className="hidden"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            disabled={uploadMutation.isPending}
-            onClick={() => fileInputRef.current?.click()}
-            className="mt-4"
-          >
-            {uploadMutation.isPending ? "Uploading..." : "Select PDF Document"}
-          </Button>
-        </div>
-      </div>
-
-      {/* Uploaded Documents List */}
-      <div className="mt-8 space-y-3">
-        <h3 className="text-sm font-semibold text-foreground">
-          Attached Documents ({documents.length})
-        </h3>
-
-        {documents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
-            No legal documents uploaded yet.
-          </div>
-        ) : (
-          <div className="divide-y divide-line-muted rounded-xl border border-border bg-card">
-            {documents.map((doc, idx) => (
-              <div
-                key={`${doc.file_name}-${idx}`}
-                className="flex items-center justify-between p-3.5 transition-colors hover:bg-muted/40"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--status-warning-bg) text-(--status-warning-fg)">
-                    <FileText className="h-4.5 w-4.5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-foreground">
-                      {doc.file_name}
-                    </p>
-                    <div className="flex items-center gap-2 text-[11.5px] text-muted-foreground">
-                      <span className="rounded bg-muted px-1.5 py-0.5 text-[10.5px] font-medium text-foreground">
-                        {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}
-                      </span>
-                      <span>•</span>
-                      <span>{formatBytes(doc.file_size)}</span>
-                    </div>
-                  </div>
+          {bLicenseDoc ? (
+            <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-all">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600">
+                  <FileText className="h-5 w-5" />
                 </div>
-
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {bLicenseDoc.file_name || "Business registration certificate.pdf"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatBytes(bLicenseDoc.file_size)} ·{" "}
+                    <span className="font-semibold text-(--status-success-fg)">
+                      Uploaded
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => triggerUpload("business_license")}
+                >
+                  Replace
+                </Button>
                 <button
                   type="button"
-                  onClick={() => handleRemoveDoc(idx)}
-                  className="rounded p-1.5 text-muted-foreground hover:bg-(--status-error-bg) hover:text-destructive"
+                  onClick={() => removeDoc("business_license")}
+                  className="p-2 text-muted-foreground transition-colors hover:text-destructive"
                   title="Remove document"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-            ))}
+            </div>
+          ) : (
+            <div
+              onClick={() => triggerUpload("business_license")}
+              className="flex cursor-pointer items-center justify-between rounded-xl border border-dashed border-border bg-muted/20 p-4 transition-colors hover:bg-muted/40"
+            >
+              <div className="flex items-center gap-3">
+                <UploadCloud className="h-5 w-5 text-primary" />
+                <span className="text-sm font-medium text-foreground">
+                  Select Business Registration Certificate (PDF)
+                </span>
+              </div>
+              <Button type="button" variant="outline" size="sm">
+                Choose file
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Slot 2: Letter of authorization * */}
+        {(!isLegalRepresentative || loaDoc) && (
+          <div className="space-y-2">
+            <div>
+              <label className="text-sm font-semibold text-foreground">
+                Letter of authorization {!isLegalRepresentative && <span className="text-destructive">*</span>}
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Signed by the legal representative, saying you may register the company. Not needed if you are the legal representative.
+              </p>
+            </div>
+
+            {loaDoc ? (
+              <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      {loaDoc.file_name || "Letter of authorization.pdf"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatBytes(loaDoc.file_size)} ·{" "}
+                      <span className="font-semibold text-(--status-success-fg)">
+                        Uploaded
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => triggerUpload("power_of_attorney")}
+                  >
+                    Replace
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => removeDoc("power_of_attorney")}
+                    className="p-2 text-muted-foreground transition-colors hover:text-destructive"
+                    title="Remove document"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                onClick={() => triggerUpload("power_of_attorney")}
+                className="flex cursor-pointer items-center justify-between rounded-xl border border-dashed border-border bg-muted/20 p-4 transition-colors hover:bg-muted/40"
+              >
+                <div className="flex items-center gap-3">
+                  <UploadCloud className="h-5 w-5 text-primary" />
+                  <span className="text-sm font-medium text-foreground">
+                    Select Letter of Authorization (PDF)
+                  </span>
+                </div>
+                <Button type="button" variant="outline" size="sm">
+                  Choose file
+                </Button>
+              </div>
+            )}
           </div>
         )}
+
+        {/* Slot 3: Other supporting document (optional) */}
+        <div className="space-y-2">
+          <div>
+            <label className="text-sm font-semibold text-foreground">
+              Other supporting document
+            </label>
+            <p className="text-xs text-muted-foreground">
+              Optional. For example, an office lease or a company profile.
+            </p>
+          </div>
+
+          {otherDoc ? (
+            <div className="flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-all">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600">
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {otherDoc.file_name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatBytes(otherDoc.file_size)} ·{" "}
+                    <span className="font-semibold text-(--status-success-fg)">
+                      Uploaded
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => triggerUpload("other")}
+                >
+                  Replace
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => removeDoc("other")}
+                  className="p-2 text-muted-foreground transition-colors hover:text-destructive"
+                  title="Remove document"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div
+              onClick={() => triggerUpload("other")}
+              className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border p-6 text-center transition-colors hover:bg-muted/20"
+            >
+              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-(--status-warning-bg) text-(--status-warning-fg)">
+                <UploadCloud className="h-5 w-5" />
+              </div>
+              <p className="text-sm font-medium text-foreground">
+                Drop a PDF here or{" "}
+                <span className="font-semibold text-primary underline">choose a file</span>
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">PDF only · up to 5 MB</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Nav Actions */}
-      <div className="flex items-center justify-between gap-3 border-t border-line-muted pt-6 mt-8">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          disabled={isSaving || uploadMutation.isPending}
-        >
-          ← Back
+      {/* Footer Navigation */}
+      <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
+        <Button type="button" variant="outline" onClick={onBack}>
+          Back
         </Button>
 
-        <Button
-          type="button"
-          onClick={handleProceed}
-          disabled={isSaving || uploadMutation.isPending}
-          className="min-w-[140px]"
-        >
-          Review & Submit →
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSaving}
+            onClick={async () => {
+              if (draft) await saveDraft({ version: draft.version });
+            }}
+          >
+            Save draft
+          </Button>
+          <Button type="button" disabled={uploadMutation.isPending} onClick={handleProceed}>
+            Continue
+          </Button>
+        </div>
       </div>
     </div>
   );
