@@ -19,8 +19,8 @@ import {
   SEARCH_PARAM,
   TONE_CLASSES,
 } from "./home.constants";
-import { CompanyMark } from "./company-mark";
 import { useHomeData } from "./home.queries";
+import { LogoTile } from "@/components/common/logo-tile";
 
 export function HomeHero() {
   const { t } = useTranslation();
@@ -51,7 +51,7 @@ export function HomeHero() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-mkt-ink bg-[radial-gradient(rgba(255,255,255,0.10)_1.2px,transparent_1.2px)] bg-[size:26px_26px] px-4 pb-[116px] pt-12 text-white md:px-12 md:pt-[72px]">
+    <section className="relative overflow-hidden bg-mkt-ink hero-dots px-4 pb-[116px] pt-12 text-white md:px-12 md:pt-[72px]">
       <div className="absolute -bottom-[330px] -left-[220px] size-[720px] rounded-full border-[1.5px] border-white/[0.09]" />
       <div className="absolute -bottom-[230px] -left-[120px] size-[520px] rounded-full border-[1.5px] border-white/[0.09]" />
 
@@ -164,19 +164,19 @@ export function HomeHero() {
             >
               <path
                 d="M346 372 C 330 230, 300 130, 250 76"
-                stroke="rgba(255,255,255,0.35)"
+                className="stroke-white/35"
                 strokeDasharray="5 6"
                 strokeWidth="1.5"
               />
               <path
                 d="M356 372 C 350 300, 330 245, 296 206"
-                stroke="rgba(255,255,255,0.35)"
+                className="stroke-white/35"
                 strokeDasharray="5 6"
                 strokeWidth="1.5"
               />
               <path
                 d="M320 404 C 296 402, 282 394, 264 384"
-                stroke="rgba(255,255,255,0.35)"
+                className="stroke-white/35"
                 strokeDasharray="5 6"
                 strokeWidth="1.5"
               />
@@ -227,7 +227,7 @@ export function HomeHero() {
                 tabIndex={-1}
                 to={`${CAREER_PATH}/${job.slug || job.id}`}
               >
-                <CompanyMark
+                <LogoTile tone="tint"
                   className="size-10 rounded-xl text-sm"
                   name={job.companyName}
                   seed={job.enterpriseId}

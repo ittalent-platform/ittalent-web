@@ -15,7 +15,6 @@ import {
   type ResetPasswordFormValues,
 } from "./reset-password.schema";
 import { forgotPasswordPath } from "./password-reset";
-import { getAuthErrorMessage } from "./auth-utils";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { StatusPanel } from "@/components/common/status-panel";
 import { Button } from "@/components/ui/button";
@@ -23,9 +22,11 @@ import { getPasswordRules } from "./password-rules";
 import { PasswordField } from "./password-field";
 import { AuthCardPage, AuthFormHeader, AuthStatusCard } from "./auth-status-card";
 import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS } from "./auth-status.constants";
+import { requestErrorMessage } from "@/api/request-error";
+import { HTTP_GONE, HTTP_NOT_FOUND, HTTP_TOO_MANY_REQUESTS } from "@/api/http-status";
 
 function getStatusTone(status?: number) {
-  if (status === 429) {
+  if (status === HTTP_TOO_MANY_REQUESTS) {
     return "warning";
   }
 
@@ -120,9 +121,9 @@ export function ResetPasswordPage() {
             : undefined;
         const status = response.response?.status;
 
-        if (code === "RESET_TOKEN_UNAVAILABLE" || status === 410) {
+        if (code === "RESET_TOKEN_UNAVAILABLE" || status === HTTP_GONE) {
           setTokenStatus("expired");
-        } else if (code === "INVALID_RESET_TOKEN" || status === 404) {
+        } else if (code === "INVALID_RESET_TOKEN" || status === HTTP_NOT_FOUND) {
           setTokenStatus("invalid");
         } else {
           setTokenStatus("error");
@@ -158,17 +159,17 @@ export function ResetPasswordPage() {
           : undefined;
       const status = response.response?.status;
 
-      if (code === "RESET_TOKEN_UNAVAILABLE" || status === 410) {
+      if (code === "RESET_TOKEN_UNAVAILABLE" || status === HTTP_GONE) {
         setTokenStatus("expired");
         return;
       }
-      if (code === "INVALID_RESET_TOKEN" || status === 404) {
+      if (code === "INVALID_RESET_TOKEN" || status === HTTP_NOT_FOUND) {
         setTokenStatus("invalid");
         return;
       }
 
       setFeedback({
-        message: getAuthErrorMessage(
+        message: requestErrorMessage(
           response.error,
           t("auth.reset.errorFallback"),
         ),

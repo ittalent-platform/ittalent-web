@@ -35,8 +35,8 @@ import {
   jobDisplayId,
 } from "./job-postings.format";
 
-const headerCell =
-  "px-3 py-3 text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle dark:text-muted-foreground uppercase whitespace-nowrap";
+// Header typography comes from TableHeaderRow; cells only keep this table's tighter padding.
+const headerCell = "px-3 whitespace-nowrap";
 const bodyCell = "px-3 py-3 align-middle text-[13px] text-foreground";
 const COLUMN_COUNT = 8;
 

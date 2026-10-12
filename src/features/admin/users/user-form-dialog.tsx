@@ -264,7 +264,7 @@ export function UserFormDialog({ onChangeEmail, onCreated, onOpenChange, onReloa
 
               {editing ? null : (
                 <fieldset className="flex flex-col gap-2">
-                  <legend className="mb-2 text-[13.5px] font-semibold text-foreground">{t("adminUsers.form.role")} <span className="text-(--field-error)">*</span></legend>
+                  <legend className="mb-2 text-[13.5px] font-semibold text-foreground">{t("adminUsers.form.role")} <span className="text-field-error">*</span></legend>
                   <div className="grid gap-2.5 sm:grid-cols-3">
                     {USER_FORM_ROLES.map((value) => (
                       <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-[14px] font-semibold text-foreground has-checked:border-2 has-checked:border-primary has-checked:bg-primary/5 has-checked:px-[15px] has-focus-visible:ring-2 has-focus-visible:ring-primary/40" key={value}>

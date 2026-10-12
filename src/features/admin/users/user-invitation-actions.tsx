@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 
 import { AccountActionError } from "./account-action-error";
 import { classifyAccountError } from "./account-error";
-import { isValidReason, ReasonField } from "./reason-field";
+import { isValidReason, ReasonField } from "@/components/common/reason-field";
 import { useCancelInvitationMutation, useResendInvitationMutation } from "./users.queries";
 
 export function UserInvitationActions({ onReload, user }: { onReload?: () => void; user: UserDto }) {

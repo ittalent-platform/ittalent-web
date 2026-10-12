@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-  ChevronLeft,
-  ChevronRight,
   MapPin,
   RefreshCw,
   Search,
@@ -18,29 +16,12 @@ import {
   INVALID_SEARCH_MESSAGE,
 } from "@/lib/search-validation";
 import {
-  getApiV1Enterprises,
-  getApiV1JobPostings,
-  type JobPosting,
-} from "@/api/generated";
-
-type Job = {
-  _id: string;
-  enterpriseId?: string;
-  title: string;
-  slug: string;
-  location?: string;
-  employment_type?: string;
-  salary_min?: number;
-  salary_max?: number;
-  currency?: string;
-  level?: string;
-  description?: string;
-  requirements?: string;
-  benefits?: string;
-  openings?: number;
-  expires_at?: string;
-  createdAt?: string;
-};
+  countValues,
+  loadAllEnterprises,
+  loadAllPublicJobs,
+  publicKeys,
+  type PublicJob as Job,
+} from "@/features/public-site/shared/public-site.data";
 
 type JobSort = "newest" | "oldest" | "salary_high" | "salary_low";
 type PostedWithin = "24h" | "7d" | "30d";
@@ -59,66 +40,23 @@ type JobListQuery = {
   sort?: JobSort;
 };
 
-type EnterpriseSummary = { id: string; name: string };
-
-const toJob = (dto: JobPosting): Job => ({
-  _id: dto.id,
-  enterpriseId: dto.enterpriseId,
-  title: dto.title,
-  slug: dto.id,
-  location: dto.location,
-  employment_type: dto.employmentType,
-  salary_min: dto.salaryMin,
-  salary_max: dto.salaryMax,
-  currency: dto.currency,
-  level: dto.level,
-  description: dto.description,
-  requirements: dto.requirements,
-  benefits: dto.benefits,
-  openings: dto.openings,
-  expires_at: dto.expiresAt,
-  createdAt: dto.createdAt,
-});
-
-async function loadAllPublicJobs(): Promise<Job[]> {
-  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100 } });
-  if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
-  const pages = await Promise.all(
-    Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
-      getApiV1JobPostings({ query: { page: index + 2, limit: 100 } }),
-    ),
-  );
-  return [first.data, ...pages.map((result) => {
-    if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-    return result.data;
-  })].flatMap((page) => page.items).map(toJob);
-}
-
-async function loadAllEnterprises(): Promise<EnterpriseSummary[]> {
-  const first = await getApiV1Enterprises({ query: { page: 1, limit: 100, status: "active" } });
-  if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
-  const pages = await Promise.all(
-    Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
-      getApiV1Enterprises({ query: { page: index + 2, limit: 100, status: "active" } }),
-    ),
-  );
-  return [first.data, ...pages.map((result) => {
-    if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-    return result.data;
-  })].flatMap((page) => page.items).map((item) => ({ id: item.id, name: item.name }));
-}
 import { MarketSelect } from "@/components/common/market-select";
 import { StateCard } from "./state-card";
 import {
-  companyInitials,
   EMPLOYMENT_LABELS,
   formatDeadline,
   formatSalaryCard,
   isNewPosting,
   LEVEL_LABELS,
-  logoPalette,
   postedAgo,
 } from "./career-format";
+import { LogoTile } from "@/components/common/logo-tile";
+import { MarketPager } from "@/features/public-site/shared/market-pager";
+import {
+  PILL_PRIMARY,
+  PILL_SECONDARY,
+} from "@/features/public-site/shared/market-styles";
+import { DirectoryHero, FloatingSearchCard } from "@/features/public-site/shared/directory-hero";
 
 const PAGE_SIZE = 12;
 const KEYWORD_MAX = 100;
@@ -150,44 +88,37 @@ const HERO_CHIPS = [
   {
     className: "left-[10px] top-[20px]",
     label: "React",
-    bg: "#e4ecfb",
-    fg: "#2a55a8",
+    tone: "bg-mkt-blue-bg text-mkt-blue-fg",
   },
   {
     className: "left-[140px] top-0",
     label: "Java",
-    bg: "#fde8e0",
-    fg: "#b33305",
+    tone: "bg-mkt-accent-soft text-mkt-accent-hover",
   },
   {
     className: "left-[250px] top-[34px]",
     label: "DevOps",
-    bg: "#efe9fb",
-    fg: "#6941c6",
+    tone: "bg-mkt-violet-bg text-mkt-violet-fg",
   },
   {
     className: "left-[60px] top-[88px]",
     label: "QA Automation",
-    bg: "#fcf3e3",
-    fg: "#b45309",
+    tone: "bg-mkt-amber-bg text-mkt-amber-fg",
   },
   {
     className: "left-[250px] top-[110px]",
     label: "Data Engineer",
-    bg: "#e8f5ee",
-    fg: "#12764a",
+    tone: "bg-mkt-green-bg text-mkt-green-fg",
   },
   {
     className: "left-[20px] top-[156px]",
     label: "Flutter",
-    bg: "#ffffff",
-    fg: "#19191c",
+    tone: "bg-white text-mkt-ink",
   },
   {
     className: "left-[150px] top-[168px]",
     label: "Go",
-    bg: "#e4ecfb",
-    fg: "#2a55a8",
+    tone: "bg-mkt-blue-bg text-mkt-blue-fg",
   },
 ];
 
@@ -241,7 +172,7 @@ function CheckRow({
             aria-hidden="true"
             fill="none"
             height="12"
-            stroke="#ffffff"
+            className="stroke-white"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="3.4"
@@ -266,7 +197,6 @@ function JobCard({
   companyName?: string;
   onOpen: () => void;
 }) {
-  const palette = logoPalette(job.enterpriseId ?? companyName);
   const type = job.employment_type
     ? (EMPLOYMENT_LABELS[job.employment_type] ?? job.employment_type)
     : null;
@@ -278,21 +208,20 @@ function JobCard({
 
   return (
     <article
-      className="flex min-w-0 cursor-pointer flex-col gap-4 rounded-2xl border border-mkt-line bg-white px-[22px] py-5 transition-colors hover:border-mkt-line-strong sm:flex-row sm:gap-[18px]"
+      className="flex min-w-0 cursor-pointer flex-col gap-4 market-card px-[22px] py-5 transition-colors hover:border-mkt-line-strong sm:flex-row sm:gap-[18px]"
       onClick={onOpen}
     >
-      <span
-        aria-hidden="true"
-        className="flex size-[52px] shrink-0 items-center justify-center rounded-xl font-['Space_Grotesk',sans-serif] text-base font-bold"
-        style={{ background: palette.bg, color: palette.fg }}
-      >
-        {companyInitials(companyName)}
-      </span>
+      <LogoTile
+        className="size-[52px] rounded-xl text-base"
+        name={companyName ?? "?"}
+        seed={job.enterpriseId ?? companyName}
+        tone="tint"
+      />
 
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex min-w-0 items-baseline gap-3">
           <Link
-            className="min-w-0 truncate font-['Space_Grotesk',sans-serif] text-[18px] font-semibold text-mkt-ink hover:text-mkt-accent-hover"
+            className="min-w-0 truncate itt-display text-[18px] font-semibold text-mkt-ink hover:text-mkt-accent-hover"
             onClick={(e) => e.stopPropagation()}
             title={job.title}
             to={`/career/${job.slug}`}
@@ -410,53 +339,95 @@ export function CareerPage() {
         ? Date.now() - POSTED_WITHIN_MS[query.postedWithin]
         : undefined;
       const filtered = all.filter((job) => {
-        if (query.employment_type?.length && !query.employment_type.includes(job.employment_type ?? "")) return false;
-        if (query.level?.length && !query.level.some((level) => level.toLowerCase() === (job.level ?? "").toLowerCase())) return false;
+        if (
+          query.employment_type?.length &&
+          !query.employment_type.includes(job.employment_type ?? "")
+        )
+          return false;
+        if (
+          query.level?.length &&
+          !query.level.some(
+            (level) => level.toLowerCase() === (job.level ?? "").toLowerCase(),
+          )
+        )
+          return false;
         if (query.location && job.location !== query.location) return false;
-        if (query.enterpriseId && job.enterpriseId !== query.enterpriseId) return false;
-        if (postedSince !== undefined && new Date(job.createdAt ?? 0).getTime() < postedSince) return false;
-        const low = job.salary_min && job.salary_min > 0 ? job.salary_min : undefined;
-        const high = job.salary_max && job.salary_max > 0 ? job.salary_max : undefined;
+        if (query.enterpriseId && job.enterpriseId !== query.enterpriseId)
+          return false;
+        if (
+          postedSince !== undefined &&
+          new Date(job.createdAt ?? 0).getTime() < postedSince
+        )
+          return false;
+        const low =
+          job.salary_min && job.salary_min > 0 ? job.salary_min : undefined;
+        const high =
+          job.salary_max && job.salary_max > 0 ? job.salary_max : undefined;
         if (query.salaryMin !== undefined || query.salaryMax !== undefined) {
           if (!low && !high) return query.includeNegotiable ?? true;
           if (job.currency && job.currency !== "VND") return true;
           const top = high ?? low!;
           const bottom = low ?? high!;
-          if (query.salaryMin !== undefined && top < query.salaryMin * 1_000_000) return false;
-          if (query.salaryMax !== undefined && bottom > query.salaryMax * 1_000_000) return false;
+          if (
+            query.salaryMin !== undefined &&
+            top < query.salaryMin * 1_000_000
+          )
+            return false;
+          if (
+            query.salaryMax !== undefined &&
+            bottom > query.salaryMax * 1_000_000
+          )
+            return false;
         }
         if (term) {
-          const haystack = [job.title, job.location, job.level, job.employment_type].join(" ").toLowerCase();
+          const haystack = [
+            job.title,
+            job.location,
+            job.level,
+            job.employment_type,
+          ]
+            .join(" ")
+            .toLowerCase();
           if (!haystack.includes(term)) return false;
         }
         return true;
       });
       const time = (job: Job) => new Date(job.createdAt ?? 0).getTime();
-      const topSalary = (job: Job) => Math.max(job.salary_max ?? 0, job.salary_min ?? 0);
+      const topSalary = (job: Job) =>
+        Math.max(job.salary_max ?? 0, job.salary_min ?? 0);
       const sorted = [...filtered].sort((a, b) => {
         switch (query.sort ?? "newest") {
-          case "oldest": return time(a) - time(b);
-          case "salary_high": return topSalary(b) - topSalary(a) || time(b) - time(a);
-          case "salary_low": return (topSalary(a) || Number.POSITIVE_INFINITY) - (topSalary(b) || Number.POSITIVE_INFINITY) || time(b) - time(a);
-          default: return time(b) - time(a);
+          case "oldest":
+            return time(a) - time(b);
+          case "salary_high":
+            return topSalary(b) - topSalary(a) || time(b) - time(a);
+          case "salary_low":
+            return (
+              (topSalary(a) || Number.POSITIVE_INFINITY) -
+                (topSalary(b) || Number.POSITIVE_INFINITY) || time(b) - time(a)
+            );
+          default:
+            return time(b) - time(a);
         }
       });
       const totalPages = Math.max(Math.ceil(sorted.length / limit), 1);
-      const countBy = (pick: (job: Job) => string | undefined) => {
-        const counts = new Map<string, number>();
-        for (const job of all) { const value = pick(job); if (value) counts.set(value, (counts.get(value) ?? 0) + 1); }
-        return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
-      };
       return {
         data: sorted.slice((page - 1) * limit, page * limit),
-        filters: { employmentTypes: countBy((job) => job.employment_type), locations: countBy((job) => job.location), enterprises: countBy((job) => job.enterpriseId) },
-        limit, page, total: sorted.length, totalPages,
+        filters: {
+          employmentTypes: countValues(all, (job) => job.employment_type),
+          locations: countValues(all, (job) => job.location),
+          enterprises: countValues(all, (job) => job.enterpriseId),
+        },
+        limit,
+        page,
+        total: sorted.length,
+        totalPages,
       };
     },
     placeholderData: (previous) => previous,
   });
   const { data: enterprises } = useQuery({
-    queryKey: ["enterprise-directory"],
+    queryKey: publicKeys.enterpriseDirectory,
     queryFn: loadAllEnterprises,
     staleTime: 60_000,
   });
@@ -504,21 +475,6 @@ export function CareerPage() {
   function goToPage(page: number) {
     setQuery((q) => ({ ...q, page }));
     window.scrollTo({ top: 0, behavior: "auto" });
-  }
-
-  function getPageNumbers(): (number | "ellipsis")[] {
-    if (totalPages <= 6) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-    const pages = new Set<number>([1, 2, 3, totalPages]);
-    if (currentPage > 1 && currentPage < totalPages) pages.add(currentPage);
-    const sorted = [...pages].sort((a, b) => a - b);
-    const out: (number | "ellipsis")[] = [];
-    sorted.forEach((p, idx) => {
-      if (idx > 0 && p - sorted[idx - 1] > 1) out.push("ellipsis");
-      out.push(p);
-    });
-    return out;
   }
 
   useEffect(() => {
@@ -629,50 +585,31 @@ export function CareerPage() {
   return (
     <main className="flex flex-col">
       {/* Hero */}
-      <section
-        className="relative overflow-hidden bg-mkt-ink bg-[radial-gradient(rgba(255,255,255,0.10)_1.2px,transparent_1.2px)] [background-size:26px_26px] px-4 pb-24 pt-[52px] text-white md:px-12"
-        id="page-hero"
-      >
-        <div className="absolute -right-40 -top-[300px] size-[640px] rounded-full bg-mkt-brand" />
-        <div className="absolute -right-[60px] -top-[220px] size-[460px] rounded-full border-2 border-white/35" />
-        <div className="relative mx-auto flex max-w-[1344px] items-center gap-12">
-          <div className="flex flex-1 flex-col gap-3.5">
-            <span className="flex h-7 items-center gap-2 self-start rounded-full border border-white/[0.14] bg-white/[0.08] px-3.5 text-[12.5px] font-semibold text-mkt-on-dark-soft">
-              <span className="size-[7px] rounded-full bg-mkt-brand" />
-              Jobs past their deadline are never shown
-            </span>
-            <h1 className="font-['Space_Grotesk',sans-serif] text-[36px] font-semibold leading-[1.08] md:text-[48px]">
-              Open IT roles,
-              <br />
-              <span className="text-mkt-brand">from every company.</span>
-            </h1>
-            <p className="max-w-[520px] text-base leading-[1.6] text-mkt-on-dark">
-              Search by title, skill or company, then narrow by city, level and
-              salary.
-            </p>
-          </div>
-          <div className="relative hidden h-[210px] w-[420px] shrink-0 lg:block">
+      <DirectoryHero
+        accent="from every company."
+        art={
+          <>
             {HERO_CHIPS.map((chip) => (
               <span
                 className={cn(
                   "absolute flex h-9 items-center rounded-full px-4 text-sm font-semibold shadow-[0_10px_24px_rgba(0,0,0,0.3)]",
                   chip.className,
+                  chip.tone,
                 )}
                 key={chip.label}
-                style={{ background: chip.bg, color: chip.fg }}
               >
                 {chip.label}
               </span>
             ))}
-          </div>
-        </div>
-      </section>
+          </>
+        }
+        badge="Jobs past their deadline are never shown"
+        description="Search by title, skill or company, then narrow by city, level and salary."
+        title="Open IT roles,"
+      />
 
       {/* Search + active filters */}
-      <section
-        aria-label="Search and filters"
-        className="relative z-[2] mx-auto -mt-[50px] flex w-[calc(100%-2rem)] max-w-[1344px] flex-col gap-4 rounded-[20px] border border-mkt-line bg-white p-5 shadow-[0_10px_24px_rgba(25,25,28,0.1)] md:w-[calc(100%-6rem)]"
-      >
+      <FloatingSearchCard label="Search and filters">
         <form
           aria-label="Search jobs"
           className="flex flex-col gap-2.5 md:flex-row"
@@ -760,13 +697,13 @@ export function CareerPage() {
             </button>
           </div>
         ) : null}
-      </section>
+      </FloatingSearchCard>
 
       {/* Filters + results */}
       <div className="mx-auto flex w-full max-w-[1440px] flex-col items-stretch gap-6 px-4 pb-16 pt-8 md:px-12 lg:flex-row lg:items-start">
         <aside
           aria-label="Filters"
-          className="box-border flex w-full shrink-0 flex-col gap-[22px] rounded-2xl border border-mkt-line bg-white p-[22px] lg:w-[296px]"
+          className="box-border flex w-full shrink-0 flex-col gap-[22px] market-card p-[22px] lg:w-[296px]"
         >
           <div className="flex items-center gap-2">
             <SlidersHorizontal
@@ -854,18 +791,31 @@ export function CareerPage() {
               allLabel="Any company"
               ariaLabel="Company"
               onChange={(value) => patch({ enterpriseId: value || undefined })}
-              options={companyOptions.map((c) => ({ label: c.name, value: c.id }))}
+              options={companyOptions.map((c) => ({
+                label: c.name,
+                value: c.id,
+              }))}
               value={query.enterpriseId ?? ""}
               variant="compact"
             />
           </div>
 
           <div className="flex flex-col gap-2">
-            <span className={legendClass.replace("pb-2.5", "")}>POSTED WITHIN</span>
+            <span className={legendClass.replace("pb-2.5", "")}>
+              POSTED WITHIN
+            </span>
             <MarketSelect
               ariaLabel="Posted within"
-              onChange={(value) => patch({ postedWithin: (value || undefined) as PostedWithin | undefined })}
-              options={POSTED_OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
+              onChange={(value) =>
+                patch({
+                  postedWithin: (value || undefined) as
+                    PostedWithin | undefined,
+                })
+              }
+              options={POSTED_OPTIONS.map((o) => ({
+                label: o.label,
+                value: o.value,
+              }))}
               value={query.postedWithin ?? ""}
               variant="compact"
             />
@@ -887,7 +837,10 @@ export function CareerPage() {
               <MarketSelect
                 ariaLabel="Sort by"
                 onChange={(value) => patch({ sort: value as JobSort })}
-                options={SORT_OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
+                options={SORT_OPTIONS.map((o) => ({
+                  label: o.label,
+                  value: o.value,
+                }))}
                 value={query.sort ?? "newest"}
                 variant="pill"
               />
@@ -910,11 +863,11 @@ export function CareerPage() {
                   className="size-[26px] text-mkt-danger"
                 />
               }
-              iconBg="#fbe9e7"
+              iconClassName="bg-mkt-danger-bg"
               title="We couldn't load jobs"
             >
               <button
-                className="flex h-10 items-center gap-2 rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+                className={PILL_PRIMARY}
                 onClick={() => refetch()}
                 type="button"
               >
@@ -935,7 +888,7 @@ export function CareerPage() {
                   className="size-[26px] text-mkt-accent-hover"
                 />
               }
-              iconBg="#fde8e0"
+              iconClassName="bg-mkt-accent-soft"
               title="No jobs match your filters"
             >
               {chips.length > 0 ? (
@@ -954,7 +907,7 @@ export function CareerPage() {
                     ))}
                   </div>
                   <button
-                    className="h-10 rounded-full border border-mkt-line-strong bg-white px-[18px] text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+                    className={PILL_SECONDARY}
                     onClick={clearAll}
                     type="button"
                   >
@@ -986,66 +939,12 @@ export function CareerPage() {
           )}
 
           {data && totalPages > 1 ? (
-            <nav
-              aria-label="Pagination"
-              className="flex flex-wrap items-center justify-center gap-1.5 pt-4"
-            >
-              <button
-                aria-label="Previous page"
-                className={cn(
-                  "flex size-9 items-center justify-center rounded-full border border-mkt-line-strong bg-white",
-                  currentPage === 1
-                    ? "cursor-default text-mkt-check"
-                    : "text-mkt-ink hover:bg-mkt-chip",
-                )}
-                disabled={currentPage === 1}
-                onClick={() => goToPage(currentPage - 1)}
-                type="button"
-              >
-                <ChevronLeft aria-hidden="true" className="size-4" />
-              </button>
-
-              {getPageNumbers().map((p, idx) =>
-                p === "ellipsis" ? (
-                  <span
-                    className="w-6 text-center text-mkt-subtle"
-                    key={`e-${idx}`}
-                  >
-                    …
-                  </span>
-                ) : (
-                  <button
-                    aria-current={p === currentPage ? "page" : undefined}
-                    className={cn(
-                      "flex size-9 items-center justify-center rounded-full text-[13px] font-semibold",
-                      p === currentPage
-                        ? "bg-mkt-accent text-white"
-                        : "border border-mkt-line-strong bg-white text-mkt-ink hover:bg-mkt-chip",
-                    )}
-                    key={p}
-                    onClick={() => goToPage(p)}
-                    type="button"
-                  >
-                    {p}
-                  </button>
-                ),
-              )}
-
-              <button
-                aria-label="Next page"
-                className={cn(
-                  "flex size-9 items-center justify-center rounded-full border border-mkt-line-strong bg-white",
-                  currentPage === totalPages
-                    ? "cursor-default text-mkt-check"
-                    : "text-mkt-ink hover:bg-mkt-chip",
-                )}
-                disabled={currentPage === totalPages}
-                onClick={() => goToPage(currentPage + 1)}
-                type="button"
-              >
-                <ChevronRight aria-hidden="true" className="size-4" />
-              </button>
-            </nav>
+            <MarketPager
+              className="pt-4"
+              onPageChange={goToPage}
+              page={currentPage}
+              totalPages={totalPages}
+            />
           ) : null}
         </div>
       </div>

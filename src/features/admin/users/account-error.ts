@@ -1,4 +1,5 @@
-import { CONFLICT_CODES, CONFLICT_MESSAGE_MARKERS, HTTP_CONFLICT, HTTP_SERVER_ERROR } from "./user-history.constants";
+import { CONFLICT_CODES, CONFLICT_MESSAGE_MARKERS } from "./user-history.constants";
+import { HTTP_CONFLICT, HTTP_SERVER_ERROR } from "@/api/http-status";
 
 export type AccountErrorKind = "accountConflict" | "companyUnavailable" | "lastAdmin" | "lastEnterpriseAdmin" | "other" | "server" | "stale" | "transition";
 

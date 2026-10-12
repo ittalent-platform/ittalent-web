@@ -13,7 +13,9 @@ import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/format";
 
 import { CERTIFICATE_LIMITS } from "./certificates.constants";
-import { type CertificateError, useCreateCertificate, useUpdateCertificate } from "./certificates.queries";
+import { useCreateCertificate, useUpdateCertificate } from "./certificates.queries";
+import type { RequestError } from "@/api/request-error";
+import { HTTP_NOT_FOUND } from "@/api/http-status";
 
 type Values = { expiryDate: string; issuedDate: string; issuer: string; name: string; suggested: boolean; url: string };
 type FieldErrors = Partial<Record<"expiryDate" | "name" | "url", string>>;
@@ -108,9 +110,9 @@ export function CertificateFormDialog({ certificate, onConflict, onOpenChange, o
         : saved;
       onSaved(result);
     } catch (error) {
-      const { code, status } = error as CertificateError;
+      const { code, status } = error as RequestError;
       if (code === "DUPLICATE_CERTIFICATE_URL") setErrors({ url: "certificates.form.errors.duplicate" });
-      else if (code === "VERSION_CONFLICT" || status === 404) onConflict();
+      else if (code === "VERSION_CONFLICT" || status === HTTP_NOT_FOUND) onConflict();
       else setFailure(t(editing ? "certificates.form.errors.updateFailed" : "certificates.form.errors.saveFailed"));
     }
   }

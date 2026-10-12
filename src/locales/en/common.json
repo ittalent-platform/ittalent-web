@@ -1,4 +1,8 @@
 {
+  "reason": {
+    "hint": "Required · at least {{min}} characters · saved in history",
+    "tooShort": "Enter a reason of at least {{min}} characters."
+  },
   "accountNav": {
     "label": "Account sections",
     "jobSearch": "Job search",
@@ -895,10 +899,6 @@
       "originalTitle": "Original suspension",
       "unknown": "This account is suspended."
     },
-    "reason": {
-      "hint": "Required · at least {{min}} characters · saved in history",
-      "tooShort": "Enter a reason of at least {{min}} characters."
-    },
     "page": {
       "total_one": "{{count}} account",
       "total_other": "{{count}} accounts",
@@ -1241,6 +1241,20 @@
     }
   },
   "adminEnterprises": {
+    "toast": {
+      "suspendedTitle": "Enterprise suspended",
+      "suspended": "{{name}} has been suspended and hidden from public view.",
+      "suspendFailedTitle": "Suspension failed",
+      "suspendFailed": "Could not suspend enterprise. Please try again.",
+      "activatedTitle": "Enterprise activated",
+      "activated": "{{name}} is now active and published.",
+      "activateFailedTitle": "Activation failed",
+      "activateFailed": "Could not activate enterprise. Please try again.",
+      "deletedTitle": "Enterprise deleted",
+      "deleted": "{{name}} was successfully removed.",
+      "deleteFailedTitle": "Deletion failed",
+      "deleteFailed": "Could not delete enterprise. Please try again."
+    },
     "page": {
       "title": "Enterprise Profiles",
       "subtitle": "Manage registered companies, compliance vetting, and account statuses",

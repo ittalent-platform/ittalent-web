@@ -19,13 +19,12 @@ import { useUrlSearchInput } from "@/hooks/use-url-search-input";
 import { CertificateFormDialog } from "./certificate-form-dialog";
 import { CertificateRow } from "./certificate-row";
 import { CERTIFICATE_LIMITS, CERTIFICATES_PAGE_SIZE, NEW_CERTIFICATE_HIGHLIGHT_MS } from "./certificates.constants";
-import { type CertificateError, useCertificatesQuery, useDeleteCertificate, useUpdateCertificate } from "./certificates.queries";
+import { useCertificatesQuery, useDeleteCertificate, useUpdateCertificate } from "./certificates.queries";
+import { HTTP_UNAUTHORIZED, HTTP_FORBIDDEN, HTTP_NOT_FOUND } from "@/api/http-status";
+import type { RequestError } from "@/api/request-error";
 
 type Dialog = { kind: "add" } | { kind: "edit"; certificate: CertificateLink } | { kind: "delete"; certificate: CertificateLink } | { kind: "conflict" } | null;
 
-const HTTP_UNAUTHORIZED = 401;
-const HTTP_FORBIDDEN = 403;
-const HTTP_NOT_FOUND = 404;
 
 export function CertificatesPage() {
   const { t } = useTranslation();
@@ -61,7 +60,7 @@ export function CertificatesPage() {
   const close = () => setDialog(null);
 
   function handleMutationError(error: unknown, fallbackKey: string) {
-    const { code, status } = error as CertificateError;
+    const { code, status } = error as RequestError;
     if (code === "VERSION_CONFLICT" || status === HTTP_NOT_FOUND) setDialog({ kind: "conflict" });
     else setActionError(t(fallbackKey));
   }
@@ -91,7 +90,7 @@ export function CertificatesPage() {
     }
   }
 
-  const status = (query.error as CertificateError | null)?.status;
+  const status = (query.error as RequestError | null)?.status;
   if (status === HTTP_UNAUTHORIZED || status === HTTP_FORBIDDEN) {
     return (
       <Shell>
@@ -107,7 +106,7 @@ export function CertificatesPage() {
   return (
     <Shell>
       <PageHeader
-        actions={<Button className="h-11 px-5" onClick={() => setDialog({ kind: "add" })} shape="pill" type="button"><Plus aria-hidden className="size-4" />{t("certificates.add")}</Button>}
+        actions={<Button size="xl" onClick={() => setDialog({ kind: "add" })} shape="pill" type="button"><Plus aria-hidden className="size-4" />{t("certificates.add")}</Button>}
         title={t("certificates.title")}
       />
 
@@ -138,7 +137,7 @@ export function CertificatesPage() {
       {query.isLoading ? (
         <ul aria-busy className="flex flex-col gap-3">
           {Array.from({ length: 3 }, (_, index) => (
-            <li className="flex items-center justify-between rounded-2xl border border-border bg-card px-5 py-5" key={index}>
+            <li className="flex items-center justify-between surface-card px-5 py-5" key={index}>
               <div className="flex flex-col gap-2"><Skeleton className="h-4 w-64" /><Skeleton className="h-3 w-40" /></div>
               <Skeleton className="h-6 w-10 rounded-full" />
             </li>
@@ -237,5 +236,5 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-2xl border border-border bg-card">{children}</div>;
+  return <div className="surface-card">{children}</div>;
 }

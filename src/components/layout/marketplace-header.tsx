@@ -4,7 +4,7 @@ import { useSession } from "@/auth/use-session";
 import { slideKey, useSlidingIndicator } from "@/hooks/use-sliding-indicator";
 import { cn } from "@/lib/utils";
 
-import { MarketplaceLogo } from "./marketplace-logo";
+import { LogoMark } from "./brand-logo";
 import { UserMenu } from "./user-menu";
 
 const navItem =
@@ -30,8 +30,8 @@ export function MarketplaceHeader({ dark = false }: { dark?: boolean }) {
         className="flex items-center gap-2.5 text-inherit"
         to="/"
       >
-        <MarketplaceLogo />
-        <span className="hidden font-['Space_Grotesk',sans-serif] text-[19px] font-bold tracking-[0.04em] sm:inline">
+        <LogoMark className="size-[32px]" />
+        <span className="hidden itt-display text-[19px] font-bold tracking-[0.04em] sm:inline">
           ITTALENT
         </span>
       </Link>

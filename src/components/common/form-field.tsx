@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export function FormFieldLabel({ children, className, htmlFor, required }: { children: ReactNode; className?: string; htmlFor?: string; required?: boolean }) {
   return (
     <Label className={cn("mb-1.5 block text-[13.5px] font-semibold", className)} htmlFor={htmlFor}>
-      {children} {required ? <span className="text-(--field-error)">*</span> : null}
+      {children} {required ? <span className="text-field-error">*</span> : null}
     </Label>
   );
 }
@@ -34,7 +34,7 @@ export function FormField({ children, className, error, hint, htmlFor, label, la
       </div>
       {children}
       {error ? (
-        <p className="text-[12.5px] leading-normal text-(--danger-fg)" role="alert">
+        <p className="text-[12.5px] leading-normal text-danger" role="alert">
           {error}
         </p>
       ) : hint ? (
@@ -45,5 +45,5 @@ export function FormField({ children, className, error, hint, htmlFor, label, la
 }
 
 export function FormSectionLabel({ children }: { children: ReactNode }) {
-  return <p className="m-0 text-[11.5px] font-bold uppercase tracking-[0.05em] text-muted-foreground">{children}</p>;
+  return <p className="m-0 eyebrow">{children}</p>;
 }

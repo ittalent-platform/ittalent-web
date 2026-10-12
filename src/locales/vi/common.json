@@ -1,4 +1,8 @@
 {
+  "reason": {
+    "hint": "Bắt buộc · tối thiểu {{min}} ký tự · được lưu vào lịch sử",
+    "tooShort": "Nhập lý do có ít nhất {{min}} ký tự."
+  },
   "accountNav": {
     "label": "Mục tài khoản",
     "jobSearch": "Tìm việc",
@@ -882,10 +886,6 @@
       "originalTitle": "Lần đình chỉ ban đầu",
       "unknown": "Tài khoản này đang bị đình chỉ."
     },
-    "reason": {
-      "hint": "Bắt buộc · tối thiểu {{min}} ký tự · được lưu vào lịch sử",
-      "tooShort": "Nhập lý do có ít nhất {{min}} ký tự."
-    },
     "page": {
       "total_one": "{{count}} tài khoản",
       "total_other": "{{count}} tài khoản",
@@ -1225,6 +1225,20 @@
     }
   },
   "adminEnterprises": {
+    "toast": {
+      "suspendedTitle": "Đã tạm khoá doanh nghiệp",
+      "suspended": "{{name}} đã bị tạm khoá và ẩn khỏi trang công khai.",
+      "suspendFailedTitle": "Tạm khoá thất bại",
+      "suspendFailed": "Không tạm khoá được doanh nghiệp. Vui lòng thử lại.",
+      "activatedTitle": "Đã kích hoạt doanh nghiệp",
+      "activated": "{{name}} đã hoạt động và hiển thị công khai.",
+      "activateFailedTitle": "Kích hoạt thất bại",
+      "activateFailed": "Không kích hoạt được doanh nghiệp. Vui lòng thử lại.",
+      "deletedTitle": "Đã xoá doanh nghiệp",
+      "deleted": "Đã xoá {{name}}.",
+      "deleteFailedTitle": "Xoá thất bại",
+      "deleteFailed": "Không xoá được doanh nghiệp. Vui lòng thử lại."
+    },
     "page": {
       "title": "Hồ sơ doanh nghiệp",
       "subtitle": "Quản lý các công ty đã đăng ký, thẩm định pháp lý và trạng thái tài khoản",

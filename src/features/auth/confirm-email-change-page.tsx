@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { AUTH_FULL_ACTION_CLASS } from "./auth-status.constants";
-import { AuthCardPage, AuthFactsBox, AuthFormHeader, AuthStatusCard } from "./auth-status-card";
-import { HTTP_CONFLICT, HTTP_FORBIDDEN, HTTP_GONE, HTTP_TOO_MANY_REQUESTS } from "./invitation.constants";
+import { AuthCardPage, AuthFormHeader, AuthStatusCard } from "./auth-status-card";
+import { HTTP_FORBIDDEN, HTTP_CONFLICT, HTTP_GONE, HTTP_TOO_MANY_REQUESTS } from "@/api/http-status";
+import { KeyValueBox } from "@/components/common/key-value-box";
 
 const FAILURE_KEY: Record<number, string> = {
   [HTTP_CONFLICT]: "accountEmailChange.conflict",
@@ -64,7 +65,7 @@ export function ConfirmEmailChangePage() {
     : (
       <div className="flex flex-col gap-[22px]">
         <AuthFormHeader description={t("accountEmailChange.description")} title={t("accountEmailChange.title")} />
-        <AuthFactsBox rows={[{ label: t("accountEmailChange.from"), value: session.user.email }]} />
+        <KeyValueBox rows={[{ label: t("accountEmailChange.from"), value: session.user.email }]} />
         {failure && failure.status !== HTTP_FORBIDDEN ? <InlineBanner tone="error">{failure.message}</InlineBanner> : null}
         <form className="flex flex-col gap-5" onSubmit={(event) => void confirm(event)}>
           <FormField error={failure?.status === HTTP_FORBIDDEN ? failure.message : undefined} htmlFor="confirm-email-password" label={t("accountEmailChange.password")}>

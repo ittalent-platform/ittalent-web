@@ -102,29 +102,6 @@ export function formatDeadline(dateStr?: string) {
   return `${String(d.getDate()).padStart(2, "0")} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-/** "Lumen Labs" -> "LL" */
-export function companyInitials(name?: string) {
-  const words = (name ?? "").trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return "?";
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
-}
-
-const LOGO_PALETTES = [
-  { bg: "#fde8e0", fg: "#b33305" },
-  { bg: "#e8f5ee", fg: "#12764a" },
-  { bg: "#e4ecfb", fg: "#2a55a8" },
-  { bg: "#f1efea", fg: "#4a4a50" },
-  { bg: "#efe9fb", fg: "#6941c6" },
-];
-
-/** Stable colour pair per company, taken from the marketplace palette. */
-export function logoPalette(seed?: string) {
-  let hash = 0;
-  for (const char of seed ?? "") hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return LOGO_PALETTES[hash % LOGO_PALETTES.length];
-}
-
 /** Salary as printed on the marketplace cards: "25–35M VND / mo", "Negotiable". */
 export function formatSalaryCard(min?: number, max?: number, currency?: string) {
   min = min && min > 0 ? min : undefined;

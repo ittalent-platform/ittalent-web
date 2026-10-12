@@ -1,11 +1,12 @@
 import { Ban, Check, Mail, Pencil, Repeat } from "lucide-react";
-import type { ReactNode } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
 
 import { Breadcrumb } from "@/components/common/breadcrumb";
 import { ClampedText } from "@/components/common/clamped-text";
+import { Field, FieldGrid } from "@/components/common/field-grid";
+import { SectionCard } from "@/components/common/section-card";
 import { ErrorState } from "@/components/common/error-state";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { LoadingScreen } from "@/components/common/loading-screen";
@@ -62,7 +63,6 @@ export function AdminUserDetailPage() {
   // The API rejects self-suspension, so an administrator never sees Suspend on their own account.
   const isSelf = session?.user.id === user.id;
   const canToggleStatus = (user.status === "active" && !isSelf) || user.status === "suspended" || user.status === "blocked";
-  const buttonClass = "h-11 px-5";
 
   return (
     <div className="flex flex-col gap-5">
@@ -83,16 +83,16 @@ export function AdminUserDetailPage() {
           <span className="line-clamp-2 wrap-anywhere text-sm text-muted-foreground" title={`${user.email} · ${subtitle}`}>{user.email} · {subtitle}</span>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button className={buttonClass} onClick={() => setDialog("edit")} shape="xl" type="button" variant="outline"><Pencil aria-hidden className="size-4" />{t("adminUsers.detail.edit")}</Button>
-          {user.status === "active" && user.emailVerified ? <Button className={buttonClass} onClick={() => setDialog("email")} shape="xl" type="button" variant="outline"><Mail aria-hidden className="size-4" />{t("adminUsers.emailChange.title")}</Button> : null}
-          {user.status === "active" && companyRole ? <Button className={buttonClass} onClick={() => setDialog("role")} shape="xl" type="button" variant="outline"><Repeat aria-hidden className="size-4" />{t("adminUsers.table.changeRole")}</Button> : null}
+          <Button size="xl" onClick={() => setDialog("edit")} shape="xl" type="button" variant="outline"><Pencil aria-hidden className="size-4" />{t("adminUsers.detail.edit")}</Button>
+          {user.status === "active" && user.emailVerified ? <Button size="xl" onClick={() => setDialog("email")} shape="xl" type="button" variant="outline"><Mail aria-hidden className="size-4" />{t("adminUsers.emailChange.title")}</Button> : null}
+          {user.status === "active" && companyRole ? <Button size="xl" onClick={() => setDialog("role")} shape="xl" type="button" variant="outline"><Repeat aria-hidden className="size-4" />{t("adminUsers.table.changeRole")}</Button> : null}
           {canToggleStatus ? (
-            <Button className={buttonClass} onClick={() => setDialog("suspend")} shape="xl" type="button" variant={user.status === "active" ? "destructive-solid" : "success-solid"}>
+            <Button size="xl" onClick={() => setDialog("suspend")} shape="xl" type="button" variant={user.status === "active" ? "destructive-solid" : "success-solid"}>
               {user.status === "active" ? <Ban aria-hidden className="size-4" /> : <Check aria-hidden className="size-4" />}
               {t(user.status === "active" ? "adminUsers.detail.suspend" : "adminUsers.table.reactivate")}
             </Button>
           ) : null}
-          {user.status === "active" && user.role === "enterprise_admin" ? <Button className={buttonClass} onClick={() => setDialog("emergency")} shape="xl" type="button" variant="destructive-outline">{t("adminUsers.detail.emergencySuspend")}</Button> : null}
+          {user.status === "active" && user.role === "enterprise_admin" ? <Button size="xl" onClick={() => setDialog("emergency")} shape="xl" type="button" variant="destructive-outline">{t("adminUsers.detail.emergencySuspend")}</Button> : null}
         </div>
       </div>
 
@@ -110,9 +110,8 @@ export function AdminUserDetailPage() {
         <div className="flex min-w-0 flex-col gap-5">
           <UserInvitationActions onReload={reload} user={user} />
 
-          <section aria-labelledby="user-personal" className="rounded-2xl border border-border bg-card p-[22px]">
-            <h2 className="mb-5 text-[15px] font-bold text-foreground" id="user-personal">{t("adminUsers.detail.personal")}</h2>
-            <dl className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+          <SectionCard id="user-personal" title={t("adminUsers.detail.personal")}>
+            <FieldGrid>
               <Field label={t("adminUsers.detail.fullName")}><span className="wrap-anywhere">{user.fullName ?? "—"}</span></Field>
               <Field label={t("adminUsers.detail.mobile")}>{user.phone ? formatMobile(user.phone) : "—"}</Field>
               <Field label={t("adminUsers.detail.email")}>
@@ -120,12 +119,11 @@ export function AdminUserDetailPage() {
                 <span className="mt-1.5 block"><EmailStatusBadge verified={user.emailVerified} /></span>
               </Field>
               <Field label={t("adminUsers.detail.accountId")}><span className="itt-mono text-xs font-bold">{userDisplayId(user.id)}</span></Field>
-            </dl>
-          </section>
+            </FieldGrid>
+          </SectionCard>
 
-          <section aria-labelledby="user-access" className="rounded-2xl border border-border bg-card p-[22px]">
-            <h2 className="mb-5 text-[15px] font-bold text-foreground" id="user-access">{t("adminUsers.detail.access")}</h2>
-            <dl className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+          <SectionCard id="user-access" title={t("adminUsers.detail.access")}>
+            <FieldGrid>
               <Field label={t("adminUsers.detail.accountStatus")}><StatusBadge status={user.status} /></Field>
               <Field label={t("adminUsers.detail.role")}><RoleBadge role={user.role} /></Field>
               <Field label={t("adminUsers.detail.company")}>
@@ -137,8 +135,8 @@ export function AdminUserDetailPage() {
                 ) : "—"}
               </Field>
               <Field label={t("adminUsers.detail.created")}>{user.createdAt ? formatDate(user.createdAt) : "—"}</Field>
-            </dl>
-          </section>
+            </FieldGrid>
+          </SectionCard>
         </div>
 
         <RailCard meta={history.data ? String(history.data.total) : undefined} title={t("adminUsers.detail.recentHistory")}>
@@ -168,11 +166,3 @@ export function AdminUserDetailPage() {
   );
 }
 
-function Field({ children, label }: { children: ReactNode; label: string }) {
-  return (
-    <div className="min-w-0">
-      <dt className="text-[13px] text-muted-foreground">{label}</dt>
-      <dd className="mt-1.5 text-[15px] font-semibold text-foreground">{children}</dd>
-    </div>
-  );
-}

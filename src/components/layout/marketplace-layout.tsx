@@ -7,7 +7,7 @@ import { MarketplaceHeader } from "./marketplace-header";
 export function MarketplaceLayout() {
   const { pathname } = useLocation();
   return (
-    <div className="flex min-h-screen flex-col bg-mkt-canvas font-['Instrument_Sans',system-ui,sans-serif] text-mkt-ink">
+    <div className="theme-light flex min-h-screen flex-col bg-mkt-canvas font-sans text-mkt-ink">
       <MarketplaceHeader dark={pathname === "/"} />
       <div className="flex-1">
         <Outlet />

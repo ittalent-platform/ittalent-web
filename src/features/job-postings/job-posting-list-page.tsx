@@ -130,11 +130,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
       <AdminPageHeader
         actions={
           actor === "recruiter" ? (
-            <Button
-              asChild
-              className="h-11 px-5 text-sm font-semibold"
-              shape="pill"
-            >
+            <Button asChild shape="pill" size="xl">
               <Link to={`${basePath}/create`}>
                 <Plus className="size-4" />
                 {t("jobPostings.create")}
@@ -208,7 +204,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
           title={t("jobPostings.loadFailed")}
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xs">
+        <div className="overflow-hidden surface-card shadow-2xs">
           <JobPostingTable
             basePath={basePath}
             canManage={actor === "recruiter"}

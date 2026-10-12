@@ -1,9 +1,11 @@
 import { useTranslation } from "react-i18next";
 
-import { FormField } from "@/components/common/form-field";
+import { FormField } from "./form-field";
 import { Textarea } from "@/components/ui/textarea";
 
-import { REASON_MAX_LENGTH, REASON_MIN_LENGTH } from "./users.constants";
+/** Every audited action (suspend, reactivate, role change, cancel…) asks for a reason of this length. */
+export const REASON_MIN_LENGTH = 10;
+export const REASON_MAX_LENGTH = 500;
 
 export const isValidReason = (reason: string) => reason.trim().length >= REASON_MIN_LENGTH && reason.trim().length <= REASON_MAX_LENGTH;
 
@@ -14,8 +16,8 @@ export function ReasonField({ id, label, onChange, placeholder, value }: { id: s
   const tooShort = value.length > 0 && length < REASON_MIN_LENGTH;
   return (
     <FormField
-      error={tooShort ? t("adminUsers.reason.tooShort", { min: REASON_MIN_LENGTH }) : undefined}
-      hint={t("adminUsers.reason.hint", { min: REASON_MIN_LENGTH })}
+      error={tooShort ? t("reason.tooShort", { min: REASON_MIN_LENGTH }) : undefined}
+      hint={t("reason.hint", { min: REASON_MIN_LENGTH })}
       htmlFor={id}
       label={label}
       required

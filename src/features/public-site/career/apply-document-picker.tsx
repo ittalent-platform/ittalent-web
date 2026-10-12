@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getApiV1Documents, postApiV1Documents } from "@/api/generated";
-import { requestError, requestErrorMessage } from "@/api/request-error";
+import { requestErrorMessage, unwrap } from "@/api/request-error";
 import type { Document } from "@/api/generated/types.gen";
 import {
   DOCUMENT_ACCEPT,
@@ -51,20 +51,10 @@ export function ApplyDocumentPicker({
   const input = useRef<HTMLInputElement>(null);
   const docs = useQuery({
     queryKey: ["my-documents", kind],
-    queryFn: async () => {
-      const result = await getApiV1Documents({
-        query: { type: kind, limit: PICKER_LIST_LIMIT, page: 1 },
-      });
-      if (result.error || !result.data) throw new Error("load-documents-failed");
-      return result.data.items;
-    },
+    queryFn: async () => unwrap(await getApiV1Documents({ query: { type: kind, limit: PICKER_LIST_LIMIT, page: 1 } })).items,
   });
   const upload = useMutation({
-    mutationFn: async (file: File) => {
-      const result = await postApiV1Documents({ body: { file, type: kind } });
-      if (result.error || !result.data) throw requestError(result, UPLOAD_FALLBACK);
-      return result.data;
-    },
+    mutationFn: async (file: File) => unwrap(await postApiV1Documents({ body: { file, type: kind } }), UPLOAD_FALLBACK),
     onSuccess: async (doc) => {
       await queryClient.invalidateQueries({ queryKey: ["my-documents", kind] });
       await queryClient.invalidateQueries({ queryKey: ["documents"] });

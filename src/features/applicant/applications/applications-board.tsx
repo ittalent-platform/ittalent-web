@@ -100,7 +100,7 @@ export function ApplicationsBoard({ items, counts, locale, onWithdraw }: Applica
               {cards.map((application) => (
                 <ApplicationCard application={application} dragging={draggingId === application.id} key={application.id} locale={locale} onDragEnd={endDrag} onDragStart={handleDragStart} onToggle={toggle} selected={selected.includes(application.id)} />
               ))}
-              {cards.length === 0 && !isDropTarget ? <div className="rounded-[14px] border-[1.5px] border-dashed border-(--border-strong) p-[18px] text-center text-[12.5px] text-slate-subtle">{t("applications.board.emptyColumn")}</div> : null}
+              {cards.length === 0 && !isDropTarget ? <div className="rounded-[14px] border-[1.5px] border-dashed border-border-strong p-[18px] text-center text-[12.5px] text-slate-subtle">{t("applications.board.emptyColumn")}</div> : null}
             </section>
           );
         })}

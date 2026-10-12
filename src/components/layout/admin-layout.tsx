@@ -33,7 +33,7 @@ export function AppLayout({ actor = "admin" }: { actor?: "admin" | "recruiter" }
       {isMobileNavOpen ? (
         <div
           aria-hidden="true"
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-overlay lg:hidden"
           onClick={() => setIsMobileNavOpen(false)}
         />
       ) : null}
@@ -46,7 +46,7 @@ export function AppLayout({ actor = "admin" }: { actor?: "admin" | "recruiter" }
       >
         <span className="mx-auto block h-full w-px bg-transparent transition group-hover:bg-primary" />
       </button>
-      <div className="flex min-w-0 flex-col bg-(--app-canvas) px-5 py-6 sm:px-8 lg:h-screen lg:overflow-y-auto lg:px-8">
+      <div className="flex min-w-0 flex-col bg-canvas px-5 py-6 sm:px-8 lg:h-screen lg:overflow-y-auto lg:px-8">
         <div className="mb-4 flex items-center gap-2 lg:hidden">
           <button
             aria-label={t("adminLayout.openMenu")}
