@@ -102,9 +102,8 @@ export function Step1CompanyForm({
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <form id="step1-company-form" onSubmit={handleSubmit(onSubmit)}>
-        <section className="rounded-2xl border border-border bg-card p-6 sm:p-7 flex flex-col gap-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <section className="rounded-2xl border border-border bg-card p-6 sm:p-7 flex flex-col gap-5">
         <div>
           <h2 className="text-[15px] font-bold tracking-tight text-foreground">
             Company details
@@ -273,7 +272,6 @@ export function Step1CompanyForm({
           </div>
         </div>
       </section>
-      </form>
 
       {/* Action buttons on background */}
       <div className="flex items-center justify-end gap-3 pt-1">
@@ -308,10 +306,10 @@ export function Step1CompanyForm({
         >
           Save draft
         </Button>
-        <Button type="submit" form="step1-company-form" disabled={isSaving}>
+        <Button type="submit" disabled={isSaving}>
           {isSaving ? "Saving..." : "Continue"}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

@@ -103,9 +103,8 @@ export function Step2RepresentativeForm({
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <form id="step2-representative-form" onSubmit={handleSubmit(onSubmit)}>
-        <section className="rounded-2xl border border-border bg-card p-6 sm:p-7 flex flex-col gap-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <section className="rounded-2xl border border-border bg-card p-6 sm:p-7 flex flex-col gap-5">
         <div>
           <h2 className="text-[15px] font-bold tracking-tight text-foreground">
             Representative
@@ -274,7 +273,6 @@ export function Step2RepresentativeForm({
         )}
 
       </section>
-      </form>
 
       {/* Footer actions on background */}
       <div className="flex items-center justify-between pt-1">
@@ -291,15 +289,11 @@ export function Step2RepresentativeForm({
           >
             Save draft
           </Button>
-          <Button
-            type="submit"
-            form="step2-representative-form"
-            disabled={isSaving}
-          >
+          <Button type="submit" disabled={isSaving}>
             {isSaving ? "Saving..." : "Continue"}
           </Button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

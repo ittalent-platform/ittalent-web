@@ -82,7 +82,7 @@ export function StartRegistrationForm({
         <InlineBanner tone="error">{serverError}</InlineBanner>
       )}
 
-      <form id="start-registration-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[18px]">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[18px]">
         <FormField
           htmlFor="representative_name"
           label="Full name"
@@ -112,18 +112,17 @@ export function StartRegistrationForm({
             {...register("corporate_email")}
           />
         </FormField>
-      </form>
 
-      <Button
-        type="submit"
-        form="start-registration-form"
-        className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
-        disabled={isSubmitting || startMutation.isPending}
-      >
-        {isSubmitting || startMutation.isPending
-          ? "Sending confirmation link..."
-          : "Send confirmation link"}
-      </Button>
+        <Button
+          type="submit"
+          className="h-12 w-full rounded-xl text-[14.5px] font-semibold"
+          disabled={isSubmitting || startMutation.isPending}
+        >
+          {isSubmitting || startMutation.isPending
+            ? "Sending confirmation link..."
+            : "Send confirmation link"}
+        </Button>
+      </form>
 
       <div className="flex flex-col gap-2 pt-1 text-[13.5px] text-muted-foreground">
         <div>

@@ -288,7 +288,7 @@ export function Step4ReviewForm({
       </div>
 
       {/* Terms Certification Checkbox & Submit */}
-      <form id="step4-review-form" onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-start gap-3">
             <input
@@ -310,34 +310,33 @@ export function Step4ReviewForm({
             </p>
           )}
         </div>
-      </form>
 
-      {/* Footer Navigation on background */}
-      <div className="flex items-center justify-between pt-1">
-        <Button type="button" variant="outline" onClick={onBack}>
-          Back
-        </Button>
+        {/* Footer Navigation on background */}
+        <div className="flex items-center justify-between pt-1">
+          <Button type="button" variant="outline" onClick={onBack}>
+            Back
+          </Button>
 
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isSaving || submitMutation.isPending}
-            onClick={async () => {
-              if (draft) await saveDraft({ version: draft.version });
-            }}
-          >
-            Save draft
-          </Button>
-          <Button
-            type="submit"
-            form="step4-review-form"
-            disabled={submitMutation.isPending}
-          >
-            {submitMutation.isPending ? "Submitting..." : "Submit registration"}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSaving || submitMutation.isPending}
+              onClick={async () => {
+                if (draft) await saveDraft({ version: draft.version });
+              }}
+            >
+              Save draft
+            </Button>
+            <Button
+              type="submit"
+              disabled={submitMutation.isPending}
+            >
+              {submitMutation.isPending ? "Submitting..." : "Submit registration"}
+            </Button>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
