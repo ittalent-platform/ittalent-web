@@ -72,6 +72,30 @@ const RecruiterEditJobPostingPage = lazy(() =>
     default: m.RecruiterEditJobPostingPage,
   })),
 );
+const RecruiterEmployeesPage = lazy(() =>
+  import("@/features/recruiter/employees/employees-page").then((m) => ({
+    default: m.RecruiterEmployeesPage,
+  })),
+);
+const RecruiterEmployeeDetailPage = lazy(() =>
+  import("@/features/recruiter/employees/employee-detail-page").then((m) => ({
+    default: m.RecruiterEmployeeDetailPage,
+  })),
+);
+const RecruiterCompanyProfilePage = lazy(() =>
+  import("@/features/recruiter/company-profile/company-profile-page").then(
+    (m) => ({
+      default: m.RecruiterCompanyProfilePage,
+    }),
+  ),
+);
+const RecruiterEditCompanyProfilePage = lazy(() =>
+  import("@/features/recruiter/company-profile/edit-company-profile-page").then(
+    (m) => ({
+      default: m.RecruiterEditCompanyProfilePage,
+    }),
+  ),
+);
 const JobsPage = lazy(() =>
   import("@/features/public-site/jobs-page").then((m) => ({
     default: m.JobsPage,
@@ -93,7 +117,9 @@ const ApplicationDetailPage = lazy(() =>
   ),
 );
 const EnterprisesPage = lazy(() =>
-  import("@/features/admin/enterprises/enterprises-page").then((m) => ({ default: m.EnterprisesPage })),
+  import("@/features/admin/enterprises/enterprises-page").then((m) => ({
+    default: m.EnterprisesPage,
+  })),
 );
 const AdminEnterpriseDetailPage = lazy(() =>
   import("@/features/admin/enterprises/enterprise-detail-page").then((m) => ({
@@ -122,17 +148,17 @@ const EnterprisePage = lazy(() =>
   })),
 );
 const EnterpriseDetailPage = lazy(() =>
-  import("@/features/public-site/enterprise/enterprise-detail-page").then((m) => ({
-    default: m.EnterpriseDetailPage,
-  })),
+  import("@/features/public-site/enterprise/enterprise-detail-page").then(
+    (m) => ({
+      default: m.EnterpriseDetailPage,
+    }),
+  ),
 );
 
 export const appRoutes = [
   {
     element: <PublicLayout />,
-    children: [
-      { path: "/jobs", element: <JobsPage /> },
-    ],
+    children: [{ path: "/jobs", element: <JobsPage /> }],
   },
   {
     element: <MarketplaceLayout />,
@@ -174,8 +200,14 @@ export const appRoutes = [
           { path: "users/:userId", element: <AdminUserDetailPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
           { path: "enterprises/new", element: <EnterpriseFormPage /> },
-          { path: "enterprises/:enterpriseId", element: <AdminEnterpriseDetailPage /> },
-          { path: "enterprises/:enterpriseId/edit", element: <EnterpriseFormPage /> },
+          {
+            path: "enterprises/:enterpriseId",
+            element: <AdminEnterpriseDetailPage />,
+          },
+          {
+            path: "enterprises/:enterpriseId/edit",
+            element: <EnterpriseFormPage />,
+          },
           { path: "job-postings", element: <JobPostingsPage /> },
           {
             path: "job-postings/:jobPostingId",
@@ -208,6 +240,16 @@ export const appRoutes = [
           {
             path: "job-postings/:jobPostingId/edit",
             element: <RecruiterEditJobPostingPage />,
+          },
+          { path: "employees", element: <RecruiterEmployeesPage /> },
+          {
+            path: "employees/:employeeId",
+            element: <RecruiterEmployeeDetailPage />,
+          },
+          { path: "profile", element: <RecruiterCompanyProfilePage /> },
+          {
+            path: "profile/edit",
+            element: <RecruiterEditCompanyProfilePage />,
           },
         ],
       },

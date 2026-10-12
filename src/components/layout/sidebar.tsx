@@ -6,7 +6,11 @@ import {
   X,
 } from "lucide-react";
 
-import { RECRUITER_JOB_POSTINGS_PATH } from "@/config/routes";
+import {
+  RECRUITER_JOB_POSTINGS_PATH,
+  RECRUITER_EMPLOYEES_PATH,
+  RECRUITER_COMPANY_PROFILE_PATH,
+} from "@/config/routes";
 import { SidebarNavList } from "./sidebar-nav-list";
 import { BrandLogo } from "./brand-logo";
 import { UserMenu } from "./user-menu";
@@ -34,11 +38,33 @@ import { useTranslation } from "react-i18next";
 
 const adminNavItems = [
   { end: false, icon: Users, labelKey: "sidebar.users", to: "/admin/users" },
-  { end: false, icon: Building2, labelKey: "sidebar.enterprises", to: "/admin/enterprises" },
+  {
+    end: false,
+    icon: Building2,
+    labelKey: "sidebar.enterprises",
+    to: "/admin/enterprises",
+  },
 ] as const;
 
 const recruiterNavItems = [
-  { end: false, icon: BriefcaseBusiness, labelKey: "sidebar.jobPostings", to: RECRUITER_JOB_POSTINGS_PATH },
+  {
+    end: false,
+    icon: BriefcaseBusiness,
+    labelKey: "sidebar.jobPostings",
+    to: RECRUITER_JOB_POSTINGS_PATH,
+  },
+  {
+    end: false,
+    icon: Users,
+    labelKey: "sidebar.employees",
+    to: RECRUITER_EMPLOYEES_PATH,
+  },
+  {
+    end: false,
+    icon: Building2,
+    labelKey: "sidebar.companyProfile",
+    to: RECRUITER_COMPANY_PROFILE_PATH,
+  },
 ] as const;
 
 type SidebarProps = {
@@ -56,7 +82,13 @@ type SidebarProps = {
 //   onCloseMobile,
 //   onToggleCollapsed,
 // }: SidebarProps) {
-export function Sidebar({ actor, collapsed, mobileOpen, onCloseMobile, onToggleCollapsed }: SidebarProps) {
+export function Sidebar({
+  actor,
+  collapsed,
+  mobileOpen,
+  onCloseMobile,
+  onToggleCollapsed,
+}: SidebarProps) {
   const { t } = useTranslation();
   const navItems = actor === "recruiter" ? recruiterNavItems : adminNavItems;
   return (
@@ -68,8 +100,16 @@ export function Sidebar({ actor, collapsed, mobileOpen, onCloseMobile, onToggleC
         collapsed && "lg:items-center",
       )}
     >
-      <div className={cn("flex items-center gap-2 px-2 pb-4 pt-1", collapsed && "lg:px-0")}>
-        <BrandLogo tone="inverse" wordmarkClassName={cn("text-[13px]", collapsed && "lg:hidden")} />
+      <div
+        className={cn(
+          "flex items-center gap-2 px-2 pb-4 pt-1",
+          collapsed && "lg:px-0",
+        )}
+      >
+        <BrandLogo
+          tone="inverse"
+          wordmarkClassName={cn("text-[13px]", collapsed && "lg:hidden")}
+        />
         {!collapsed ? (
           <button
             aria-label={t("sidebar.collapse")}
@@ -92,7 +132,14 @@ export function Sidebar({ actor, collapsed, mobileOpen, onCloseMobile, onToggleC
         </button>
       </div>
 
-      <SidebarNavList collapsed={collapsed} items={navItems.map(({ labelKey, ...item }) => ({ ...item, label: t(labelKey) }))} onItemClick={onCloseMobile} />
+      <SidebarNavList
+        collapsed={collapsed}
+        items={navItems.map(({ labelKey, ...item }) => ({
+          ...item,
+          label: t(labelKey),
+        }))}
+        onItemClick={onCloseMobile}
+      />
 
       <div
         className={cn(
