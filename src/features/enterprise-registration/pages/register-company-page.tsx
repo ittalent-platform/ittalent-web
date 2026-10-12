@@ -4,6 +4,7 @@ import { LoadingScreen } from "@/components/common/loading-screen";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
 import { WizardLayout } from "@/features/enterprise-registration/components/wizard-layout";
+import { IntakeSplitLayout } from "@/features/enterprise-registration/components/intake-split-layout";
 import { StartRegistrationForm } from "@/features/enterprise-registration/components/start-registration-form";
 import { RegistrationCheckEmail } from "@/features/enterprise-registration/components/registration-check-email";
 import { ResumeDraftForm } from "@/features/enterprise-registration/components/resume-draft-form";
@@ -172,7 +173,7 @@ export function RegisterCompanyPage() {
   if (!isWizardActive) {
     if (view === "start") {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-background p-4 sm:p-8">
+        <IntakeSplitLayout>
           <StartRegistrationForm
             onSuccess={(email) => {
               setContactEmail(email);
@@ -180,13 +181,13 @@ export function RegisterCompanyPage() {
             }}
             onContinueLaterClick={() => setView("resume-draft")}
           />
-        </div>
+        </IntakeSplitLayout>
       );
     }
 
     if (view === "check-email") {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-background p-4 sm:p-8">
+        <IntakeSplitLayout>
           <RegistrationCheckEmail
             email={contactEmail}
             onResend={async () => {
@@ -199,15 +200,15 @@ export function RegisterCompanyPage() {
             }}
             onChangeEmail={() => setView("start")}
           />
-        </div>
+        </IntakeSplitLayout>
       );
     }
 
     if (view === "resume-draft") {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-background p-4 sm:p-8">
+        <IntakeSplitLayout>
           <ResumeDraftForm onBack={() => setView("start")} />
-        </div>
+        </IntakeSplitLayout>
       );
     }
   }

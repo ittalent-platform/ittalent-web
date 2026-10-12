@@ -4,6 +4,7 @@ export * from "./enterprise-registration.schemas";
 export * from "./enterprise-registration.queries";
 export * from "./components/stepper-nav";
 export * from "./components/wizard-layout";
+export * from "./components/intake-split-layout";
 export * from "./components/start-registration-form";
 export * from "./components/registration-check-email";
 export * from "./components/resume-draft-form";
