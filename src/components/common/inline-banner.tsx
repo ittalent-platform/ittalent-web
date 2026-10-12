@@ -47,7 +47,7 @@ export function InlineBanner({
       className={cn("flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-[13px] leading-normal", TONE_CLASS[tone])}
     >
       <Icon aria-hidden className="mt-px size-4 shrink-0" />
-      <span className="flex-1">{children}</span>
+      <span className="min-w-0 flex-1 wrap-anywhere">{children}</span>
       {action ? (
         action.href ? (
           <Link className={ACTION_CLASS} to={action.href}>

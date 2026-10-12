@@ -1,22 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { client } from "@/api/client";
-import {
-  createEmployee,
-  getApiV1UsersById,
-  getUserHistory,
-  patchApiV1UsersById,
-  updateUserStatus,
-} from "@/api/generated";
+import { getApiV1UsersById } from "@/api/generated";
+import type { UserDto, UserListResponse } from "@/api/generated/types.gen";
+
 import type {
   CreateEmployeeRequest,
-  UpdateUserRequest,
-  UpdateUserStatusRequest,
-  UserDto,
+  EmployeesListParams,
+  UpdateEmployeeRequest,
+  UpdateEmployeeStatusRequest,
   UserHistoryResponse,
-  UserListResponse,
-} from "@/api/generated/types.gen";
+} from "./employees.types";
 
-import type { EmployeesListParams } from "./employees.types";
+const JSON_HEADERS = { "Content-Type": "application/json" };
 
 export const employeesKeys = {
   all: ["recruiter-employees"] as const,
@@ -116,9 +111,8 @@ export function useEmployeeHistoryQuery(employeeId: string, enabled = true) {
     enabled: Boolean(employeeId) && enabled,
     queryKey: employeesKeys.history(employeeId),
     queryFn: async (): Promise<UserHistoryResponse> => {
-      const result = await getUserHistory({
-        client,
-        path: { id: employeeId },
+      const result = await client.get<{ 200: UserHistoryResponse }>({
+        url: `/api/v1/users/${employeeId}/history`,
       });
 
       if (result.error) {
@@ -141,9 +135,10 @@ export function useCreateEmployeeMutation() {
 
   return useMutation({
     mutationFn: async (data: CreateEmployeeRequest): Promise<UserDto> => {
-      const result = await createEmployee({
-        client,
+      const result = await client.post<{ 201: UserDto }>({
+        url: "/api/v1/users",
         body: data,
+        headers: JSON_HEADERS,
       });
 
       if (result.error) {
@@ -174,11 +169,11 @@ export function useUpdateEmployeeMutation(employeeId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateUserRequest): Promise<UserDto> => {
-      const result = await patchApiV1UsersById({
-        client,
-        path: { id: employeeId },
+    mutationFn: async (data: UpdateEmployeeRequest): Promise<UserDto> => {
+      const result = await client.patch<{ 200: UserDto }>({
+        url: `/api/v1/users/${employeeId}`,
         body: data,
+        headers: JSON_HEADERS,
       });
 
       if (result.error) {
@@ -214,11 +209,11 @@ export function useUpdateEmployeeStatusMutation(employeeId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateUserStatusRequest): Promise<UserDto> => {
-      const result = await updateUserStatus({
-        client,
-        path: { id: employeeId },
+    mutationFn: async (data: UpdateEmployeeStatusRequest): Promise<UserDto> => {
+      const result = await client.patch<{ 200: UserDto }>({
+        url: `/api/v1/users/${employeeId}/status`,
         body: data,
+        headers: JSON_HEADERS,
       });
 
       if (result.error) {

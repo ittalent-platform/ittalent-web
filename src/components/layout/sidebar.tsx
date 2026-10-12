@@ -94,7 +94,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-50 flex h-full w-66 max-w-[85vw] flex-col overflow-y-auto bg-(--sidebar-surface) px-2.5 py-5 text-white transition-transform duration-200 ease-out",
+        "fixed inset-y-0 left-0 z-50 flex h-full w-66 max-w-[85vw] flex-col overflow-y-auto bg-sidebar px-2.5 py-5 text-sidebar-foreground transition-transform duration-200 ease-out",
         "lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:max-h-screen lg:w-auto lg:translate-x-0",
         mobileOpen ? "translate-x-0" : "-translate-x-full",
         collapsed && "lg:items-center",
@@ -113,7 +113,7 @@ export function Sidebar({
         {!collapsed ? (
           <button
             aria-label={t("sidebar.collapse")}
-            className="ml-auto hidden size-8 place-items-center rounded-md border border-white/10 text-white/60 transition hover:bg-white/5 hover:text-white lg:grid cursor-pointer"
+            className="ml-auto hidden size-8 place-items-center rounded-md border border-white/10 text-sidebar-foreground/60 transition hover:bg-white/5 hover:text-sidebar-foreground lg:grid cursor-pointer"
             onClick={onToggleCollapsed}
             title={t("sidebar.collapse")}
             type="button"
@@ -123,7 +123,7 @@ export function Sidebar({
         ) : null}
         <button
           aria-label={t("sidebar.closeMenu")}
-          className="ml-auto grid size-8 place-items-center rounded-md border border-white/10 text-white/60 transition hover:bg-white/5 hover:text-white lg:hidden cursor-pointer"
+          className="ml-auto grid size-8 place-items-center rounded-md border border-white/10 text-sidebar-foreground/60 transition hover:bg-white/5 hover:text-sidebar-foreground lg:hidden cursor-pointer"
           onClick={onCloseMobile}
           title={t("sidebar.closeMenu")}
           type="button"
@@ -143,7 +143,7 @@ export function Sidebar({
 
       <div
         className={cn(
-          "mt-auto border-t border-[var(--sidebar-border)] pt-3 lg:shrink-0",
+          "mt-auto border-t border-sidebar-border pt-3 lg:shrink-0",
           collapsed && "lg:w-full",
         )}
       >

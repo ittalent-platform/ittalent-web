@@ -29,11 +29,8 @@ export const HISTORY_PAGE_SIZE = 100;
 export const MAX_SEARCH_LENGTH = 100;
 export const MAX_REASON_LENGTH = 500;
 export const SEARCH_DEBOUNCE_MS = 300;
-export const HTTP_BAD_REQUEST = 400;
-export const HTTP_NOT_FOUND = 404;
-export const HTTP_CONFLICT = 409;
 export const TOAST_DURATION_MS = 5000;
-export const MS_PER_DAY = 86_400_000;
+export { MS_PER_DAY } from "@/lib/format";
 
 export type ViewMode = "table" | "board";
 export const VIEW_MODES: readonly ViewMode[] = ["table", "board"];

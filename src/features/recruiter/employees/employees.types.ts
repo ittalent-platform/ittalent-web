@@ -1,5 +1,28 @@
 import { z } from "zod";
-import type { UserDto, UserHistoryResponse } from "@/api/generated/types.gen";
+import type { UserDto } from "@/api/generated/types.gen";
+
+// The employee screens use the recruiter-side contract of /api/v1/users, which differs from the system-admin
+// operations in the generated client (username, expectedVersion, audit shape), so these are typed here.
+export type CreateEmployeeRequest = {
+  fullName: string;
+  email: string;
+  phone?: string | null;
+  role?: "recruiter" | "interviewer" | "admin" | "user" | "enterprise_admin";
+  enterpriseId?: string;
+  status?: "active" | "inactive";
+};
+export type UpdateEmployeeRequest = { fullName?: string; phone?: string | null };
+export type UpdateEmployeeStatusRequest = { status: "active" | "suspended" | "inactive"; reason?: string };
+export type UserHistoryResponse = {
+  items: {
+    id: string;
+    action: string;
+    description: string;
+    timestamp: string;
+    actorId?: string | null;
+    actorName?: string | null;
+  }[];
+};
 
 export type Employee = UserDto;
 

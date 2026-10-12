@@ -45,6 +45,8 @@ export const BLOCKED_EMAIL_DOMAINS = [
   "fastmail.com",
 ] as const;
 
+export const BYTES_PER_MB = 1024 * 1024;
+
 export const REGISTRATION_CONFIG = {
   CODE_REGEX: /^REG-\d{8}-[A-Z0-9]{4,6}$/,
   TAX_CODE_REGEX: /^[0-9]{10,13}$/,
@@ -68,7 +70,7 @@ export const REGISTRATION_CONFIG = {
   COUNTRY_MAX_LENGTH: 100,
   POSTAL_CODE_MAX_LENGTH: 20,
   FILE_NAME_MAX_LENGTH: 255,
-  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB per BR-41 / NFR-2
+  MAX_FILE_SIZE: 5 * BYTES_PER_MB, // 5MB per BR-41 / NFR-2
   ALLOWED_DOCUMENT_MIME_TYPES: ["application/pdf"],
   REJECTION_REASON_MIN_LENGTH: 20,
   REJECTION_REASON_MAX_LENGTH: 1000,
@@ -76,19 +78,34 @@ export const REGISTRATION_CONFIG = {
   DEFAULT_LIMIT: 20,
 } as const;
 
-export const REGISTRATION_MESSAGES = {
-  PERSONAL_EMAIL_REJECTED: "Use your company domain, not a personal email",
-  CANDIDATE_ACCOUNT_RESTRICTION: "Candidate accounts cannot request a company profile",
-  TAX_CODE_CLAIM_CONFLICT: "This tax code already belongs to a company on ITTalent or another registration in review.",
-  MISSING_LEGAL_DOCUMENTS: "Business Registration Certificate (PDF) is required for submission",
-  AUTHORIZATION_LETTER_REQUIRED: "Letter of Authorization (PDF) is required when you are not the legal representative",
-  CHECKLIST_INCOMPLETE: "All verification checklist items must be confirmed before approval",
-  REJECTION_REASON_REQUIRED: "Write at least 20 characters so the requester knows what to fix.",
+/** Backend business-rule codes map to these translated messages (`enterpriseRegistration.validation.*`). */
+export const REGISTRATION_MESSAGE_KEYS = {
+  PERSONAL_EMAIL_REJECTED: "enterpriseRegistration.validation.personalEmail",
+  MISSING_LEGAL_DOCUMENTS: "enterpriseRegistration.validation.missingDocuments",
+  AUTHORIZATION_LETTER_REQUIRED: "enterpriseRegistration.validation.loaRequired",
+  CHECKLIST_INCOMPLETE: "enterpriseRegistration.validation.checklistIncomplete",
+  REJECTION_REASON_REQUIRED: "enterpriseRegistration.validation.rejectionReason",
 } as const;
 
-export const DOCUMENT_TYPE_LABELS: Record<LegalDocumentType, string> = {
-  business_license: "Business Registration Certificate (BRC)",
-  power_of_attorney: "Letter of Authorization (LoA)",
-  tax_registration: "Tax Registration Certificate",
-  other: "Supporting Document",
-};
+/** `value` is what the API stores; `key` picks the translated label (`enterpriseRegistration.industries.*`). */
+export const INDUSTRY_OPTIONS = [
+  { key: "logisticsTech", value: "Logistics technology" },
+  { key: "software", value: "Software & IT Services" },
+  { key: "fintech", value: "Fintech & Banking" },
+  { key: "ecommerce", value: "E-commerce & Retail" },
+  { key: "health", value: "Healthcare & Biotech" },
+  { key: "education", value: "Education & Edtech" },
+  { key: "telecom", value: "Telecommunications" },
+  { key: "gaming", value: "Gaming & Entertainment" },
+  { key: "ai", value: "Artificial Intelligence & Data" },
+  { key: "hardware", value: "Hardware & Electronics" },
+  { key: "other", value: "Other" },
+] as const;
+
+export const WIZARD_STEPS = ["step1", "step2", "step3", "step4"] as const;
+
+/** The start screen asks only for name and email, but the API requires a phone there; step 2 collects the real one. */
+export const START_PHONE_PLACEHOLDER = "0900000000";
+
+export const DEFAULT_COUNTRY = "Vietnam";
+export const DEFAULT_SLA_DAYS = 2;

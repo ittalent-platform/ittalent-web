@@ -59,7 +59,7 @@ export function ChangeCoverDialog({
     setErrorMessage(null);
     try {
       await updateMutation.mutateAsync({
-        cover_url: coverUrl.trim() ? coverUrl.trim() : null,
+        cover_url: coverUrl.trim(),
       });
       onOpenChange(false);
     } catch (err: unknown) {
@@ -72,7 +72,7 @@ export function ChangeCoverDialog({
     setErrorMessage(null);
     try {
       await updateMutation.mutateAsync({
-        cover_url: null,
+        cover_url: "",
       });
       setCoverUrl("");
       onOpenChange(false);

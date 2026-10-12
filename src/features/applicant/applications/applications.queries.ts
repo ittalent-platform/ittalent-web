@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getApiV1MeApplications, getApiV1MeApplicationsById, getApiV1MeApplicationsByIdHistory, patchApiV1MeApplicationsByIdWithdraw } from "@/api/generated";
 import type { GetApiV1MeApplicationsData } from "@/api/generated/types.gen";
 import { HISTORY_PAGE_SIZE } from "./applications.constants";
+import { unwrap } from "@/api/request-error";
 
 export type ListParams = NonNullable<GetApiV1MeApplicationsData["query"]>;
-export type ApplicationRequestError = Error & { status?: number };
 
 export const applicationKeys = {
   all: ["my-applications"] as const,
@@ -13,20 +13,7 @@ export const applicationKeys = {
   history: (id: string) => [...applicationKeys.all, "history", id] as const,
 };
 
-const REQUEST_FAILED = "APPLICATION_REQUEST_FAILED";
 
-function unwrap<T>(result: { data?: T; error?: unknown; response?: Response }): T {
-  if (result.error || !result.data) {
-    const error: ApplicationRequestError = new Error(REQUEST_FAILED);
-    error.status = result.response?.status;
-    throw error;
-  }
-  return result.data;
-}
-
-export function requestStatus(error: unknown): number | undefined {
-  return (error as ApplicationRequestError | null)?.status;
-}
 
 /** `enabled: false` skips the request while the filters are invalid (nothing is fetched for an invalid query). */
 export function useApplications(params: ListParams, options: { enabled?: boolean } = {}) {

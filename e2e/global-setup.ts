@@ -2,6 +2,8 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { backendEnv, E2E_API_URL } from "../playwright.config";
 import { ACCOUNTS, PASSWORD, TOKEN_DIR, tokenFile } from "./support";
+import { JOB_POSTING_ACCOUNTS } from "./job-posting-data";
+import { seedEnterpriseAdminJobPostings } from "./seed-enterprise-admin-job-postings";
 
 const isWindows = process.platform === "win32";
 const npmCommand = isWindows ? "cmd.exe" : "npm";
@@ -33,8 +35,13 @@ function runBackendScript(
 export default async function globalSetup(): Promise<void> {
   runBackendScript("migrate:application-indexes");
   runBackendScript("seed:applications", { SEED_RESET: "true" });
+  await seedEnterpriseAdminJobPostings();
   mkdirSync(TOKEN_DIR, { recursive: true });
-  for (const email of Object.values(ACCOUNTS)) {
+  const authenticatedAccounts = [
+    ...Object.values(ACCOUNTS),
+    JOB_POSTING_ACCOUNTS.enterpriseAdmin,
+  ];
+  for (const email of authenticatedAccounts) {
     const response = await fetch(`${E2E_API_URL}/api/v1/auth/login`, {
       method: "POST",
       headers: { "content-type": "application/json" },

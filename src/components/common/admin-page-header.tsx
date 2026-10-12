@@ -7,6 +7,8 @@ export type PageHeaderProps = {
   description?: ReactNode;
   leading?: ReactNode;
   title: ReactNode;
+  /** Beside the title, outside the heading: e.g. a status badge. */
+  titleAddon?: ReactNode;
 };
 
 export function PageHeader({
@@ -14,15 +16,19 @@ export function PageHeader({
   description,
   leading,
   title,
+  titleAddon,
 }: PageHeaderProps) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="flex min-w-0 items-start gap-3">
         {leading}
         <div className="min-w-0">
-          <h1 className="itt-display text-2xl font-semibold leading-tight text-foreground">
-            {title}
-          </h1>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h1 className="itt-display text-2xl font-semibold leading-tight text-foreground">
+              {title}
+            </h1>
+            {titleAddon}
+          </div>
           {description ? (
             <p className="mt-1 text-[13.5px] text-muted-foreground">
               {description}
@@ -41,6 +47,7 @@ export function AdminPageHeader({
   actions,
   description,
   title,
+  titleAddon,
 }: Omit<PageHeaderProps, "leading">) {
   const adminLayout = useAdminLayout();
 
@@ -58,6 +65,7 @@ export function AdminPageHeader({
         ) : null
       }
       title={title}
+      titleAddon={titleAddon}
     />
   );
 }

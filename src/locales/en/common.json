@@ -1,7 +1,125 @@
 {
+  "roles": {
+    "admin": "Admin",
+    "enterpriseAdmin": "Enterprise admin",
+    "recruiter": "Recruiter",
+    "user": "User"
+  },
+  "reason": {
+    "hint": "Required · at least {{min}} characters · saved in history",
+    "tooShort": "Enter a reason of at least {{min}} characters."
+  },
+  "accountNav": {
+    "label": "Account sections",
+    "jobSearch": "Job search",
+    "myApplications": "My applications",
+    "myProfile": "My profile",
+    "documents": "Documents",
+    "certificates": "Certificates"
+  },
+  "certificates": {
+    "title": "Certificates",
+    "add": "Add certificate",
+    "suggestedSummary_one": "<b>{{count}} certificate</b> is suggested when you apply",
+    "suggestedSummary_other": "<b>{{count}} certificates</b> are suggested when you apply",
+    "opensInNewTab": "(opens in a new tab)",
+    "notHttps": "Not HTTPS",
+    "noIssuer": "No issuer",
+    "issuedOn": "Issued {{date}}",
+    "expiresOn": "Expires {{date}}",
+    "expiredOn": "Expired {{date}}",
+    "noExpiry": "No expiry",
+    "expired": "Expired",
+    "version": "Version {{version}}",
+    "suggestOnApply": "Suggest on apply",
+    "suggestFor": "Suggest {{name}} when I apply",
+    "actionsFor": "Actions for {{name}}",
+    "edit": "Edit",
+    "openLink": "Open link",
+    "deleteMenu": "Delete…",
+    "pageGone": "That page doesn't exist. Showing the first page of your certificates.",
+    "search": {
+      "placeholder": "Search name, issuer or link",
+      "tooLong": "Use up to {{max}} characters.",
+      "results_one": "{{count}} result for “{{term}}”",
+      "results_other": "{{count}} results for “{{term}}”",
+      "clear": "Clear search",
+      "noMatch": "No certificates match “{{term}}”",
+      "noMatchDescription": "Try another word or clear the search."
+    },
+    "empty": {
+      "title": "No certificates yet",
+      "description": "Add links to certificates you've earned. You choose which ones to send when you apply."
+    },
+    "errors": {
+      "loadTitle": "Your certificates didn't load",
+      "loadDescription": "Check your connection and try again.",
+      "retry": "Try again",
+      "switchFailed": "Couldn't update this certificate. Nothing changed. Please try again.",
+      "deleteFailed": "Couldn't delete the certificate. It's still in your list. Please try again."
+    },
+    "access": {
+      "title": "Sign in again to see your certificates",
+      "description": "Your session or account access changed.",
+      "signIn": "Sign in"
+    },
+    "toast": {
+      "suggested": "Will be suggested when you apply.",
+      "unsuggested": "Won't be suggested when you apply.",
+      "added": "{{name}} added.",
+      "saved": "{{name}} saved.",
+      "deleted": "{{name}} deleted. Sent copies are kept."
+    },
+    "delete": {
+      "title": "Delete this certificate?",
+      "description": "<b>{{name}}</b> is removed from your list and won't be suggested on new applications.",
+      "sentNote_one": "The application you already sent keeps its copy. Companies can still see it there.",
+      "sentNote_other": "The {{count}} applications you already sent keep their copy. Companies can still see it there.",
+      "keep": "Keep it",
+      "confirm": "Delete"
+    },
+    "conflict": {
+      "title": "This certificate changed somewhere else",
+      "description": "It was edited or deleted in another tab. Load the latest version, then make your change again.",
+      "loadLatest": "Load latest"
+    },
+    "form": {
+      "addTitle": "Add certificate",
+      "editTitle": "Edit certificate",
+      "addDescription": "Private to you. Add a link to where the certificate can be seen.",
+      "editDescription": "Version {{version}} · last changed {{date}}.",
+      "sentNote_one": "Sent with 1 application. It keeps the version it was sent with; your changes apply to new applications only.",
+      "sentNote_other": "Sent with {{count}} applications. They keep the version they were sent with; your changes apply to new applications only.",
+      "name": "Certificate name",
+      "namePlaceholder": "e.g. AWS Certified Solutions Architect",
+      "url": "Link",
+      "urlHint": "A page that shows the certificate. ITTalent doesn't open or check it.",
+      "issuer": "Issuer",
+      "optional": "optional",
+      "issued": "Issued",
+      "expires": "Expires",
+      "expiresHint": "Leave empty if it doesn't expire.",
+      "suggest": "Suggest it when I apply",
+      "suggestHint": "Pre-ticked on new applications. You can still untick it each time.",
+      "add": "Add certificate",
+      "adding": "Adding…",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "errors": {
+        "name": "Name the certificate.",
+        "url": "Use a web link that starts with https:// (or http://).",
+        "dates": "The expiry date must be after the issued date.",
+        "duplicate": "You already added this link.",
+        "saveFailed": "Couldn't save the certificate. Nothing was added. Please try again.",
+        "updateFailed": "Couldn't update this certificate. Nothing changed. Please try again."
+      }
+    }
+  },
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
+    "showMore": "Show more",
+    "showLess": "Show less",
     "delete": "Delete",
     "edit": "Edit",
     "create": "Create",
@@ -41,6 +159,12 @@
     "placeholder": "Search…",
     "clearSearch": "Clear search"
   },
+  "confirmDialog": {
+    "discardTitle": "Discard what you entered?",
+    "discardDescription": "Nothing has been saved yet.",
+    "discard": "Discard",
+    "keepEditing": "Keep editing"
+  },
   "timeline": {
     "viewAll": "View all {{count}}",
     "by": "by {{name}}",
@@ -48,6 +172,26 @@
     "viewMessageFor": "View message for {{label}}"
   },
   "applications": {
+    "certificates": {
+      "title": "Certificates",
+      "open": "Open",
+      "openLabel": "Open {{name}} in a new tab",
+      "issued": "Issued {{date}}",
+      "expires": "expires {{date}}",
+      "note": "Your own claim, not verified by ITTalent. The linked page may have changed since."
+    },
+    "applyCertificates": {
+      "title": "Certificates",
+      "optional": "optional",
+      "tickedFromSuggestions_one": "{{count}} ticked from your suggestions. Untick any, or send none.",
+      "tickedFromSuggestions_other": "{{count}} ticked from your suggestions. Untick any, or send none.",
+      "ticked_one": "{{count}} ticked. Untick any, or send none.",
+      "ticked_other": "{{count}} ticked. Untick any, or send none.",
+      "noneTicked": "None ticked. Tick any you want to send.",
+      "manage": "Manage certificates",
+      "open": "Open {{name}} in a new tab",
+      "unavailable": "A certificate you ticked was changed or deleted. Check the list and send again."
+    },
     "title": "My applications",
     "browse": "Browse jobs",
     "subtitle_one": "{{count}} application",
@@ -267,6 +411,12 @@
       "useDifferentEmail": "Use a different email"
     },
     "hero": {
+      "employer": {
+        "title1": "Hire IT talent",
+        "title2": "with less busywork.",
+        "body": "Post jobs, review applications and schedule interviews for your company in one workspace.",
+        "candidate": "Looking for a job? Candidate sign in →"
+      },
       "body": "Apply to IT jobs from verified companies and follow every application in one place.",
       "employers": "Hiring? Go to ITTalent for employers →",
       "title1": "Where IT careers",
@@ -497,6 +647,8 @@
     "level": "Level",
     "minimumSalary": "Minimum salary",
     "maximumSalary": "Maximum salary",
+    "salaryNegotiable": "Salary is negotiable",
+    "salaryNegotiableHint": "The salary range is cleared and disabled while this is selected.",
     "currency": "Currency",
     "openings": "Openings",
     "expiryDate": "Expiry date",
@@ -506,6 +658,8 @@
     "required": "Required",
     "optional": "Optional",
     "cancel": "Cancel",
+    "showMore": "Show more",
+    "showLess": "Show less",
     "create": "Create job posting",
     "save": {
       "createdTitle": "Job posting published",
@@ -513,7 +667,9 @@
       "message": "Your changes have been saved.",
       "failedTitle": "Could not save job posting",
       "noEnterprise": "Your recruiter account has not been assigned to an enterprise yet. Please contact the administrator.",
-      "action": "Save changes"
+      "action": "Save changes",
+      "draftAction": "Save draft",
+      "publishAction": "Publish job"
     },
     "requiredMark": "required",
     "optionalMark": "optional",
@@ -546,6 +702,7 @@
     "publicationStatus": {
       "draft": "Draft",
       "published": "Published",
+      "closed": "Closed",
       "archived": "Archived"
     },
     "applications": "Applications",
@@ -559,6 +716,8 @@
     "toolbar": {
       "type": "Type",
       "level": "Level",
+      "publicationStatus": "Publication",
+      "recruitmentStatus": "Recruitment",
       "all": "All",
       "clear": "Clear filters"
     },
@@ -608,12 +767,48 @@
       "otherEnterprise": "This job posting belongs to another enterprise.",
       "loading": "Loading job posting…",
       "statusCard": "Status",
-      "statusNote": "Saving a job publishes it. It stays open until the end of its deadline day (Vietnam time); move the deadline forward to reopen it.",
+      "statusNote": "Lifecycle actions are available only when the current status allows them. Deadlines use Vietnam time.",
       "applicationsCard": "Applications",
       "applicationCount_one": "{{count}} application",
       "applicationCount_other": "{{count}} applications",
       "applicationNote": "A job that has received any application cannot be deleted.",
-      "recordCard": "Record"
+      "deleteBlocked": "Jobs with applications cannot be deleted. Archive this job after closing it instead.",
+      "metaPosted": "Posted {{date}}",
+      "metaCreated": "Created {{date}}",
+      "metaDeadline": "Deadline {{date}}",
+      "metaNoDeadline": "No deadline",
+      "notices": {
+        "draft": {
+          "title": "Draft · candidates cannot see this job",
+          "description": "Complete the required publishing fields, then publish the job when it is ready."
+        },
+        "closed": {
+          "title": "Closed · not accepting new applications",
+          "description": "Existing applications and interviews are kept. Reopen the job or archive it when recruitment is finished."
+        },
+        "archived": {
+          "title": "Archived · read-only",
+          "description": "Restore this job to Closed before editing or reopening it."
+        }
+      },
+      "recordCard": "Record",
+      "aboutRole": "ABOUT THE ROLE",
+      "descriptionSection": "DESCRIPTION",
+      "requirementsSection": "REQUIREMENTS",
+      "benefitsSection": "BENEFITS",
+      "detailsSection": "DETAILS",
+      "applicationsSection": "APPLICATIONS",
+      "historySection": "HISTORY",
+      "visibility": "Visibility",
+      "visibilityPublic": "Public · open",
+      "visibilityHiddenDraft": "Hidden · draft",
+      "visibilityClosed": "Closed",
+      "visibilityArchived": "Archived · read-only",
+      "viewApplications": "View applications",
+      "viewFullHistory": "View full history",
+      "noApplicationsYet": "No applications yet",
+      "notSet": "Not set",
+      "notAddedYet": "Not added yet."
     },
     "delete": {
       "title": "Delete “{{title}}”?",
@@ -624,18 +819,184 @@
       "doneMessage": "“{{title}}” was permanently removed.",
       "failedTitle": "Could not delete job posting"
     },
+    "lifecycle": {
+      "failedTitle": "Could not change job posting status",
+      "publish": {
+        "action": "Publish",
+        "title": "Publish “{{title}}”?",
+        "description": "The job becomes visible to candidates and starts accepting applications.",
+        "confirm": "Publish job",
+        "doneTitle": "Job published",
+        "doneMessage": "The job is now published."
+      },
+      "draft": {
+        "action": "Move to draft",
+        "title": "Move “{{title}}” to draft?",
+        "description": "The job will no longer be visible to candidates.",
+        "confirm": "Move to draft",
+        "doneTitle": "Moved to draft",
+        "doneMessage": "The job is now a draft."
+      },
+      "close": {
+        "action": "Close",
+        "title": "Close “{{title}}”?",
+        "description": "Candidates will no longer be able to apply until the job is reopened.",
+        "confirm": "Close job",
+        "doneTitle": "Job closed",
+        "doneMessage": "The job is no longer accepting applications."
+      },
+      "reopen": {
+        "action": "Reopen",
+        "title": "Reopen “{{title}}”?",
+        "description": "The job will accept applications again if its deadline and company are valid.",
+        "confirm": "Reopen job",
+        "doneTitle": "Job reopened",
+        "doneMessage": "The job is accepting applications again."
+      },
+      "archive": {
+        "action": "Archive",
+        "title": "Archive “{{title}}”?",
+        "description": "The closed job will move to the archive and become read-only until restored.",
+        "confirm": "Archive job",
+        "doneTitle": "Job archived",
+        "doneMessage": "The job was moved to the archive."
+      },
+      "restore": {
+        "action": "Restore",
+        "title": "Restore “{{title}}”?",
+        "description": "The archived job will return as closed. You can then reopen it.",
+        "confirm": "Restore job",
+        "doneTitle": "Job restored",
+        "doneMessage": "The job was restored as closed."
+      }
+    },
+    "history": {
+      "title": "Activity history",
+      "loadFailed": "Could not load job posting history.",
+      "empty": "No recorded activity yet.",
+      "actor": "User {{id}}",
+      "changedFields": "Changed fields: {{fields}}",
+      "actions": {
+        "create": "Job created",
+        "update": "Job updated",
+        "delete": "Job deleted",
+        "publish": "Job published",
+        "draft": "Moved to draft",
+        "close": "Job closed",
+        "reopen": "Job reopened",
+        "archive": "Job archived",
+        "restore": "Job restored"
+      }
+    },
     "form": {
-      "createDescription": "Saving publishes the job straight away. Fields marked * are required.",
+      "createDescription": "Save an incomplete draft or publish when all required fields are ready.",
       "editDescription": "Changes are recorded in the audit log. Fields marked * are required.",
       "basicDescription": "What candidates see first on the job card.",
       "compensationDescription": "Optional. Leave empty if the salary is not shared.",
       "contentDescription": "Shown as written on the public job page.",
       "railSystemTitle": "Set by the system",
-      "railSystemBody": "Status <strong>Published</strong> and open until the deadline, your company, the creator (you) and the created time. Status is never chosen in this form.",
+      "railSystemBody": "Save a <strong>Draft</strong> while details are incomplete, or publish when the job is ready for candidates.",
+      "requiredToPublishTitle": "Required to publish",
+      "requiredTitle": "A title of 5–150 characters",
+      "requiredBasics": "Job type and location",
+      "requiredContent": "Description, requirements and benefits",
+      "requiredDeadline": "A deadline of today or later",
       "railNotEditableTitle": "Not editable here",
       "railNotEditableBody": "Company and status are set by the system. The job closes at the end of the deadline day and reopens if you move the deadline forward.",
       "railCurrentStatus": "Current status",
-      "fixErrors": "Check the highlighted fields and try again."
+      "fixErrors": "Check the highlighted fields and try again.",
+      "errorBanner": "Please resolve the highlighted fields before continuing. Nothing was published.",
+      "aboutRole": "About the role",
+      "aboutRoleHint": "Optional summary of the role, team, and impact.",
+      "titleDraftHint": "only field required for Draft",
+      "requiredToPublish": "required to publish",
+      "salaryRangeNegotiableHint": "Range is disabled while Negotiable is on.",
+      "sidebarCallout": "Draft needs only a title. Publish requires description, requirements, benefits, location, job type, and deadline. Every action is recorded in the job’s history.",
+      "minSalaryPlaceholder": "Min",
+      "maxSalaryPlaceholder": "Max",
+      "datePlaceholder": "Select date",
+      "dateHint": "Today or a future date",
+      "toolbar": {
+        "bold": "Bold",
+        "italic": "Italic",
+        "underline": "Underline",
+        "list": "List",
+        "link": "Link"
+      }
+    },
+    "actions": {
+      "viewDetails": "View details",
+      "edit": "Edit",
+      "publish": "Publish",
+      "close": "Close job",
+      "unpublish": "Unpublish",
+      "reopen": "Reopen job",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "delete": "Delete",
+      "hasApplications": "Has applications",
+      "deadlinePassed": "Deadline passed"
+    },
+    "dialogs": {
+      "close": {
+        "title": "Close {{title}}?",
+        "description": "This posting will stop accepting new applications. You can reopen or archive it afterward. The {{count}} applications and their interviews stay as they are.",
+        "keepOpen": "Cancel",
+        "confirm": "Close job"
+      },
+      "archive": {
+        "title": "Archive “{{title}}”?",
+        "description": "Archived postings are hidden from candidate searches and read-only. Applications and audit logs are preserved permanently. You can unarchive this posting later.",
+        "keepClosed": "Cancel",
+        "confirm": "Archive job"
+      },
+      "unarchive": {
+        "title": "Unarchive “{{title}}”?",
+        "description": "The posting will be restored to Closed status. To start accepting applications again, you will need to reopen it.",
+        "cancel": "Cancel",
+        "confirm": "Unarchive job"
+      },
+      "deleteDraft": {
+        "title": "Delete draft “{{title}}”?",
+        "description": "This draft job posting will be permanently deleted. This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "publishBlocked": {
+        "title": "Finish the job before publishing",
+        "description": "{{title}} is still a draft. Nothing was published.",
+        "cancel": "Cancel",
+        "openEditor": "Open editor",
+        "checklist": {
+          "basics": "Title, job type and location",
+          "description": "Description of at least 20 characters",
+          "requirements": "Requirements",
+          "benefits": "Benefits",
+          "deadline": "Deadline (today or later)"
+        }
+      },
+      "history": {
+        "title": "History",
+        "subtitle": "{{title}} · {{id}}",
+        "olderEvents": "Show older events",
+        "timeNotice": "Times in ICT (UTC+7). History is append-only: it can’t be edited or deleted, and candidates never see it.",
+        "close": "Close",
+        "salaryRangeEdited": "Salary range edited",
+        "requirementsEdited": "Requirements edited",
+        "descriptionEdited": "Description edited",
+        "publishedOpen": "Published · open for applications",
+        "publishCheckPassed": "Publish check passed",
+        "draftCreated": "Draft created",
+        "byActor": "by {{name}}",
+        "bySystem": "by System"
+      }
+    },
+    "search": {
+      "validation": "Use letters, numbers, spaces and - . ' only.",
+      "firstJobTitle": "Post your first job",
+      "firstJobDescription": "You don’t have any job postings yet. Create one to start receiving applications.",
+      "noResultsTitle": "No results for “{{query}}”",
+      "noResultsDescription": "No job postings match this keyword. Check the spelling or try a different title, content, or location."
     },
     "notSpecified": "Not specified"
   },
@@ -653,16 +1014,126 @@
     "dismiss": "Dismiss",
     "region": "Toast notifications"
   },
+  "accountEmailChange": {
+    "conflict": "This email can't be used or the account changed. Ask the administrator to start again.",
+    "wrongPassword": "The password is incorrect. Try again.",
+    "signInAgain": "Sign in again",
+    "title": "Confirm your new email",
+    "description": "Enter your password to start signing in with the new address.",
+    "password": "Current password",
+    "confirm": "Confirm new email",
+    "expired": "This link has expired or was already used. Your email hasn’t changed.",
+    "rateLimited": "You can try again in a few minutes. Your email hasn’t changed and the link stays valid.",
+    "failed": "The request could not be confirmed. Check your password and try again.",
+    "successTitle": "Email changed",
+    "successDescription": "You've been signed out of other devices. Sign in again with your new email.",
+    "signInTitle": "Sign in to confirm",
+    "signInDescription": "Sign in to the account that received the email-change request, then confirm it here.",
+    "invalidTitle": "This link isn’t valid",
+    "missingToken": "This link is missing its confirmation token. Ask the administrator to send a new request.",
+    "from": "From",
+    "rateLimitedTitle": "Too many attempts",
+    "backToAccount": "Back to my account",
+    "notNow": "Not now"
+  },
+  "accountInvitation": {
+    "companyTitle": "{{company}} isn’t available",
+    "companyDescription": "Your account can be activated once {{company}} is active again. This link still works.",
+    "errorTitle": "Couldn't check the invitation",
+    "title": "Set your password",
+    "description": "You've been invited to join ITTalent. Choose a password to activate your account.",
+    "email": "Email",
+    "role": "Role",
+    "company": "Company",
+    "password": "New password",
+    "confirmPassword": "Confirm password",
+    "passwordMismatch": "Passwords don’t match.",
+    "accept": "Set password and activate",
+    "invalidTitle": "Invitation link isn’t valid",
+    "invalidDescription": "This invitation link is no longer valid — ask your administrator to send a new one.",
+    "successTitle": "Your account is active",
+    "successDescription": "You’re set up as {{role}}. Sign in with {{email}} and the password you just chose.",
+    "signIn": "Sign in",
+    "backToSignIn": "Back to sign in",
+    "expired": "This invitation has expired or was already used. Ask for a new invitation.",
+    "failed": "Unable to activate the account. Check the link or ask the administrator for help.",
+    "descriptionCompany": "{{company}} invited you to join ITTalent. Choose a password to activate your account.",
+    "invalidNote": "It may have expired, been replaced by a newer invitation, been cancelled, or already been used.",
+    "goToSignIn": "Go to sign in",
+    "companyFallback": "The company",
+    "successDescriptionCompany": "You’re set up as {{role}} at {{company}}. Sign in with {{email}} and the password you just chose.",
+    "activating": "Activating…",
+    "expiresNote": "This link works once and expires {{date}}.",
+    "passwordRules": "Password doesn’t meet the rules below.",
+    "rule": {
+      "length": "8–64 characters",
+      "uppercase": "Uppercase letter",
+      "lowercase": "Lowercase letter",
+      "number": "Number",
+      "special": "Special character (! @ # $ % ^ & *)"
+    },
+    "companyDescriptionGeneric": "Your account can be activated once the company is active again. This link still works.",
+    "tryAgain": "Try again"
+  },
   "adminUsers": {
+    "errors": {
+      "showLatest": "Show latest",
+      "otherTitle": "Couldn't complete the action",
+      "stale": {
+        "title": "Status already changed",
+        "body": "Someone else changed this account while you were working. Show the latest version, then decide again."
+      },
+      "lastAdmin": {
+        "title": "This is the last active system admin",
+        "body": "The final active System administrator can't be suspended. Activate another system admin first."
+      },
+      "lastEnterpriseAdmin": {
+        "title": "This is the last active Enterprise admin",
+        "body": "Activate another Enterprise admin for this company first, or use emergency suspension."
+      },
+      "transition": {
+        "title": "Already in that status",
+        "body": "The account is already in that status, or the change isn't supported from its current one."
+      },
+      "companyUnavailable": {
+        "title": "Company unavailable",
+        "body": "The company is missing or no longer active. Choose another active company."
+      },
+      "accountConflict": {
+        "title": "This email already has an account",
+        "body": "An account with this email already exists."
+      },
+      "server": {
+        "title": "Couldn't save the change",
+        "body": "The change wasn't saved because the service is unavailable. Nothing was changed. Try again."
+      }
+    },
+    "suspension": {
+      "title": "Suspended on {{date}} by {{actor}}",
+      "reasonLabel": "Reason:",
+      "summary": "Suspended on {{date}} by {{actor}}. Reason: {{reason}}",
+      "noReason": "not recorded",
+      "originalTitle": "Original suspension",
+      "unknown": "This account is suspended."
+    },
     "page": {
+      "total_one": "{{count}} account",
+      "total_other": "{{count}} accounts",
+      "subtitle": "Every applicant, HR, Enterprise admin and system admin account",
       "title": "Users",
       "create": "Create user",
       "count_one": "{{count}} account in your authorized scope",
-      "count_other": "{{count}} accounts in your authorized scope"
+      "count_other": "{{count}} accounts in your authorized scope",
+      "shownOf_one": "{{shown}} of {{count}} account",
+      "shownOf_other": "{{shown}} of {{count}} accounts"
     },
     "role": {
       "admin": "Admin",
-      "user": "Applicant"
+      "user": "Applicant",
+      "recruiter": "HR",
+      "enterprise_admin": "Enterprise admin",
+      "applicant": "Applicant",
+      "interviewer": "Interviewer"
     },
     "emailStatus": {
       "verified": "Verified",
@@ -670,23 +1141,45 @@
     },
     "status": {
       "active": "Active",
+      "invited": "Invited",
       "inactive": "Inactive",
-      "suspended": "Suspended"
+      "suspended": "Suspended",
+      "blocked": "Blocked"
     },
     "toolbar": {
+      "companySearch": "Search companies",
       "email": "Email",
-      "search": "Search by name, email or phone…",
+      "company": "Company",
+      "search": "Search by name, email or phone",
+      "searchHint": "Enter at least {{min}} characters (up to {{max}})",
       "role": "Role",
-      "status": "Status",
+      "status": "Account",
       "all": "All"
     },
+    "list": {
+      "activeFilters": "Active filters",
+      "removeFilter": "Remove {{filter}} filter",
+      "clearAll": "Clear all",
+      "clearFilters": "Clear all filters",
+      "invalidFilters": "Some filters in the link weren't valid and were removed.",
+      "dismiss": "Dismiss",
+      "emptyTitle": "No accounts match these filters",
+      "emptyDescription": "Try a different search or remove some filters.",
+      "errorTitle": "We couldn't load the accounts",
+      "errorDescription": "Something went wrong while loading user accounts. Try again in a moment.",
+      "forbiddenTitle": "You don't have access to user accounts",
+      "forbiddenDescription": "Your role can't manage accounts. Ask an administrator if you need access.",
+      "goToDashboard": "Go to my dashboard"
+    },
     "table": {
+      "emailOverdue": "Unverified · overdue",
+      "emailInviteFailed": "Invite not delivered",
       "id": "ID",
       "name": "Name",
       "email": "Email",
       "emailStatus": "Email status",
       "role": "Role",
-      "accountStatus": "Account status",
+      "accountStatus": "Account",
       "created": "Created",
       "actions": "Actions",
       "rowActions": "Actions for {{name}}",
@@ -694,9 +1187,22 @@
       "edit": "Edit",
       "suspend": "Suspend",
       "empty": "No users found.",
-      "mobile": "Mobile"
+      "mobile": "Mobile",
+      "company": "Company",
+      "invitation": "Invitation",
+      "changeRole": "Change role",
+      "reactivate": "Reactivate",
+      "resendInvitation": "Send invitation again",
+      "cancelInvitation": "Cancel invitation"
     },
     "detail": {
+      "edit": "Edit",
+      "roleAtCompany": "{{role}} at {{company}}",
+      "editInformation": "Edit information",
+      "personal": "Personal information",
+      "mobile": "Mobile",
+      "access": "Account and access",
+      "recentHistory": "Recent history",
       "back": "Back to users",
       "breadcrumb": "Breadcrumb",
       "notFoundTitle": "User not found",
@@ -711,21 +1217,50 @@
       "accountId": "Account ID",
       "suspend": "Suspend",
       "fullName": "Full name",
-      "phone": "Phone"
+      "phone": "Phone",
+      "company": "Company",
+      "invitation": "Invitation",
+      "history": "Account history",
+      "emergencySuspend": "Emergency suspend"
     },
     "form": {
-      "createTitle": "Create internal user",
-      "createDescription": "Avatar is generated from initials · recorded in audit log",
-      "editTitle": "Edit user",
-      "created": "created {{date}}",
+      "view": "View",
+      "createdOn": "Created {{date}}",
+      "createdTitle": "Account created",
+      "createdSent": "Account {{name}} created · invitation sent",
+      "undeliveredTitle": "Invitation not delivered",
+      "undeliveredBody": "The account was created and stays Invited, but its invitation email wasn't delivered. Send it again, or open the account.",
+      "openAccount": "Open account",
+      "conflictTitle": "This account changed while you were editing",
+      "conflictBody": "Nothing was saved. Review what is saved now against your changes.",
+      "conflictField": "Field",
+      "conflictSaved": "Saved now",
+      "conflictYours": "Yours",
+      "loadLatest": "Load latest and edit again",
+      "existsTitle": "This email already has an account",
+      "existsBody": "{{email}} is already registered. Open the existing account instead of creating another.",
+      "openExisting": "Open existing account",
+      "discardEditTitle": "Discard your changes?",
+      "discardEditDescription": "The edits you made to this account won't be saved.",
+      "discard": "Discard",
+      "keepEditing": "Keep editing",
+      "createTitle": "Create user account",
+      "createDescription": "They get an email to set their own password. The account starts as Invited.",
+      "editTitle": "Edit information",
+      "changed": "Changed",
       "unavailable": "Creating accounts isn't available yet: a new account needs a way to receive its sign-in credentials.",
-      "identity": "Identity",
       "fullName": "Full name",
       "fullNamePlaceholder": "Nguyen Van A",
       "fullNameHint": "{{min}}–{{max}} characters",
+      "username": "Username",
+      "usernamePlaceholder": "nguyen_van_a",
+      "usernameHint": "{{min}}–{{max}} characters · must be unique",
+      "usernameError": "Use {{min}}–{{max}} lowercase letters, numbers or underscores.",
       "email": "Email",
       "emailPlaceholder": "name@company.vn",
       "emailHint": "Max {{max}} characters · must be unique",
+      "workEmailHint": "Use the work email address that should receive this invitation · max {{max}} characters",
+      "emailError": "Enter a valid email address.",
       "access": "Access",
       "accessPermissions": "Access & permissions",
       "role": "Role",
@@ -734,14 +1269,33 @@
       "since": "since {{date}}",
       "statusNote": "Status can't be changed in this form. To suspend or activate the account, use the row menu in the user list or the user's detail page.",
       "save": "Save changes",
-      "create": "Create user",
+      "create": "Create and send invitation",
       "mobile": "Mobile number",
-      "mobilePlaceholder": "0901 234 567",
-      "mobileHint": "Optional · 9–15 digits, spaces allowed",
+      "mobilePlaceholder": "0901234567",
+      "mobileHint": "Optional · 10 digits starting with 0, e.g. 0901234567",
       "fullNameError": "Enter a name of {{min}}–{{max}} characters.",
-      "mobileError": "Enter a valid mobile number: 9–15 digits, optionally starting with +.",
-      "emailLocked": "Email is the sign-in identity and can't be changed here.",
+      "mobileError": "Enter a 10-digit mobile number starting with 0, e.g. 0901234567.",
+      "emailLocked": "Email is the sign-in identity. Use Change email to change it.",
+      "enterprise": "Company",
+      "enterprisePlaceholder": "Choose a company",
+      "enterpriseSearch": "Search active companies…",
+      "enterpriseHint": "Choose the active company this account will belong to.",
+      "enterpriseError": "Choose an active company.",
+      "enterpriseRequired": "Choose a company for HR and Enterprise Admin accounts.",
+      "enterpriseLoadFailed": "Couldn't load companies. Try again.",
+      "activeEnterprises": "Active companies",
+      "noEnterprises": "No active companies match. Try another search or activate a company first.",
+      "created": "Account created",
+      "createdNoInvite": "Account created; invitation not sent",
+      "inviteSent": "Invitation sent to {{email}}.",
+      "inviteFailed": "Invitation could not be sent to {{email}}. Send it again from the account details.",
+      "createFailed": "Couldn't create the account. Check the details and try again.",
+      "creating": "Creating account…",
+      "roleError": "Choose an account role.",
+      "cancelChangesTitle": "Discard this new user?",
+      "cancelChangesDescription": "Nothing is created and no invitation is sent.",
       "roleLocked": "You can't change your own role.",
+      "roleReadOnly": "Role changes are not available in this profile form.",
       "saving": "Saving…",
       "saved": "Changes saved",
       "savedMessage": "{{name}} was updated.",
@@ -750,11 +1304,174 @@
     },
     "suspend": {
       "title": "Suspend {{name}}?",
-      "description": "They will be signed out everywhere and can't sign in or perform protected actions while suspended. This is recorded in the audit log.",
+      "description": "They're signed out everywhere and can't sign in. Applications, interviews, notifications and history are kept.",
       "confirm": "Suspend account"
+    },
+    "statusActions": {
+      "notAllowed": "This account is {{status}}, so this change isn't available.",
+      "reason": "Reason",
+      "reasonPlaceholder": "Why is this account suspended?",
+      "reactivatePlaceholder": "Why is this account being reactivated?",
+      "reactivateTitle": "Reactivate {{name}}?",
+      "reactivateConfirm": "Reactivate account",
+      "reactivateDescription": "They can sign in again.",
+      "reactivateUnverifiedDescription": "They can sign in again once the email is verified. A new verification email is sent now.",
+      "suspended": "{{name}} was suspended and signed out everywhere.",
+      "reactivated": "{{name}} was reactivated.",
+      "conflict": "The account changed, or this is the last active administrator. Reload the page and try again."
+    },
+    "roleChange": {
+      "title": "Change role for {{name}}?",
+      "description": "They're signed out and get the new role when they sign in again.",
+      "from": "Current role",
+      "to": "New role",
+      "reason": "Reason",
+      "reasonPlaceholder": "Why is this role changing?",
+      "confirm": "Change role",
+      "saved": "{{name}} now has the selected role.",
+      "lastAdmin": "The account changed or this is the last Enterprise Admin. Reload, or activate a replacement first."
+    },
+    "emailChange": {
+      "title": "Change email",
+      "description": "A confirmation link will be sent to the new address. {{name}} must sign in and confirm it with their current password before the address changes.",
+      "current": "Current email",
+      "newEmail": "New email",
+      "hint": "We'll send a verification link here. It works for 24 hours.",
+      "sending": "Sending…",
+      "confirm": "Send verification link",
+      "requested": "Email change requested",
+      "sent": "A confirmation link was sent to {{email}}.",
+      "deliveryFailed": "The request was saved, but the email could not be delivered to {{email}}."
+    },
+    "history": {
+      "actorSelf": "This user",
+      "actorAdmin": "Administrator",
+      "empty": "No history yet",
+      "emptyDescription": "Events appear here as the account changes.",
+      "emptyFiltered": "No events match these filters. Reset them to see everything.",
+      "viewAllCount": "View full history ({{count}})",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "timeZoneNote": "Times shown in {{zone}}",
+      "rangeInvalid": "Fix the date range to see events.",
+      "loadFailedTitle": "History unavailable",
+      "showing_one": "Showing {{count}} of {{total}} event",
+      "showing_other": "Showing {{count}} of {{total}} events",
+      "older": "Show older events",
+      "filters": "Filters",
+      "eventType": "Event type",
+      "allEvents": "All events",
+      "group": {
+        "account": "Account and status",
+        "profile": "Personal information",
+        "email": "Email and invitation"
+      },
+      "doneBy": "Done by",
+      "anyone": "Anyone",
+      "actor": {
+        "admin": "Administrators",
+        "self": "This user"
+      },
+      "from": "From",
+      "to": "To",
+      "rangeOrder": "'To' must be on or after 'From'.",
+      "rangeSpan": "The range can't be longer than 12 months.",
+      "reset": "Reset filters",
+      "dateRange": "Date range",
+      "filterTitle": "Filter",
+      "resetShort": "Reset",
+      "verb": {
+        "account_invited": "invited the account",
+        "profile_updated": "updated personal information",
+        "role_changed": "changed the role",
+        "status_suspended": "suspended the account",
+        "status_reopened": "reactivated the account",
+        "invitation_accepted": "accepted the invitation",
+        "invitation_revoked": "cancelled the invitation",
+        "email_change_requested": "requested an email change",
+        "email_changed": "changed the email"
+      },
+      "field": {
+        "fullName": "Full name",
+        "phone": "Mobile",
+        "role": "Role",
+        "enterpriseId": "Company",
+        "emergency": "Emergency",
+        "invitationResent": "Invitation resent",
+        "email": "Email",
+        "newEmail": "New email"
+      },
+      "loadFailed": "Account history could not be loaded. Try again later.",
+      "viewAll": "View full history",
+      "filter": "Filter history",
+      "all": "All activity",
+      "account_invited": "Account invitation sent",
+      "profile_updated": "Profile updated",
+      "role_changed": "Role changed",
+      "status_suspended": "Account suspended",
+      "status_reopened": "Account reactivated",
+      "invitation_accepted": "Invitation accepted",
+      "invitation_revoked": "Invitation cancelled",
+      "email_change_requested": "Email change requested",
+      "email_changed": "Email changed"
+    },
+    "emergency": {
+      "title": "Emergency suspend {{name}}?",
+      "calloutTitle": "Enterprise admin at {{company}}",
+      "calloutBody": "If this is the company's last active Enterprise admin, {{company}} will have none until this account is reactivated or another one is made active.",
+      "reason": "Reason",
+      "reasonPlaceholder": "Describe the security or access risk.",
+      "confirm": "Emergency suspend"
+    },
+    "invitation": {
+      "badge": {
+        "pending": "Pending",
+        "pendingExpires": "Pending · expires in {{left}}",
+        "failed": "Not delivered",
+        "accepted": "Accepted",
+        "cancelled": "Cancelled",
+        "expired": "Expired",
+        "revoked": "Replaced"
+      },
+      "title": "Invitation",
+      "resend": "Resend",
+      "sentTo": "Sent {{date}} to {{email}}",
+      "endedOn": "Ended {{date}}",
+      "pending": "Invitation pending",
+      "sent": "Invitation sent",
+      "failed": "Invitation not delivered",
+      "accepted": "Invitation accepted",
+      "cancelled": "Invitation cancelled",
+      "expired": "Invitation expired",
+      "revoked": "Invitation replaced",
+      "expires": "Expires {{date}}",
+      "awaiting": "Waiting for the recipient to accept.",
+      "sending": "Sending…",
+      "resendTitle": "Send a new invitation?",
+      "resendDescription": "The previous link will stop working. A one-use link will be sent to {{email}}.",
+      "cancelTitle": "Cancel this invitation?",
+      "cancelDescription": "The link will stop working. The account remains invited and cannot sign in.",
+      "cancelReason": "Reason for cancellation",
+      "confirmCancel": "Cancel invitation",
+      "resendSuccess": "New invitation sent · previous link revoked",
+      "cancelSuccess": "Invitation cancelled. The account remains invited."
     }
   },
   "adminEnterprises": {
+    "toast": {
+      "suspendedTitle": "Enterprise suspended",
+      "suspended": "{{name}} has been suspended and hidden from public view.",
+      "suspendFailedTitle": "Suspension failed",
+      "suspendFailed": "Could not suspend enterprise. Please try again.",
+      "activatedTitle": "Enterprise activated",
+      "activated": "{{name}} is now active and published.",
+      "activateFailedTitle": "Activation failed",
+      "activateFailed": "Could not activate enterprise. Please try again.",
+      "deletedTitle": "Enterprise deleted",
+      "deleted": "{{name}} was successfully removed.",
+      "deleteFailedTitle": "Deletion failed",
+      "deleteFailed": "Could not delete enterprise. Please try again."
+    },
     "page": {
       "title": "Enterprise Profiles",
       "subtitle": "Manage registered companies, compliance vetting, and account statuses",
@@ -1080,5 +1797,249 @@
     "clear": "Clear",
     "previousMonth": "Previous month",
     "nextMonth": "Next month"
+  },
+  "enterpriseRegistration": {
+    "shell": {
+      "title": "Company registration",
+      "saving": "Saving draft...",
+      "exit": "Exit registration",
+      "progressAria": "Registration progress"
+    },
+    "header": {
+      "title": "Register {{company}}",
+      "titleFallback": "Register your company",
+      "saved": "Draft · saved {{time}}",
+      "draftBadge": "Draft",
+      "confirmedTitle": "Work email confirmed",
+      "confirmedBody": "<strong>{{email}}</strong> is verified. Your progress saves as a draft, so you can come back any time."
+    },
+    "steps": {
+      "step1": "Company",
+      "step2": "Representative",
+      "step3": "Documents",
+      "step4": "Review and submit"
+    },
+    "common": {
+      "back": "Back",
+      "saveDraft": "Save draft",
+      "continue": "Continue",
+      "saving": "Saving...",
+      "edit": "Edit",
+      "empty": "—"
+    },
+    "hero": {
+      "badge": "For employers",
+      "candidateShort": "Candidate sign in →"
+    },
+    "start": {
+      "title": "Register your company",
+      "subtitle": "Start with your work email. We'll send a link to confirm it. You won't need a password until your company is approved.",
+      "name": "Full name",
+      "namePlaceholder": "Đỗ Minh Châu",
+      "email": "Work email",
+      "emailHint": "Use your company domain, not a personal email.",
+      "emailPlaceholder": "chau.do@lumenlogistics.vn",
+      "submit": "Send confirmation link",
+      "submitting": "Sending confirmation link...",
+      "resumePrompt": "Started a registration before?",
+      "resumeLink": "Continue it",
+      "signInPrompt": "Already work at a company on ITTalent?",
+      "signInLink": "Employer sign in",
+      "failed": "Failed to start registration. Please try again."
+    },
+    "checkEmail": {
+      "title": "Check your email",
+      "body": "We sent a confirmation link to <strong>{{email}}</strong>.",
+      "step1": "Open the email from <strong>ITTalent</strong>.",
+      "step2": "Select <strong>Confirm work email</strong>. The link works once and expires in 24 hours.",
+      "step3": "You land on your registration draft. No password needed.",
+      "changeEmail": "Change email",
+      "resend": "Resend email",
+      "resendIn": "Resend ({{seconds}}s)",
+      "tip": "Can't find it? Check Spam or Promotions. Resend is limited to 3 times per 24 hours, one minute apart."
+    },
+    "resume": {
+      "title": "Continue your registration",
+      "subtitle": "Enter the work email you registered with. We'll send a link that opens your draft or shows its review status.",
+      "email": "Work email",
+      "submit": "Send link",
+      "newPrompt": "New here?",
+      "newLink": "Register your company",
+      "sentTitle": "Resume link sent",
+      "sentBody": "If an active registration exists for <strong>{{email}}</strong>, we have emailed a link to resume your draft.",
+      "returnToRegistration": "Return to registration",
+      "invalidEmail": "Invalid work email"
+    },
+    "verify": {
+      "invalid": "Verification link has expired or is invalid. Please start registration again.",
+      "restart": "Start new registration"
+    },
+    "step1": {
+      "title": "Company details",
+      "legalName": "Legal name",
+      "legalNameHint": "As on the business registration certificate",
+      "legalNamePlaceholder": "Công ty Cổ phần Lumen Logistics",
+      "name": "Trading name",
+      "nameHint": "Shown to candidates",
+      "namePlaceholder": "Lumen Logistics JSC",
+      "taxCode": "Tax code",
+      "taxCodeHint": "10 or 13 digits · leading zeros are kept",
+      "taxCodePlaceholder": "0109876543",
+      "corporateEmail": "Corporate email",
+      "corporateEmailHint": "Company domain",
+      "corporateEmailPlaceholder": "contact@lumenlogistics.vn",
+      "industry": "Industry",
+      "industryPlaceholder": "Select industry",
+      "size": "Company size",
+      "sizePlaceholder": "Select size",
+      "website": "Website",
+      "websitePlaceholder": "lumenlogistics.vn",
+      "phone": "Phone",
+      "phonePlaceholder": "024 3999 1188",
+      "address": "Address",
+      "addressPlaceholder": "18 Duy Tân, Cầu Giấy, Hà Nội",
+      "saveFailed": "Failed to save company details. Please try again."
+    },
+    "industries": {
+      "logisticsTech": "Logistics technology",
+      "software": "Software & IT services",
+      "fintech": "Fintech & banking",
+      "ecommerce": "E-commerce & retail",
+      "health": "Healthcare & biotech",
+      "education": "Education & edtech",
+      "telecom": "Telecommunications",
+      "gaming": "Gaming & entertainment",
+      "ai": "Artificial intelligence & data",
+      "hardware": "Hardware & electronics",
+      "other": "Other"
+    },
+    "step2": {
+      "title": "Representative",
+      "subtitle": "You will become the company's first Enterprise admin after approval.",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Đỗ Minh Châu",
+      "workEmail": "Work email",
+      "verified": "Verified",
+      "workEmailHint": "Confirmed. The invitation goes here.",
+      "position": "Position",
+      "positionPlaceholder": "Head of Operations",
+      "phone": "Phone",
+      "phonePlaceholder": "0912 778 456",
+      "legalQuestion": "Are you the company's legal representative?",
+      "yes": "Yes",
+      "yesHint": "The person named on the business registration certificate.",
+      "no": "No",
+      "noHint": "You'll upload a letter of authorization in the next step.",
+      "legalName": "Legal representative's name",
+      "legalNameHint": "As on the certificate",
+      "legalNamePlaceholder": "Nguyễn Văn Lâm",
+      "saveFailed": "Failed to save representative information. Please try again."
+    },
+    "step3": {
+      "title": "Documents",
+      "subtitle": "An ITTalent admin checks these before approving. Files are private: only reviewers can open them.",
+      "brc": "Business registration certificate",
+      "brcHint": "The latest certificate showing the legal name and tax code.",
+      "brcSelect": "Select Business Registration Certificate (PDF)",
+      "loa": "Letter of authorization",
+      "loaHint": "Signed by the legal representative, saying you may register the company. Not needed if you are the legal representative.",
+      "loaSelect": "Select Letter of Authorization (PDF)",
+      "other": "Other supporting document",
+      "otherHint": "Optional. For example, an office lease or a company profile.",
+      "dropText": "Drop a PDF here or <choose>choose a file</choose>",
+      "dropHint": "PDF only · up to {{mb}} MB",
+      "chooseFile": "Choose file",
+      "replace": "Replace",
+      "remove": "Remove document",
+      "uploaded": "Uploaded",
+      "unknownSize": "Unknown size",
+      "onlyPdf": "Only PDF documents (.pdf) are accepted for legal verification.",
+      "tooLarge": "File size exceeds {{mb}} MB limit.",
+      "missingId": "Registration intake ID is missing. Please restart registration.",
+      "uploadFailed": "Failed to upload document. Please try again."
+    },
+    "documentTypes": {
+      "business_license": "Business Registration Certificate (BRC)",
+      "power_of_attorney": "Letter of Authorization (LoA)",
+      "tax_registration": "Tax Registration Certificate",
+      "other": "Supporting document"
+    },
+    "step4": {
+      "company": "Company",
+      "representative": "Representative",
+      "documents": "Documents",
+      "legalName": "Legal name",
+      "taxCode": "Tax code",
+      "corporateEmail": "Corporate email",
+      "address": "Address",
+      "name": "Name",
+      "workEmail": "Work email",
+      "verified": "Verified",
+      "position": "Position",
+      "legalRep": "Legal representative",
+      "legalRepYes": "Yes",
+      "legalRepNo": "No · letter of authorization attached",
+      "brc": "Business registration certificate",
+      "loa": "Letter of authorization",
+      "loaNotRequired": "Not required (legal representative)",
+      "pdfSize": "PDF · {{size}}",
+      "reservation": "<strong>When you submit</strong>, the tax code and corporate email are reserved for this registration, so no one else can register them while it's reviewed. You can't edit it during review.",
+      "certify": "I certify that all provided information and uploaded documents are true, accurate, and lawfully obtained under the laws of Vietnam.",
+      "submit": "Submit registration",
+      "submitting": "Submitting...",
+      "missingId": "Registration ID is missing. Please restart intake.",
+      "notLoaded": "Registration details not loaded.",
+      "submitFailed": "Failed to submit enterprise registration. Please review and try again."
+    },
+    "status": {
+      "pending": "Pending review",
+      "meta": "Registration {{code}} · version {{version}} · submitted {{date}}",
+      "noticeTitle": "Submitted for review",
+      "noticeBody": "An ITTalent admin usually decides within {{count}} working days. We'll email <strong>{{email}}</strong> when it's done; you don't need to keep this page open.",
+      "progress": "Progress",
+      "emailConfirmed": "Work email confirmed",
+      "submitted": "Registration submitted",
+      "submittedAt": "{{date}} · version {{version}}",
+      "review": "Admin review",
+      "reviewNote": "In progress · tax code and email reserved for you",
+      "accept": "Accept the invitation",
+      "acceptNote": "After approval, you accept by email and get access to your company",
+      "summary": "Your registration",
+      "taxCode": "Tax code",
+      "corporateEmail": "Corporate email",
+      "documents": "Documents",
+      "pdfs_one": "{{count}} PDF",
+      "pdfs_other": "{{count}} PDFs"
+    },
+    "validation": {
+      "emailInvalid": "Valid email address is required",
+      "personalEmail": "Use your company domain, not a personal email",
+      "repNameMin": "Full name must be at least {{count}} characters",
+      "repNameMax": "Full name cannot exceed {{count}} characters",
+      "phoneInvalid": "Invalid contact phone number format",
+      "streetRequired": "Street address is required",
+      "cityRequired": "City is required",
+      "countryRequired": "Country is required",
+      "companyNameMin": "Company name must be at least {{count}} characters",
+      "taxCode": "Tax identification code must be 10 to 13 numeric digits",
+      "websiteInvalid": "Invalid website URL",
+      "industryMin": "Industry must be at least {{count}} characters",
+      "sizeRequired": "Company size is required",
+      "foundedInvalid": "Invalid founded year",
+      "foundedFuture": "Founded year cannot be in the future",
+      "representativeNameMin": "Representative name must be at least {{count}} characters",
+      "fileNameRequired": "File name is required",
+      "fileUrlInvalid": "Valid file URL is required",
+      "fileTooLarge": "File size cannot exceed {{mb}} MB",
+      "missingDocuments": "Business Registration Certificate (PDF) is required for submission",
+      "loaRequired": "Letter of Authorization (PDF) is required when you are not the legal representative",
+      "certifyRequired": "You must certify authorization and agree to terms",
+      "versionPositive": "Version must be a positive integer",
+      "checklistIncomplete": "All verification checklist items must be confirmed before approval",
+      "rejectionReason": "Write at least {{count}} characters so the requester knows what to fix.",
+      "confirmPassword": "Please confirm your password",
+      "termsRequired": "You must agree to the Employer Terms of Service",
+      "passwordsMismatch": "Passwords do not match"
+    }
   }
 }

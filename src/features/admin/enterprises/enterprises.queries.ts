@@ -9,11 +9,12 @@ import {
 } from "@/api/generated";
 import type {
   CreateEnterpriseDto,
-  EnterpriseDetailDto,
   EnterpriseListResponse,
   UpdateEnterpriseDto,
   UpdateEnterpriseStatusDto,
 } from "@/api/generated/types.gen";
+import { HTTP_NOT_FOUND } from "@/api/http-status";
+import { unwrap } from "@/api/request-error";
 
 // email, phone, createdAt and creatorAccountId are part of the list contract now.
 export type EnterpriseSummaryDto = EnterpriseListResponse["items"][number];
@@ -37,6 +38,9 @@ export const enterprisesKeys = {
   detail: (enterpriseId: string) => [...enterprisesKeys.details(), enterpriseId] as const,
 };
 
+/** Fallback message when a create or update fails without a server message. */
+export const SAVE_FAILED = "An error occurred while saving the enterprise profile.";
+
 export const DEFAULT_PAGE_SIZE = 10;
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
 
@@ -47,45 +51,21 @@ export function useEnterprisesListQuery(params: EnterpriseListParams) {
     enabled,
     queryKey: enterprisesKeys.list({ ...queryParams, limit }),
     queryFn: async () => {
-      try {
-        const result = await getApiV1Enterprises({
-          query: {
-            limit,
-            page: queryParams.page,
-            ...(queryParams.keyword ? { keyword: queryParams.keyword } : {}),
-            ...(queryParams.industry ? { industry: queryParams.industry } : {}),
-            ...(queryParams.location ? { location: queryParams.location } : {}),
-            ...(queryParams.company_size ? { company_size: queryParams.company_size } : {}),
-            ...(queryParams.status ? { status: queryParams.status } : {}),
-          },
-        });
-
-        if (result.error) {
-          throw Object.assign(result.error as object, { status: result.response?.status });
-        }
-
-        return (
-          result.data ?? {
-            items: [] as EnterpriseSummaryDto[],
-            total: 0,
-            page: 1,
-            limit,
-            totalPages: 0,
-          }
-        );
-      } catch (err) {
-        const error = err as { status?: number };
-        if (error.status === 404) {
-          return {
-            items: [] as EnterpriseSummaryDto[],
-            total: 0,
-            page: 1,
-            limit,
-            totalPages: 0,
-          };
-        }
-        throw err;
-      }
+      const empty = { items: [] as EnterpriseSummaryDto[], total: 0, page: 1, limit, totalPages: 0 };
+      const result = await getApiV1Enterprises({
+        query: {
+          limit,
+          page: queryParams.page,
+          ...(queryParams.keyword ? { keyword: queryParams.keyword } : {}),
+          ...(queryParams.industry ? { industry: queryParams.industry } : {}),
+          ...(queryParams.location ? { location: queryParams.location } : {}),
+          ...(queryParams.company_size ? { company_size: queryParams.company_size } : {}),
+          ...(queryParams.status ? { status: queryParams.status } : {}),
+        },
+      });
+      // A backend without the list endpoint yet (404) shows an empty list instead of an error.
+      if (result.response?.status === HTTP_NOT_FOUND) return empty;
+      return unwrap(result, "Unable to load enterprises") ?? empty;
     },
   });
 }
@@ -95,17 +75,9 @@ export function useEnterpriseDetailQuery(enterpriseId: string | undefined) {
     enabled: Boolean(enterpriseId),
     queryKey: enterprisesKeys.detail(enterpriseId ?? ""),
     queryFn: async () => {
-      const result = await getApiV1EnterprisesByEnterpriseId({
+      return unwrap(await getApiV1EnterprisesByEnterpriseId({
         path: { enterpriseId: enterpriseId as string },
-      });
-
-      if (result.error || !result.data) {
-        throw Object.assign((result.error as object) ?? new Error("Enterprise not found"), {
-          status: result.response?.status,
-        });
-      }
-
-      return result.data as EnterpriseDetailDto;
+      }), "Enterprise not found");
     },
   });
 }
@@ -115,18 +87,9 @@ export function useCreateEnterpriseMutation() {
 
   return useMutation({
     mutationFn: async (payload: CreateEnterpriseDto) => {
-      const result = await postApiV1Enterprises({
+      return unwrap(await postApiV1Enterprises({
         body: payload,
-      });
-
-      if (result.error || !result.data) {
-        throw Object.assign(
-          (result.error as object) ?? new Error("Failed to create enterprise"),
-          { status: result.response?.status, data: result.error },
-        );
-      }
-
-      return result.data;
+      }), SAVE_FAILED);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: enterprisesKeys.lists() });
@@ -139,19 +102,10 @@ export function useUpdateEnterpriseMutation(enterpriseId: string) {
 
   return useMutation({
     mutationFn: async (payload: UpdateEnterpriseDto) => {
-      const result = await patchApiV1EnterprisesByEnterpriseId({
+      return unwrap(await patchApiV1EnterprisesByEnterpriseId({
         path: { enterpriseId },
         body: payload,
-      });
-
-      if (result.error || !result.data) {
-        throw Object.assign(
-          (result.error as object) ?? new Error("Failed to update enterprise"),
-          { status: result.response?.status, data: result.error },
-        );
-      }
-
-      return result.data;
+      }), SAVE_FAILED);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: enterprisesKeys.detail(enterpriseId) });
@@ -165,19 +119,10 @@ export function useUpdateEnterpriseStatusMutation(enterpriseId: string) {
 
   return useMutation({
     mutationFn: async (payload: UpdateEnterpriseStatusDto) => {
-      const result = await patchApiV1EnterprisesByEnterpriseIdStatus({
+      return unwrap(await patchApiV1EnterprisesByEnterpriseIdStatus({
         path: { enterpriseId },
         body: payload,
-      });
-
-      if (result.error || !result.data) {
-        throw Object.assign(
-          (result.error as object) ?? new Error("Failed to update enterprise status"),
-          { status: result.response?.status, data: result.error },
-        );
-      }
-
-      return result.data;
+      }), "Failed to update enterprise status");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: enterprisesKeys.detail(enterpriseId) });
@@ -191,18 +136,9 @@ export function useDeleteEnterpriseMutation(enterpriseId: string) {
 
   return useMutation({
     mutationFn: async () => {
-      const result = await deleteApiV1EnterprisesByEnterpriseId({
+      return unwrap(await deleteApiV1EnterprisesByEnterpriseId({
         path: { enterpriseId },
-      });
-
-      if (result.error) {
-        throw Object.assign(
-          (result.error as object) ?? new Error("Failed to delete enterprise"),
-          { status: result.response?.status, data: result.error },
-        );
-      }
-
-      return result.data;
+      }), "Failed to delete enterprise");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: enterprisesKeys.lists() });
