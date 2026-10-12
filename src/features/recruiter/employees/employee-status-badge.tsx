@@ -28,6 +28,7 @@ export function EmployeeStatusBadge({
     case "pending":
     case "invitation pending":
     case "inactive":
+    case "invited":
       return (
         <Badge
           className={cn(
@@ -40,6 +41,7 @@ export function EmployeeStatusBadge({
         </Badge>
       );
     case "suspended":
+    case "blocked":
       return (
         <Badge
           className={cn(
