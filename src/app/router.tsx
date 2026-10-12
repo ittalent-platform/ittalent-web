@@ -1,9 +1,10 @@
+import { CandidateAccountLayout } from "@/components/layout/candidate-account-layout";
+import { CertificatesPage } from "@/features/certificates/certificates-page";
 import { lazy, Suspense } from "react";
 import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
 import { AppLayout } from "@/components/layout/admin-layout";
-import { PublicLayout } from "@/components/layout/public-layout";
 import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
@@ -39,6 +40,12 @@ const RegisterCompanyPage = lazy(() =>
     }),
   ),
 );
+const AcceptInvitationPage = lazy(() =>
+  import("@/features/auth/accept-invitation-page").then((m) => ({ default: m.AcceptInvitationPage })),
+);
+const ConfirmEmailChangePage = lazy(() =>
+  import("@/features/auth/confirm-email-change-page").then((m) => ({ default: m.ConfirmEmailChangePage })),
+);
 const UsersPage = lazy(() =>
   import("@/features/admin/users/users-page").then((m) => ({
     default: m.UsersPage,
@@ -48,6 +55,9 @@ const AdminUserDetailPage = lazy(() =>
   import("@/features/admin/users/user-detail-page").then((m) => ({
     default: m.AdminUserDetailPage,
   })),
+);
+const AdminUserHistoryPage = lazy(() =>
+  import("@/features/admin/users/user-history-page").then((m) => ({ default: m.AdminUserHistoryPage })),
 );
 const JobPostingsPage = lazy(() =>
   import("@/features/admin/job-postings/job-postings-pages").then((m) => ({
@@ -77,11 +87,6 @@ const RecruiterJobPostingDetailPage = lazy(() =>
 const RecruiterEditJobPostingPage = lazy(() =>
   import("@/features/recruiter/job-postings/job-postings-pages").then((m) => ({
     default: m.RecruiterEditJobPostingPage,
-  })),
-);
-const JobsPage = lazy(() =>
-  import("@/features/public-site/jobs-page").then((m) => ({
-    default: m.JobsPage,
   })),
 );
 const DocumentsPage = lazy(() =>
@@ -136,12 +141,6 @@ const EnterpriseDetailPage = lazy(() =>
 
 export const appRoutes = [
   {
-    element: <PublicLayout />,
-    children: [
-      { path: "/jobs", element: <JobsPage /> },
-    ],
-  },
-  {
     element: <MarketplaceLayout />,
     children: [
       { path: "/", element: <HomePage /> },
@@ -157,6 +156,8 @@ export const appRoutes = [
   { path: "/verify-email", element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
+  { path: "/accept-invitation", element: <AcceptInvitationPage /> },
+  { path: "/confirm-email-change", element: <ConfirmEmailChangePage /> },
   {
     element: <ProtectedRoute requiredRole="user" />,
     children: [
@@ -166,6 +167,7 @@ export const appRoutes = [
           { path: "/documents", element: <DocumentsPage /> },
           { path: "/my-applications", element: <ApplicationsPage /> },
           { path: "/my-applications/:id", element: <ApplicationDetailPage /> },
+          { element: <CandidateAccountLayout />, children: [{ path: "/certificates", element: <CertificatesPage /> }] },
         ],
       },
     ],
@@ -180,6 +182,7 @@ export const appRoutes = [
           { index: true, element: <Navigate replace to="/admin/users" /> },
           { path: "users", element: <UsersPage /> },
           { path: "users/:userId", element: <AdminUserDetailPage /> },
+          { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
           { path: "enterprises/new", element: <EnterpriseFormPage /> },
           { path: "enterprises/:enterpriseId", element: <AdminEnterpriseDetailPage /> },
@@ -195,7 +198,7 @@ export const appRoutes = [
   },
   {
     path: "/recruiter",
-    element: <ProtectedRoute requiredRole="recruiter" />,
+    element: <ProtectedRoute requiredRoles={["recruiter", "enterprise_admin"]} />,
     children: [
       {
         element: <AppLayout actor="recruiter" />,

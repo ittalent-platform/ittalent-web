@@ -1,5 +1,6 @@
 /** Route paths shared by layout chrome and feature code, so neither hardcodes a URL. */
 export const APPLICATIONS_PATH = "/my-applications";
+export const CERTIFICATES_PATH = "/certificates";
 export const RECRUITER_JOB_POSTINGS_PATH = "/recruiter/job-postings";
 
 /** Public job page and its apply flow (UC-BJOB-03); applications link here to view or apply again. */
@@ -12,4 +13,8 @@ export const ADMIN_USERS_PATH = "/admin/users";
 
 export function adminUserPath(userId: string): string {
   return `${ADMIN_USERS_PATH}/${userId}`;
+}
+
+export function adminEnterprisePath(enterpriseId: string): string {
+  return `/admin/enterprises/${enterpriseId}`;
 }
