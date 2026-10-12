@@ -40,7 +40,11 @@ function renderWithClient(ui: ReactElement): QueryClient {
       mutations: { retry: false },
     },
   });
-  render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+  render(
+    <MemoryRouter>
+      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+    </MemoryRouter>,
+  );
   return queryClient;
 }
 
@@ -62,16 +66,14 @@ describe("Employer Registration Flow Components", () => {
         />,
       );
 
-      expect(screen.getByLabelText(/your full name/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/corporate work email/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/contact phone number/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/work email/i)).toBeInTheDocument();
 
       // Enter a personal email
-      await user.type(screen.getByLabelText(/your full name/i), "Hoàng Nam");
-      await user.type(screen.getByLabelText(/corporate work email/i), "test@gmail.com");
-      await user.type(screen.getByLabelText(/contact phone number/i), "0912345678");
+      await user.type(screen.getByLabelText(/full name/i), "Hoàng Nam");
+      await user.type(screen.getByLabelText(/work email/i), "test@gmail.com");
 
-      await user.click(screen.getByRole("button", { name: /continue with work email/i }));
+      await user.click(screen.getByRole("button", { name: /send confirmation link/i }));
 
       // Error message for personal email
       await waitFor(() => {
@@ -106,11 +108,10 @@ describe("Employer Registration Flow Components", () => {
         />,
       );
 
-      await user.type(screen.getByLabelText(/your full name/i), "Hoàng Nam");
-      await user.type(screen.getByLabelText(/corporate work email/i), "hr@corp.vn");
-      await user.type(screen.getByLabelText(/contact phone number/i), "0912345678");
+      await user.type(screen.getByLabelText(/full name/i), "Hoàng Nam");
+      await user.type(screen.getByLabelText(/work email/i), "hr@corp.vn");
 
-      await user.click(screen.getByRole("button", { name: /continue with work email/i }));
+      await user.click(screen.getByRole("button", { name: /send confirmation link/i }));
 
       await waitFor(() => {
         expect(onSuccess).toHaveBeenCalledWith("hr@corp.vn");
@@ -132,11 +133,11 @@ describe("Employer Registration Flow Components", () => {
         />,
       );
 
-      expect(screen.getByText(/check your work email/i)).toBeInTheDocument();
+      expect(screen.getByText(/check your email/i)).toBeInTheDocument();
       expect(screen.getByText("hr@corp.vn")).toBeInTheDocument();
 
       await user.click(
-        screen.getByRole("button", { name: /use a different email address/i }),
+        screen.getByRole("button", { name: /change email/i }),
       );
       expect(onChangeEmail).toHaveBeenCalled();
     });

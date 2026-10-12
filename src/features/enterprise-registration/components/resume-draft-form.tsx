@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,6 @@ export function ResumeDraftForm({
 
     setIsSubmitting(true);
     try {
-      // Re-triggering magic intake sends the active draft resume link if exists
       setIsSubmitted(true);
     } catch {
       setError("Failed to send resume link. Please try again.");
@@ -39,17 +38,17 @@ export function ResumeDraftForm({
 
   if (isSubmitted) {
     return (
-      <div className="w-full max-w-[440px] rounded-2xl border border-border bg-card p-8 text-center shadow-xs">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-(--status-success-bg) text-(--status-success-fg)">
+      <div className="w-full max-w-[460px] rounded-2xl border border-border bg-card p-8 text-center shadow-xs">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-(--status-success-bg) text-(--status-success-fg)">
           <CheckCircle2 className="h-7 w-7" />
         </div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">
           Resume link sent
         </h2>
-        <p className="mt-2 text-[13.5px] text-muted-foreground">
+        <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
           If an active registration exists for{" "}
           <span className="font-semibold text-foreground">{email}</span>, we have emailed
-          a resume link.
+          a link to resume your draft.
         </p>
         <Button
           type="button"
@@ -64,13 +63,13 @@ export function ResumeDraftForm({
   }
 
   return (
-    <div className="w-full max-w-[440px] rounded-2xl border border-border bg-card p-8 shadow-xs">
+    <div className="w-full max-w-[460px] rounded-2xl border border-border bg-card p-8 shadow-xs">
       <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-foreground">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground">
           Continue your registration
         </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Enter your registered work email to receive a secure link to resume your draft.
+        <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+          Enter the work email you registered with. We&apos;ll send a link that opens your draft or shows its review status.
         </p>
       </div>
 
@@ -83,7 +82,7 @@ export function ResumeDraftForm({
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <FormField
           htmlFor="resume_email"
-          label="Corporate work email"
+          label="Work email"
           required
           error={error}
         >
@@ -92,22 +91,27 @@ export function ResumeDraftForm({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="name@company.com"
+            placeholder="chau.do@lumenlogistics.vn"
           />
         </FormField>
 
         <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
-          {isSubmitting ? "Sending resume link..." : "Send resume link →"}
+          {isSubmitting ? "Sending link..." : "Send link"}
         </Button>
       </form>
 
-      <div className="mt-6 border-t border-line-muted pt-4 text-center">
+      <p className="mt-5 text-[12.5px] leading-relaxed text-muted-foreground">
+        For your privacy we show the same message whether or not this email has a registration.
+      </p>
+
+      <div className="mt-6 border-t border-border pt-5 text-[13px] text-muted-foreground">
+        New here?{" "}
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+          className="font-semibold text-primary hover:underline"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to new registration
+          Register your company
         </button>
       </div>
     </div>
