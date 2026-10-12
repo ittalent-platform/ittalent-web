@@ -36,8 +36,7 @@ export type UserFormStatus = (typeof USER_FORM_STATUSES)[number];
 
 export const ENTERPRISES_PAGE_SIZE = 50;
 /** Same bounds as the API for every reason (suspend, reopen, emergency suspend, cancel invitation, role change). */
-export const REASON_MIN_LENGTH = 10;
-export const REASON_MAX_LENGTH = 500;
+export { REASON_MAX_LENGTH, REASON_MIN_LENGTH } from "@/components/common/reason-field";
 
 export const FULL_NAME_HINT_RANGE = { max: 100, min: 2 } as const;
 export const USERNAME_HINT_RANGE = { max: 30, min: 3 } as const;

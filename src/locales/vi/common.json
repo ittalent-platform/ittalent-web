@@ -1,4 +1,8 @@
 {
+  "reason": {
+    "hint": "Bắt buộc · tối thiểu {{min}} ký tự · được lưu vào lịch sử",
+    "tooShort": "Nhập lý do có ít nhất {{min}} ký tự."
+  },
   "accountNav": {
     "label": "Mục tài khoản",
     "jobSearch": "Tìm việc",
@@ -883,10 +887,6 @@
       "noReason": "không được ghi",
       "originalTitle": "Lần đình chỉ ban đầu",
       "unknown": "Tài khoản này đang bị đình chỉ."
-    },
-    "reason": {
-      "hint": "Bắt buộc · tối thiểu {{min}} ký tự · được lưu vào lịch sử",
-      "tooShort": "Nhập lý do có ít nhất {{min}} ký tự."
     },
     "page": {
       "total_one": "{{count}} tài khoản",

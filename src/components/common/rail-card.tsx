@@ -7,7 +7,7 @@ export function RailCard({ ariaLabel, children, className, meta, title }: { aria
   return (
     <section aria-label={ariaLabel} className={cn("flex min-w-0 flex-col gap-3 surface-card p-5", className)}>
       <div className="flex items-center justify-between">
-        <h2 className="text-[11.5px] font-bold uppercase tracking-[0.06em] text-muted-foreground">{title}</h2>
+        <h2 className="eyebrow">{title}</h2>
         {meta ? <span className="itt-mono text-[11px] text-muted-foreground">{meta}</span> : null}
       </div>
       {children}

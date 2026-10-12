@@ -3,12 +3,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { UserDto } from "@/api/generated/types.gen";
+import { KeyValueBox } from "@/components/common/key-value-box";
 import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { useToast } from "@/components/toast/toast-provider";
 
 import { AccountActionError } from "./account-action-error";
 import { BLOCKING_ACCOUNT_ERRORS, classifyAccountError } from "./account-error";
-import { isValidReason, ReasonField } from "./reason-field";
+import { isValidReason, ReasonField } from "@/components/common/reason-field";
 import { RoleBadge } from "./user-badges";
 import { userShortName } from "./user-display";
 import { useUpdateUserRoleMutation } from "./users.queries";
@@ -62,14 +63,7 @@ export function ChangeUserRoleDialog({ onOpenChange, onReload, open, user }: { o
       variant="default"
     >
       <div className="flex flex-col gap-4">
-        <dl className="flex flex-col gap-2.5 rounded-xl border border-border bg-muted/40 px-4 py-3.5 text-[13.5px]">
-          {rows.map((row) => (
-            <div className="flex items-center justify-between gap-4" key={row.label}>
-              <dt className="text-muted-foreground">{row.label}</dt>
-              <dd className="min-w-0 text-right">{row.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <KeyValueBox rows={rows} />
         <ReasonField id="role-change-reason" label={t("adminUsers.roleChange.reason")} onChange={setReason} placeholder={t("adminUsers.roleChange.reasonPlaceholder")} value={reason} />
       </div>
     </ActionConfirmDialog>

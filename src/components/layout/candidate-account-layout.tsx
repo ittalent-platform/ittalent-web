@@ -26,7 +26,7 @@ export function CandidateAccountLayout() {
       <nav aria-label={t("accountNav.label")} className="flex shrink-0 flex-col gap-5 lg:w-[220px]">
         {ACCOUNT_NAV.map((group) => (
           <div className="flex flex-col gap-1" key={group.labelKey}>
-            <p className="px-3 pb-1 text-[11.5px] font-bold uppercase tracking-[0.06em] text-muted-foreground">{t(group.labelKey)}</p>
+            <p className="px-3 pb-1 eyebrow">{t(group.labelKey)}</p>
             {group.items.map(({ icon: Icon, labelKey, to }) => (
               <NavLink
                 className={({ isActive }) => cn("flex items-center gap-3 rounded-lg px-3 py-2 text-[14.5px] text-foreground hover:bg-muted", isActive && "bg-muted font-semibold")}

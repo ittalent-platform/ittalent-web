@@ -106,7 +106,7 @@ export function CertificatesPage() {
   return (
     <Shell>
       <PageHeader
-        actions={<Button className="h-11 px-5" onClick={() => setDialog({ kind: "add" })} shape="pill" type="button"><Plus aria-hidden className="size-4" />{t("certificates.add")}</Button>}
+        actions={<Button size="xl" onClick={() => setDialog({ kind: "add" })} shape="pill" type="button"><Plus aria-hidden className="size-4" />{t("certificates.add")}</Button>}
         title={t("certificates.title")}
       />
 

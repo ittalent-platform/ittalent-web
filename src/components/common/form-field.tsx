@@ -45,5 +45,5 @@ export function FormField({ children, className, error, hint, htmlFor, label, la
 }
 
 export function FormSectionLabel({ children }: { children: ReactNode }) {
-  return <p className="m-0 text-[11.5px] font-bold uppercase tracking-[0.05em] text-muted-foreground">{children}</p>;
+  return <p className="m-0 eyebrow">{children}</p>;
 }

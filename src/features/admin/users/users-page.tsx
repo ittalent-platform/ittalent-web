@@ -116,7 +116,7 @@ export function UsersPage() {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         actions={
-          <Button className="h-11 px-5" onClick={() => setDialog({ kind: "create" })} shape="pill" type="button">
+          <Button size="xl" onClick={() => setDialog({ kind: "create" })} shape="pill" type="button">
             <Plus aria-hidden className="size-4" />
             {t("adminUsers.page.create")}
           </Button>

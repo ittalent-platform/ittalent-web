@@ -841,3 +841,8 @@
 @utility market-card {
   @apply rounded-2xl border border-mkt-line bg-white;
 }
+
+/* Small uppercase label above a group: card eyebrows, filter legends, table heads. */
+@utility eyebrow {
+  @apply text-[11.5px] font-bold tracking-[0.06em] uppercase text-muted-foreground;
+}

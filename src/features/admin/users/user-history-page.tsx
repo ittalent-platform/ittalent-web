@@ -31,7 +31,7 @@ const PARAMS = { actor: "actor", from: "from", group: "group", to: "to" } as con
 const GROUP_SEPARATOR = ",";
 const FIELD_CLASS = "flex items-center gap-2.5 text-[13.5px] text-foreground";
 const CONTROL_CLASS = "size-4 shrink-0 cursor-pointer accent-primary";
-const SECTION_LABEL_CLASS = "text-[11.5px] font-bold uppercase tracking-[0.06em] text-muted-foreground";
+const SECTION_LABEL_CLASS = "eyebrow";
 
 export function AdminUserHistoryPage() {
   const { t } = useTranslation();

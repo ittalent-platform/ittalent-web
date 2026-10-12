@@ -1,4 +1,8 @@
 {
+  "reason": {
+    "hint": "Required · at least {{min}} characters · saved in history",
+    "tooShort": "Enter a reason of at least {{min}} characters."
+  },
   "accountNav": {
     "label": "Account sections",
     "jobSearch": "Job search",
@@ -896,10 +900,6 @@
       "noReason": "not recorded",
       "originalTitle": "Original suspension",
       "unknown": "This account is suspended."
-    },
-    "reason": {
-      "hint": "Required · at least {{min}} characters · saved in history",
-      "tooShort": "Enter a reason of at least {{min}} characters."
     },
     "page": {
       "total_one": "{{count}} account",

@@ -9,7 +9,7 @@ import { useToast } from "@/components/toast/toast-provider";
 
 import { AccountActionError } from "./account-action-error";
 import { BLOCKING_ACCOUNT_ERRORS, classifyAccountError } from "./account-error";
-import { isValidReason, ReasonField } from "./reason-field";
+import { isValidReason, ReasonField } from "@/components/common/reason-field";
 import { userShortName } from "./user-display";
 import { useEmergencySuspendUserMutation, useUpdateUserStatusMutation } from "./users.queries";
 
