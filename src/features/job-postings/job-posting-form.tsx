@@ -31,6 +31,7 @@ import {
   JOB_POSTINGS_PATH,
 } from "./job-postings.constants";
 import { toDeadlineDate } from "./job-postings.format";
+import { JobPostingStatusBadge } from "./job-posting-status-badge";
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
 
@@ -672,12 +673,15 @@ export function JobPostingForm({
 
             {/* Deadline */}
             <div className="flex flex-col gap-1.5">
-              <label
-                className="text-[13px] font-semibold text-foreground"
-                htmlFor="expiresAt"
-              >
-                {t("jobPostings.expiryDate")}
-              </label>
+              <div className="flex items-center justify-between gap-2">
+                <label
+                  className="text-[13px] font-semibold text-foreground"
+                  htmlFor="expiresAt"
+                >
+                  {t("jobPostings.expiryDate")}
+                </label>
+                {posting ? <JobPostingStatusBadge posting={posting} /> : null}
+              </div>
               <Controller
                 control={form.control}
                 name="expiresAt"
