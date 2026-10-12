@@ -1,77 +1,114 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
-import { BrandLogo } from "@/components/layout/brand-logo";
-import { HERO_RINGS } from "@/features/auth/auth-hero.constants";
+import { LogoMark } from "@/components/layout/brand-logo";
+
+const EMPLOYER_HERO_ARCHES = [
+  { d: "M-196 520 A476 476 0 0 1 756 520", color: "var(--hero-employer-ring-1)" },
+  { d: "M-140 520 A420 420 0 0 1 700 520", color: "var(--hero-employer-ring-2)" },
+  { d: "M-84 520 A364 364 0 0 1 644 520", color: "var(--hero-employer-ring-3)" },
+  { d: "M-28 520 A308 308 0 0 1 588 520", color: "var(--hero-employer-ring-4)" },
+  { d: "M28 520 A252 252 0 0 1 532 520", color: "var(--hero-employer-ring-5)" },
+  { d: "M84 520 A196 196 0 0 1 476 520", color: "var(--hero-employer-ring-6)" },
+  { d: "M140 520 A140 140 0 0 1 420 520", color: "var(--hero-employer-ring-7)" },
+  { d: "M196 520 A84 84 0 0 1 364 520", color: "var(--hero-employer-ring-8)" },
+  { d: "M252 520 A28 28 0 0 1 308 520", color: "var(--hero-employer-ring-9)" },
+] as const;
 
 export function IntakeSplitLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[540px_1fr] xl:grid-cols-[600px_1fr]">
-        <aside className="relative hidden flex-col justify-between overflow-hidden bg-(--hero-bg) px-12 py-10 text-white lg:flex">
-          {/* Concentric rings background */}
-          <div
+    <div className="flex min-h-screen w-full bg-background font-sans text-foreground">
+      <div className="flex min-h-screen w-full flex-col lg:flex-row">
+        {/* Desktop 560px Dark Sidebar matching Design Screen 10 */}
+        <aside className="relative hidden w-[560px] shrink-0 flex-col overflow-hidden bg-(--hero-bg) px-14 py-11 text-white lg:flex">
+          {/* Concentric rings background SVG anchored at bottom center of aside */}
+          <svg
             aria-hidden="true"
-            className="itt-hero-rings pointer-events-none absolute inset-x-0 bottom-0 select-none opacity-40"
+            width="560"
+            height="520"
+            viewBox="0 0 560 520"
+            fill="none"
+            className="pointer-events-none absolute bottom-0 left-0 block select-none"
           >
-            {HERO_RINGS.map((ring) => (
-              <span
-                key={ring.id}
-                className={`itt-ring absolute rounded-full ${ring.fillClass}`}
-                style={{
-                  animationDelay: `${ring.pulseDelaySeconds}s`,
-                  bottom: ring.bottom,
-                  height: ring.size,
-                  left: ring.left,
-                  width: ring.size,
-                }}
-              />
-            ))}
-          </div>
+            <g className="itt-breathe">
+              {EMPLOYER_HERO_ARCHES.map((arch) => (
+                <path
+                  key={arch.d}
+                  d={arch.d}
+                  stroke={arch.color}
+                  strokeWidth="57"
+                  strokeLinecap="butt"
+                />
+              ))}
+            </g>
+          </svg>
 
-          {/* Top brand & headline */}
-          <div className="relative z-10 flex flex-col items-start gap-12">
-            <BrandLogo tone="inverse" />
+          {/* Foreground content stack */}
+          <div className="relative z-10 flex flex-col">
+            {/* Logo: Orange brand tile with white person icon + white uppercase wordmark */}
+            <Link
+              to="/"
+              aria-label="ITTalent home"
+              className="flex shrink-0 items-center gap-2.5 text-white"
+            >
+              <LogoMark tone="brand" />
+              <span className="itt-display text-[18px] font-bold uppercase tracking-[0.04em] text-white">
+                ITTALENT
+              </span>
+            </Link>
 
-            <div className="flex flex-col gap-4">
-              <div>
-                <span className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wider text-(--primary) uppercase">
-                  FOR EMPLOYERS
-                </span>
-              </div>
-              <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight text-white xl:text-5xl">
+            {/* Copy block with 88px top offset matching mockup */}
+            <div className="mt-[88px] flex flex-col gap-[18px]">
+              <span className="self-start inline-flex h-[26px] items-center rounded-full bg-(--primary)/18 px-3 text-[11.5px] font-bold uppercase tracking-[0.08em] text-(--hero-employer-badge-fg)">
+                FOR EMPLOYERS
+              </span>
+
+              <h1 className="font-heading text-[46px] font-semibold leading-[1.06] tracking-[-0.015em] text-white">
                 Hire IT talent
                 <br />
                 with less busywork.
               </h1>
-              <p className="max-w-md text-base leading-relaxed text-white/70">
+
+              <p className="max-w-[400px] text-[15.5px] leading-[1.6] text-(--hero-employer-desc)">
                 Post jobs, review applications and schedule interviews for your company in one workspace.
               </p>
-            </div>
-          </div>
 
-          {/* Bottom link */}
-          <div className="relative z-10 pt-8">
-            <Link
-              to="/login"
-              className="text-sm font-medium text-white/80 underline underline-offset-4 decoration-white/40 transition-colors hover:text-white"
-            >
-              Looking for a job? Candidate sign in →
-            </Link>
+              {/* Candidate sign in CTA directly below hero copy */}
+              <div className="mt-1.5 text-[14px]">
+                <Link
+                  to="/login"
+                  className="font-semibold text-white underline underline-offset-4 decoration-white/40 transition-colors hover:text-white hover:decoration-white"
+                >
+                  Looking for a job? Candidate sign in →
+                </Link>
+              </div>
+            </div>
           </div>
         </aside>
 
-        {/* Form view column */}
-        <main className="flex min-h-screen flex-col overflow-y-auto bg-background">
-          <div className="flex items-center justify-between border-b border-border bg-(--hero-bg) px-6 py-4 text-white lg:hidden">
-            <BrandLogo tone="inverse" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-(--primary)">
-              FOR EMPLOYERS
+        {/* Mobile Top Header (Small Screens Only) */}
+        <div className="flex items-center justify-between border-b border-border bg-(--hero-bg) px-6 py-4 text-white lg:hidden">
+          <Link
+            to="/"
+            aria-label="ITTalent home"
+            className="flex shrink-0 items-center gap-2.5 text-white"
+          >
+            <LogoMark tone="brand" />
+            <span className="itt-display text-[18px] font-bold uppercase tracking-[0.04em] text-white">
+              ITTALENT
             </span>
-          </div>
-          <div className="flex flex-1 items-center justify-center p-6 sm:p-12 lg:p-16">
-            <div className="w-full max-w-[480px]">
-              {children}
-            </div>
+          </Link>
+          <Link
+            to="/login"
+            className="text-xs font-semibold text-white/90 underline underline-offset-2"
+          >
+            Candidate sign in →
+          </Link>
+        </div>
+
+        {/* Form view column */}
+        <main className="flex min-h-screen flex-1 items-center justify-center overflow-y-auto bg-background p-6 sm:p-10 lg:p-12">
+          <div className="w-full max-w-[440px]">
+            {children}
           </div>
         </main>
       </div>
