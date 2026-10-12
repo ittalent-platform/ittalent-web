@@ -130,11 +130,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
       <AdminPageHeader
         actions={
           actor === "recruiter" ? (
-            <Button
-              asChild
-              className="h-11 px-5 text-sm font-semibold"
-              shape="pill"
-            >
+            <Button asChild shape="pill" size="xl">
               <Link to={`${basePath}/create`}>
                 <Plus className="size-4" />
                 {t("jobPostings.create")}

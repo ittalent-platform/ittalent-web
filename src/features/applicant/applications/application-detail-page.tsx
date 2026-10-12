@@ -25,7 +25,6 @@ import { WithdrawApplicationsDialog } from "./withdraw-applications-dialog";
 import { HTTP_BAD_REQUEST, HTTP_NOT_FOUND } from "@/api/http-status";
 import { requestStatus } from "@/api/request-error";
 
-const PAGE = "mx-auto flex w-full max-w-[1264px] flex-col gap-5 px-4 pb-12 pt-8 sm:px-6";
 const CARD = "surface-card";
 
 /** UC-MYAPP-02 / 03: one owned application with its progress, documents and status history. */
@@ -56,17 +55,17 @@ export function ApplicationDetailPage() {
   );
 
   if (detail.isPending) {
-    return <main aria-busy="true" className={PAGE}><Skeleton className="h-6 w-56" /><Skeleton className="h-44 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /></main>;
+    return <div aria-busy="true" className="flex flex-col gap-5"><Skeleton className="h-6 w-56" /><Skeleton className="h-44 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /></div>;
   }
   if (detail.isError || !application) {
     const status = requestStatus(detail.error);
     const missing = status === HTTP_NOT_FOUND || status === HTTP_BAD_REQUEST;
     return (
-      <main className={PAGE}>
+      <>
         {missing
           ? <div className={CARD}><EmptyState action={{ label: t("applications.back"), onClick: () => navigate(APPLICATIONS_PATH), variant: "outline" }} description={t(status === HTTP_BAD_REQUEST ? "applications.invalidLinkDescription" : "applications.notFoundDescription")} icon={FileText} title={t(status === HTTP_BAD_REQUEST ? "applications.invalidLink" : "applications.notFound")} /></div>
           : <ErrorState description={t("applications.loadErrorHint")} onRetry={() => void detail.refetch()} secondaryAction={{ label: t("applications.back"), onClick: () => navigate(APPLICATIONS_PATH) }} title={t("applications.loadErrorTitle")} />}
-      </main>
+      </>
     );
   }
 
@@ -75,7 +74,7 @@ export function ApplicationDetailPage() {
   const isWithdrawn = application.status === "withdrawn";
 
   return (
-    <main className={PAGE}>
+    <>
       <div className="flex items-center gap-3">
         <Breadcrumb ariaLabel={t("applications.breadcrumb")} items={[{ label: t("applications.title"), to: APPLICATIONS_PATH }, { label: displayId, mono: true }]} />
         <Button asChild className="h-10 gap-2 px-[18px] text-sm font-semibold" shape="pill" variant="outline"><Link to={jobPath(application.jobId)}><ExternalLink aria-hidden />{t("applications.viewJob")}</Link></Button>
@@ -169,6 +168,6 @@ export function ApplicationDetailPage() {
         onOpenChange={() => setWithdrawOpen(false)}
         targets={withdrawOpen ? [{ id: application.id, jobTitle: application.job.title, companyName: application.job.companyName, version: application.version, isReapplication }] : []}
       />
-    </main>
+    </>
   );
 }

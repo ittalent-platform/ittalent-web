@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { useSession } from "@/auth/use-session";
 import { APPLICATIONS_PATH } from "@/config/routes";
 
-import { MarketplaceLogo } from "./marketplace-logo";
+import { LogoMark } from "./brand-logo";
 
 const colTitle =
   "font-mono text-[11px] font-bold tracking-[0.12em] text-mkt-on-dark-muted";
@@ -17,7 +17,7 @@ export function MarketplaceFooter() {
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
         <div className="flex flex-col gap-3.5">
           <div className="flex items-center gap-2.5">
-            <MarketplaceLogo size={28} />
+            <LogoMark className="size-[28px]" />
             <span className="itt-display text-[17px] font-bold tracking-[0.04em]">
               ITTALENT
             </span>

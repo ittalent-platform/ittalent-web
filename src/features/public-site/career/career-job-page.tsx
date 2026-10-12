@@ -16,77 +16,17 @@ import { Link, useNavigate, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { useSession } from "@/auth/use-session";
-import { getErrorStatus } from "@/lib/api-errors";
-import {
-  getApiV1EnterprisesByEnterpriseId,
-  getApiV1JobPostings,
-  getApiV1JobPostingsByIdPublic,
-  type EnterpriseDetailDto,
-  type JobPosting,
-} from "@/api/generated";
+import { HTTP_NOT_FOUND } from "@/api/http-status";
+import { requestStatus } from "@/api/request-error";
 
 import { ApplyButton } from "./apply-button";
-
-type Job = {
-  _id: string;
-  enterpriseId?: string;
-  title: string;
-  slug: string;
-  location?: string;
-  employment_type?: string;
-  salary_min?: number;
-  salary_max?: number;
-  currency?: string;
-  level?: string;
-  aboutTheRole?: string;
-  description?: string;
-  requirements?: string;
-  benefits?: string;
-  openings?: number;
-  expires_at?: string;
-  createdAt?: string;
-};
-
-const toJob = (dto: JobPosting): Job => ({
-  _id: dto.id,
-  enterpriseId: dto.enterpriseId,
-  title: dto.title,
-  slug: dto.id,
-  location: dto.location,
-  employment_type: dto.employmentType,
-  salary_min: dto.salaryMin,
-  salary_max: dto.salaryMax,
-  currency: dto.currency,
-  level: dto.level,
-  description: dto.description,
-  requirements: dto.requirements,
-  benefits: dto.benefits,
-  openings: dto.openings,
-  expires_at: dto.expiresAt,
-  createdAt: dto.createdAt,
-});
-
-type Enterprise = {
-  id: string;
-  name: string;
-  logoUrl?: string;
-  industry?: string;
-  location?: string;
-  shortDescription?: string;
-  description?: string;
-  website?: string;
-};
-
-const toEnterprise = (dto: EnterpriseDetailDto): Enterprise => ({
-  id: dto.id,
-  name: dto.name,
-  logoUrl: dto.logoUrl ?? undefined,
-  industry: dto.industry ?? undefined,
-  location: [dto.address.city, dto.address.country].filter(Boolean).join(", ") || undefined,
-  shortDescription: dto.shortDescription ?? undefined,
-  description: dto.description ?? undefined,
-  website: dto.website ?? undefined,
-});
+import {
+  loadEnterprise,
+  loadEnterpriseOpenJobs,
+  loadPublicJob,
+  publicKeys,
+  type PublicJob as Job,
+} from "@/features/public-site/shared/public-site.data";
 import {
   EMPLOYMENT_LABELS,
   formatDeadline,
@@ -96,9 +36,8 @@ import {
 } from "./career-format";
 import { StateCard } from "./state-card";
 import { LogoTile } from "@/components/common/logo-tile";
+import { CARD_TITLE, PILL_PRIMARY, PILL_SECONDARY } from "@/features/public-site/shared/market-styles";
 
-const h2Class =
-  "m-0 itt-display text-[21px] font-semibold";
 const cardClass =
   "flex flex-col gap-3.5 market-card p-5 md:p-7";
 
@@ -180,39 +119,22 @@ export function CareerJobPage() {
   const { data: session } = useSession();
 
   const { data, error, isError, isLoading, refetch } = useQuery({
-    queryKey: ["job", slug],
-    queryFn: async () => {
-      const result = await getApiV1JobPostingsByIdPublic({ path: { id: slug! } });
-      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      return toJob(result.data);
-    },
+    queryKey: publicKeys.job(slug),
+    queryFn: () => loadPublicJob(slug!),
     enabled: !!slug,
   });
   const job: Job | undefined = data;
 
   const enterpriseId = job?.enterpriseId;
   const { data: company } = useQuery({
-    queryKey: ["enterprise", enterpriseId],
-    queryFn: async () => {
-      const result = await getApiV1EnterprisesByEnterpriseId({ path: { enterpriseId: enterpriseId! } });
-      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      return toEnterprise(result.data);
-    },
+    queryKey: publicKeys.enterprise(enterpriseId),
+    queryFn: () => loadEnterprise(enterpriseId!),
     enabled: !!enterpriseId,
     staleTime: 60_000,
   });
   const { data: companyJobs } = useQuery({
-    queryKey: ["enterprise-jobs", enterpriseId],
-    queryFn: async () => {
-      const result = await getApiV1JobPostings({ query: { enterprise_id: enterpriseId!, limit: 100, page: 1 } });
-      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      const now = Date.now();
-      const jobs = result.data.items
-        .filter((item) => item.enterpriseId === enterpriseId)
-        .filter((item) => !item.expiresAt || new Date(item.expiresAt).getTime() >= now)
-        .map(toJob);
-      return jobs;
-    },
+    queryKey: publicKeys.enterpriseJobs(enterpriseId),
+    queryFn: () => loadEnterpriseOpenJobs(enterpriseId!),
     enabled: !!enterpriseId,
     staleTime: 60_000,
   });
@@ -239,7 +161,7 @@ export function CareerJobPage() {
     );
   }
 
-  if (isError && getErrorStatus(error) !== 404) {
+  if (isError && requestStatus(error) !== HTTP_NOT_FOUND) {
     return (
       <PageShell>
         <div className="px-4 py-16 md:px-12">
@@ -256,7 +178,7 @@ export function CareerJobPage() {
           >
             <div className="flex flex-wrap justify-center gap-2.5">
               <button
-                className="flex h-10 items-center gap-2 rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+                className={PILL_PRIMARY}
                 onClick={() => refetch()}
                 type="button"
               >
@@ -264,7 +186,7 @@ export function CareerJobPage() {
                 Try again
               </button>
               <Link
-                className="flex h-10 items-center rounded-full border border-mkt-line-strong bg-white px-[18px] text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+                className={PILL_SECONDARY}
                 to="/career"
               >
                 Back to job list
@@ -293,13 +215,13 @@ export function CareerJobPage() {
           >
             <div className="flex flex-wrap justify-center gap-2.5">
               <Link
-                className="flex h-10 items-center rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+                className={PILL_PRIMARY}
                 to="/career"
               >
                 Browse jobs
               </Link>
               <Link
-                className="flex h-10 items-center rounded-full border border-mkt-line-strong bg-white px-[18px] text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+                className={PILL_SECONDARY}
                 to="/enterprises"
               >
                 Browse companies
@@ -460,21 +382,21 @@ export function CareerJobPage() {
         <div className="flex min-w-0 flex-col gap-4 lg:col-span-8">
           {about ? (
             <section className={cardClass}>
-              <h2 className={h2Class}>About the role</h2>
+              <h2 className={CARD_TITLE}>About the role</h2>
               <TextBlock text={about} />
             </section>
           ) : null}
 
           {job.requirements ? (
             <section className={cardClass}>
-              <h2 className={h2Class}>Requirements</h2>
+              <h2 className={CARD_TITLE}>Requirements</h2>
               <TextBlock text={job.requirements} />
             </section>
           ) : null}
 
           {benefits.length > 0 ? (
             <section className={cardClass}>
-              <h2 className={h2Class}>Benefits</h2>
+              <h2 className={CARD_TITLE}>Benefits</h2>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {benefits.map((b, i) => (
                   <div
@@ -494,7 +416,7 @@ export function CareerJobPage() {
 
           {job.location ? (
             <section className={`${cardClass} gap-3`}>
-              <h2 className={h2Class}>Where you'll work</h2>
+              <h2 className={CARD_TITLE}>Where you'll work</h2>
               <div className="flex items-start gap-3 text-sm text-mkt-ink-2">
                 <MapPin
                   aria-hidden="true"

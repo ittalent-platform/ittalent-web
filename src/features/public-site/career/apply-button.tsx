@@ -5,6 +5,8 @@ import { Link } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 
 import { postApiV1MeApplications } from "@/api/generated";
+import { HTTP_BAD_REQUEST, HTTP_CONFLICT, HTTP_FORBIDDEN, HTTP_NOT_FOUND, HTTP_UNAUTHORIZED } from "@/api/http-status";
+import { type RequestError, unwrap } from "@/api/request-error";
 import {
   Dialog,
   DialogContent,
@@ -29,22 +31,19 @@ type ApplyButtonProps = {
 const primaryBtn =
   "flex h-[46px] w-full items-center justify-center rounded-full bg-mkt-accent text-[14.5px] font-semibold text-white hover:bg-mkt-accent-hover disabled:cursor-not-allowed disabled:opacity-60";
 
-function errorMessage(status: number | undefined, error: unknown) {
-  const raw = JSON.stringify(error ?? {});
+function errorMessage(status: number | undefined, code: string | undefined) {
   switch (status) {
-    case 400:
+    case HTTP_BAD_REQUEST:
       return "Your application is invalid. Please re-select your CV and try again.";
-    case 401:
+    case HTTP_UNAUTHORIZED:
       return "Your session has expired. Please sign in again.";
-    case 403:
+    case HTTP_FORBIDDEN:
       return "Only applicant accounts with a verified email can apply.";
-    case 404:
+    case HTTP_NOT_FOUND:
       return "This job is no longer available.";
-    case 409:
-      if (raw.includes("ALREADY_APPLIED"))
-        return "You have already applied to this job.";
-      if (raw.includes("POSITION_FILLED"))
-        return "This position has been filled.";
+    case HTTP_CONFLICT:
+      if (code === "ALREADY_APPLIED") return "You have already applied to this job.";
+      if (code === "POSITION_FILLED") return "This position has been filled.";
       return "You can't apply to this job again.";
     default:
       return "Something went wrong. Please try again.";
@@ -74,8 +73,8 @@ export function ApplyButton({ companyName, deadline, jobId, jobTitle }: ApplyBut
   const expired = deadline ? new Date(deadline).getTime() < now : false;
 
   const apply = useMutation({
-    mutationFn: async () => {
-      const result = await postApiV1MeApplications({
+    mutationFn: async () =>
+      unwrap(await postApiV1MeApplications({
         body: {
           jobPostingId: jobId,
           cvId,
@@ -83,23 +82,15 @@ export function ApplyButton({ companyName, deadline, jobId, jobTitle }: ApplyBut
           ...(message.trim() ? { message: message.trim() } : {}),
           ...(certificateLinkIds.length ? { certificateLinkIds } : {}),
         },
-      });
-      if (result.error || !result.data) {
-        throw Object.assign(new Error("apply-failed"), {
-          status: result.response?.status,
-          detail: result.error,
-        });
-      }
-      return result.data;
-    },
+      })),
     onSuccess: () => setOpen(false),
-    onError: (err: Error & { status?: number; detail?: unknown }) => {
-      if (err.status === 409 && JSON.stringify(err.detail ?? {}).includes("CERTIFICATE_UNAVAILABLE")) {
+    onError: (err: RequestError) => {
+      if (err.code === "CERTIFICATE_UNAVAILABLE") {
         setFormError(t("applications.applyCertificates.unavailable"));
         void certificates.refetch();
         return;
       }
-      setFormError(errorMessage(err.status, err.detail));
+      setFormError(errorMessage(err.status, err.code));
     },
   });
 

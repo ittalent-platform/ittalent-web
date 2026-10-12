@@ -3,7 +3,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 // Static class names so Tailwind can see them; the palette itself lives in globals.css (--logo-n).
-const LOGO_TONES = ["bg-(--logo-1)", "bg-(--logo-2)", "bg-(--logo-3)", "bg-(--logo-4)", "bg-(--logo-5)", "bg-(--logo-6)"] as const;
+const LOGO_TONES = ["bg-logo-1", "bg-logo-2", "bg-logo-3", "bg-logo-4", "bg-logo-5", "bg-logo-6"] as const;
 // Same five pairs and hash as the marketplace Jobs / Companies marks, so a company keeps one colour everywhere.
 const TINT_TONES = [
   "bg-mkt-accent-soft text-mkt-accent-hover",

@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { type RefObject, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import {
   AlertCircle,
   Check,
@@ -8,13 +8,20 @@ import {
   Plus,
   Upload,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { HTTP_CONFLICT } from "@/api/http-status";
+import type { RequestError } from "@/api/request-error";
 import type {
   CreateEnterpriseDto,
   EnterpriseDetailDto,
   UpdateEnterpriseDto,
 } from "@/api/generated/types.gen";
+import { DIALOG_BUTTON_CLASS } from "@/components/common/action-confirm-dialog";
+import { AdminPageHeader } from "@/components/common/admin-page-header";
+import { Breadcrumb } from "@/components/common/breadcrumb";
+import { FormField, FormFieldLabel, FormFieldMessage } from "@/components/common/form-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,11 +42,13 @@ import {
   COUNTRY_OPTIONS,
 } from "./enterprises.constants";
 import {
+  SAVE_FAILED,
   useCreateEnterpriseMutation,
   useEnterpriseDetailQuery,
   useUpdateEnterpriseMutation,
 } from "./enterprises.queries";
 import { EnterpriseStatusBadge, formatEnterpriseId } from "./enterprise-badges";
+import { SectionCard } from "@/components/common/section-card";
 
 type TagInputProps = {
   label: string;
@@ -78,7 +87,7 @@ function TagInput({ label, tags, onChange, placeholder = "Type and press Enter" 
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-[13.5px] font-semibold text-foreground">{label}</label>
+      <FormFieldLabel className="mb-0">{label}</FormFieldLabel>
       <div className="flex flex-wrap items-center gap-1.5 p-2 rounded-xl border border-border bg-card min-h-[46px] focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition">
         {tags.map((tag) => (
           <span
@@ -219,35 +228,18 @@ function EnterpriseFormContent({
   const [branchCity, setBranchCity] = useState("Hà Nội");
   const [branchCountry, setBranchCountry] = useState("Vietnam");
 
-  function handleLogoFile(file: File) {
+  // Logo and cover are previewed (and sent) as data URLs, up to 2 MB each.
+  function readImage(file: File, kind: "Logo" | "Cover", setUrl: (url: string) => void) {
     if (file.size > 2 * 1024 * 1024) {
       toast.showToast({
         tone: "error",
         title: "File too large",
-        message: "Logo image must be under 2 MB.",
+        message: `${kind} image must be under 2 MB.`,
       });
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => {
-      setLogoUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function handleCoverFile(file: File) {
-    if (file.size > 2 * 1024 * 1024) {
-      toast.showToast({
-        tone: "error",
-        title: "File too large",
-        message: "Cover image must be under 2 MB.",
-      });
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setCoverUrl(reader.result as string);
-    };
+    reader.onload = () => setUrl(reader.result as string);
     reader.readAsDataURL(file);
   }
 
@@ -406,57 +398,45 @@ function EnterpriseFormContent({
         }
       }
     } catch (err: unknown) {
-      const errObj = err as {
-        status?: number;
-        data?: { message?: string; errors?: Record<string, string[]> };
-        message?: string;
-      };
-
-      if (errObj.status === 409) {
-        setErrorMessage(
-          errObj.data?.message ||
-            "Tax code or corporate email already belongs to another enterprise. Please verify details."
-        );
-      } else {
-        setErrorMessage(
-          errObj.data?.message ||
-            errObj.message ||
-            "An error occurred while saving the enterprise profile."
-        );
-      }
+      const { message, status } = err as RequestError;
+      // A 409 without a server message still explains the usual cause.
+      setErrorMessage(status === HTTP_CONFLICT && message === SAVE_FAILED
+        ? "Tax code or corporate email already belongs to another enterprise. Please verify details."
+        : message || SAVE_FAILED);
     }
   }
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
+  const clearError = (key: string) => {
+    if (fieldErrors[key]) setFieldErrors((prev) => ({ ...prev, [key]: "" }));
+  };
+  const required = (key: string, setter: (value: string) => void) => (value: string) => {
+    setter(value);
+    clearError(key);
+  };
+
   return (
     <div className="space-y-5">
-      {/* Breadcrumb matching design */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Link to="/admin/enterprises" className="hover:text-foreground transition-colors">
-          {t("adminEnterprises.page.title", "Enterprise Profiles")}
-        </Link>
-        <span aria-hidden="true" className="text-muted-foreground">/</span>
-        <span className="font-mono text-foreground font-semibold">
-          {isEditMode ? `${formatEnterpriseId(enterpriseId)} / Edit` : "New"}
-        </span>
-      </nav>
-
-      {/* Header */}
-      <div className="flex flex-col gap-1.5">
-        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-          {isEditMode
-            ? t("adminEnterprises.form.editTitle", "Edit enterprise profile")
-            : t("adminEnterprises.form.createTitle", "Create enterprise profile")}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {isEditMode
-            ? "Changes are saved to the audit log. Fields marked * are required."
-            : "For a company that passed offline legal and tax vetting. Fields marked * are required."}
-        </p>
+      <div className="flex">
+        <Breadcrumb
+          ariaLabel="Breadcrumb"
+          items={[
+            { label: t("adminEnterprises.page.title", "Enterprise Profiles"), to: "/admin/enterprises" },
+            { label: isEditMode ? `${formatEnterpriseId(enterpriseId)} / Edit` : "New", mono: true },
+          ]}
+        />
       </div>
 
-      {/* Error alert banner */}
+      <AdminPageHeader
+        description={isEditMode
+          ? "Changes are saved to the audit log. Fields marked * are required."
+          : "For a company that passed offline legal and tax vetting. Fields marked * are required."}
+        title={isEditMode
+          ? t("adminEnterprises.form.editTitle", "Edit enterprise profile")
+          : t("adminEnterprises.form.createTitle", "Create enterprise profile")}
+      />
+
       {errorMessage && (
         <div className="flex items-start gap-3 p-4 rounded-xl border border-(--danger-border) bg-(--danger-bg) text-(--danger-fg) text-sm">
           <AlertCircle className="size-5 shrink-0 mt-0.5" />
@@ -467,68 +447,27 @@ function EnterpriseFormContent({
         </div>
       )}
 
-      {/* Form & Right Rail Grid Layout matching design */}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-5 items-start">
-          {/* Main Form Sections */}
           <div className="flex flex-col gap-[18px]">
-            {/* Section 1: Legal identity */}
-            <section className="p-6 surface-card flex flex-col gap-[18px]">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-base font-bold text-foreground">Legal identity</h2>
-                <span className="text-[13px] text-muted-foreground">Must match the documents checked during offline vetting.</span>
-              </div>
-
+            <SectionCard description="Must match the documents checked during offline vetting." title="Legal identity">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4.5">
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="company-name" className="text-[13.5px] font-semibold text-foreground">
-                    Display name <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    id="company-name"
-                    placeholder="Nova Fintech"
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: "" }));
-                    }}
-                    className={`h-[46px] rounded-xl border-border ${fieldErrors.name ? "border-destructive focus-visible:ring-destructive/20" : ""}`}
-                  />
-                  <span className="text-[12.5px] text-muted-foreground">Shown on the public company page · 2–150 characters</span>
-                  {fieldErrors.name && <p className="text-xs text-destructive font-medium">{fieldErrors.name}</p>}
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="legal-name" className="text-[13.5px] font-semibold text-foreground">
-                    Legal name
-                  </label>
-                  <Input
-                    id="legal-name"
-                    placeholder="Công ty Cổ phần …"
-                    value={legalName}
-                    onChange={(e) => setLegalName(e.target.value)}
-                    className="h-[46px] rounded-xl border-border"
-                  />
-                  <span className="text-[12.5px] text-muted-foreground">As on the business registration</span>
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="tax-code" className="text-[13.5px] font-semibold text-foreground">
-                    Tax code <span className="text-destructive">*</span>
-                  </label>
+                <FormField error={fieldErrors.name} hint="Shown on the public company page · 2–150 characters" htmlFor="company-name" label="Display name" required>
+                  <Input aria-invalid={Boolean(fieldErrors.name)} id="company-name" onChange={(e) => required("name", setName)(e.target.value)} placeholder="Nova Fintech" value={name} />
+                </FormField>
+                <FormField hint="As on the business registration" htmlFor="legal-name" label="Legal name">
+                  <Input id="legal-name" onChange={(e) => setLegalName(e.target.value)} placeholder="Công ty Cổ phần …" value={legalName} />
+                </FormField>
+                <FormField error={fieldErrors.taxCode} hint={isEditMode ? "Locked after creation · 10–13 digits" : "10–13 digits · must be unique"} htmlFor="tax-code" label="Tax code" required>
                   <div className="relative">
                     <Input
+                      aria-invalid={Boolean(fieldErrors.taxCode)}
+                      className={`font-mono ${isEditMode ? "pr-10" : ""}`}
+                      disabled={isEditMode}
                       id="tax-code"
+                      onChange={(e) => required("taxCode", setTaxCode)(e.target.value)}
                       placeholder="10–13 numeric digits"
                       value={taxCode}
-                      disabled={isEditMode}
-                      onChange={(e) => {
-                        setTaxCode(e.target.value);
-                        if (fieldErrors.taxCode) setFieldErrors((prev) => ({ ...prev, taxCode: "" }));
-                      }}
-                      className={`h-[46px] rounded-xl border-border font-mono ${
-                        isEditMode ? "bg-surface-readonly dark:bg-muted/40 text-foreground/70 cursor-not-allowed pr-10" : ""
-                      } ${fieldErrors.taxCode ? "border-destructive focus-visible:ring-destructive/20" : ""}`}
                     />
                     {isEditMode && (
                       <span className="absolute right-3.5 top-3.5 text-muted-foreground">
@@ -536,231 +475,68 @@ function EnterpriseFormContent({
                       </span>
                     )}
                   </div>
-                  <span className="text-[12.5px] text-muted-foreground">
-                    {isEditMode ? "Locked after creation · 10–13 digits" : "10–13 digits · must be unique"}
-                  </span>
-                  {fieldErrors.taxCode && <p className="text-xs text-destructive font-medium">{fieldErrors.taxCode}</p>}
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="reg-number" className="text-[13.5px] font-semibold text-foreground">
-                    Registration number
-                  </label>
+                </FormField>
+                <FormField htmlFor="reg-number" label="Registration number">
+                  <Input className="font-mono" id="reg-number" onChange={(e) => setRegistrationNumber(e.target.value)} placeholder="Optional" value={registrationNumber} />
+                </FormField>
+                <FormField hint="Between 1900 and this year" htmlFor="founded-year" label="Founded year">
                   <Input
-                    id="reg-number"
-                    placeholder="Optional"
-                    value={registrationNumber}
-                    onChange={(e) => setRegistrationNumber(e.target.value)}
-                    className="h-[46px] rounded-xl border-border font-mono"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="founded-year" className="text-[13.5px] font-semibold text-foreground">
-                    Founded year
-                  </label>
-                  <Input
+                    className="font-mono"
                     id="founded-year"
-                    type="number"
-                    min={1900}
                     max={new Date().getFullYear()}
-                    placeholder="e.g. 2016"
-                    value={foundedYear}
+                    min={1900}
                     onChange={(e) => setFoundedYear(e.target.value ? parseInt(e.target.value, 10) : "")}
-                    className="h-[46px] rounded-xl border-border font-mono"
+                    placeholder="e.g. 2016"
+                    type="number"
+                    value={foundedYear}
                   />
-                  <span className="text-[12.5px] text-muted-foreground">Between 1900 and this year</span>
-                </div>
+                </FormField>
               </div>
-            </section>
+            </SectionCard>
 
-            {/* Section 2: Contact */}
-            <section className="p-6 surface-card flex flex-col gap-[18px]">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-base font-bold text-foreground">Contact</h2>
-                <span className="text-[13px] text-muted-foreground">The corporate email and tax code must not belong to another enterprise.</span>
-              </div>
-
+            <SectionCard description="The corporate email and tax code must not belong to another enterprise." title="Contact">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4.5">
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="email" className="text-[13.5px] font-semibold text-foreground">
-                    Corporate email <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="hr@company.vn"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: "" }));
-                    }}
-                    className={`h-[46px] rounded-xl border-border ${fieldErrors.email ? "border-destructive focus-visible:ring-destructive/20" : ""}`}
-                  />
-                  <span className="text-[12.5px] text-muted-foreground">Must be unique · stored in lowercase</span>
-                  {fieldErrors.email && <p className="text-xs text-destructive font-medium">{fieldErrors.email}</p>}
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="phone" className="text-[13.5px] font-semibold text-foreground">
-                    Phone <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    id="phone"
-                    placeholder="028 3822 1100"
-                    value={phone}
-                    onChange={(e) => {
-                      setPhone(e.target.value);
-                      if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: "" }));
-                    }}
-                    className={`h-[46px] rounded-xl border-border ${fieldErrors.phone ? "border-destructive focus-visible:ring-destructive/20" : ""}`}
-                  />
-                  <span className="text-[12.5px] text-muted-foreground">8–20 digits</span>
-                  {fieldErrors.phone && <p className="text-xs text-destructive font-medium">{fieldErrors.phone}</p>}
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="website" className="text-[13.5px] font-semibold text-foreground">
-                    Website
-                  </label>
-                  <Input
-                    id="website"
-                    type="url"
-                    placeholder="https://"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    className="h-[46px] rounded-xl border-border"
-                  />
-                </div>
+                <FormField error={fieldErrors.email} hint="Must be unique · stored in lowercase" htmlFor="email" label="Corporate email" required>
+                  <Input aria-invalid={Boolean(fieldErrors.email)} id="email" onChange={(e) => required("email", setEmail)(e.target.value)} placeholder="hr@company.vn" type="email" value={email} />
+                </FormField>
+                <FormField error={fieldErrors.phone} hint="8–20 digits" htmlFor="phone" label="Phone" required>
+                  <Input aria-invalid={Boolean(fieldErrors.phone)} id="phone" onChange={(e) => required("phone", setPhone)(e.target.value)} placeholder="028 3822 1100" value={phone} />
+                </FormField>
+                <FormField htmlFor="website" label="Website">
+                  <Input id="website" onChange={(e) => setWebsite(e.target.value)} placeholder="https://" type="url" value={website} />
+                </FormField>
               </div>
-            </section>
+            </SectionCard>
 
-            {/* Section 3: Company admin (Create mode only) */}
             {!isEditMode && (
-              <section className="p-6 surface-card flex flex-col gap-[18px]">
-                <div className="flex flex-col gap-1">
-                  <h2 className="text-base font-bold text-foreground">Company admin</h2>
-                  <span className="text-[13px] text-muted-foreground">The first person who can sign in for this company. They get an invitation email to set a password.</span>
-                </div>
-
+              <SectionCard description="The first person who can sign in for this company. They get an invitation email to set a password." title="Company admin">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4.5">
-                  <div className="flex flex-col gap-2 min-w-0">
-                    <label htmlFor="admin-name" className="text-[13.5px] font-semibold text-foreground">
-                      Full name <span className="text-destructive">*</span>
-                    </label>
-                    <Input
-                      id="admin-name"
-                      placeholder="Tran Thi B"
-                      value={companyAdminName}
-                      onChange={(e) => {
-                        setCompanyAdminName(e.target.value);
-                        if (fieldErrors.adminName) setFieldErrors((prev) => ({ ...prev, adminName: "" }));
-                      }}
-                      className={`h-[46px] rounded-xl border-border ${fieldErrors.adminName ? "border-destructive focus-visible:ring-destructive/20" : ""}`}
-                    />
-                    {fieldErrors.adminName && <p className="text-xs text-destructive font-medium">{fieldErrors.adminName}</p>}
-                  </div>
-
-                  <div className="flex flex-col gap-2 min-w-0">
-                    <label htmlFor="admin-email" className="text-[13.5px] font-semibold text-foreground">
-                      Work email <span className="text-destructive">*</span>
-                    </label>
-                    <Input
-                      id="admin-email"
-                      type="email"
-                      placeholder="name@company.vn"
-                      value={companyAdminEmail}
-                      onChange={(e) => {
-                        setCompanyAdminEmail(e.target.value);
-                        if (fieldErrors.adminEmail) setFieldErrors((prev) => ({ ...prev, adminEmail: "" }));
-                      }}
-                      className={`h-[46px] rounded-xl border-border ${fieldErrors.adminEmail ? "border-destructive focus-visible:ring-destructive/20" : ""}`}
-                    />
-                    <span className="text-[12.5px] text-muted-foreground">Must not belong to another ITTalent account</span>
-                    {fieldErrors.adminEmail && <p className="text-xs text-destructive font-medium">{fieldErrors.adminEmail}</p>}
-                  </div>
-
-                  <div className="flex flex-col gap-2 min-w-0">
-                    <label htmlFor="admin-title" className="text-[13.5px] font-semibold text-foreground">
-                      Job title
-                    </label>
-                    <Input
-                      id="admin-title"
-                      placeholder="Optional"
-                      value={companyAdminTitle}
-                      onChange={(e) => setCompanyAdminTitle(e.target.value)}
-                      className="h-[46px] rounded-xl border-border"
-                    />
-                  </div>
+                  <FormField error={fieldErrors.adminName} htmlFor="admin-name" label="Full name" required>
+                    <Input aria-invalid={Boolean(fieldErrors.adminName)} id="admin-name" onChange={(e) => required("adminName", setCompanyAdminName)(e.target.value)} placeholder="Tran Thi B" value={companyAdminName} />
+                  </FormField>
+                  <FormField error={fieldErrors.adminEmail} hint="Must not belong to another ITTalent account" htmlFor="admin-email" label="Work email" required>
+                    <Input aria-invalid={Boolean(fieldErrors.adminEmail)} id="admin-email" onChange={(e) => required("adminEmail", setCompanyAdminEmail)(e.target.value)} placeholder="name@company.vn" type="email" value={companyAdminEmail} />
+                  </FormField>
+                  <FormField htmlFor="admin-title" label="Job title">
+                    <Input id="admin-title" onChange={(e) => setCompanyAdminTitle(e.target.value)} placeholder="Optional" value={companyAdminTitle} />
+                  </FormField>
                 </div>
-              </section>
+              </SectionCard>
             )}
 
-            {/* Section 4: Business */}
-            <section className="p-6 surface-card flex flex-col gap-[18px]">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-base font-bold text-foreground">Business</h2>
-                <span className="text-[13px] text-muted-foreground">Used for filters on the public company list.</span>
-              </div>
-
+            <SectionCard description="Used for filters on the public company list." title="Business">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4.5">
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="industry-select" className="text-[13.5px] font-semibold text-foreground">
-                    Industry <span className="text-destructive">*</span>
-                  </label>
-                  <Select value={industry} onValueChange={(val) => {
-                    setIndustry(val);
-                    if (fieldErrors.industry) setFieldErrors((prev) => ({ ...prev, industry: "" }));
-                  }}>
-                    <SelectTrigger id="industry-select" className="w-full h-[46px] rounded-xl border-border">
-                      <SelectValue placeholder="Select industry..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {INDUSTRY_OPTIONS.map((opt) => (
-                        <SelectItem key={opt} value={opt}>
-                          {opt}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <span className="text-[12.5px] text-muted-foreground">e.g. Information Technology, Fintech</span>
-                  {fieldErrors.industry && <p className="text-xs text-destructive font-medium">{fieldErrors.industry}</p>}
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="company-type-select" className="text-[13.5px] font-semibold text-foreground">
-                    Company type
-                  </label>
-                  <Select value={companyType} onValueChange={setCompanyType}>
-                    <SelectTrigger id="company-type-select" className="w-full h-[46px] rounded-xl border-border">
-                      <SelectValue placeholder="Select type..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COMPANY_TYPE_OPTIONS.map((opt) => (
-                        <SelectItem key={opt} value={opt}>
-                          {opt}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <span className="text-[12.5px] text-muted-foreground">Product, Outsourcing, IT Service, Consulting, Agency, Hybrid or Other</span>
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <TagInput
-                    label="Sub-industries"
-                    placeholder="Type and press Enter"
-                    tags={subIndustries}
-                    onChange={setSubIndustries}
-                  />
-                </div>
+                <FormField error={fieldErrors.industry} hint="e.g. Information Technology, Fintech" htmlFor="industry-select" label="Industry" required>
+                  <OptionSelect id="industry-select" onChange={required("industry", setIndustry)} options={INDUSTRY_OPTIONS} placeholder="Select industry..." value={industry} />
+                </FormField>
+                <FormField hint="Product, Outsourcing, IT Service, Consulting, Agency, Hybrid or Other" htmlFor="company-type-select" label="Company type">
+                  <OptionSelect id="company-type-select" onChange={setCompanyType} options={COMPANY_TYPE_OPTIONS} placeholder="Select type..." value={companyType} />
+                </FormField>
+                <TagInput label="Sub-industries" onChange={setSubIndustries} placeholder="Type and press Enter" tags={subIndustries} />
               </div>
 
-              {/* Company size button chips matching design */}
               <div className="flex flex-col gap-2">
-                <label className="text-[13.5px] font-semibold text-foreground">
-                  Company size <span className="text-destructive">*</span>
-                </label>
+                <FormFieldLabel className="mb-0" required>Company size</FormFieldLabel>
                 <div role="group" className="flex flex-wrap gap-2">
                   {COMPANY_SIZE_OPTIONS.map((opt) => {
                     const isSelected = companySize === opt;
@@ -768,10 +544,7 @@ function EnterpriseFormContent({
                       <button
                         key={opt}
                         type="button"
-                        onClick={() => {
-                          setCompanySize(opt);
-                          if (fieldErrors.companySize) setFieldErrors((prev) => ({ ...prev, companySize: "" }));
-                        }}
+                        onClick={() => required("companySize", setCompanySize)(opt)}
                         className={`h-[42px] px-4 rounded-xl text-sm font-medium transition cursor-pointer border ${
                           isSelected
                             ? "border-foreground bg-surface-readonly dark:bg-muted text-foreground font-semibold"
@@ -783,116 +556,32 @@ function EnterpriseFormContent({
                     );
                   })}
                 </div>
-                {fieldErrors.companySize && <p className="text-xs text-destructive font-medium">{fieldErrors.companySize}</p>}
+                {fieldErrors.companySize && <FormFieldMessage error>{fieldErrors.companySize}</FormFieldMessage>}
               </div>
-            </section>
+            </SectionCard>
 
-            {/* Section 5: Headquarters address */}
-            <section className="p-6 surface-card flex flex-col gap-[18px]">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-base font-bold text-foreground">Headquarters address</h2>
-                <span className="text-[13px] text-muted-foreground">Street, city and country are required.</span>
-              </div>
-
+            <SectionCard description="Street, city and country are required." title="Headquarters address">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4.5">
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="street" className="text-[13.5px] font-semibold text-foreground">
-                    Street <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    id="street"
-                    placeholder="Number, street, ward"
-                    value={street}
-                    onChange={(e) => {
-                      setStreet(e.target.value);
-                      if (fieldErrors.street) setFieldErrors((prev) => ({ ...prev, street: "" }));
-                    }}
-                    className={`h-[46px] rounded-xl border-border ${fieldErrors.street ? "border-destructive focus-visible:ring-destructive/20" : ""}`}
-                  />
-                  {fieldErrors.street && <p className="text-xs text-destructive font-medium">{fieldErrors.street}</p>}
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="district" className="text-[13.5px] font-semibold text-foreground">
-                    District
-                  </label>
-                  <Input
-                    id="district"
-                    placeholder="Optional"
-                    value={district}
-                    onChange={(e) => setDistrict(e.target.value)}
-                    className="h-[46px] rounded-xl border-border"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="city-select" className="text-[13.5px] font-semibold text-foreground">
-                    City <span className="text-destructive">*</span>
-                  </label>
-                  <Select value={city} onValueChange={(val) => {
-                    setCity(val);
-                    if (fieldErrors.city) setFieldErrors((prev) => ({ ...prev, city: "" }));
-                  }}>
-                    <SelectTrigger id="city-select" className="w-full h-[46px] rounded-xl border-border">
-                      <SelectValue placeholder="Select city..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CITY_OPTIONS.map((opt) => (
-                        <SelectItem key={opt} value={opt}>
-                          {opt}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {fieldErrors.city && <p className="text-xs text-destructive font-medium">{fieldErrors.city}</p>}
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="state-province" className="text-[13.5px] font-semibold text-foreground">
-                    State / province
-                  </label>
-                  <Input
-                    id="state-province"
-                    placeholder="Optional"
-                    value={stateProvince}
-                    onChange={(e) => setStateProvince(e.target.value)}
-                    className="h-[46px] rounded-xl border-border"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="country-select" className="text-[13.5px] font-semibold text-foreground">
-                    Country <span className="text-destructive">*</span>
-                  </label>
-                  <Select value={country} onValueChange={setCountry}>
-                    <SelectTrigger id="country-select" className="w-full h-[46px] rounded-xl border-border">
-                      <SelectValue placeholder="Select country..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COUNTRY_OPTIONS.map((opt) => (
-                        <SelectItem key={opt} value={opt}>
-                          {opt}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex flex-col gap-2 min-w-0">
-                  <label htmlFor="postal-code" className="text-[13.5px] font-semibold text-foreground">
-                    Postal code
-                  </label>
-                  <Input
-                    id="postal-code"
-                    placeholder="Optional"
-                    value={postalCode}
-                    onChange={(e) => setPostalCode(e.target.value)}
-                    className="h-[46px] rounded-xl border-border"
-                  />
-                </div>
+                <FormField error={fieldErrors.street} htmlFor="street" label="Street" required>
+                  <Input aria-invalid={Boolean(fieldErrors.street)} id="street" onChange={(e) => required("street", setStreet)(e.target.value)} placeholder="Number, street, ward" value={street} />
+                </FormField>
+                <FormField htmlFor="district" label="District">
+                  <Input id="district" onChange={(e) => setDistrict(e.target.value)} placeholder="Optional" value={district} />
+                </FormField>
+                <FormField error={fieldErrors.city} htmlFor="city-select" label="City" required>
+                  <OptionSelect id="city-select" onChange={required("city", setCity)} options={CITY_OPTIONS} placeholder="Select city..." value={city} />
+                </FormField>
+                <FormField htmlFor="state-province" label="State / province">
+                  <Input id="state-province" onChange={(e) => setStateProvince(e.target.value)} placeholder="Optional" value={stateProvince} />
+                </FormField>
+                <FormField htmlFor="country-select" label="Country" required>
+                  <OptionSelect id="country-select" onChange={setCountry} options={COUNTRY_OPTIONS} placeholder="Select country..." value={country} />
+                </FormField>
+                <FormField htmlFor="postal-code" label="Postal code">
+                  <Input id="postal-code" onChange={(e) => setPostalCode(e.target.value)} placeholder="Optional" value={postalCode} />
+                </FormField>
               </div>
 
-              {/* Branch list */}
               {branches.length > 0 && (
                 <div className="flex flex-col gap-2">
                   {branches.map((branch, idx) => (
@@ -913,226 +602,61 @@ function EnterpriseFormContent({
                 </div>
               )}
 
-              {/* Add branch form */}
               {isAddingBranch ? (
                 <div className="p-4 rounded-xl border border-border bg-background dark:bg-muted/20 flex flex-col gap-3">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <Input
-                      placeholder="Street address"
-                      value={branchStreet}
-                      onChange={(e) => setBranchStreet(e.target.value)}
-                      className="h-[42px] rounded-xl border-border"
-                    />
-                    <Input
-                      placeholder="City"
-                      value={branchCity}
-                      onChange={(e) => setBranchCity(e.target.value)}
-                      className="h-[42px] rounded-xl border-border"
-                    />
-                    <Input
-                      placeholder="Country"
-                      value={branchCountry}
-                      onChange={(e) => setBranchCountry(e.target.value)}
-                      className="h-[42px] rounded-xl border-border"
-                    />
+                    <Input aria-label="Branch street" className="h-[42px]" onChange={(e) => setBranchStreet(e.target.value)} placeholder="Street address" value={branchStreet} />
+                    <Input aria-label="Branch city" className="h-[42px]" onChange={(e) => setBranchCity(e.target.value)} placeholder="City" value={branchCity} />
+                    <Input aria-label="Branch country" className="h-[42px]" onChange={(e) => setBranchCountry(e.target.value)} placeholder="Country" value={branchCountry} />
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      onClick={handleAddBranch}
-                      disabled={!branchStreet.trim()}
-                      className="h-9 px-4 rounded-xl bg-brand hover:bg-brand/90 text-white text-xs font-semibold cursor-pointer"
-                    >
-                      Add
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => { setIsAddingBranch(false); setBranchStreet(""); }}
-                      className="h-9 px-4 rounded-xl border-border text-xs font-semibold cursor-pointer"
-                    >
-                      Cancel
-                    </Button>
+                    <Button disabled={!branchStreet.trim()} onClick={handleAddBranch} size="lg" type="button">Add</Button>
+                    <Button onClick={() => { setIsAddingBranch(false); setBranchStreet(""); }} size="lg" type="button" variant="outline">Cancel</Button>
                   </div>
                 </div>
               ) : (
                 <div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsAddingBranch(true)}
-                    className="h-10 px-4 rounded-xl border-border text-sm font-semibold inline-flex items-center gap-2 cursor-pointer"
-                  >
+                  <Button className={DIALOG_BUTTON_CLASS} onClick={() => setIsAddingBranch(true)} type="button" variant="outline">
                     <Plus className="size-4" />
                     <span>Add branch</span>
                   </Button>
                 </div>
               )}
-            </section>
+            </SectionCard>
 
-            {/* Section 6: Public profile */}
-            <section className="p-6 surface-card flex flex-col gap-[18px]">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-base font-bold text-foreground">Public profile</h2>
-                <span className="text-[13px] text-muted-foreground">Optional. Shown on the public company page. Can be completed later.</span>
-              </div>
-
-              {/* Logo & Cover Dropzones matching design */}
+            <SectionCard description="Optional. Shown on the public company page. Can be completed later." title="Public profile">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4.5">
-                <div className="flex flex-col gap-2">
-                  <span className="text-[13.5px] font-semibold text-foreground">Logo</span>
-                  <input
-                    ref={logoInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleLogoFile(file);
-                    }}
-                  />
-                  <div
-                    onClick={() => logoInputRef.current?.click()}
-                    className="h-[120px] rounded-xl border-[1.5px] border-dashed border-border bg-background dark:bg-muted/30 flex flex-col items-center justify-center gap-1.5 text-xs text-muted-foreground cursor-pointer hover:border-brand/60 transition overflow-hidden relative"
-                  >
-                    {logoUrl ? (
-                      <>
-                        <img src={logoUrl} alt="Logo preview" className="h-full w-full object-contain p-2" />
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); setLogoUrl(""); }}
-                          className="absolute top-1.5 right-1.5 size-6 rounded-full bg-card/80 backdrop-blur border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition cursor-pointer"
-                        >
-                          <X className="size-3" />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="size-5 text-muted-foreground" />
-                        <span className="font-semibold text-foreground">Upload logo</span>
-                        <span>PNG or JPG, up to 2 MB</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <span className="text-[13.5px] font-semibold text-foreground">Cover image</span>
-                  <input
-                    ref={coverInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleCoverFile(file);
-                    }}
-                  />
-                  <div
-                    onClick={() => coverInputRef.current?.click()}
-                    className="h-[120px] rounded-xl border-[1.5px] border-dashed border-border bg-background dark:bg-muted/30 flex flex-col items-center justify-center gap-1.5 text-xs text-muted-foreground cursor-pointer hover:border-brand/60 transition overflow-hidden relative"
-                  >
-                    {coverUrl ? (
-                      <>
-                        <img src={coverUrl} alt="Cover preview" className="h-full w-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); setCoverUrl(""); }}
-                          className="absolute top-1.5 right-1.5 size-6 rounded-full bg-card/80 backdrop-blur border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition cursor-pointer"
-                        >
-                          <X className="size-3" />
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <ImageIcon className="size-5 text-muted-foreground" />
-                        <span className="font-semibold text-foreground">Upload cover</span>
-                        <span>PNG or JPG, up to 2 MB</span>
-                      </>
-                    )}
-                  </div>
-                </div>
+                <ImageDrop icon={Upload} inputRef={logoInputRef} label="Logo" onClear={() => setLogoUrl("")} onFile={(file) => readImage(file, "Logo", setLogoUrl)} previewClassName="object-contain p-2" title="Upload logo" url={logoUrl} />
+                <ImageDrop icon={ImageIcon} inputRef={coverInputRef} label="Cover image" onClear={() => setCoverUrl("")} onFile={(file) => readImage(file, "Cover", setCoverUrl)} previewClassName="object-cover" title="Upload cover" url={coverUrl} />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label htmlFor="short-desc" className="text-[13.5px] font-semibold text-foreground">
-                  Short description
-                </label>
-                <Input
-                  id="short-desc"
-                  placeholder="One line for company cards"
-                  value={shortDescription}
-                  onChange={(e) => setShortDescription(e.target.value)}
-                  className="h-[46px] rounded-xl border-border"
-                />
-                <span className="text-[12.5px] text-muted-foreground">Up to 160 characters</span>
-              </div>
+              <FormField hint="Up to 160 characters" htmlFor="short-desc" label="Short description">
+                <Input id="short-desc" onChange={(e) => setShortDescription(e.target.value)} placeholder="One line for company cards" value={shortDescription} />
+              </FormField>
 
-              <div className="flex flex-col gap-2">
-                <label htmlFor="full-desc" className="text-[13.5px] font-semibold text-foreground">
-                  Description
-                </label>
-                <Textarea
-                  id="full-desc"
-                  rows={4}
-                  placeholder="About the company"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="rounded-xl border-border p-3 text-sm focus-visible:ring-primary/20"
-                />
-                <span className="text-[12.5px] text-muted-foreground">Up to 5,000 characters</span>
+              <FormField hint="Up to 5,000 characters" htmlFor="full-desc" label="Description">
+                <Textarea id="full-desc" onChange={(e) => setDescription(e.target.value)} placeholder="About the company" rows={4} value={description} />
+              </FormField>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4.5">
+                <FormField htmlFor="culture-summary" label="Culture summary">
+                  <Textarea id="culture-summary" onChange={(e) => setCulture(e.target.value)} placeholder="Small squads, weekly demos and a written-first culture." rows={2} value={culture} />
+                </FormField>
+                <FormField htmlFor="working-days" label="Working days">
+                  <Input id="working-days" onChange={(e) => setWorkingDays(e.target.value)} placeholder="e.g. Mon – Fri" value={workingDays} />
+                </FormField>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4.5">
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="culture-summary" className="text-[13.5px] font-semibold text-foreground">
-                    Culture summary
-                  </label>
-                  <Textarea
-                    id="culture-summary"
-                    rows={2}
-                    placeholder="Small squads, weekly demos and a written-first culture."
-                    value={culture}
-                    onChange={(e) => setCulture(e.target.value)}
-                    className="rounded-xl border-border p-3 text-sm focus-visible:ring-primary/20"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="working-days" className="text-[13.5px] font-semibold text-foreground">
-                    Working days
-                  </label>
-                  <Input
-                    id="working-days"
-                    placeholder="e.g. Mon – Fri"
-                    value={workingDays}
-                    onChange={(e) => setWorkingDays(e.target.value)}
-                    className="h-[46px] rounded-xl border-border"
-                  />
-                </div>
+                <TagInput label="Benefits" onChange={setBenefits} placeholder="Add a perk (e.g. 13th-month salary)..." tags={benefits} />
+                <TagInput label="Tech stack" onChange={setTechStack} placeholder="Add a technology (e.g. React, Go, Kotlin)..." tags={techStack} />
               </div>
+            </SectionCard>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4.5">
-                <TagInput
-                  label="Benefits"
-                  placeholder="Add a perk (e.g. 13th-month salary)..."
-                  tags={benefits}
-                  onChange={setBenefits}
-                />
-                <TagInput
-                  label="Tech stack"
-                  placeholder="Add a technology (e.g. React, Go, Kotlin)..."
-                  tags={techStack}
-                  onChange={setTechStack}
-                />
-              </div>
-            </section>
-
-            {/* Section 7: Offline Vetting Confirmation (Create mode only) */}
             {!isEditMode && (
               <section
                 onClick={() => setVettingConfirmed(!vettingConfirmed)}
-                className="p-5 px-6 rounded-2xl bg-(--status-peach-bg) dark:bg-amber-950/20 border border-(--primary-border) dark:border-amber-900/40 flex gap-3.5 items-start cursor-pointer transition select-none"
+                className="p-5 px-6 rounded-2xl bg-(--status-peach-bg) border border-(--primary-border) flex gap-3.5 items-start cursor-pointer transition select-none"
               >
                 <span
                   role="checkbox"
@@ -1150,29 +674,22 @@ function EnterpriseFormContent({
                   <span className="text-[13px] leading-relaxed text-foreground/70 dark:text-muted-foreground">
                     The enterprise is created as <strong>Active</strong> and becomes visible on the public company list right away.
                   </span>
-                  {fieldErrors.vetting && (
-                    <p className="text-xs text-destructive font-medium mt-1">{fieldErrors.vetting}</p>
-                  )}
+                  {fieldErrors.vetting && <FormFieldMessage error>{fieldErrors.vetting}</FormFieldMessage>}
                 </div>
               </section>
             )}
 
-            {/* Footer Actions matching design */}
             <div className="flex items-center justify-end gap-3 pt-4.5">
               <Button
+                disabled={isSubmitting}
+                onClick={() => navigate(isEditMode ? `/admin/enterprises/${enterpriseId}` : "/admin/enterprises")}
+                size="xl"
                 type="button"
                 variant="outline"
-                onClick={() => navigate(isEditMode ? `/admin/enterprises/${enterpriseId}` : "/admin/enterprises")}
-                disabled={isSubmitting}
-                className="h-11 px-5 rounded-xl border-border bg-card text-foreground font-semibold text-sm hover:bg-muted"
               >
                 {t("adminEnterprises.form.cancel", "Cancel")}
               </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="h-11 px-5 rounded-xl bg-brand hover:bg-brand/90 text-white font-semibold text-sm transition shadow-none cursor-pointer"
-              >
+              <Button disabled={isSubmitting} size="xl" type="submit">
                 {isSubmitting
                   ? "Saving..."
                   : isEditMode
@@ -1182,27 +699,20 @@ function EnterpriseFormContent({
             </div>
           </div>
 
-          {/* Right Sticky Sidebar (300px) matching design */}
           <aside className="sticky top-6 flex flex-col gap-4">
             {!isEditMode ? (
-              <>
-                <section className="p-5 surface-card flex flex-col gap-2">
-                  <span className="text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle uppercase">
-                    SET BY THE SYSTEM
-                  </span>
-                  <p className="text-[13px] leading-relaxed text-foreground/70 dark:text-muted-foreground m-0">
-                    Status <strong>Active</strong>, creator (you), created time and enterprise ID. Status is never chosen in this form.
-                    <br /><br />
-                    An invitation (valid 7 days) is emailed to the company admin when you create the enterprise.
-                  </p>
-                </section>
-              </>
+              <section className="p-5 surface-card flex flex-col gap-2">
+                <span className="eyebrow">Set by the system</span>
+                <p className="text-[13px] leading-relaxed text-foreground/70 dark:text-muted-foreground m-0">
+                  Status <strong>Active</strong>, creator (you), created time and enterprise ID. Status is never chosen in this form.
+                  <br /><br />
+                  An invitation (valid 7 days) is emailed to the company admin when you create the enterprise.
+                </p>
+              </section>
             ) : (
               <>
                 <section className="p-5 surface-card flex flex-col gap-3">
-                  <span className="text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle uppercase">
-                    NOT EDITABLE HERE
-                  </span>
+                  <span className="eyebrow">Not editable here</span>
                   <p className="text-[13px] leading-relaxed text-foreground/70 dark:text-muted-foreground m-0">
                     <strong className="text-foreground">Tax code</strong> is locked after creation.
                     <br />
@@ -1221,6 +731,78 @@ function EnterpriseFormContent({
           </aside>
         </div>
       </form>
+    </div>
+  );
+}
+
+
+function OptionSelect({ id, onChange, options, placeholder, value }: { id: string; onChange: (value: string) => void; options: readonly string[]; placeholder: string; value: string }) {
+  return (
+    <Select onValueChange={onChange} value={value}>
+      <SelectTrigger className="w-full h-[46px] rounded-md" id={id}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((opt) => (
+          <SelectItem key={opt} value={opt}>
+            {opt}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+type ImageDropProps = {
+  icon: LucideIcon;
+  inputRef: RefObject<HTMLInputElement | null>;
+  label: string;
+  onClear: () => void;
+  onFile: (file: File) => void;
+  previewClassName: string;
+  title: string;
+  url: string;
+};
+
+/** Click-to-upload image box with a preview and a clear button (logo and cover). */
+function ImageDrop({ icon: Icon, inputRef, label, onClear, onFile, previewClassName, title, url }: ImageDropProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[13.5px] font-semibold text-foreground">{label}</span>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/png,image/jpeg"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) onFile(file);
+        }}
+      />
+      <div
+        onClick={() => inputRef.current?.click()}
+        className="h-[120px] rounded-xl border-[1.5px] border-dashed border-border bg-background dark:bg-muted/30 flex flex-col items-center justify-center gap-1.5 text-xs text-muted-foreground cursor-pointer hover:border-brand/60 transition overflow-hidden relative"
+      >
+        {url ? (
+          <>
+            <img src={url} alt={`${label} preview`} className={`h-full w-full ${previewClassName}`} />
+            <button
+              type="button"
+              aria-label={`Remove ${label.toLowerCase()}`}
+              onClick={(e) => { e.stopPropagation(); onClear(); }}
+              className="absolute top-1.5 right-1.5 size-6 rounded-full bg-card/80 backdrop-blur border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition cursor-pointer"
+            >
+              <X className="size-3" />
+            </button>
+          </>
+        ) : (
+          <>
+            <Icon className="size-5 text-muted-foreground" />
+            <span className="font-semibold text-foreground">{title}</span>
+            <span>PNG or JPG, up to 2 MB</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }

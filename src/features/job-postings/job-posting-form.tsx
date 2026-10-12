@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FormFieldLabel } from "@/components/common/form-field";
+import { FormField } from "@/components/common/form-field";
 import { RailCard } from "@/components/common/rail-card";
 import type {
   CreateJobPostingRequest,
@@ -33,6 +33,7 @@ import {
 } from "./job-postings.constants";
 import { JobPostingStatusBadge } from "./job-posting-status-badge";
 import { toDeadlineDate } from "./job-postings.format";
+import { SectionCard } from "@/components/common/section-card";
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
 
@@ -197,29 +198,7 @@ function updatePayloadFrom(values: Values): UpdateJobPostingRequest {
 
 /** Radix Select cannot hold an empty value, so "clear" is a sentinel that maps back to "". */
 const NO_SELECTION = "__none__";
-const controlClass = "h-[46px] rounded-xl border-border";
-const sectionClass =
-  "flex flex-col gap-[18px] surface-card p-6";
 
-function FormSection({
-  children,
-  description,
-  title,
-}: {
-  children: ReactNode;
-  description: string;
-  title: string;
-}) {
-  return (
-    <section className={sectionClass}>
-      <div className="flex flex-col gap-1">
-        <h2 className="text-[16px] font-bold text-foreground">{title}</h2>
-        <p className="m-0 text-[13px] text-muted-foreground">{description}</p>
-      </div>
-      {children}
-    </section>
-  );
-}
 
 export function JobPostingForm({
   isSaving,
@@ -247,15 +226,13 @@ export function JobPostingForm({
   useEffect(() => form.reset(valuesFrom(posting)), [form, posting]);
 
   const errorOf = (name: keyof Values) => form.formState.errors[name]?.message;
-  const label = (name: keyof Values, text: string, required: boolean) => (
-    <FormFieldLabel className="mb-0" htmlFor={name} required={required}>
-      {text}
-      {required ? null : (
-        <span className="ml-1 font-normal text-muted-foreground">
-          ({t("jobPostings.optional")})
-        </span>
-      )}
-    </FormFieldLabel>
+  const optional = (
+    <span className="text-[13.5px] font-normal text-muted-foreground">({t("jobPostings.optional")})</span>
+  );
+  const wrap = (name: keyof Values, text: string, required: boolean, control: ReactNode, hint?: string) => (
+    <FormField error={errorOf(name)} hint={hint} htmlFor={name} label={text} labelAddon={required ? undefined : optional} required={required}>
+      {control}
+    </FormField>
   );
   const field = (
     name: keyof Values,
@@ -267,73 +244,39 @@ export function JobPostingForm({
       required?: boolean;
       type?: string;
     } = {},
-  ) => (
-    <div className="flex min-w-0 flex-col gap-2">
-      {label(name, text, options.required ?? false)}
-      {options.multiline ? (
-        <Textarea
-          aria-invalid={errorOf(name) ? true : undefined}
-          className="rounded-xl border-border"
-          id={name}
-          rows={5}
-          {...form.register(name)}
-        />
+  ) =>
+    wrap(
+      name,
+      text,
+      options.required ?? false,
+      options.multiline ? (
+        <Textarea aria-invalid={errorOf(name) ? true : undefined} id={name} rows={5} {...form.register(name)} />
       ) : (
-        <Input
-          aria-invalid={errorOf(name) ? true : undefined}
-          className={controlClass}
-          id={name}
-          min={options.min}
-          type={options.type ?? "text"}
-          {...form.register(name)}
-        />
-      )}
-      {errorOf(name) ? (
-        <p
-          className="text-[12.5px] leading-normal text-(--danger-fg)"
-          role="alert"
-        >
-          {errorOf(name)}
-        </p>
-      ) : options.hint ? (
-        <p className="text-[12.5px] leading-normal text-muted-foreground">
-          {options.hint}
-        </p>
-      ) : null}
-    </div>
-  );
+        <Input aria-invalid={errorOf(name) ? true : undefined} id={name} min={options.min} type={options.type ?? "text"} {...form.register(name)} />
+      ),
+      options.hint,
+    );
   const select = (
     name: "employmentType" | "level",
     text: string,
     required: boolean,
     placeholder: string,
     options: { label: string; value: string }[],
-  ) => (
-    <div className="flex min-w-0 flex-col gap-2">
-      {label(name, text, required)}
+  ) =>
+    wrap(
+      name,
+      text,
+      required,
       <Controller
         control={form.control}
         name={name}
         render={({ field }) => (
-          <Select
-            onValueChange={(value) =>
-              field.onChange(value === NO_SELECTION ? "" : value)
-            }
-            value={field.value || undefined}
-          >
-            <SelectTrigger
-              aria-invalid={errorOf(name) ? true : undefined}
-              className={`${controlClass} aria-invalid:border-destructive`}
-              id={name}
-            >
+          <Select onValueChange={(value) => field.onChange(value === NO_SELECTION ? "" : value)} value={field.value || undefined}>
+            <SelectTrigger aria-invalid={errorOf(name) ? true : undefined} className="h-[46px] w-full rounded-md aria-invalid:border-destructive" id={name}>
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
-              {required ? null : (
-                <SelectItem value={NO_SELECTION}>
-                  {t("jobPostings.notSpecified")}
-                </SelectItem>
-              )}
+              {required ? null : <SelectItem value={NO_SELECTION}>{t("jobPostings.notSpecified")}</SelectItem>}
               {options.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -342,17 +285,8 @@ export function JobPostingForm({
             </SelectContent>
           </Select>
         )}
-      />
-      {errorOf(name) ? (
-        <p
-          className="text-[12.5px] leading-normal text-(--danger-fg)"
-          role="alert"
-        >
-          {errorOf(name)}
-        </p>
-      ) : null}
-    </div>
-  );
+      />,
+    );
   const contentHint = t("jobPostings.contentHint", {
     min: JOB_LIMITS.CONTENT_MIN,
     max: JOB_LIMITS.CONTENT_MAX,
@@ -369,7 +303,7 @@ export function JobPostingForm({
     >
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="flex flex-col gap-[18px]">
-          <FormSection
+          <SectionCard
             description={t("jobPostings.form.basicDescription")}
             title={t("jobPostings.basicInformation")}
           >
@@ -403,9 +337,9 @@ export function JobPostingForm({
                 ],
               )}
             </div>
-          </FormSection>
+          </SectionCard>
 
-          <FormSection
+          <SectionCard
             description={t("jobPostings.form.compensationDescription")}
             title={t("jobPostings.compensation")}
           >
@@ -424,9 +358,9 @@ export function JobPostingForm({
                 type: "number",
               })}
             </div>
-          </FormSection>
+          </SectionCard>
 
-          <FormSection
+          <SectionCard
             description={t("jobPostings.form.contentDescription")}
             title={t("jobPostings.content")}
           >
@@ -447,42 +381,30 @@ export function JobPostingForm({
                 required: true,
               })}
             </div>
-          </FormSection>
+          </SectionCard>
 
-          <FormSection
+          <SectionCard
             description={t("jobPostings.deadlineHint")}
             title={t("jobPostings.jobDetails")}
           >
-            <div className="flex max-w-xs flex-col gap-2">
-              {label("expiresAt", t("jobPostings.expiryDate"), true)}
-              <Controller
-                control={form.control}
-                name="expiresAt"
-                render={({ field }) => (
-                  <DatePicker
-                    aria-invalid={errorOf("expiresAt") ? true : undefined}
-                    id="expiresAt"
-                    min={today}
-                    onChange={field.onChange}
-                    today={today}
-                    value={field.value}
-                  />
-                )}
-              />
-              {errorOf("expiresAt") ? (
-                <p
-                  className="text-[12.5px] leading-normal text-(--danger-fg)"
-                  role="alert"
-                >
-                  {errorOf("expiresAt")}
-                </p>
-              ) : null}
+            <div className="max-w-xs">
+              {wrap(
+                "expiresAt",
+                t("jobPostings.expiryDate"),
+                true,
+                <Controller
+                  control={form.control}
+                  name="expiresAt"
+                  render={({ field }) => (
+                    <DatePicker aria-invalid={errorOf("expiresAt") ? true : undefined} id="expiresAt" min={today} onChange={field.onChange} today={today} value={field.value} />
+                  )}
+                />,
+              )}
             </div>
-          </FormSection>
+          </SectionCard>
 
           <div className="flex justify-end gap-3 pt-2">
             <Button
-              className="h-11 rounded-xl px-5 text-sm font-semibold"
               onClick={() =>
                 navigate(
                   posting
@@ -490,16 +412,19 @@ export function JobPostingForm({
                     : JOB_POSTINGS_PATH,
                 )
               }
+              shape="xl"
+              size="xl"
               type="button"
               variant="outline"
             >
               {t("jobPostings.cancel")}
             </Button>
             <Button
-              className="h-11 rounded-xl px-5 text-sm font-semibold"
               disabled={
                 isSaving || (Boolean(posting) && !form.formState.isDirty)
               }
+              shape="xl"
+              size="xl"
               type="submit"
             >
               {isSaving

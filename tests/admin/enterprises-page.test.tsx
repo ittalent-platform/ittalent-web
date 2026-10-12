@@ -176,7 +176,7 @@ describe("Enterprise Profiles Feature Tests", () => {
 
     expect(screen.getByRole("heading", { name: "Create enterprise profile" })).toBeInTheDocument();
     expect(screen.queryByText("REQUIRED TO CREATE")).not.toBeInTheDocument();
-    expect(screen.getByText("SET BY THE SYSTEM")).toBeInTheDocument();
+    expect(screen.getByText(/set by the system/i)).toBeInTheDocument();
     expect(screen.getByText(/I confirm the legal and tax vetting was completed offline/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText("10–13 numeric digits")).toBeInTheDocument();
   });
@@ -211,7 +211,7 @@ describe("Enterprise Profiles Feature Tests", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Edit enterprise profile" })).toBeInTheDocument();
-    expect(screen.getByText("NOT EDITABLE HERE")).toBeInTheDocument();
+    expect(screen.getByText(/not editable here/i)).toBeInTheDocument();
 
     const taxInput = screen.getByDisplayValue("0312345678");
     expect(taxInput).toBeDisabled();
@@ -257,12 +257,12 @@ describe("Enterprise Profiles Feature Tests", () => {
 
     // Type short reason (< 10 chars)
     fireEvent.change(textarea, { target: { value: "Short" } });
-    expect(screen.getByText(/Reason must be at least 10 characters \(5 more needed\)/i)).toBeInTheDocument();
+    expect(screen.getByText("Enter a reason of at least 10 characters.")).toBeInTheDocument();
     expect(submitBtn).toBeDisabled();
 
     // Type >= 10 chars
     fireEvent.change(textarea, { target: { value: "Valid suspension reason for testing" } });
-    expect(screen.queryByText(/Reason must be at least 10 characters/i)).not.toBeInTheDocument();
+    expect(screen.queryByText("Enter a reason of at least 10 characters.")).not.toBeInTheDocument();
     expect(submitBtn).not.toBeDisabled();
   });
 });

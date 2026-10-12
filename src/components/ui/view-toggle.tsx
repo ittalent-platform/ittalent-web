@@ -35,7 +35,7 @@ export function ViewToggle<T extends string = ViewMode>({
 
   return (
     <div
-      className="relative inline-grid rounded-full border border-(--border-strong) bg-card p-1"
+      className="relative inline-grid rounded-full border border-border-strong bg-card p-1"
       role="group"
       /* dynamic: runtime value */
       style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}

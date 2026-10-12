@@ -51,7 +51,7 @@ export function ApplicationsPage() {
       return (
         <div className={`${CARD} flex flex-col items-end gap-3 p-6`}>
           <Callout className="w-full" role="alert" title={t("applications.loadErrorTitle")} tone="error">{t("applications.loadErrorHint")}</Callout>
-          <Button className="h-11 px-6 text-sm font-semibold" onClick={() => void query.refetch()} shape="pill">{t("actions.retry")}</Button>
+          <Button className="px-6 font-semibold" onClick={() => void query.refetch()} shape="pill" size="xl">{t("actions.retry")}</Button>
         </div>
       );
     }
@@ -70,9 +70,9 @@ export function ApplicationsPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-[1264px] flex-col gap-5 px-4 pb-12 pt-8 sm:px-6">
+    <>
       <PageHeader
-        actions={<Button asChild className="h-11 px-[22px] text-sm font-semibold" shape="pill"><Link to="/">{t("applications.browse")}</Link></Button>}
+        actions={<Button asChild className="font-semibold" size="xl" shape="pill"><Link to="/">{t("applications.browse")}</Link></Button>}
         description={subtitle}
         title={t("applications.title")}
       />
@@ -82,6 +82,6 @@ export function ApplicationsPage() {
         <Pagination limit={state.limit} onLimitChange={(limit) => state.set("limit", String(limit))} onPageChange={(page) => state.set("page", String(page))} page={state.page} pageSizeOptions={PAGE_SIZE_OPTIONS} total={data.total} totalPages={data.totalPages} />
       ) : null}
       <WithdrawApplicationsDialog onOpenChange={() => setWithdrawTargets([])} targets={withdrawTargets} />
-    </main>
+    </>
   );
 }

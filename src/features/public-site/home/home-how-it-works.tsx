@@ -9,6 +9,7 @@ import {
   REGISTER_PATH,
   STEP_NUMBERS,
 } from "./home.constants";
+import { SECTION_EYEBROW, SECTION_TITLE } from "@/features/public-site/shared/market-styles";
 
 type Side = "candidates" | "employers";
 
@@ -47,10 +48,10 @@ export function HomeHowItWorks() {
   return (
     <section className="flex flex-col gap-8 border-t border-mkt-line bg-mkt-canvas px-4 py-20 md:px-12">
       <div className="flex flex-col items-center gap-2 text-center">
-        <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-mkt-accent-hover">
+        <span className={SECTION_EYEBROW}>
           {t("home.how.eyebrow")}
         </span>
-        <h2 className="itt-display text-[28px] font-semibold md:text-4xl">
+        <h2 className={SECTION_TITLE}>
           {t("home.how.title")}
         </h2>
       </div>

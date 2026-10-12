@@ -2,18 +2,14 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { AdminPageHeader } from "@/components/common/admin-page-header";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { useListParams } from "@/hooks/use-list-params";
-import { useToast } from "@/components/toast/toast-provider";
 import { EnterprisesTable } from "./enterprises-table";
 import { EnterprisesToolbar, type EnterpriseStatusFilter } from "./enterprises-toolbar";
-import {
-  useEnterprisesListQuery,
-  useUpdateEnterpriseStatusMutation,
-  useDeleteEnterpriseMutation,
-  type EnterpriseSummaryDto,
-} from "./enterprises.queries";
+import { useEnterprisesListQuery, type EnterpriseSummaryDto } from "./enterprises.queries";
+import { useEnterpriseStatusActions } from "./use-enterprise-status-actions";
 import {
   SuspendEnterpriseDialog,
   ActivateEnterpriseDialog,
@@ -25,7 +21,6 @@ const DEFAULT_PAGE_SIZE = 10;
 
 export function EnterprisesPage() {
   const { t } = useTranslation();
-  const toast = useToast();
   const { page, limit, search, set } = useListParams({
     defaultLimit: DEFAULT_PAGE_SIZE,
   });
@@ -49,8 +44,7 @@ export function EnterprisesPage() {
     ...(industry !== "all" ? { industry } : {}),
   });
 
-  const updateStatusMutation = useUpdateEnterpriseStatusMutation(targetItem?.id ?? "");
-  const deleteMutation = useDeleteEnterpriseMutation(targetItem?.id ?? "");
+  const statusActions = useEnterpriseStatusActions(targetItem);
 
   const rawItems = listQuery.data?.items;
   const total = listQuery.data?.total ?? 0;
@@ -102,94 +96,28 @@ export function EnterprisesPage() {
     });
   }, [filteredItems, sortBy, sortOrder]);
 
-  async function handleConfirmSuspend(reason: string) {
-    if (!targetItem) return;
-    try {
-      await updateStatusMutation.mutateAsync({
-        status: "suspended",
-        reason,
-      });
-      toast.showToast({
-        tone: "warning",
-        title: "Enterprise suspended",
-        message: `${targetItem.name} has been suspended and hidden from public view.`,
-      });
-      setActionType(null);
-      setTargetItem(null);
-    } catch {
-      toast.showToast({
-        tone: "error",
-        title: "Suspension failed",
-        message: "Could not suspend enterprise. Please try again.",
-      });
-    }
-  }
-
-  async function handleConfirmActivate(reason?: string) {
-    if (!targetItem) return;
-    try {
-      await updateStatusMutation.mutateAsync({
-        status: "active",
-        reason,
-      });
-      toast.showToast({
-        tone: "success",
-        title: "Enterprise activated",
-        message: `${targetItem.name} is now active and published.`,
-      });
-      setActionType(null);
-      setTargetItem(null);
-    } catch {
-      toast.showToast({
-        tone: "error",
-        title: "Activation failed",
-        message: "Could not activate enterprise. Please try again.",
-      });
-    }
-  }
-
-  async function handleConfirmDelete() {
-    if (!targetItem) return;
-    try {
-      await deleteMutation.mutateAsync();
-      toast.showToast({
-        tone: "success",
-        title: "Enterprise deleted",
-        message: `${targetItem.name} was successfully removed.`,
-      });
-      setActionType(null);
-      setTargetItem(null);
-    } catch {
-      toast.showToast({
-        tone: "error",
-        title: "Deletion failed",
-        message: "Could not delete enterprise. Please try again.",
-      });
-    }
-  }
+  const closeDialog = () => {
+    setActionType(null);
+    setTargetItem(null);
+  };
 
   return (
     <div className="space-y-5">
-      {/* Header matching design */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-col gap-1.5">
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-            {t("adminEnterprises.page.title", "Enterprise Profiles")}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {t("adminEnterprises.page.subtitleCount", {
-              count: total,
-              defaultValue: `${total} enterprises · deleted profiles are not listed`,
-            })}
-          </p>
-        </div>
-        <Button asChild className="h-11 px-5 rounded-full bg-brand hover:bg-brand/90 text-white font-semibold text-sm transition shadow-none cursor-pointer">
-          <Link to="/admin/enterprises/new">
-            <Plus className="size-4 mr-2" />
-            <span>{t("adminEnterprises.create", "Create enterprise")}</span>
-          </Link>
-        </Button>
-      </div>
+      <AdminPageHeader
+        actions={
+          <Button asChild shape="pill" size="xl">
+            <Link to="/admin/enterprises/new">
+              <Plus aria-hidden className="size-4" />
+              {t("adminEnterprises.create", "Create enterprise")}
+            </Link>
+          </Button>
+        }
+        description={t("adminEnterprises.page.subtitleCount", {
+          count: total,
+          defaultValue: `${total} enterprises · deleted profiles are not listed`,
+        })}
+        title={t("adminEnterprises.page.title", "Enterprise Profiles")}
+      />
 
       {/* Search and Filters Toolbar */}
       <EnterprisesToolbar
@@ -263,11 +191,8 @@ export function EnterprisesPage() {
         <SuspendEnterpriseDialog
           isOpen={true}
           enterpriseName={targetItem.name}
-          onClose={() => {
-            setActionType(null);
-            setTargetItem(null);
-          }}
-          onConfirm={handleConfirmSuspend}
+          onClose={closeDialog}
+          onConfirm={statusActions.suspend}
         />
       )}
 
@@ -275,11 +200,8 @@ export function EnterprisesPage() {
         <ActivateEnterpriseDialog
           isOpen={true}
           enterpriseName={targetItem.name}
-          onClose={() => {
-            setActionType(null);
-            setTargetItem(null);
-          }}
-          onConfirm={handleConfirmActivate}
+          onClose={closeDialog}
+          onConfirm={statusActions.activate}
         />
       )}
 
@@ -287,11 +209,8 @@ export function EnterprisesPage() {
         <DeleteEnterpriseDialog
           isOpen={true}
           enterpriseName={targetItem.name}
-          onClose={() => {
-            setActionType(null);
-            setTargetItem(null);
-          }}
-          onConfirm={handleConfirmDelete}
+          onClose={closeDialog}
+          onConfirm={statusActions.remove}
         />
       )}
     </div>

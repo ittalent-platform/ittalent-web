@@ -25,6 +25,7 @@ import {
   type HistoryGroup,
 } from "./user-history.constants";
 import { useUserDetailQuery, useUserHistoryFeedQuery, type HistoryFilters } from "./users.queries";
+import { AdminPageHeader } from "@/components/common/admin-page-header";
 
 const PARAMS = { actor: "actor", from: "from", group: "group", to: "to" } as const;
 /** Several event types travel in one query value: `group=account,email`. */
@@ -82,10 +83,10 @@ export function AdminUserHistoryPage() {
   return (
     <div className="flex flex-col gap-5">
       <Breadcrumb ariaLabel={t("adminUsers.detail.breadcrumb")} items={[{ label: t("adminUsers.page.title"), to: ADMIN_USERS_PATH }, { label: userDisplayName(subject), to: adminUserPath(userId) }, { label: t("adminUsers.detail.history") }]} />
-      <div>
-        <h1 className="itt-display text-2xl font-semibold text-foreground">{t("adminUsers.detail.history")}</h1>
-        <p className="mt-1 line-clamp-2 wrap-anywhere text-[13px] text-muted-foreground" title={userDisplayName(subject)}>{userDisplayName(subject)} · {t("adminUsers.history.timeZoneNote", { zone: HISTORY_TIME_ZONE_LABEL })}</p>
-      </div>
+      <AdminPageHeader
+        description={<span className="line-clamp-2 wrap-anywhere" title={userDisplayName(subject)}>{userDisplayName(subject)} · {t("adminUsers.history.timeZoneNote", { zone: HISTORY_TIME_ZONE_LABEL })}</span>}
+        title={t("adminUsers.detail.history")}
+      />
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="flex min-w-0 flex-col gap-5">
@@ -179,7 +180,7 @@ export function AdminUserHistoryPage() {
                 <DatePicker aria-invalid={rangeError === "span"} clearable id="history-to" onChange={(value) => setParam(PARAMS.to, value)} value={to} />
               </FormField>
             </div>
-            {rangeError ? <p className="text-[12.5px] leading-normal text-(--danger-fg)" role="alert">{t(rangeError === "order" ? "adminUsers.history.rangeOrder" : "adminUsers.history.rangeSpan")}</p> : null}
+            {rangeError ? <p className="text-[12.5px] leading-normal text-danger" role="alert">{t(rangeError === "order" ? "adminUsers.history.rangeOrder" : "adminUsers.history.rangeSpan")}</p> : null}
           </div>
         </section>
       </div>

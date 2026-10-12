@@ -15,10 +15,11 @@ import { Input } from "@/components/ui/input";
 
 import { loginSchema, type LoginFormValues } from "./login.schema";
 import { forgotPasswordPath } from "./password-reset";
-import { getAuthErrorMessage, safeInternalPath } from "./auth-utils";
+import { safeInternalPath } from "./auth-utils";
 import { PasswordField } from "./password-field";
 import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
+import { requestErrorMessage } from "@/api/request-error";
 
 interface SubmitAlertState {
   variant: "error" | "warning";
@@ -73,7 +74,7 @@ export function LoginPage() {
         navigate("/", { replace: true });
       }
     } catch (error) {
-      const rawMessage = getAuthErrorMessage(error, t("auth.login.errorFallback"));
+      const rawMessage = requestErrorMessage(error, t("auth.login.errorFallback"));
       const lower = rawMessage.toLowerCase();
 
       if (
@@ -197,7 +198,7 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <div className="flex items-center gap-3 text-[12.5px] text-(--fg-faint)">
+          <div className="flex items-center gap-3 text-[12.5px] text-fg-faint">
             <div className="h-px flex-1 bg-(--border-faint)" />
             <span>{t("auth.login.newHere")}</span>
             <div className="h-px flex-1 bg-(--border-faint)" />

@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   Building2,
-  ChevronLeft,
-  ChevronRight,
   MapPin,
   RefreshCw,
   Search,
@@ -22,23 +20,23 @@ import {
 import { StateCard } from "@/features/public-site/career/state-card";
 
 import {
-  getApiV1Enterprises,
-  getApiV1JobPostings,
-  type EnterpriseListResponse,
-} from "@/api/generated";
-import { companyInitials, companyTint, LogoTile } from "@/components/common/logo-tile";
-
-type Enterprise = {
-  id: string;
-  name: string;
-  logoUrl?: string;
-  industry?: string;
-  location?: string;
-  shortDescription?: string;
-  description?: string;
-  website?: string;
-  companySize?: string;
-};
+  companyInitials,
+  companyTint,
+  LogoTile,
+} from "@/components/common/logo-tile";
+import {
+  countValues,
+  loadAllEnterprises,
+  loadOpenJobCounts,
+  publicKeys,
+  type PublicEnterprise as Enterprise,
+} from "@/features/public-site/shared/public-site.data";
+import { MarketPager } from "@/features/public-site/shared/market-pager";
+import {
+  PILL_PRIMARY,
+  PILL_SECONDARY,
+} from "@/features/public-site/shared/market-styles";
+import { DirectoryHero, FloatingSearchCard } from "@/features/public-site/shared/directory-hero";
 
 type EnterpriseDirectoryQuery = {
   keyword?: string;
@@ -53,51 +51,6 @@ type EnterpriseDirectoryQuery = {
 
 type EnterpriseSort = "most_jobs" | "name";
 
-const toEnterprise = (item: EnterpriseListResponse["items"][number]): Enterprise => ({
-  id: item.id,
-  name: item.name,
-  logoUrl: item.logoUrl ?? undefined,
-  industry: item.industry ?? undefined,
-  location: item.location ?? undefined,
-  shortDescription: item.shortDescription ?? undefined,
-  companySize: item.companySize ?? undefined,
-});
-
-async function loadAllEnterprises(): Promise<Enterprise[]> {
-  const first = await getApiV1Enterprises({ query: { page: 1, limit: 100, status: "active" } });
-  if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
-  const pages = await Promise.all(
-    Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
-      getApiV1Enterprises({ query: { page: index + 2, limit: 100, status: "active" } }),
-    ),
-  );
-  return [first.data, ...pages.map((result) => {
-    if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-    return result.data;
-  })].flatMap((page) => page.items).map(toEnterprise);
-}
-
-async function loadOpenJobCounts(): Promise<Record<string, number>> {
-  const first = await getApiV1JobPostings({ query: { page: 1, limit: 100 } });
-  if (first.error || !first.data) throw Object.assign(first.error ?? {}, { status: first.response?.status });
-  const pages = await Promise.all(
-    Array.from({ length: Math.max(first.data.totalPages - 1, 0) }, (_, index) =>
-      getApiV1JobPostings({ query: { page: index + 2, limit: 100 } }),
-    ),
-  );
-  const jobs = [first.data, ...pages.map((result) => {
-    if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-    return result.data;
-  })].flatMap((page) => page.items);
-  const counts: Record<string, number> = {};
-  const now = Date.now();
-  for (const job of jobs) {
-    if (job.expiresAt && new Date(job.expiresAt).getTime() < now) continue;
-    counts[job.enterpriseId] = (counts[job.enterpriseId] ?? 0) + 1;
-  }
-  return counts;
-}
-
 const PAGE_SIZE = 12;
 const KEYWORD_MAX = 100;
 
@@ -109,17 +62,43 @@ const SORT_OPTIONS: { value: EnterpriseSort; label: string }[] = [
 /** Hero tile slots; real company initials are dropped in when available. */
 const HERO_TILES = [
   { pos: "left-0 top-6", l: "NP", tone: "bg-mkt-blue-bg text-mkt-blue-fg" },
-  { pos: "left-[100px] top-0", l: "LL", tone: "bg-mkt-accent-soft text-mkt-accent-hover" },
-  { pos: "left-[200px] top-6", l: "TQ", tone: "bg-mkt-violet-bg text-mkt-violet-fg" },
-  { pos: "left-[300px] top-0", l: "MC", tone: "bg-mkt-green-bg text-mkt-green-fg" },
-  { pos: "left-[50px] top-[116px]", l: "VA", tone: "bg-mkt-amber-bg text-mkt-amber-fg" },
+  {
+    pos: "left-[100px] top-0",
+    l: "LL",
+    tone: "bg-mkt-accent-soft text-mkt-accent-hover",
+  },
+  {
+    pos: "left-[200px] top-6",
+    l: "TQ",
+    tone: "bg-mkt-violet-bg text-mkt-violet-fg",
+  },
+  {
+    pos: "left-[300px] top-0",
+    l: "MC",
+    tone: "bg-mkt-green-bg text-mkt-green-fg",
+  },
+  {
+    pos: "left-[50px] top-[116px]",
+    l: "VA",
+    tone: "bg-mkt-amber-bg text-mkt-amber-fg",
+  },
   { pos: "left-[250px] top-[116px]", l: "SH", tone: "bg-white text-mkt-ink" },
-  { pos: "left-[336px] top-[100px]", l: "KH", tone: "bg-mkt-blue-bg text-mkt-blue-fg" },
+  {
+    pos: "left-[336px] top-[100px]",
+    l: "KH",
+    tone: "bg-mkt-blue-bg text-mkt-blue-fg",
+  },
 ];
 
-
 /** Company size bands the API accepts, smallest first. */
-const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"] as const;
+const COMPANY_SIZES = [
+  "1-10",
+  "11-50",
+  "51-200",
+  "201-500",
+  "501-1000",
+  "1000+",
+] as const;
 
 type ActiveChip = { key: string; label: string; remove: () => void };
 
@@ -140,7 +119,8 @@ function CompanyCard({
       onClick={onOpen}
     >
       <div className="flex items-center gap-3.5">
-        <LogoTile tone="tint"
+        <LogoTile
+          tone="tint"
           className="size-[52px] rounded-xl text-[17px]"
           logoUrl={item.logoUrl}
           name={item.name}
@@ -226,7 +206,10 @@ export function EnterprisePage() {
   const { data, isError, isFetching, isLoading, refetch } = useQuery({
     queryKey: ["enterprise-directory-page", query],
     queryFn: async () => {
-      const [all, roleCounts] = await Promise.all([loadAllEnterprises(), loadOpenJobCounts()]);
+      const [all, roleCounts] = await Promise.all([
+        loadAllEnterprises(),
+        loadOpenJobCounts(),
+      ]);
       const term = query.keyword?.trim().toLowerCase();
       const limit = query.limit ?? PAGE_SIZE;
       const filtered = all.filter((item) => {
@@ -237,27 +220,31 @@ export function EnterprisePage() {
         if (term && !item.name.toLowerCase().includes(term)) return false;
         return true;
       });
-      const sorted = [...filtered].sort((a, b) => query.sort === "name"
-        ? a.name.localeCompare(b.name)
-        : (roleCounts[b.id] ?? 0) - (roleCounts[a.id] ?? 0) || a.name.localeCompare(b.name));
+      const sorted = [...filtered].sort((a, b) =>
+        query.sort === "name"
+          ? a.name.localeCompare(b.name)
+          : (roleCounts[b.id] ?? 0) - (roleCounts[a.id] ?? 0) ||
+            a.name.localeCompare(b.name),
+      );
       const totalPages = Math.max(Math.ceil(sorted.length / limit), 1);
       const page = Math.min(Math.max(query.page ?? 1, 1), totalPages);
-      const count = (pick: (item: Enterprise) => string | undefined) => {
-        const counts = new Map<string, number>();
-        for (const item of all) { const value = pick(item); if (value) counts.set(value, (counts.get(value) ?? 0) + 1); }
-        return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
-      };
       return {
         data: sorted.slice((page - 1) * limit, page * limit),
         roleCounts,
-        filters: { industries: count((item) => item.industry), locations: count((item) => item.location) },
-        limit, page, total: sorted.length, totalPages,
+        filters: {
+          industries: countValues(all, (item) => item.industry),
+          locations: countValues(all, (item) => item.location),
+        },
+        limit,
+        page,
+        total: sorted.length,
+        totalPages,
       };
     },
     placeholderData: (previous) => previous,
   });
   const { data: directory } = useQuery({
-    queryKey: ["enterprise-directory"],
+    queryKey: publicKeys.enterpriseDirectory,
     queryFn: loadAllEnterprises,
     staleTime: 60_000,
   });
@@ -267,7 +254,11 @@ export function EnterprisePage() {
       HERO_TILES.map((slot, i) => {
         const company = directory?.[i];
         if (!company) return slot;
-        return { ...slot, l: companyInitials(company.name), tone: companyTint(company.id) };
+        return {
+          ...slot,
+          l: companyInitials(company.name),
+          tone: companyTint(company.id),
+        };
       }),
     [directory],
   );
@@ -297,21 +288,6 @@ export function EnterprisePage() {
   function goToPage(page: number) {
     setQuery((q) => ({ ...q, page }));
     window.scrollTo({ top: 0, behavior: "auto" });
-  }
-
-  function getPageNumbers(): (number | "ellipsis")[] {
-    if (totalPages <= 6) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-    const pages = new Set<number>([1, 2, 3, totalPages]);
-    if (currentPage > 1 && currentPage < totalPages) pages.add(currentPage);
-    const sorted = [...pages].sort((a, b) => a - b);
-    const out: (number | "ellipsis")[] = [];
-    sorted.forEach((p, idx) => {
-      if (idx > 0 && p - sorted[idx - 1] > 1) out.push("ellipsis");
-      out.push(p);
-    });
-    return out;
   }
 
   useEffect(() => {
@@ -380,33 +356,10 @@ export function EnterprisePage() {
   return (
     <main className="flex flex-col">
       {/* Hero */}
-      <section
-        className="relative overflow-hidden bg-mkt-ink hero-dots px-4 pb-24 pt-[52px] text-white md:px-12"
-        id="page-hero"
-      >
-        <div className="absolute -right-40 -top-[300px] size-[640px] rounded-full bg-mkt-brand" />
-        <div className="absolute -right-[60px] -top-[220px] size-[460px] rounded-full border-2 border-white/35" />
-        <div className="relative mx-auto flex max-w-[1344px] items-center gap-12">
-          <div className="flex flex-1 flex-col gap-3.5">
-            <span className="flex h-7 items-center gap-2 self-start rounded-full border border-white/[0.14] bg-white/[0.08] px-3.5 text-[12.5px] font-semibold text-mkt-on-dark-soft">
-              <span className="size-[7px] rounded-full bg-mkt-brand" />
-              Approved companies only
-            </span>
-            <h1 className="itt-display text-[36px] font-semibold leading-[1.08] md:text-[48px]">
-              Find the team
-              <br />
-              <span className="text-mkt-brand">you want to join.</span>
-            </h1>
-            <p className="max-w-[520px] text-base leading-[1.6] text-mkt-on-dark">
-              Every company hiring on ITTalent. Open a company to see its
-              profile and open jobs.
-            </p>
-          </div>
-
-          <div
-            aria-hidden="true"
-            className="relative hidden h-[210px] w-[420px] shrink-0 lg:block"
-          >
+      <DirectoryHero
+        accent="you want to join."
+        art={
+          <>
             {heroTiles.map((t) => (
               <span
                 className={cn(
@@ -420,26 +373,31 @@ export function EnterprisePage() {
               </span>
             ))}
             <span className="absolute left-[150px] top-[116px] box-border flex size-[84px] items-center justify-center rounded-[22px] border-[3px] border-mkt-ink bg-mkt-brand">
-              <svg aria-hidden="true" height="40" viewBox="0 0 32 32" width="40">
-                <circle cx="16" cy="10" fill="#ffffff" r="3.4" />
+              <svg
+                aria-hidden="true"
+                height="40"
+                viewBox="0 0 32 32"
+                width="40"
+              >
+                <circle cx="16" cy="10" className="fill-white" r="3.4" />
                 <path
                   d="M7 25c1.6-6.2 4.8-9.4 9-9.4s7.4 3.2 9 9.4"
                   fill="none"
-                  stroke="#ffffff"
+                  className="stroke-white"
                   strokeLinecap="round"
                   strokeWidth="2.8"
                 />
               </svg>
             </span>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+        badge="Approved companies only"
+        description="Every company hiring on ITTalent. Open a company to see its profile and open jobs."
+        title="Find the team"
+      />
 
       {/* Search + active filters */}
-      <section
-        aria-label="Search companies"
-        className="relative z-[2] mx-auto -mt-[50px] flex w-[calc(100%-2rem)] max-w-[1344px] flex-col gap-4 rounded-[20px] border border-mkt-line bg-white p-5 shadow-[0_10px_24px_rgba(25,25,28,0.1)] md:w-[calc(100%-6rem)]"
-      >
+      <FloatingSearchCard label="Search companies">
         <form
           aria-label="Search companies"
           className="flex flex-col gap-2.5 md:flex-row"
@@ -486,7 +444,10 @@ export function EnterprisePage() {
             ariaLabel="Industry"
             className="md:w-[190px]"
             onChange={(value) => patch({ industry: value || undefined })}
-            options={industries.map((o) => ({ label: o.value, value: o.value }))}
+            options={industries.map((o) => ({
+              label: o.value,
+              value: o.value,
+            }))}
             value={query.industry ?? ""}
           />
 
@@ -504,7 +465,10 @@ export function EnterprisePage() {
             ariaLabel="Company size"
             className="md:w-[160px]"
             onChange={(value) => patch({ size: value || undefined })}
-            options={COMPANY_SIZES.map((size) => ({ label: `${size} people`, value: size }))}
+            options={COMPANY_SIZES.map((size) => ({
+              label: `${size} people`,
+              value: size,
+            }))}
             value={query.size ?? ""}
           />
 
@@ -569,7 +533,7 @@ export function EnterprisePage() {
             </button>
           ) : null}
         </div>
-      </section>
+      </FloatingSearchCard>
 
       {/* Results */}
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 pb-16 pt-8 md:px-12">
@@ -588,7 +552,10 @@ export function EnterprisePage() {
             <MarketSelect
               ariaLabel="Sort by"
               onChange={(value) => patch({ sort: value as EnterpriseSort })}
-              options={SORT_OPTIONS.map((o) => ({ label: o.label, value: o.value }))}
+              options={SORT_OPTIONS.map((o) => ({
+                label: o.label,
+                value: o.value,
+              }))}
               value={query.sort ?? "most_jobs"}
               variant="pill"
             />
@@ -617,7 +584,7 @@ export function EnterprisePage() {
             title="We couldn't load companies"
           >
             <button
-              className="flex h-10 items-center gap-2 rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+              className={PILL_PRIMARY}
               onClick={() => refetch()}
               type="button"
             >
@@ -647,12 +614,14 @@ export function EnterprisePage() {
             }
             iconClassName="bg-mkt-accent-soft"
             title={
-              hasFilters ? "No companies match your filters" : "No companies yet"
+              hasFilters
+                ? "No companies match your filters"
+                : "No companies yet"
             }
           >
             {hasFilters ? (
               <button
-                className="h-10 rounded-full border border-mkt-line-strong bg-white px-[18px] text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+                className={PILL_SECONDARY}
                 onClick={clearAll}
                 type="button"
               >
@@ -679,66 +648,12 @@ export function EnterprisePage() {
         )}
 
         {data && totalPages > 1 ? (
-          <nav
-            aria-label="Pagination"
-            className="flex flex-wrap items-center justify-center gap-1.5 pt-5"
-          >
-            <button
-              aria-label="Previous page"
-              className={cn(
-                "flex size-9 items-center justify-center rounded-full border border-mkt-line-strong bg-white",
-                currentPage === 1
-                  ? "cursor-default text-mkt-check"
-                  : "text-mkt-ink hover:bg-mkt-chip",
-              )}
-              disabled={currentPage === 1}
-              onClick={() => goToPage(currentPage - 1)}
-              type="button"
-            >
-              <ChevronLeft aria-hidden="true" className="size-4" />
-            </button>
-
-            {getPageNumbers().map((p, idx) =>
-              p === "ellipsis" ? (
-                <span
-                  className="w-6 text-center text-mkt-subtle"
-                  key={`e-${idx}`}
-                >
-                  …
-                </span>
-              ) : (
-                <button
-                  aria-current={p === currentPage ? "page" : undefined}
-                  className={cn(
-                    "flex size-9 items-center justify-center rounded-full text-[13px] font-semibold",
-                    p === currentPage
-                      ? "bg-mkt-accent text-white"
-                      : "border border-mkt-line-strong bg-white text-mkt-ink hover:bg-mkt-chip",
-                  )}
-                  key={p}
-                  onClick={() => goToPage(p)}
-                  type="button"
-                >
-                  {p}
-                </button>
-              ),
-            )}
-
-            <button
-              aria-label="Next page"
-              className={cn(
-                "flex size-9 items-center justify-center rounded-full border border-mkt-line-strong bg-white",
-                currentPage === totalPages
-                  ? "cursor-default text-mkt-check"
-                  : "text-mkt-ink hover:bg-mkt-chip",
-              )}
-              disabled={currentPage === totalPages}
-              onClick={() => goToPage(currentPage + 1)}
-              type="button"
-            >
-              <ChevronRight aria-hidden="true" className="size-4" />
-            </button>
-          </nav>
+          <MarketPager
+            className="pt-5"
+            onPageChange={goToPage}
+            page={currentPage}
+            totalPages={totalPages}
+          />
         ) : null}
       </div>
     </main>

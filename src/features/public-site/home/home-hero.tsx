@@ -164,19 +164,19 @@ export function HomeHero() {
             >
               <path
                 d="M346 372 C 330 230, 300 130, 250 76"
-                stroke="rgba(255,255,255,0.35)"
+                className="stroke-white/35"
                 strokeDasharray="5 6"
                 strokeWidth="1.5"
               />
               <path
                 d="M356 372 C 350 300, 330 245, 296 206"
-                stroke="rgba(255,255,255,0.35)"
+                className="stroke-white/35"
                 strokeDasharray="5 6"
                 strokeWidth="1.5"
               />
               <path
                 d="M320 404 C 296 402, 282 394, 264 384"
-                stroke="rgba(255,255,255,0.35)"
+                className="stroke-white/35"
                 strokeDasharray="5 6"
                 strokeWidth="1.5"
               />

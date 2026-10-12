@@ -1,13 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
 
 import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
+import { PageHeader } from "@/components/common/admin-page-header";
 import { Breadcrumb } from "@/components/common/breadcrumb";
 import { DetailRow } from "@/components/common/detail-row";
+import { Field, FieldGrid } from "@/components/common/field-grid";
 import { RailCard } from "@/components/common/rail-card";
+import { SectionCard } from "@/components/common/section-card";
 import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,30 +32,10 @@ import {
 
 type Actor = "admin" | "recruiter";
 
-const card =
-  "flex flex-col gap-[18px] surface-card p-[22px] pb-6";
-
-function Field({ label, value }: { label: string; value?: ReactNode }) {
-  const { t } = useTranslation();
-  return (
-    <div className="flex min-w-0 flex-col gap-1.5">
-      <dt className="text-[13px] text-muted-foreground">{label}</dt>
-      <dd className="m-0 wrap-anywhere text-[14.5px] font-semibold text-foreground">
-        {value || (
-          <span className="font-normal text-muted-foreground">
-            {t("jobPostings.detail.notProvided")}
-          </span>
-        )}
-      </dd>
-    </div>
-  );
-}
-
 function TextSection({ text, title }: { text?: string; title: string }) {
   const { t } = useTranslation();
   return (
-    <section className={card}>
-      <h2 className="text-[15px] font-bold text-foreground">{title}</h2>
+    <SectionCard title={title}>
       {text ? (
         <p className="m-0 whitespace-pre-wrap text-[13.5px] leading-relaxed text-foreground/80">
           {text}
@@ -62,7 +45,7 @@ function TextSection({ text, title }: { text?: string; title: string }) {
           {t("jobPostings.detail.notProvided")}
         </p>
       )}
-    </section>
+    </SectionCard>
   );
 }
 
@@ -115,6 +98,8 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
   const posting = query.data;
   const canManage = actor === "recruiter";
   const applicationCount = posting.applicationCount ?? 0;
+  const orNotProvided = (value?: string) =>
+    value || <span className="font-normal text-muted-foreground">{t("jobPostings.detail.notProvided")}</span>;
 
   return (
     <div className="space-y-5">
@@ -126,93 +111,44 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
         ]}
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex min-w-0 items-center gap-4">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="itt-display truncate text-2xl font-semibold leading-tight text-foreground">
-                {posting.title}
-              </h1>
-              <JobPostingStatusBadge posting={posting} />
-            </div>
-            <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">
-              {[
-                posting.enterprise.name,
-                posting.location,
-                posting.employmentType,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
-          </div>
-        </div>
-        {canManage ? (
-          <div className="flex flex-wrap items-center gap-2.5">
+      <PageHeader
+        actions={canManage ? (
+          <>
             {posting.status !== "archived" ? (
-              <Button
-                asChild
-                className="h-11 rounded-xl px-5 text-sm font-semibold"
-                variant="outline"
-              >
+              <Button asChild shape="xl" size="xl" variant="outline">
                 <Link to={`${basePath}/${posting.id}/edit`}>
                   <Pencil className="size-4 text-muted-foreground" />
                   {t("jobPostings.table.edit")}
                 </Link>
               </Button>
             ) : null}
-            <Button
-              className="h-11 rounded-xl bg-(--danger-fg) px-5 text-sm font-semibold text-white hover:bg-(--danger-fg)/90"
-              onClick={() => setConfirmingDelete(true)}
-              type="button"
-            >
+            <Button onClick={() => setConfirmingDelete(true)} shape="xl" size="xl" type="button" variant="destructive-solid">
               <Trash2 className="size-4" />
               {t("jobPostings.table.delete")}
             </Button>
-          </div>
+          </>
         ) : null}
-      </div>
+        description={
+          <span className="flex flex-wrap items-center gap-2">
+            <JobPostingStatusBadge posting={posting} />
+            <span className="line-clamp-1">{[posting.enterprise.name, posting.location, posting.employmentType].filter(Boolean).join(" · ")}</span>
+          </span>
+        }
+        title={posting.title}
+      />
 
       <div className="grid items-start gap-[18px] lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex flex-col gap-[18px]">
-          <section className={card}>
-            <h2 className="text-[15px] font-bold text-foreground">
-              {t("jobPostings.detail.overview")}
-            </h2>
-            <dl className="m-0 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-              <Field
-                label={t("jobPostings.detail.location")}
-                value={posting.location}
-              />
-              <Field
-                label={t("jobPostings.detail.type")}
-                value={posting.employmentType}
-              />
-              <Field
-                label={t("jobPostings.detail.level")}
-                value={posting.level}
-              />
-              <Field
-                label={t("jobPostings.detail.salary")}
-                value={
-                  formatSalary(posting) === "—"
-                    ? undefined
-                    : formatSalary(posting)
-                }
-              />
-              <Field
-                label={t("jobPostings.detail.openings")}
-                value={posting.openings?.toString()}
-              />
-              <Field
-                label={t("jobPostings.detail.deadline")}
-                value={
-                  posting.expiresAt
-                    ? formatDeadline(posting.expiresAt)
-                    : undefined
-                }
-              />
-            </dl>
-          </section>
+          <SectionCard title={t("jobPostings.detail.overview")}>
+            <FieldGrid>
+              <Field label={t("jobPostings.detail.location")}>{orNotProvided(posting.location)}</Field>
+              <Field label={t("jobPostings.detail.type")}>{orNotProvided(posting.employmentType)}</Field>
+              <Field label={t("jobPostings.detail.level")}>{orNotProvided(posting.level)}</Field>
+              <Field label={t("jobPostings.detail.salary")}>{orNotProvided(formatSalary(posting) === "—" ? undefined : formatSalary(posting))}</Field>
+              <Field label={t("jobPostings.detail.openings")}>{orNotProvided(posting.openings?.toString())}</Field>
+              <Field label={t("jobPostings.detail.deadline")}>{orNotProvided(posting.expiresAt ? formatDeadline(posting.expiresAt) : undefined)}</Field>
+            </FieldGrid>
+          </SectionCard>
           <TextSection
             text={posting.description}
             title={t("jobPostings.detail.description")}

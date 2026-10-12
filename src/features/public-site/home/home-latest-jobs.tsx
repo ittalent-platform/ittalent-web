@@ -18,6 +18,8 @@ import {
 } from "./home.constants";
 import { useHomeData, type HomeJob } from "./home.queries";
 import { LogoTile } from "@/components/common/logo-tile";
+import { cn } from "@/lib/utils";
+import { PILL_SECONDARY, SECTION_EYEBROW, SECTION_TITLE } from "@/features/public-site/shared/market-styles";
 
 const chip =
   "flex h-6 items-center rounded-full bg-mkt-chip px-2.5 text-[12px] font-semibold text-mkt-ink-2";
@@ -88,16 +90,16 @@ export function HomeLatestJobs() {
     <section className="flex flex-col gap-7 border-y border-mkt-line bg-mkt-canvas px-4 py-[72px] md:px-12">
       <div className="flex items-end gap-6">
         <div className="flex flex-col gap-2">
-          <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-mkt-accent-hover">
+          <span className={SECTION_EYEBROW}>
             {t("home.latest.eyebrow")}
           </span>
-          <h2 className="itt-display text-[28px] font-semibold md:text-4xl">
+          <h2 className={SECTION_TITLE}>
             {t("home.latest.title")}
           </h2>
         </div>
         <div className="flex-1" />
         <Link
-          className="flex h-10 shrink-0 items-center gap-2 rounded-full border border-mkt-line-strong bg-white px-[18px] text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+          className={cn(PILL_SECONDARY, "shrink-0")}
           to={CAREER_PATH}
         >
           {t("home.latest.viewAll")}

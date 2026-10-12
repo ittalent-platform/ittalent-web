@@ -21,9 +21,9 @@ export function CandidateLayout() {
           </div>
         </div>
       </header>
-      <div className="flex-1">
+      <main className="mx-auto flex w-full max-w-[1264px] flex-1 flex-col gap-5 px-4 pb-12 pt-8 sm:px-6">
         <Outlet />
-      </div>
+      </main>
       <MarketplaceFooter />
     </div>
   );

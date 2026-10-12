@@ -13,7 +13,8 @@ import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { useSession } from "@/auth/use-session";
-import { getErrorStatus } from "@/lib/api-errors";
+import { HTTP_NOT_FOUND } from "@/api/http-status";
+import { requestStatus } from "@/api/request-error";
 import { cn } from "@/lib/utils";
 import {
   EMPLOYMENT_LABELS,
@@ -24,71 +25,14 @@ import {
 } from "@/features/public-site/career/career-format";
 import { StateCard } from "@/features/public-site/career/state-card";
 
-import {
-  getApiV1EnterprisesByEnterpriseId,
-  getApiV1JobPostings,
-  type EnterpriseDetailDto,
-  type JobPosting,
-} from "@/api/generated";
 import { slideKey, useSlidingIndicator } from "@/hooks/use-sliding-indicator";
 import { LogoTile } from "@/components/common/logo-tile";
-
-type Enterprise = {
-  id: string;
-  name: string;
-  logoUrl?: string;
-  industry?: string;
-  location?: string;
-  shortDescription?: string;
-  description?: string;
-  website?: string;
-  companySize?: string;
-  offices?: string[];
-};
-
-type Job = {
-  _id: string;
-  enterpriseId?: string;
-  title: string;
-  slug: string;
-  location?: string;
-  employment_type?: string;
-  salary_min?: number;
-  salary_max?: number;
-  currency?: string;
-  level?: string;
-  expires_at?: string;
-  createdAt?: string;
-};
-
-const toEnterprise = (dto: EnterpriseDetailDto): Enterprise => ({
-  id: dto.id,
-  name: dto.name,
-  logoUrl: dto.logoUrl ?? undefined,
-  industry: dto.industry ?? undefined,
-  location: [dto.address.city, dto.address.country].filter(Boolean).join(", ") || undefined,
-  shortDescription: dto.shortDescription ?? undefined,
-  description: dto.description ?? undefined,
-  website: dto.website ?? undefined,
-  companySize: dto.companySize ?? undefined,
-  // Offices other than the headquarters.
-  offices: (dto.branches ?? []).map((branch) => branch.city).filter(Boolean),
-});
-
-const toJob = (dto: JobPosting): Job => ({
-  _id: dto.id,
-  enterpriseId: dto.enterpriseId,
-  title: dto.title,
-  slug: dto.id,
-  location: dto.location,
-  employment_type: dto.employmentType,
-  salary_min: dto.salaryMin,
-  salary_max: dto.salaryMax,
-  currency: dto.currency,
-  level: dto.level,
-  expires_at: dto.expiresAt,
-  createdAt: dto.createdAt,
-});
+import {
+  loadEnterprise,
+  loadEnterpriseOpenJobs,
+  publicKeys,
+} from "@/features/public-site/shared/public-site.data";
+import { CARD_TITLE, PILL_PRIMARY, PILL_SECONDARY } from "@/features/public-site/shared/market-styles";
 
 const JOBS_SHOWN = 6;
 /** How long scrolling does not override a tab the visitor just clicked (covers the smooth scroll). */
@@ -110,8 +54,6 @@ function hostname(url: string) {
 
 const card =
   "flex flex-col market-card";
-const h2 =
-  "itt-display text-[21px] font-semibold text-mkt-ink";
 
 function Fact({
   icon,
@@ -219,12 +161,8 @@ export function EnterpriseDetailPage() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["enterprise", id],
-    queryFn: async () => {
-      const result = await getApiV1EnterprisesByEnterpriseId({ path: { enterpriseId: id! } });
-      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      return toEnterprise(result.data);
-    },
+    queryKey: publicKeys.enterprise(id),
+    queryFn: () => loadEnterprise(id!),
     enabled: !!id,
   });
   const {
@@ -233,16 +171,8 @@ export function EnterpriseDetailPage() {
     isError: jobsError,
     refetch: refetchJobs,
   } = useQuery({
-    queryKey: ["enterprise-jobs", id],
-    queryFn: async () => {
-      const result = await getApiV1JobPostings({ query: { enterprise_id: id!, limit: 100, page: 1 } });
-      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      const now = Date.now();
-      return result.data.items
-        .filter((item) => item.enterpriseId === id)
-        .filter((item) => !item.expiresAt || new Date(item.expiresAt).getTime() >= now)
-        .map(toJob);
-    },
+    queryKey: publicKeys.enterpriseJobs(id),
+    queryFn: () => loadEnterpriseOpenJobs(id!),
     enabled: !!id,
   });
 
@@ -272,7 +202,7 @@ export function EnterpriseDetailPage() {
 
   if (isLoading) return <DetailSkeleton />;
 
-  const notFound = isError && getErrorStatus(error) === 404;
+  const notFound = isError && requestStatus(error) === HTTP_NOT_FOUND;
 
   if (isError && !notFound) {
     return (
@@ -290,7 +220,7 @@ export function EnterpriseDetailPage() {
         >
           <div className="flex flex-wrap justify-center gap-2.5">
             <button
-              className="flex h-10 items-center gap-2 rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+              className={PILL_PRIMARY}
               onClick={() => refetch()}
               type="button"
             >
@@ -298,7 +228,7 @@ export function EnterpriseDetailPage() {
               Try again
             </button>
             <Link
-              className="flex h-10 items-center rounded-full border border-mkt-line-strong bg-white px-[18px] text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+              className={PILL_SECONDARY}
               to="/enterprises"
             >
               Back to companies
@@ -324,7 +254,7 @@ export function EnterpriseDetailPage() {
           title="Company not found"
         >
           <Link
-            className="flex h-10 items-center rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+            className={PILL_PRIMARY}
             to="/enterprises"
           >
             Browse companies
@@ -441,7 +371,7 @@ export function EnterpriseDetailPage() {
             className={cn(card, "scroll-mt-4 gap-3.5 p-7")}
             id="about"
           >
-            <h2 className={h2}>About {enterprise.name}</h2>
+            <h2 className={CARD_TITLE}>About {enterprise.name}</h2>
             {aboutParagraphs.length > 0 ? (
               aboutParagraphs.map((p, i) => (
                 <p
@@ -463,7 +393,7 @@ export function EnterpriseDetailPage() {
             id="open-jobs"
           >
             <div className="flex flex-wrap items-center gap-y-1 pb-2.5">
-              <h2 className={h2}>Open jobs</h2>
+              <h2 className={CARD_TITLE}>Open jobs</h2>
               {jobCount > JOBS_SHOWN ? (
                 <span className="ml-2.5 text-[13px] text-mkt-muted">
                   Showing {shownJobs.length} of {jobCount}

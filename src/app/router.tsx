@@ -5,7 +5,6 @@ import { Navigate, createBrowserRouter, RouterProvider } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
 import { AppLayout } from "@/components/layout/admin-layout";
-import { PublicLayout } from "@/components/layout/public-layout";
 import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
@@ -83,11 +82,6 @@ const RecruiterEditJobPostingPage = lazy(() =>
     default: m.RecruiterEditJobPostingPage,
   })),
 );
-const JobsPage = lazy(() =>
-  import("@/features/public-site/jobs-page").then((m) => ({
-    default: m.JobsPage,
-  })),
-);
 const DocumentsPage = lazy(() =>
   import("@/features/documents/documents-page").then((m) => ({
     default: m.DocumentsPage,
@@ -139,12 +133,6 @@ const EnterpriseDetailPage = lazy(() =>
 );
 
 export const appRoutes = [
-  {
-    element: <PublicLayout />,
-    children: [
-      { path: "/jobs", element: <JobsPage /> },
-    ],
-  },
   {
     element: <MarketplaceLayout />,
     children: [
