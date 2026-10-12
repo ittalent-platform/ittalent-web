@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   deleteApiV1DocumentsById,
+  getApiV1AdminDocuments,
   getApiV1Documents,
   getApiV1DocumentsByIdDownload,
   getApiV1DocumentsByIdPreview,
@@ -39,6 +40,17 @@ export function useDocuments(params: DocumentListParams) {
     queryFn: async () =>
       unwrap(
         await getApiV1Documents({ query: params }),
+        "Could not load documents.",
+      ),
+  });
+}
+
+export function useAdminDocuments(params: DocumentListParams) {
+  return useQuery({
+    queryKey: [...documentKeys.all, "admin", params] as const,
+    queryFn: async () =>
+      unwrap(
+        await getApiV1AdminDocuments({ query: params }),
         "Could not load documents.",
       ),
   });

@@ -9,6 +9,8 @@ import {
   E2E_STORAGE_URL,
 } from "./e2e/environment";
 
+export { backendEnv, E2E_API_URL, E2E_WEB_PORT, E2E_WEB_URL } from "./e2e/environment";
+
 // The suite boots the real backend and the real Vite app on their own ports, against a dedicated database,
 // so it never touches the dev data on 3001/5173. MongoDB and Redis come from the backend's docker-compose.
 export default defineConfig({

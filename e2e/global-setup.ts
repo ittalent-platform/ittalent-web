@@ -1,7 +1,15 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { runBackendScript } from "./backend-script";
 import { E2E_API_URL } from "./environment";
-import { ACCOUNT_PASSWORDS, ACCOUNTS, TOKEN_DIR, tokenFile } from "./support";
+import { JOB_POSTING_ACCOUNTS } from "./job-posting-data";
+import { seedEnterpriseAdminJobPostings } from "./seed-enterprise-admin-job-postings";
+import {
+  ACCOUNT_PASSWORDS,
+  ACCOUNTS,
+  PASSWORD,
+  TOKEN_DIR,
+  tokenFile,
+} from "./support";
 
 /** Rebuilds the deterministic demo data, then signs each account in once so tests never hit the login rate limit. */
 export default async function globalSetup(): Promise<void> {
@@ -9,14 +17,22 @@ export default async function globalSetup(): Promise<void> {
   runBackendScript("migrate:document-indexes");
   runBackendScript("seed:applications", { SEED_RESET: "true" });
   runBackendScript("seed:documents:e2e");
+  await seedEnterpriseAdminJobPostings();
   mkdirSync(TOKEN_DIR, { recursive: true });
-  for (const email of Object.values(ACCOUNTS)) {
+  const authenticatedAccounts = [
+    ...Object.values(ACCOUNTS),
+    JOB_POSTING_ACCOUNTS.enterpriseAdmin,
+  ];
+  for (const email of authenticatedAccounts) {
     const response = await fetch(`${E2E_API_URL}/api/v1/auth/login`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         identifier: email,
-        password: ACCOUNT_PASSWORDS[email],
+        password:
+          email === JOB_POSTING_ACCOUNTS.enterpriseAdmin
+            ? PASSWORD
+            : ACCOUNT_PASSWORDS[email],
       }),
     });
     if (!response.ok)

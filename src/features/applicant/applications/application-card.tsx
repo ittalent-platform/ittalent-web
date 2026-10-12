@@ -53,7 +53,7 @@ export function ApplicationCard({ application, locale, selected, dragging, onTog
         <button
           aria-checked={selected}
           aria-label={t("applications.board.select", { id: displayId })}
-          className={cn("absolute right-3 top-3 grid size-5 cursor-pointer place-items-center rounded-md border-[1.5px] p-0 text-white outline-none focus-visible:ring-2 focus-visible:ring-primary/40", selected ? cn("border-transparent", tone.dot) : "border-(--line-dashed) bg-card")}
+          className={cn("absolute right-3 top-3 grid size-5 cursor-pointer place-items-center rounded-md border-[1.5px] p-0 text-white outline-none focus-visible:ring-2 focus-visible:ring-primary/40", selected ? cn("border-transparent", tone.dot) : "border-line-dashed bg-card")}
           onClick={() => onToggle(application.id)}
           role="checkbox"
           type="button"

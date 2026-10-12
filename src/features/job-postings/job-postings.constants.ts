@@ -42,10 +42,20 @@ export const SKELETON_ROW_COUNT = 5;
 export const LIST_PARAMS = {
   type: "type",
   level: "level",
+  publicationStatus: "publication_status",
+  recruitmentStatus: "recruitment_status",
   sortBy: "sort_by",
   sortOrder: "sort_order",
 } as const;
 export const ALL_OPTION = "all";
+
+export const JOB_PUBLICATION_STATUSES = [
+  "draft",
+  "published",
+  "archived",
+] as const;
+export const JOB_RECRUITMENT_STATUSES = ["open", "closed"] as const;
+export const JOB_HISTORY_PAGE_SIZE = 100;
 
 export type JobSortBy = "created_at" | "title" | "expires_at";
 export type JobSortOrder = "asc" | "desc";

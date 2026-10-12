@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 
 import { postApiV1AuthLogin } from "@/api/generated";
 import { authClient } from "@/auth/auth-client";
+// import { dashboardPathForRole } from "@/auth/roles";
 import { authKeys } from "@/auth/use-session";
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
@@ -15,10 +16,11 @@ import { Input } from "@/components/ui/input";
 
 import { loginSchema, type LoginFormValues } from "./login.schema";
 import { forgotPasswordPath } from "./password-reset";
-import { getAuthErrorMessage } from "./auth-utils";
+import { safeInternalPath } from "./auth-utils";
 import { PasswordField } from "./password-field";
 import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";
+import { requestErrorMessage } from "@/api/request-error";
 
 interface SubmitAlertState {
   variant: "error" | "warning";
@@ -59,15 +61,21 @@ export function LoginPage() {
       // Replace any earlier "signed out" session result, or ProtectedRoute would send the user straight back here.
       queryClient.setQueryData(authKeys.me(), result.data.user);
 
+      const next = searchParams.get("next");
+      if (next) {
+        navigate(safeInternalPath(next, "/"), { replace: true });
+        return;
+      }
+
       if (result.data.user.role === "admin") {
         navigate("/admin/users", { replace: true });
-      } else if (result.data.user.role === "recruiter") {
+      } else if (result.data.user.role === "recruiter" || result.data.user.role === "enterprise_admin") {
         navigate("/recruiter/job-postings", { replace: true });
       } else {
         navigate("/", { replace: true });
       }
     } catch (error) {
-      const rawMessage = getAuthErrorMessage(error, t("auth.login.errorFallback"));
+      const rawMessage = requestErrorMessage(error, t("auth.login.errorFallback"));
       const lower = rawMessage.toLowerCase();
 
       if (
@@ -119,7 +127,7 @@ export function LoginPage() {
       <div className="flex h-full flex-1 items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-10">
         <div className="flex w-full max-w-[420px] flex-col gap-[22px]">
           <div className="flex flex-col gap-2">
-            <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[30px] font-semibold tracking-[-0.01em] text-foreground">
+            <h1 className="m-0 itt-display text-[30px] font-semibold tracking-[-0.01em] text-foreground">
               {t("auth.login.title")}
             </h1>
 
@@ -191,7 +199,7 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <div className="flex items-center gap-3 text-[12.5px] text-(--fg-faint)">
+          <div className="flex items-center gap-3 text-[12.5px] text-fg-faint">
             <div className="h-px flex-1 bg-(--border-faint)" />
             <span>{t("auth.login.newHere")}</span>
             <div className="h-px flex-1 bg-(--border-faint)" />
