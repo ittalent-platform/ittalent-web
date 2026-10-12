@@ -1,13 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, type ReactNode } from "react";
+import { Bold, Italic, Link2, List, Underline } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { z } from "zod";
 
-import { Callout } from "@/components/common/callout";
-import { FormFieldLabel } from "@/components/common/form-field";
-import { RailCard } from "@/components/common/rail-card";
+import type {
+  CreateJobPostingRequest,
+  JobPosting,
+  UpdateJobPostingRequest,
+} from "@/api/generated/types.gen";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
@@ -18,12 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import type {
-  CreateJobPostingRequest,
-  JobPosting,
-  UpdateJobPostingRequest,
-} from "@/api/generated/types.gen";
+import { cn } from "@/lib/utils";
 
 import {
   DEFAULT_CURRENCY,
@@ -32,7 +30,6 @@ import {
   JOB_LIMITS,
   JOB_POSTINGS_PATH,
 } from "./job-postings.constants";
-import { JobPostingStatusBadge } from "./job-posting-status-badge";
 import { toDeadlineDate } from "./job-postings.format";
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
@@ -183,7 +180,6 @@ function buildSchema(t: Translate, today: string, postingDeadline?: string) {
           path: ["openings"],
         });
       }
-      // A deadline must be today or later; an existing one that already passed can stay as it is.
       if (
         value.expiresAt &&
         value.expiresAt !== postingDeadline &&
@@ -201,114 +197,89 @@ function buildSchema(t: Translate, today: string, postingDeadline?: string) {
 type Values = z.infer<ReturnType<typeof buildSchema>>;
 
 const blank: Values = {
-  title: "",
-  location: "",
-  employmentType: "",
-  level: "",
-  salaryMin: "",
-  salaryMax: "",
-  salaryNegotiable: false,
-  currency: DEFAULT_CURRENCY,
-  openings: "",
-  expiresAt: "",
-  description: "",
-  requirements: "",
   benefits: "",
+  currency: DEFAULT_CURRENCY,
+  description: "",
+  employmentType: "",
+  expiresAt: "",
+  level: "",
+  location: "",
+  openings: "",
   publicationStatus: "published",
+  requirements: "",
+  salaryMax: "",
+  salaryMin: "",
+  salaryNegotiable: false,
+  title: "",
 };
 
 function valuesFrom(posting?: JobPosting): Values {
   if (!posting) return blank;
   return {
-    title: posting.title,
-    location: posting.location ?? "",
+    benefits: posting.benefits ?? "",
+    currency: posting.currency,
+    description: posting.description ?? "",
     employmentType: (JOB_EMPLOYMENT_TYPES as readonly string[]).includes(
       posting.employmentType ?? "",
     )
       ? (posting.employmentType as Values["employmentType"])
       : "",
-    level: posting.level ?? "",
-    salaryMin: posting.salaryMin?.toString() ?? "",
-    salaryMax: posting.salaryMax?.toString() ?? "",
-    salaryNegotiable: posting.salaryNegotiable,
-    currency: posting.currency,
-    openings: posting.openings?.toString() ?? "",
     expiresAt: posting.expiresAt ? toDeadlineDate(posting.expiresAt) : "",
-    description: posting.description ?? "",
-    requirements: posting.requirements ?? "",
-    benefits: posting.benefits ?? "",
+    level: posting.level ?? "",
+    location: posting.location ?? "",
+    openings: posting.openings?.toString() ?? "",
     publicationStatus: posting.status === "draft" ? "draft" : "unchanged",
+    requirements: posting.requirements ?? "",
+    salaryMax: posting.salaryMax?.toString() ?? "",
+    salaryMin: posting.salaryMin?.toString() ?? "",
+    salaryNegotiable: posting.salaryNegotiable,
+    title: posting.title,
   };
 }
 
 function payloadFrom(values: Values): CreateJobPostingRequest {
   const optional = (value: string) => value.trim() || undefined;
   return {
-    title: values.title.trim(),
+    benefits: optional(values.benefits),
+    currency: values.currency.trim(),
+    description: optional(values.description),
+    employment_type: values.employmentType || undefined,
+    expires_at: optional(values.expiresAt),
+    level: optional(values.level),
+    location: optional(values.location),
+    openings: values.openings ? Number(values.openings) : undefined,
     ...(values.publicationStatus === "unchanged"
       ? {}
       : { publication_status: values.publicationStatus }),
-    location: optional(values.location),
-    employment_type: values.employmentType || undefined,
-    level: optional(values.level),
+    requirements: optional(values.requirements),
     ...(values.salaryNegotiable
       ? { salary_negotiable: true }
       : {
-          salary_min: values.salaryMin ? Number(values.salaryMin) : undefined,
           salary_max: values.salaryMax ? Number(values.salaryMax) : undefined,
+          salary_min: values.salaryMin ? Number(values.salaryMin) : undefined,
         }),
-    currency: values.currency.trim(),
-    openings: values.openings ? Number(values.openings) : undefined,
-    expires_at: optional(values.expiresAt),
-    description: optional(values.description),
-    requirements: optional(values.requirements),
-    benefits: optional(values.benefits),
+    title: values.title.trim(),
   };
 }
 
-// Only the optional fields can be cleared (null); required ones are always sent.
 function updatePayloadFrom(values: Values): UpdateJobPostingRequest {
   return {
     ...payloadFrom(values),
-    salary_negotiable: values.salaryNegotiable,
     level: values.level.trim() || null,
-    salary_min:
-      !values.salaryNegotiable && values.salaryMin
-        ? Number(values.salaryMin)
-        : null,
+    openings: values.openings ? Number(values.openings) : null,
     salary_max:
       !values.salaryNegotiable && values.salaryMax
         ? Number(values.salaryMax)
         : null,
-    openings: values.openings ? Number(values.openings) : null,
+    salary_min:
+      !values.salaryNegotiable && values.salaryMin
+        ? Number(values.salaryMin)
+        : null,
+    salary_negotiable: values.salaryNegotiable,
   };
 }
 
-/** Radix Select cannot hold an empty value, so "clear" is a sentinel that maps back to "". */
 const NO_SELECTION = "__none__";
-const controlClass = "h-[46px] rounded-xl border-border";
-const sectionClass =
-  "flex flex-col gap-[18px] rounded-2xl border border-border bg-card p-6";
-
-function FormSection({
-  children,
-  description,
-  title,
-}: {
-  children: ReactNode;
-  description: string;
-  title: string;
-}) {
-  return (
-    <section className={sectionClass}>
-      <div className="flex flex-col gap-1">
-        <h2 className="text-[16px] font-bold text-foreground">{title}</h2>
-        <p className="m-0 text-[13px] text-muted-foreground">{description}</p>
-      </div>
-      {children}
-    </section>
-  );
-}
 
 export function JobPostingForm({
   isSaving,
@@ -333,7 +304,9 @@ export function JobPostingForm({
     defaultValues: valuesFrom(posting),
     resolver: zodResolver(schema) as never,
   });
+
   useEffect(() => form.reset(valuesFrom(posting)), [form, posting]);
+
   const publicationStatus = useWatch({
     control: form.control,
     name: "publicationStatus",
@@ -345,262 +318,363 @@ export function JobPostingForm({
   const requiresPublishedFields = publicationStatus !== "draft";
 
   const errorOf = (name: keyof Values) => form.formState.errors[name]?.message;
-  const label = (name: keyof Values, text: string, required: boolean) => (
-    <FormFieldLabel className="mb-0" htmlFor={name} required={required}>
-      {text}
-      {required ? null : (
-        <span className="ml-1 font-normal text-muted-foreground">
-          ({t("jobPostings.optional")})
-        </span>
-      )}
-    </FormFieldLabel>
-  );
-  const field = (
-    name: keyof Values,
-    text: string,
-    options: {
-      disabled?: boolean;
-      hint?: string;
-      min?: string;
-      multiline?: boolean;
-      required?: boolean;
-      type?: string;
-    } = {},
-  ) => (
-    <div className="flex min-w-0 flex-col gap-2">
-      {label(name, text, options.required ?? false)}
-      {options.multiline ? (
-        <Textarea
-          aria-invalid={errorOf(name) ? true : undefined}
-          className="rounded-xl border-border"
-          id={name}
-          rows={5}
-          {...form.register(name)}
-        />
-      ) : (
-        <Input
-          aria-invalid={errorOf(name) ? true : undefined}
-          className={controlClass}
-          disabled={options.disabled}
-          id={name}
-          min={options.min}
-          type={options.type ?? "text"}
-          {...form.register(name)}
-        />
-      )}
-      {errorOf(name) ? (
-        <p
-          className="text-[12.5px] leading-normal text-(--danger-fg)"
-          role="alert"
-        >
-          {errorOf(name)}
-        </p>
-      ) : options.hint ? (
-        <p className="text-[12.5px] leading-normal text-muted-foreground">
-          {options.hint}
-        </p>
-      ) : null}
-    </div>
-  );
-  const select = (
-    name: "employmentType" | "level",
-    text: string,
-    required: boolean,
-    placeholder: string,
-    options: { label: string; value: string }[],
-  ) => (
-    <div className="flex min-w-0 flex-col gap-2">
-      {label(name, text, required)}
-      <Controller
-        control={form.control}
-        name={name}
-        render={({ field }) => (
-          <Select
-            onValueChange={(value) =>
-              field.onChange(value === NO_SELECTION ? "" : value)
-            }
-            value={field.value || NO_SELECTION}
-          >
-            <SelectTrigger
-              aria-invalid={errorOf(name) ? true : undefined}
-              className={`${controlClass} aria-invalid:border-destructive`}
-              id={name}
-            >
-              <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-              {required ? null : (
-                <SelectItem value={NO_SELECTION}>
-                  {t("jobPostings.notSpecified")}
-                </SelectItem>
-              )}
-              {options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      />
-      {errorOf(name) ? (
-        <p
-          className="text-[12.5px] leading-normal text-(--danger-fg)"
-          role="alert"
-        >
-          {errorOf(name)}
-        </p>
-      ) : null}
-    </div>
-  );
-  const contentHint = t("jobPostings.contentHint", {
-    min: JOB_LIMITS.CONTENT_MIN,
-    max: JOB_LIMITS.CONTENT_MAX,
-  });
+
   const submit = (values: Values) =>
     posting
       ? onUpdate(updatePayloadFrom(values))
       : onCreate(payloadFrom(values));
+
   const submitAs = (status: Values["publicationStatus"]) => {
     form.setValue("publicationStatus", status);
     void form.handleSubmit(submit)();
   };
 
+  const hasErrors =
+    form.formState.submitCount > 0 &&
+    Object.keys(form.formState.errors).length > 0;
+
   return (
-    <form noValidate onSubmit={form.handleSubmit(submit)}>
-      {form.formState.submitCount > 0 &&
-      Object.keys(form.formState.errors).length > 0 ? (
-        <Callout
-          className="mb-5"
+    <form className="space-y-6" noValidate onSubmit={form.handleSubmit(submit)}>
+      {/* Top action header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="itt-display text-2xl font-bold tracking-tight text-foreground sm:text-[28px]">
+            {posting
+              ? t("jobPostings.editTitle")
+              : t("jobPostings.createTitle")}
+          </h1>
+          <p className="mt-1 text-[13.5px] text-muted-foreground">
+            {posting
+              ? t("jobPostings.form.editDescription")
+              : t("jobPostings.form.createDescription")}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button
+            className="h-10 px-5 text-[13.5px] font-semibold"
+            onClick={() =>
+              navigate(
+                posting
+                  ? `${JOB_POSTINGS_PATH}/${posting.id}`
+                  : JOB_POSTINGS_PATH,
+              )
+            }
+            shape="pill"
+            type="button"
+            variant="outline"
+          >
+            {t("jobPostings.cancel")}
+          </Button>
+
+          {!posting || posting.status === "draft" ? (
+            <Button
+              className="h-10 px-5 text-[13.5px] font-semibold"
+              disabled={
+                isSaving || (Boolean(posting) && !form.formState.isDirty)
+              }
+              onClick={() => submitAs("draft")}
+              shape="pill"
+              type="button"
+              variant="outline"
+            >
+              {isSaving ? t("state.saving") : t("jobPostings.save.draftAction")}
+            </Button>
+          ) : null}
+
+          <Button
+            className="h-10 px-5 text-[13.5px] font-semibold"
+            disabled={
+              isSaving ||
+              (Boolean(posting) &&
+                posting?.status !== "draft" &&
+                !form.formState.isDirty)
+            }
+            onClick={() =>
+              form.setValue(
+                "publicationStatus",
+                !posting || posting.status === "draft"
+                  ? "published"
+                  : "unchanged",
+              )
+            }
+            shape="pill"
+            type="submit"
+          >
+            {isSaving
+              ? t("state.saving")
+              : posting
+                ? posting.status === "draft"
+                  ? t("jobPostings.save.publishAction")
+                  : t("jobPostings.save.action")
+                : t("jobPostings.save.publishAction")}
+          </Button>
+        </div>
+      </div>
+
+      {/* Highlighted error alert banner */}
+      {hasErrors ? (
+        <div
+          className="rounded-lg border border-destructive/30 bg-destructive/10 p-3.5 px-4 text-[13.5px] font-medium leading-relaxed text-destructive"
           role="alert"
-          title={t("jobPostings.form.fixErrors")}
-          tone="error"
-        />
+        >
+          {t("jobPostings.form.errorBanner")}
+        </div>
       ) : null}
+
+      {/* Two-column layout matching reference (minmax(0,1fr) 300px) */}
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="flex flex-col gap-[18px]">
-          <FormSection
-            description={t("jobPostings.form.basicDescription")}
-            title={t("jobPostings.basicInformation")}
-          >
-            <div className="grid gap-x-5 gap-y-[18px] md:grid-cols-2">
-              {field("title", t("jobPostings.titleLabel"), { required: true })}
-              {field("location", t("jobPostings.location"), {
-                required: requiresPublishedFields,
-              })}
-              {select(
-                "employmentType",
-                t("jobPostings.employmentType"),
-                requiresPublishedFields,
-                t("jobPostings.employmentTypePlaceholder"),
-                JOB_EMPLOYMENT_TYPES.map((type) => ({
-                  label: t(`jobPostings.employmentTypes.${type}`),
-                  value: type,
-                })),
-              )}
-              {select(
-                "level",
-                t("jobPostings.level"),
-                false,
-                t("jobPostings.level_placeholder"),
-                [
-                  ...JOB_LEVELS.map((level) => ({
-                    label: level,
-                    value: level,
-                  })),
-                  ...(posting?.level &&
-                  !(JOB_LEVELS as readonly string[]).includes(posting.level)
-                    ? [{ label: posting.level, value: posting.level }]
-                    : []),
-                ],
-              )}
+        {/* Left Column: Role Details & Content */}
+        <section className="flex flex-col gap-6 rounded-xl border border-border bg-card p-6 shadow-xs">
+          {/* Title Field */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-baseline gap-2">
+              <label
+                className="text-[13px] font-semibold text-foreground"
+                htmlFor="title"
+              >
+                {t("jobPostings.titleLabel")}
+              </label>
+              <span className="text-[12px] text-muted-foreground">
+                {t("jobPostings.form.titleDraftHint")}
+              </span>
             </div>
-          </FormSection>
-
-          <FormSection
-            description={t("jobPostings.form.compensationDescription")}
-            title={t("jobPostings.compensation")}
-          >
-            <div className="grid gap-x-5 gap-y-[18px] md:grid-cols-2">
-              {field("salaryMin", t("jobPostings.minimumSalary"), {
-                disabled: salaryNegotiable,
-                min: "0",
-                type: "number",
-              })}
-              {field("salaryMax", t("jobPostings.maximumSalary"), {
-                disabled: salaryNegotiable,
-                min: "0",
-                type: "number",
-              })}
-              {field("currency", t("jobPostings.currency"), { required: true })}
-              {field("openings", t("jobPostings.openings"), {
-                min: "1",
-                type: "number",
-              })}
-            </div>
-            <Controller
-              control={form.control}
-              name="salaryNegotiable"
-              render={({ field }) => (
-                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-surface-subtle px-4 py-3.5">
-                  <input
-                    checked={field.value}
-                    className="mt-0.5 size-5 shrink-0 accent-primary"
-                    onChange={(event) => {
-                      field.onChange(event.target.checked);
-                      if (event.target.checked) {
-                        form.setValue("salaryMin", "", { shouldDirty: true });
-                        form.setValue("salaryMax", "", { shouldDirty: true });
-                      }
-                    }}
-                    type="checkbox"
-                  />
-                  <span className="flex flex-col gap-0.5">
-                    <span className="text-[13.5px] font-semibold text-foreground">
-                      {t("jobPostings.salaryNegotiable")}
-                    </span>
-                    <span className="text-[12.5px] text-muted-foreground">
-                      {t("jobPostings.salaryNegotiableHint")}
-                    </span>
-                  </span>
-                </label>
+            <Input
+              aria-invalid={errorOf("title") ? true : undefined}
+              className={cn(
+                "h-11 rounded-lg border-border text-[14px]",
+                errorOf("title") && "border-destructive ring-1 ring-destructive/30",
               )}
+              id="title"
+              placeholder="Senior Backend Engineer (Java)"
+              {...form.register("title")}
             />
-          </FormSection>
+            {errorOf("title") ? (
+              <p className="text-[12px] text-destructive" role="alert">
+                {errorOf("title")}
+              </p>
+            ) : (
+              <p className="text-[12px] text-muted-foreground">
+                5–150 characters
+              </p>
+            )}
+          </div>
 
-          <FormSection
-            description={t("jobPostings.form.contentDescription")}
-            title={t("jobPostings.content")}
-          >
-            <div className="grid gap-[18px]">
-              {field("description", t("jobPostings.description"), {
-                hint: contentHint,
-                multiline: true,
-                required: requiresPublishedFields,
-              })}
-              {field("requirements", t("jobPostings.requirements"), {
-                hint: contentHint,
-                multiline: true,
-                required: requiresPublishedFields,
-              })}
-              {field("benefits", t("jobPostings.benefits"), {
-                hint: contentHint,
-                multiline: true,
-                required: requiresPublishedFields,
-              })}
+          {/* Description Textarea with Toolbar */}
+          <RichTextareaField
+            error={errorOf("description")}
+            hint={t("jobPostings.contentHint", {
+              max: JOB_LIMITS.CONTENT_MAX,
+              min: JOB_LIMITS.CONTENT_MIN,
+            })}
+            id="description"
+            label={t("jobPostings.description")}
+            register={form.register("description")}
+            required={requiresPublishedFields}
+            subtext={
+              requiresPublishedFields
+                ? t("jobPostings.form.requiredToPublish")
+                : undefined
+            }
+          />
+
+          {/* Requirements Textarea with Toolbar */}
+          <RichTextareaField
+            error={errorOf("requirements")}
+            hint={t("jobPostings.contentHint", {
+              max: JOB_LIMITS.CONTENT_MAX,
+              min: JOB_LIMITS.CONTENT_MIN,
+            })}
+            id="requirements"
+            label={t("jobPostings.requirements")}
+            register={form.register("requirements")}
+            required={requiresPublishedFields}
+            subtext={
+              requiresPublishedFields
+                ? t("jobPostings.form.requiredToPublish")
+                : undefined
+            }
+          />
+
+          {/* Benefits Textarea with Toolbar */}
+          <RichTextareaField
+            error={errorOf("benefits")}
+            hint={t("jobPostings.contentHint", {
+              max: JOB_LIMITS.CONTENT_MAX,
+              min: JOB_LIMITS.CONTENT_MIN,
+            })}
+            id="benefits"
+            label={t("jobPostings.benefits")}
+            register={form.register("benefits")}
+            required={requiresPublishedFields}
+            subtext={
+              requiresPublishedFields
+                ? t("jobPostings.form.requiredToPublish")
+                : undefined
+            }
+          />
+        </section>
+
+        {/* Right Column: Metadata & Sidebar Callout (300px) */}
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-6">
+          <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 shadow-xs">
+            {/* Employment Type */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                className="text-[13px] font-semibold text-foreground"
+                htmlFor="employmentType"
+              >
+                {t("jobPostings.employmentType")}
+              </label>
+              <Controller
+                control={form.control}
+                name="employmentType"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(val) =>
+                      field.onChange(val === NO_SELECTION ? "" : val)
+                    }
+                    value={field.value || NO_SELECTION}
+                  >
+                    <SelectTrigger
+                      aria-invalid={errorOf("employmentType") ? true : undefined}
+                      aria-label={t("jobPostings.employmentType")}
+                      className={cn(
+                        "h-11 rounded-lg border-border text-[13.5px]",
+                        errorOf("employmentType") &&
+                          "border-destructive ring-1 ring-destructive/30",
+                      )}
+                      id="employmentType"
+                    >
+                      <SelectValue
+                        placeholder={t("jobPostings.employmentTypePlaceholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_SELECTION}>
+                        {t("jobPostings.notSpecified")}
+                      </SelectItem>
+                      {JOB_EMPLOYMENT_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {t(`jobPostings.employmentTypes.${type}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errorOf("employmentType") ? (
+                <p className="text-[12px] text-destructive" role="alert">
+                  {errorOf("employmentType")}
+                </p>
+              ) : null}
             </div>
-          </FormSection>
 
-          <FormSection
-            description={t("jobPostings.deadlineHint")}
-            title={t("jobPostings.jobDetails")}
-          >
-            <div className="flex max-w-xs flex-col gap-2">
-              {label(
-                "expiresAt",
-                t("jobPostings.expiryDate"),
-                requiresPublishedFields,
-              )}
+            {/* Level */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                className="text-[13px] font-semibold text-foreground"
+                htmlFor="level"
+              >
+                {t("jobPostings.level")}
+              </label>
+              <Controller
+                control={form.control}
+                name="level"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(val) =>
+                      field.onChange(val === NO_SELECTION ? "" : val)
+                    }
+                    value={field.value || NO_SELECTION}
+                  >
+                    <SelectTrigger
+                      aria-invalid={errorOf("level") ? true : undefined}
+                      aria-label={t("jobPostings.level")}
+                      className="h-11 rounded-lg border-border text-[13.5px]"
+                      id="level"
+                    >
+                      <SelectValue
+                        placeholder={t("jobPostings.level_placeholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_SELECTION}>
+                        {t("jobPostings.notSpecified")}
+                      </SelectItem>
+                      {JOB_LEVELS.map((lvl) => (
+                        <SelectItem key={lvl} value={lvl}>
+                          {lvl}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            {/* Location */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                className="text-[13px] font-semibold text-foreground"
+                htmlFor="location"
+              >
+                {t("jobPostings.location")}
+              </label>
+              <Input
+                aria-invalid={errorOf("location") ? true : undefined}
+                className={cn(
+                  "h-11 rounded-lg border-border text-[13.5px]",
+                  errorOf("location") &&
+                    "border-destructive ring-1 ring-destructive/30",
+                )}
+                id="location"
+                placeholder="Ho Chi Minh City"
+                {...form.register("location")}
+              />
+              {errorOf("location") ? (
+                <p className="text-[12px] text-destructive" role="alert">
+                  {errorOf("location")}
+                </p>
+              ) : null}
+            </div>
+
+            {/* Openings */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                className="text-[13px] font-semibold text-foreground"
+                htmlFor="openings"
+              >
+                {t("jobPostings.openings")}
+              </label>
+              <Input
+                aria-invalid={errorOf("openings") ? true : undefined}
+                className={cn(
+                  "h-11 rounded-lg border-border text-[13.5px]",
+                  errorOf("openings") &&
+                    "border-destructive ring-1 ring-destructive/30",
+                )}
+                id="openings"
+                min="1"
+                placeholder={t("jobPostings.notSpecified")}
+                type="number"
+                {...form.register("openings")}
+              />
+              {errorOf("openings") ? (
+                <p className="text-[12px] text-destructive" role="alert">
+                  {errorOf("openings")}
+                </p>
+              ) : null}
+            </div>
+
+            {/* Deadline */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                className="text-[13px] font-semibold text-foreground"
+                htmlFor="expiresAt"
+              >
+                {t("jobPostings.expiryDate")}
+              </label>
               <Controller
                 control={form.control}
                 name="expiresAt"
@@ -616,123 +690,213 @@ export function JobPostingForm({
                 )}
               />
               {errorOf("expiresAt") ? (
-                <p
-                  className="text-[12.5px] leading-normal text-(--danger-fg)"
-                  role="alert"
-                >
+                <p className="text-[12px] text-destructive" role="alert">
                   {errorOf("expiresAt")}
                 </p>
-              ) : null}
+              ) : (
+                <p className="text-[12px] text-muted-foreground">
+                  {t("jobPostings.form.dateHint")}
+                </p>
+              )}
             </div>
-          </FormSection>
 
-          <div className="flex justify-end gap-3 pt-2">
-            <Button
-              className="h-11 rounded-xl px-5 text-sm font-semibold"
-              onClick={() =>
-                navigate(
-                  posting
-                    ? `${JOB_POSTINGS_PATH}/${posting.id}`
-                    : JOB_POSTINGS_PATH,
-                )
-              }
-              type="button"
-              variant="outline"
-            >
-              {t("jobPostings.cancel")}
-            </Button>
-            {!posting || posting.status === "draft" ? (
-              <Button
-                className="h-11 rounded-xl px-5 text-sm font-semibold"
-                disabled={
-                  isSaving || (Boolean(posting) && !form.formState.isDirty)
-                }
-                onClick={() => submitAs("draft")}
-                type="button"
-                variant="outline"
-              >
-                {isSaving
-                  ? t("state.saving")
-                  : t("jobPostings.save.draftAction")}
-              </Button>
-            ) : null}
-            <Button
-              className="h-11 rounded-xl px-5 text-sm font-semibold"
-              disabled={
-                isSaving ||
-                (Boolean(posting) &&
-                  posting?.status !== "draft" &&
-                  !form.formState.isDirty)
-              }
-              onClick={() =>
-                form.setValue(
-                  "publicationStatus",
-                  !posting || posting.status === "draft"
-                    ? "published"
-                    : "unchanged",
-                )
-              }
-              type="submit"
-            >
-              {isSaving
-                ? t("state.saving")
-                : posting
-                  ? posting.status === "draft"
-                    ? t("jobPostings.save.publishAction")
-                    : t("jobPostings.save.action")
-                  : t("jobPostings.save.publishAction")}
-            </Button>
-          </div>
-        </div>
+            {/* Salary Range with Negotiable Toggle */}
+            <div className="flex flex-col gap-2 pt-1 border-t border-border/60">
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-semibold text-foreground">
+                  {t("jobPostings.compensation")}
+                </span>
+                <Controller
+                  control={form.control}
+                  name="salaryNegotiable"
+                  render={({ field }) => (
+                    <label className="flex cursor-pointer items-center gap-1.5 text-[12.5px] font-medium text-foreground">
+                      <input
+                        checked={field.value}
+                        className="size-4 rounded accent-primary cursor-pointer"
+                        id="salaryNegotiable"
+                        onChange={(event) => {
+                          field.onChange(event.target.checked);
+                          if (event.target.checked) {
+                            form.setValue("salaryMin", "", {
+                              shouldDirty: true,
+                            });
+                            form.setValue("salaryMax", "", {
+                              shouldDirty: true,
+                            });
+                          }
+                        }}
+                        type="checkbox"
+                      />
+                      <span>{t("jobPostings.salaryNegotiable")}</span>
+                    </label>
+                  )}
+                />
+              </div>
 
-        <aside className="flex flex-col gap-4 lg:sticky lg:top-6">
-          <RailCard title={t("jobPostings.form.requiredToPublishTitle")}>
-            <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-[13px] text-foreground/80 dark:text-muted-foreground">
-              {[
-                t("jobPostings.form.requiredTitle"),
-                t("jobPostings.form.requiredBasics"),
-                t("jobPostings.form.requiredContent"),
-                t("jobPostings.form.requiredDeadline"),
-              ].map((item) => (
-                <li className="flex items-start gap-2" key={item}>
-                  <span
-                    aria-hidden
-                    className="mt-[7px] size-1.5 shrink-0 rounded-full bg-primary"
-                  />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </RailCard>
-          {posting ? (
-            <>
-              <RailCard title={t("jobPostings.form.railNotEditableTitle")}>
-                <p className="m-0 text-[13px] leading-relaxed text-foreground/70 dark:text-muted-foreground">
-                  {t("jobPostings.form.railNotEditableBody")}
-                </p>
-              </RailCard>
-              <RailCard title={t("jobPostings.form.railCurrentStatus")}>
+              <div className="grid grid-cols-[minmax(0,1fr)_12px_minmax(0,1fr)] items-center gap-2">
                 <div>
-                  <JobPostingStatusBadge posting={posting} />
-                </div>
-              </RailCard>
-            </>
-          ) : (
-            <>
-              <RailCard title={t("jobPostings.form.railSystemTitle")}>
-                <p className="m-0 text-[13px] leading-relaxed text-foreground/70 dark:text-muted-foreground">
-                  <Trans
-                    i18nKey="jobPostings.form.railSystemBody"
-                    components={{
-                      strong: <strong className="text-foreground" />,
-                    }}
+                  <label className="sr-only" htmlFor="salaryMin">
+                    {t("jobPostings.minimumSalary")}
+                  </label>
+                  <Input
+                    aria-invalid={errorOf("salaryMin") ? true : undefined}
+                    className="h-11 rounded-lg border-border text-[13.5px]"
+                    disabled={salaryNegotiable}
+                    id="salaryMin"
+                    min="0"
+                    placeholder={t("jobPostings.form.minSalaryPlaceholder")}
+                    type="number"
+                    {...form.register("salaryMin")}
                   />
+                </div>
+                <span className="text-center text-muted-foreground">–</span>
+                <div>
+                  <label className="sr-only" htmlFor="salaryMax">
+                    {t("jobPostings.maximumSalary")}
+                  </label>
+                  <Input
+                    aria-invalid={errorOf("salaryMin") ? true : undefined}
+                    className="h-11 rounded-lg border-border text-[13.5px]"
+                    disabled={salaryNegotiable}
+                    id="salaryMax"
+                    min="0"
+                    placeholder={t("jobPostings.form.maxSalaryPlaceholder")}
+                    type="number"
+                    {...form.register("salaryMax")}
+                  />
+                </div>
+              </div>
+
+              {errorOf("salaryMin") ? (
+                <p className="text-[12px] text-destructive" role="alert">
+                  {errorOf("salaryMin")}
                 </p>
-              </RailCard>
-            </>
-          )}
+              ) : (
+                <p className="text-[12px] text-muted-foreground">
+                  {salaryNegotiable
+                    ? t("jobPostings.form.salaryRangeNegotiableHint")
+                    : t("jobPostings.form.compensationDescription")}
+                </p>
+              )}
+            </div>
+          </section>
+
+          {/* Informational Callout matching reference */}
+          <div className="rounded-xl border border-primary/20 bg-(--status-info-bg) p-4 text-[13px] leading-relaxed text-(--status-info-fg)">
+            {t("jobPostings.form.sidebarCallout")}
+          </div>
         </aside>
       </div>
     </form>
+  );
+}
+
+function RichTextareaField({
+  error,
+  hint,
+  id,
+  label,
+  register,
+  required,
+  subtext,
+}: {
+  error?: string;
+  hint?: string;
+  id: string;
+  label: string;
+  register: Record<string, unknown>;
+  required?: boolean;
+  subtext?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-baseline justify-between">
+        <label
+          className="text-[13px] font-semibold text-foreground"
+          htmlFor={id}
+        >
+          {label}
+        </label>
+        {subtext ? (
+          <span
+            className={cn(
+              "text-[12px]",
+              required ? "font-medium text-destructive" : "text-muted-foreground",
+            )}
+          >
+            {subtext}
+          </span>
+        ) : null}
+      </div>
+
+      <div
+        className={cn(
+          "overflow-hidden rounded-lg border bg-card transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20",
+          error
+            ? "border-destructive ring-1 ring-destructive/30"
+            : "border-border",
+        )}
+      >
+        <div className="flex h-10 items-center gap-1 border-b border-border bg-(--surface-subtle) px-2 dark:bg-muted/30">
+          <button
+            aria-label="Bold"
+            className="flex size-7 items-center justify-center rounded text-muted-foreground transition hover:bg-card hover:text-foreground"
+            tabIndex={-1}
+            type="button"
+          >
+            <Bold className="size-3.5" />
+          </button>
+          <button
+            aria-label="Italic"
+            className="flex size-7 items-center justify-center rounded text-muted-foreground transition hover:bg-card hover:text-foreground"
+            tabIndex={-1}
+            type="button"
+          >
+            <Italic className="size-3.5" />
+          </button>
+          <button
+            aria-label="Underline"
+            className="flex size-7 items-center justify-center rounded text-muted-foreground transition hover:bg-card hover:text-foreground"
+            tabIndex={-1}
+            type="button"
+          >
+            <Underline className="size-3.5" />
+          </button>
+          <button
+            aria-label="List"
+            className="flex size-7 items-center justify-center rounded text-muted-foreground transition hover:bg-card hover:text-foreground"
+            tabIndex={-1}
+            type="button"
+          >
+            <List className="size-3.5" />
+          </button>
+          <button
+            aria-label="Link"
+            className="flex size-7 items-center justify-center rounded text-muted-foreground transition hover:bg-card hover:text-foreground"
+            tabIndex={-1}
+            type="button"
+          >
+            <Link2 className="size-3.5" />
+          </button>
+        </div>
+        <textarea
+          aria-invalid={error ? true : undefined}
+          aria-label={label}
+          className="block w-full resize-y border-0 bg-transparent p-3.5 text-[14px] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
+          id={id}
+          rows={5}
+          {...register}
+        />
+      </div>
+
+      {error ? (
+        <p className="text-[12px] text-destructive" role="alert">
+          {error}
+        </p>
+      ) : hint ? (
+        <p className="text-[12px] text-muted-foreground">{hint}</p>
+      ) : null}
+    </div>
   );
 }

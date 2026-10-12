@@ -1,30 +1,39 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
 
 import type { JobPosting } from "@/api/generated/types.gen";
-import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
+import { AdminPageHeader } from "@/components/common/admin-page-header";
 import { ErrorState } from "@/components/common/error-state";
 import { ListToolbar } from "@/components/common/list-toolbar";
-import { AdminPageHeader } from "@/components/common/admin-page-header";
 import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
 import { FilterSelect } from "@/components/ui/filter-select";
 import { Pagination } from "@/components/ui/pagination";
 import { useListParams } from "@/hooks/use-list-params";
 
-import { JobPostingTable } from "./job-posting-table";
+import {
+  ArchiveJobDialog,
+  CloseJobDialog,
+  DeleteJobDialog,
+  MoveToDraftDialog,
+  PublishChecklistDialog,
+  PublishJobDialog,
+  ReopenJobDialog,
+  UnarchiveJobDialog,
+} from "./job-posting-dialogs";
 import { jobPostingErrorMessage } from "./job-posting-errors";
+import { JobPostingTable } from "./job-posting-table";
 import {
   ALL_OPTION,
   DEFAULT_SORT,
   JOB_EMPLOYMENT_TYPES,
-  JOB_PUBLICATION_STATUSES,
-  JOB_RECRUITMENT_STATUSES,
   JOB_LEVELS,
   JOB_LIST_DEFAULT_LIMIT,
+  JOB_PUBLICATION_STATUSES,
+  JOB_RECRUITMENT_STATUSES,
   LIST_PARAMS,
   type JobSortBy,
   type JobSortOrder,
@@ -32,12 +41,17 @@ import {
 import {
   deleteJobPosting,
   jobPostingKeys,
+  moveJobPostingToDraft,
+  publishJobPosting,
+  transitionJobPosting,
   useJobPostingList,
   type JobPostingListParams,
+  type JobPostingTransition,
 } from "./job-postings.queries";
 
 type Actor = "admin" | "recruiter";
 const SORT_FIELDS: readonly JobSortBy[] = ["created_at", "title", "expires_at"];
+const SEARCH_REGEX = /^[a-zA-Z0-9\s.\-'\u00C0-\u024F\u1EA0-\u1EF9]*$/;
 
 export function JobPostingListPage({ actor }: { actor: Actor }) {
   const { t } = useTranslation();
@@ -47,7 +61,15 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
   const { page, limit, search, debouncedSearch, set, setMany } = useListParams({
     defaultLimit: JOB_LIST_DEFAULT_LIMIT,
   });
+
   const [pendingDelete, setPendingDelete] = useState<JobPosting | null>(null);
+  const [pendingClose, setPendingClose] = useState<JobPosting | null>(null);
+  const [pendingArchive, setPendingArchive] = useState<JobPosting | null>(null);
+  const [pendingUnarchive, setPendingUnarchive] = useState<JobPosting | null>(null);
+  const [pendingReopen, setPendingReopen] = useState<JobPosting | null>(null);
+  const [pendingPublish, setPendingPublish] = useState<JobPosting | null>(null);
+  const [pendingPublishBlocked, setPendingPublishBlocked] = useState<JobPosting | null>(null);
+  const [pendingUnpublish, setPendingUnpublish] = useState<JobPosting | null>(null);
 
   const type = searchParams.get(LIST_PARAMS.type) ?? ALL_OPTION;
   const level = searchParams.get(LIST_PARAMS.level) ?? ALL_OPTION;
@@ -84,12 +106,17 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
     level !== ALL_OPTION ||
     Boolean(publicationStatus) ||
     Boolean(recruitmentStatus);
+
+  const isSearchValid = SEARCH_REGEX.test(search);
+  const searchError =
+    !isSearchValid && search ? t("jobPostings.search.validation") : undefined;
+
   const params: JobPostingListParams = {
     page,
     limit,
     sort_by: sortBy,
     sort_order: sortOrder,
-    ...(debouncedSearch ? { search: debouncedSearch } : {}),
+    ...(isSearchValid && debouncedSearch ? { search: debouncedSearch } : {}),
     ...(type !== ALL_OPTION ? { employment_type: type } : {}),
     ...(level !== ALL_OPTION ? { level } : {}),
     ...(publicationStatus ? { publication_status: publicationStatus } : {}),
@@ -97,6 +124,11 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
   };
   const query = useJobPostingList(actor, params);
   const total = query.data?.total ?? 0;
+
+  const invalidate = () =>
+    queryClient.invalidateQueries({
+      queryKey: jobPostingKeys.root(actor),
+    });
 
   const deletion = useMutation({
     mutationFn: deleteJobPosting,
@@ -107,9 +139,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         tone: "error",
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: jobPostingKeys.root(actor),
-      });
+      await invalidate();
       showToast({
         title: t("jobPostings.delete.doneTitle"),
         message: t("jobPostings.delete.doneMessage", {
@@ -120,6 +150,101 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
       setPendingDelete(null);
     },
   });
+
+  const transition = useMutation({
+    mutationFn: ({
+      id,
+      action: transAction,
+    }: {
+      action: JobPostingTransition;
+      id: string;
+    }) => transitionJobPosting(id, transAction),
+    onError: (error) =>
+      showToast({
+        title: t("jobPostings.lifecycle.failedTitle"),
+        message: jobPostingErrorMessage(error, t),
+        tone: "error",
+      }),
+    onSuccess: async (_data, variables) => {
+      await invalidate();
+      const doneKey =
+        variables.action === "close"
+          ? "close"
+          : variables.action === "reopen"
+            ? "reopen"
+            : variables.action === "archive"
+              ? "archive"
+              : "restore";
+      showToast({
+        title: t(`jobPostings.lifecycle.${doneKey}.doneTitle`),
+        message: t(`jobPostings.lifecycle.${doneKey}.doneMessage`),
+        tone: "success",
+      });
+      setPendingClose(null);
+      setPendingArchive(null);
+      setPendingUnarchive(null);
+      setPendingReopen(null);
+    },
+  });
+
+  const publishing = useMutation({
+    mutationFn: publishJobPosting,
+    onError: (error) =>
+      showToast({
+        title: t("jobPostings.lifecycle.failedTitle"),
+        message: jobPostingErrorMessage(error, t),
+        tone: "error",
+      }),
+    onSuccess: async () => {
+      await invalidate();
+      showToast({
+        title: t("jobPostings.lifecycle.publish.doneTitle"),
+        message: t("jobPostings.lifecycle.publish.doneMessage"),
+        tone: "success",
+      });
+      setPendingPublish(null);
+    },
+  });
+
+  const unpublishing = useMutation({
+    mutationFn: moveJobPostingToDraft,
+    onError: (error) =>
+      showToast({
+        title: t("jobPostings.lifecycle.failedTitle"),
+        message: jobPostingErrorMessage(error, t),
+        tone: "error",
+      }),
+    onSuccess: async () => {
+      await invalidate();
+      showToast({
+        title: t("jobPostings.lifecycle.draft.doneTitle"),
+        message: t("jobPostings.lifecycle.draft.doneMessage"),
+        tone: "success",
+      });
+      setPendingUnpublish(null);
+    },
+  });
+
+  function handlePublishAttempt(posting: JobPosting) {
+    const isReady = Boolean(
+      posting.title &&
+        posting.employmentType &&
+        posting.location &&
+        posting.description &&
+        posting.description.trim().length >= 20 &&
+        posting.requirements &&
+        posting.requirements.trim().length > 0 &&
+        posting.benefits &&
+        posting.benefits.trim().length > 0 &&
+        posting.expiresAt &&
+        new Date(posting.expiresAt).getTime() >= Date.now(),
+    );
+    if (!isReady) {
+      setPendingPublishBlocked(posting);
+    } else {
+      setPendingPublish(posting);
+    }
+  }
 
   function handleSort(field: JobSortBy) {
     const nextOrder: JobSortOrder =
@@ -144,8 +269,6 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
       [LIST_PARAMS.publicationStatus]: null,
       [LIST_PARAMS.recruitmentStatus]: null,
     });
-  const filterLabel = (label: string) =>
-    `${label}: ${t("jobPostings.toolbar.all")}`;
 
   return (
     <div className="space-y-5">
@@ -176,40 +299,10 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
       <ListToolbar
         onSearchChange={(value) => set("search", value)}
         search={search}
+        searchError={searchError}
         searchPlaceholder={t("jobPostings.searchPlaceholder")}
       >
         <div className="flex flex-wrap items-center gap-2.5">
-          <FilterSelect
-            onChange={(value) =>
-              set(LIST_PARAMS.type, value === ALL_OPTION ? null : value)
-            }
-            options={[
-              {
-                label: filterLabel(t("jobPostings.toolbar.type")),
-                value: ALL_OPTION,
-              },
-              ...JOB_EMPLOYMENT_TYPES.map((value) => ({
-                label: t(`jobPostings.employmentTypes.${value}`),
-                value,
-              })),
-            ]}
-            placeholder={filterLabel(t("jobPostings.toolbar.type"))}
-            value={type}
-          />
-          <FilterSelect
-            onChange={(value) =>
-              set(LIST_PARAMS.level, value === ALL_OPTION ? null : value)
-            }
-            options={[
-              {
-                label: filterLabel(t("jobPostings.toolbar.level")),
-                value: ALL_OPTION,
-              },
-              ...JOB_LEVELS.map((value) => ({ label: value, value })),
-            ]}
-            placeholder={filterLabel(t("jobPostings.toolbar.level"))}
-            value={level}
-          />
           <FilterSelect
             onChange={(value) =>
               set(
@@ -219,19 +312,75 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
             }
             options={[
               {
-                label: filterLabel(t("jobPostings.toolbar.publicationStatus")),
+                label: t("jobPostings.toolbar.all"),
                 value: ALL_OPTION,
               },
-              ...JOB_PUBLICATION_STATUSES.map((value) => ({
-                label: t(`jobPostings.publicationStatus.${value}`),
-                value,
+              ...JOB_PUBLICATION_STATUSES.map((val) => ({
+                label: t(`jobPostings.publicationStatus.${val}`),
+                value: val,
               })),
             ]}
-            placeholder={filterLabel(
-              t("jobPostings.toolbar.publicationStatus"),
+            placeholder={t("jobPostings.toolbar.all")}
+            renderTrigger={(selectedLabel) => (
+              <span>
+                {t("jobPostings.status")}:{" "}
+                <span className="font-semibold text-foreground">
+                  {selectedLabel}
+                </span>
+              </span>
             )}
             value={publicationStatus ?? ALL_OPTION}
           />
+
+          <FilterSelect
+            onChange={(value) =>
+              set(LIST_PARAMS.type, value === ALL_OPTION ? null : value)
+            }
+            options={[
+              {
+                label: t("jobPostings.toolbar.all"),
+                value: ALL_OPTION,
+              },
+              ...JOB_EMPLOYMENT_TYPES.map((val) => ({
+                label: t(`jobPostings.employmentTypes.${val}`),
+                value: val,
+              })),
+            ]}
+            placeholder={t("jobPostings.toolbar.all")}
+            renderTrigger={(selectedLabel) => (
+              <span>
+                {t("jobPostings.toolbar.type")}:{" "}
+                <span className="font-semibold text-foreground">
+                  {selectedLabel}
+                </span>
+              </span>
+            )}
+            value={type}
+          />
+
+          <FilterSelect
+            onChange={(value) =>
+              set(LIST_PARAMS.level, value === ALL_OPTION ? null : value)
+            }
+            options={[
+              {
+                label: t("jobPostings.toolbar.all"),
+                value: ALL_OPTION,
+              },
+              ...JOB_LEVELS.map((val) => ({ label: val, value: val })),
+            ]}
+            placeholder={t("jobPostings.toolbar.all")}
+            renderTrigger={(selectedLabel) => (
+              <span>
+                {t("jobPostings.toolbar.level")}:{" "}
+                <span className="font-semibold text-foreground">
+                  {selectedLabel}
+                </span>
+              </span>
+            )}
+            value={level}
+          />
+
           <FilterSelect
             onChange={(value) =>
               set(
@@ -241,22 +390,29 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
             }
             options={[
               {
-                label: filterLabel(t("jobPostings.toolbar.recruitmentStatus")),
+                label: t("jobPostings.toolbar.all"),
                 value: ALL_OPTION,
               },
-              ...JOB_RECRUITMENT_STATUSES.map((value) => ({
-                label: t(`jobPostings.recruitmentStatus.${value}`),
-                value,
+              ...JOB_RECRUITMENT_STATUSES.map((val) => ({
+                label: t(`jobPostings.recruitmentStatus.${val}`),
+                value: val,
               })),
             ]}
-            placeholder={filterLabel(
-              t("jobPostings.toolbar.recruitmentStatus"),
+            placeholder={t("jobPostings.toolbar.all")}
+            renderTrigger={(selectedLabel) => (
+              <span>
+                {t("jobPostings.toolbar.recruitmentStatus")}:{" "}
+                <span className="font-semibold text-foreground">
+                  {selectedLabel}
+                </span>
+              </span>
             )}
             value={recruitmentStatus ?? ALL_OPTION}
           />
+
           {hasFilters ? (
             <Button
-              className="h-10 px-3 text-xs font-semibold text-muted-foreground hover:text-foreground"
+              className="h-11 px-3 text-sm font-semibold text-muted-foreground hover:text-foreground"
               onClick={clearFilters}
               type="button"
               variant="ghost"
@@ -281,9 +437,15 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
             hasFilters={hasFilters}
             isLoading={query.isPending}
             items={query.data?.items ?? []}
+            onArchive={(p) => setPendingArchive(p)}
             onClearFilters={clearFilters}
-            onDelete={setPendingDelete}
+            onClose={(p) => setPendingClose(p)}
+            onDelete={(p) => setPendingDelete(p)}
+            onPublish={handlePublishAttempt}
+            onReopen={(p) => setPendingReopen(p)}
             onSort={handleSort}
+            onUnarchive={(p) => setPendingUnarchive(p)}
+            onUnpublish={(p) => setPendingUnpublish(p)}
             sortBy={sortBy}
             sortOrder={sortOrder}
           />
@@ -303,21 +465,91 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         />
       ) : null}
 
+      {/* Confirmation & Checklist Dialogs */}
       {actor === "recruiter" && pendingDelete ? (
-        <ActionConfirmDialog
-          action={
-            deletion.isPending
-              ? t("jobPostings.delete.deleting")
-              : t("jobPostings.delete.confirm")
-          }
-          description={t("jobPostings.delete.description")}
+        <DeleteJobDialog
           disabled={deletion.isPending}
-          icon={Trash2}
           onConfirm={() => deletion.mutate(pendingDelete.id)}
           onOpenChange={(open) => !open && setPendingDelete(null)}
           open
-          title={t("jobPostings.delete.title", { title: pendingDelete.title })}
-          variant="destructive-solid"
+          posting={pendingDelete}
+        />
+      ) : null}
+
+      {actor === "recruiter" && pendingClose ? (
+        <CloseJobDialog
+          disabled={transition.isPending}
+          onConfirm={() =>
+            transition.mutate({ action: "close", id: pendingClose.id })
+          }
+          onOpenChange={(open) => !open && setPendingClose(null)}
+          open
+          posting={pendingClose}
+        />
+      ) : null}
+
+      {actor === "recruiter" && pendingArchive ? (
+        <ArchiveJobDialog
+          disabled={transition.isPending}
+          onConfirm={() =>
+            transition.mutate({ action: "archive", id: pendingArchive.id })
+          }
+          onOpenChange={(open) => !open && setPendingArchive(null)}
+          open
+          posting={pendingArchive}
+        />
+      ) : null}
+
+      {actor === "recruiter" && pendingUnarchive ? (
+        <UnarchiveJobDialog
+          disabled={transition.isPending}
+          onConfirm={() =>
+            transition.mutate({ action: "restore", id: pendingUnarchive.id })
+          }
+          onOpenChange={(open) => !open && setPendingUnarchive(null)}
+          open
+          posting={pendingUnarchive}
+        />
+      ) : null}
+
+      {actor === "recruiter" && pendingReopen ? (
+        <ReopenJobDialog
+          disabled={transition.isPending}
+          onConfirm={() =>
+            transition.mutate({ action: "reopen", id: pendingReopen.id })
+          }
+          onOpenChange={(open) => !open && setPendingReopen(null)}
+          open
+          posting={pendingReopen}
+        />
+      ) : null}
+
+      {actor === "recruiter" && pendingPublish ? (
+        <PublishJobDialog
+          disabled={publishing.isPending}
+          onConfirm={() => publishing.mutate(pendingPublish.id)}
+          onOpenChange={(open) => !open && setPendingPublish(null)}
+          open
+          posting={pendingPublish}
+        />
+      ) : null}
+
+      {actor === "recruiter" && pendingPublishBlocked ? (
+        <PublishChecklistDialog
+          editPath={`${basePath}/${pendingPublishBlocked.id}/edit`}
+          onOpenChange={(open) => !open && setPendingPublishBlocked(null)}
+          open
+          posting={pendingPublishBlocked}
+        />
+      ) : null}
+
+      {actor === "recruiter" && pendingUnpublish ? (
+        <MoveToDraftDialog
+          disabled={unpublishing.isPending}
+          onConfirm={() => unpublishing.mutate(pendingUnpublish.id)}
+          onOpenChange={(open) => !open && setPendingUnpublish(null)}
+          open
+          posting={pendingUnpublish}
         />
       ) : null}
     </div>

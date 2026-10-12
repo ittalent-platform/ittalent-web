@@ -1,29 +1,41 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Archive,
-  CirclePause,
-  FilePenLine,
-  Pencil,
-  Play,
+  ArrowRight,
+  Eye,
+  Lock,
+  MoreVertical,
   RotateCcw,
-  Send,
   Trash2,
+  Undo2,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
 
-import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { Breadcrumb } from "@/components/common/breadcrumb";
-import { Callout } from "@/components/common/callout";
-import { DetailRow } from "@/components/common/detail-row";
-import { LogoTile } from "@/components/common/logo-tile";
-import { RailCard } from "@/components/common/rail-card";
-import { Timeline, type TimelineTone } from "@/components/common/timeline";
 import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
+import {
+  ArchiveJobDialog,
+  CloseJobDialog,
+  DeleteJobDialog,
+  JobPostingHistoryDialog,
+  MoveToDraftDialog,
+  PublishChecklistDialog,
+  PublishJobDialog,
+  ReopenJobDialog,
+  UnarchiveJobDialog,
+} from "./job-posting-dialogs";
 import { JobPostingErrorState } from "./job-posting-error-state";
 import { jobPostingErrorMessage } from "./job-posting-errors";
 import { JobPostingStatusBadge } from "./job-posting-status-badge";
@@ -39,7 +51,6 @@ import {
 } from "./job-postings.queries";
 import {
   formatDeadline,
-  formatJobDateTime,
   formatPostedDate,
   formatSalary,
   jobDisplayId,
@@ -48,75 +59,19 @@ import {
 type Actor = "admin" | "recruiter";
 type LifecycleAction = JobPostingTransition | "draft" | "publish";
 
-const HISTORY_TONES: Record<
-  | "create"
-  | "update"
-  | "delete"
-  | "publish"
-  | "draft"
-  | "close"
-  | "reopen"
-  | "archive"
-  | "restore",
-  TimelineTone
-> = {
-  archive: "neutral",
-  close: "warning",
-  create: "info",
-  delete: "error",
-  draft: "neutral",
-  publish: "success",
-  reopen: "success",
-  restore: "info",
-  update: "info",
-};
-
-const card =
-  "flex flex-col gap-[18px] rounded-2xl border border-border bg-card p-[22px] pb-6";
-
-function Field({ label, value }: { label: string; value?: ReactNode }) {
-  const { t } = useTranslation();
-  return (
-    <div className="flex min-w-0 flex-col gap-1.5">
-      <dt className="text-[13px] text-muted-foreground">{label}</dt>
-      <dd className="m-0 wrap-anywhere text-[14.5px] font-semibold text-foreground">
-        {value || (
-          <span className="font-normal text-muted-foreground">
-            {t("jobPostings.detail.notProvided")}
-          </span>
-        )}
-      </dd>
-    </div>
-  );
-}
-
-function TextSection({ text, title }: { text?: string; title: string }) {
-  const { t } = useTranslation();
-  return (
-    <section className={card}>
-      <h2 className="text-[15px] font-bold text-foreground">{title}</h2>
-      {text ? (
-        <p className="m-0 whitespace-pre-wrap text-[13.5px] leading-relaxed text-foreground/80">
-          {text}
-        </p>
-      ) : (
-        <p className="m-0 text-[13.5px] text-muted-foreground">
-          {t("jobPostings.detail.notProvided")}
-        </p>
-      )}
-    </section>
-  );
-}
-
 export function JobPostingDetailPage({ actor }: { actor: Actor }) {
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
   const { jobPostingId } = useParams<{ jobPostingId: string }>();
   const navigate = useNavigate();
   const client = useQueryClient();
   const { showToast } = useToast();
+
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [lifecycleAction, setLifecycleAction] =
     useState<LifecycleAction | null>(null);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [publishChecklistOpen, setPublishChecklistOpen] = useState(false);
+
   const query = useJobPosting(jobPostingId);
   const history = useJobPostingHistory(jobPostingId);
   const basePath = `/${actor}/job-postings`;
@@ -141,6 +96,7 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
       navigate(basePath);
     },
   });
+
   const lifecycle = useMutation({
     mutationFn: (action: LifecycleAction) =>
       action === "draft"
@@ -164,9 +120,21 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
           queryKey: jobPostingKeys.history(jobPostingId ?? ""),
         }),
       ]);
+      const doneKey =
+        action === "close"
+          ? "close"
+          : action === "reopen"
+            ? "reopen"
+            : action === "archive"
+              ? "archive"
+              : action === "restore"
+                ? "restore"
+                : action === "publish"
+                  ? "publish"
+                  : "draft";
       showToast({
-        title: t(`jobPostings.lifecycle.${action}.doneTitle`),
-        message: t(`jobPostings.lifecycle.${action}.doneMessage`),
+        title: t(`jobPostings.lifecycle.${doneKey}.doneTitle`),
+        message: t(`jobPostings.lifecycle.${doneKey}.doneMessage`),
         tone: "success",
       });
       setLifecycleAction(null);
@@ -178,354 +146,557 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
       <div aria-busy="true" className="space-y-5">
         <Skeleton className="h-5 w-48 rounded" />
         <Skeleton className="h-14 w-96 rounded-2xl" />
-        <div className="grid gap-[18px] lg:grid-cols-[minmax(0,1fr)_380px]">
-          <Skeleton className="h-96 rounded-2xl" />
-          <Skeleton className="h-96 rounded-2xl" />
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <Skeleton className="h-96 rounded-xl" />
+          <Skeleton className="h-96 rounded-xl" />
         </div>
       </div>
     );
   }
+
   if (query.isError || !query.data)
     return <JobPostingErrorState backTo={basePath} error={query.error} />;
 
   const posting = query.data;
   const canManage = actor === "recruiter";
   const applicationCount = posting.applicationCount ?? 0;
-  const statusNotice =
-    posting.status === "draft"
-      ? { key: "draft", tone: "info" as const }
-      : posting.status === "archived"
-        ? { key: "archived", tone: "neutral" as const }
+
+  function handlePublishClick() {
+    const isReady = Boolean(
+      posting.title &&
+        posting.employmentType &&
+        posting.location &&
+        posting.description &&
+        posting.description.trim().length >= 20 &&
+        posting.requirements &&
+        posting.requirements.trim().length > 0 &&
+        posting.benefits &&
+        posting.benefits.trim().length > 0 &&
+        posting.expiresAt &&
+        new Date(posting.expiresAt).getTime() >= Date.now(),
+    );
+    if (!isReady) {
+      setPublishChecklistOpen(true);
+    } else {
+      setLifecycleAction("publish");
+    }
+  }
+
+  const visibilityText =
+    posting.status === "published"
+      ? t("jobPostings.detail.visibilityPublic")
+      : posting.status === "draft"
+        ? t("jobPostings.detail.visibilityHiddenDraft")
         : posting.status === "closed"
-          ? { key: "closed", tone: "warning" as const }
-          : null;
-  const historyEntries = (history.data?.items ?? []).map((event) => ({
-    atIso: event.occurredAt,
-    by: t("jobPostings.history.actor", {
-      id: event.actorUserId.slice(-6).toUpperCase(),
-    }),
-    label: t(`jobPostings.history.actions.${event.action}`),
-    message: event.changedFields?.length
-      ? t("jobPostings.history.changedFields", {
-          fields: event.changedFields.join(", "),
-        })
-      : undefined,
-    tone: HISTORY_TONES[event.action],
-  }));
-  const lifecycleButtons: Array<{
-    action: LifecycleAction;
-    icon: typeof Play;
-  }> = canManage
-    ? [
-        ...(posting.status === "draft"
-          ? [{ action: "publish" as const, icon: Send }]
-          : []),
-        ...(posting.status === "published" &&
-        posting.recruitmentStatus === "open"
-          ? [{ action: "close" as const, icon: CirclePause }]
-          : []),
-        ...(posting.status === "published"
-          ? [{ action: "draft" as const, icon: FilePenLine }]
-          : []),
-        ...(posting.status === "closed"
-          ? [
-              { action: "reopen" as const, icon: Play },
-              { action: "archive" as const, icon: Archive },
-            ]
-          : []),
-        ...(posting.status === "archived"
-          ? [{ action: "restore" as const, icon: RotateCcw }]
-          : []),
-      ]
-    : [];
+          ? t("jobPostings.detail.visibilityClosed")
+          : t("jobPostings.detail.visibilityArchived");
+
+  const historyItems = history.data?.items ?? [];
 
   return (
     <div className="space-y-5">
+      {/* Breadcrumb */}
       <Breadcrumb
         ariaLabel={t("jobPostings.title")}
         items={[
           { label: t("jobPostings.title"), to: basePath },
-          { label: jobDisplayId(posting.id), mono: true },
+          { label: posting.title },
         ]}
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex min-w-0 items-center gap-4">
-          <LogoTile name={posting.enterprise.name} size="md" />
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="itt-display truncate text-2xl font-semibold leading-tight text-foreground">
-                {posting.title}
-              </h1>
-              <JobPostingStatusBadge posting={posting} />
-            </div>
-            <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">
-              {[
-                jobDisplayId(posting.id),
-                posting.enterprise.name,
-                t(
-                  posting.publishedAt
-                    ? "jobPostings.detail.metaPosted"
-                    : "jobPostings.detail.metaCreated",
-                  {
-                    date: formatPostedDate(
-                      posting.publishedAt ?? posting.createdAt,
-                    ),
-                  },
-                ),
-                posting.expiresAt
-                  ? t("jobPostings.detail.metaDeadline", {
-                      date: formatDeadline(posting.expiresAt),
-                    })
-                  : t("jobPostings.detail.metaNoDeadline"),
-                t("jobPostings.detail.applicationCount", {
-                  count: applicationCount,
-                }),
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
+      {/* Page Header */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="itt-display text-2xl font-bold tracking-tight text-foreground sm:text-[26px]">
+              {posting.title}
+            </h1>
+            <JobPostingStatusBadge mode="publication" posting={posting} />
           </div>
+          <p className="m-0 text-[13.5px] text-muted-foreground">
+            {[
+              jobDisplayId(posting.id),
+              posting.publishedAt
+                ? t("jobPostings.detail.metaPosted", {
+                    date: formatPostedDate(posting.publishedAt),
+                  })
+                : t("jobPostings.detail.metaCreated", {
+                    date: formatPostedDate(posting.createdAt),
+                  }),
+              posting.expiresAt
+                ? t("jobPostings.detail.metaDeadline", {
+                    date: formatDeadline(posting.expiresAt),
+                  })
+                : t("jobPostings.detail.metaNoDeadline"),
+              t("jobPostings.detail.applicationCount", {
+                count: applicationCount,
+              }),
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
         </div>
+
+        {/* Action Buttons */}
         {canManage ? (
           <div className="flex flex-wrap items-center gap-2.5">
-            {lifecycleButtons.map(({ action, icon: Icon }) => (
-              <Button
-                className="h-11 rounded-xl px-5 text-sm font-semibold"
-                disabled={lifecycle.isPending}
-                key={action}
-                onClick={() => setLifecycleAction(action)}
-                type="button"
-                variant={action === "archive" ? "destructive" : "outline"}
-              >
-                <Icon className="size-4" />
-                {t(`jobPostings.lifecycle.${action}.action`)}
-              </Button>
-            ))}
             {posting.status !== "archived" ? (
               <Button
                 asChild
-                className="h-11 rounded-xl px-5 text-sm font-semibold"
+                className="h-10 px-4.5 text-[13.5px] font-semibold"
+                shape="pill"
                 variant="outline"
               >
                 <Link to={`${basePath}/${posting.id}/edit`}>
-                  <Pencil className="size-4 text-muted-foreground" />
-                  {t("jobPostings.table.edit")}
+                  {t("jobPostings.actions.edit")}
                 </Link>
               </Button>
             ) : null}
+
+            {/* Lifecycle action buttons */}
+            {posting.status === "draft" ? (
+              <Button
+                className="h-10 px-4.5 text-[13.5px] font-semibold bg-(--status-success-fg) text-white hover:opacity-90"
+                onClick={handlePublishClick}
+                shape="pill"
+                type="button"
+              >
+                {t("jobPostings.lifecycle.publish.action")}
+              </Button>
+            ) : null}
+
+            {posting.status === "published" ? (
+              <>
+                <Button
+                  className="h-10 px-4.5 text-[13.5px] font-semibold text-destructive border-border hover:bg-muted"
+                  onClick={() => setLifecycleAction("close")}
+                  shape="pill"
+                  type="button"
+                  variant="outline"
+                >
+                  <Lock className="size-3.5" />
+                  {t("jobPostings.lifecycle.close.action")}
+                </Button>
+                <Button
+                  className="h-10 px-4.5 text-[13.5px] font-semibold"
+                  onClick={() => setLifecycleAction("draft")}
+                  shape="pill"
+                  type="button"
+                  variant="outline"
+                >
+                  <Undo2 className="size-3.5" />
+                  {t("jobPostings.lifecycle.draft.action")}
+                </Button>
+              </>
+            ) : null}
+
+            {posting.status === "closed" ? (
+              <>
+                <Button
+                  className="h-10 px-4.5 text-[13.5px] font-semibold text-blue-600 dark:text-blue-400 border-border hover:bg-muted"
+                  onClick={() => setLifecycleAction("reopen")}
+                  shape="pill"
+                  type="button"
+                  variant="outline"
+                >
+                  <RotateCcw className="size-3.5" />
+                  {t("jobPostings.lifecycle.reopen.action")}
+                </Button>
+                <Button
+                  className="h-10 px-4.5 text-[13.5px] font-semibold text-purple-600 dark:text-purple-400 border-border hover:bg-muted"
+                  onClick={() => setLifecycleAction("archive")}
+                  shape="pill"
+                  type="button"
+                  variant="outline"
+                >
+                  <Archive className="size-3.5" />
+                  {t("jobPostings.lifecycle.archive.action")}
+                </Button>
+              </>
+            ) : null}
+
+            {posting.status === "archived" ? (
+              <Button
+                className="h-10 px-4.5 text-[13.5px] font-semibold text-purple-600 dark:text-purple-400 border-border hover:bg-muted"
+                onClick={() => setLifecycleAction("restore")}
+                shape="pill"
+                type="button"
+                variant="outline"
+              >
+                <RotateCcw className="size-3.5" />
+                {t("jobPostings.lifecycle.restore.action")}
+              </Button>
+            ) : null}
+
             <Button
-              className="h-11 rounded-xl bg-(--danger-fg) px-5 text-sm font-semibold text-white hover:bg-(--danger-fg)/90"
-              disabled={applicationCount > 0}
-              onClick={() => setConfirmingDelete(true)}
-              title={
-                applicationCount > 0
-                  ? t("jobPostings.detail.deleteBlocked")
-                  : undefined
-              }
-              type="button"
+              asChild
+              className="h-10 px-5 text-[13.5px] font-semibold"
+              shape="pill"
             >
-              <Trash2 className="size-4" />
-              {t("jobPostings.table.delete")}
+              <Link to={`/${actor}/applications?jobId=${posting.id}`}>
+                {t("jobPostings.detail.viewApplications")}
+              </Link>
             </Button>
+
+            {/* More actions menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  aria-label={t("jobPostings.table.actions")}
+                  className="flex size-10 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  type="button"
+                >
+                  <MoreVertical className="size-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 text-sm shadow-xl">
+                <DropdownMenuItem
+                  className="flex cursor-pointer items-center gap-2 px-3 py-2 text-[13.5px]"
+                  onClick={() => setHistoryModalOpen(true)}
+                >
+                  <Eye className="size-4 text-muted-foreground" />
+                  <span>{t("jobPostings.detail.viewFullHistory")}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex cursor-pointer items-center gap-2 border-t border-border/50 px-3 py-2 text-[13.5px] text-destructive"
+                  disabled={applicationCount > 0}
+                  onClick={() => setConfirmingDelete(true)}
+                >
+                  <Trash2 className="size-4" />
+                  <span className="flex-1">{t("jobPostings.actions.delete")}</span>
+                  {applicationCount > 0 ? (
+                    <span className="text-[11.5px] text-muted-foreground">
+                      {t("jobPostings.actions.hasApplications")}
+                    </span>
+                  ) : null}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         ) : null}
       </div>
 
-      {statusNotice ? (
-        <Callout
-          title={t(`jobPostings.detail.notices.${statusNotice.key}.title`)}
-          tone={statusNotice.tone}
+      {/* Status Notice Banner */}
+      {posting.status === "draft" ? (
+        <div
+          className="rounded-lg border border-primary/20 bg-(--status-info-bg) p-3 px-4 text-[13.5px] leading-relaxed text-(--status-info-fg)"
+          role="status"
         >
-          {t(`jobPostings.detail.notices.${statusNotice.key}.description`)}
-        </Callout>
+          {t("jobPostings.detail.notices.draft.title")} —{" "}
+          {t("jobPostings.detail.notices.draft.description")}
+        </div>
+      ) : posting.status === "closed" ? (
+        <div
+          className="rounded-lg border border-(--status-warning-bg) bg-(--status-warning-bg)/20 p-3 px-4 text-[13.5px] leading-relaxed text-(--status-warning-fg)"
+          role="status"
+        >
+          {t("jobPostings.detail.notices.closed.title")} —{" "}
+          {t("jobPostings.detail.notices.closed.description")}
+        </div>
+      ) : posting.status === "archived" ? (
+        <div
+          className="rounded-lg border border-border bg-(--canvas) p-3 px-4 text-[13.5px] leading-relaxed text-muted-foreground"
+          role="status"
+        >
+          {t("jobPostings.detail.notices.archived.title")} —{" "}
+          {t("jobPostings.detail.notices.archived.description")}
+        </div>
       ) : null}
 
-      <div className="grid items-start gap-[18px] lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="flex flex-col gap-[18px]">
-          <section className={card}>
-            <h2 className="text-[15px] font-bold text-foreground">
-              {t("jobPostings.detail.overview")}
-            </h2>
-            <dl className="m-0 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-              <Field
-                label={t("jobPostings.detail.location")}
-                value={posting.location}
-              />
-              <Field
-                label={t("jobPostings.detail.type")}
-                value={posting.employmentType}
-              />
-              <Field
-                label={t("jobPostings.detail.level")}
-                value={posting.level}
-              />
-              <Field
-                label={t("jobPostings.detail.salary")}
-                value={
-                  formatSalary(posting) === "—"
-                    ? undefined
-                    : formatSalary(posting)
-                }
-              />
-              <Field
-                label={t("jobPostings.detail.openings")}
-                value={posting.openings?.toString()}
-              />
-              <Field
-                label={t("jobPostings.detail.deadline")}
-                value={
-                  posting.expiresAt
-                    ? formatDeadline(posting.expiresAt)
-                    : undefined
-                }
-              />
-            </dl>
-          </section>
-          <TextSection
-            text={posting.description}
-            title={t("jobPostings.detail.description")}
-          />
-          <TextSection
-            text={posting.requirements}
-            title={t("jobPostings.detail.requirements")}
-          />
-          <TextSection
-            text={posting.benefits}
-            title={t("jobPostings.detail.benefits")}
-          />
-        </div>
+      {/* Two-Column Grid Layout matching reference (minmax(0,1fr) 320px) */}
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+        {/* Left Column: Role Details & Content Sections */}
+        <section className="flex flex-col gap-6 rounded-xl border border-border bg-card p-6 shadow-xs">
+          {/* DESCRIPTION */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[11.5px] font-bold tracking-[0.05em] text-muted-foreground uppercase">
+              {t("jobPostings.detail.descriptionSection")}
+            </span>
+            {posting.description ? (
+              <p className="m-0 whitespace-pre-wrap text-[14px] leading-relaxed text-foreground">
+                {posting.description}
+              </p>
+            ) : (
+              <p className="m-0 text-[14px] text-muted-foreground">
+                {t("jobPostings.detail.notAddedYet")}
+              </p>
+            )}
+          </div>
 
-        <div className="flex flex-col gap-[18px]">
-          <RailCard title={t("jobPostings.detail.statusCard")}>
-            <div>
-              <JobPostingStatusBadge posting={posting} />
+          {/* REQUIREMENTS */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[11.5px] font-bold tracking-[0.05em] text-muted-foreground uppercase">
+              {t("jobPostings.detail.requirementsSection")}
+            </span>
+            {posting.requirements ? (
+              <p className="m-0 whitespace-pre-wrap text-[14px] leading-relaxed text-foreground">
+                {posting.requirements}
+              </p>
+            ) : (
+              <p className="m-0 text-[14px] text-muted-foreground">
+                {t("jobPostings.detail.notAddedYet")}
+              </p>
+            )}
+          </div>
+
+          {/* BENEFITS */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[11.5px] font-bold tracking-[0.05em] text-muted-foreground uppercase">
+              {t("jobPostings.detail.benefitsSection")}
+            </span>
+            {posting.benefits ? (
+              <p className="m-0 whitespace-pre-wrap text-[14px] leading-relaxed text-foreground">
+                {posting.benefits}
+              </p>
+            ) : (
+              <p className="m-0 text-[14px] text-muted-foreground">
+                {t("jobPostings.detail.notAddedYet")}
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* Right Column: Details, Applications, History (320px) */}
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-6">
+          {/* DETAILS CARD */}
+          <section className="flex flex-col gap-2 rounded-xl border border-border bg-card p-5 pb-3 shadow-xs">
+            <span className="text-[11.5px] font-bold tracking-[0.05em] text-muted-foreground uppercase">
+              {t("jobPostings.detail.detailsSection")}
+            </span>
+            <div className="mt-1 divide-y divide-border/40">
+              <div className="flex items-center justify-between gap-3 py-2 text-[13.5px]">
+                <span className="text-muted-foreground">
+                  {t("jobPostings.detail.salary")}
+                </span>
+                <span className="font-semibold text-foreground text-right">
+                  {posting.salaryNegotiable
+                    ? t("jobPostings.salaryNegotiable")
+                    : formatSalary(posting)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-2 text-[13.5px]">
+                <span className="text-muted-foreground">
+                  {t("jobPostings.detail.level")}
+                </span>
+                <span className="font-semibold text-foreground text-right">
+                  {posting.level || t("jobPostings.notSpecified")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-2 text-[13.5px]">
+                <span className="text-muted-foreground">
+                  {t("jobPostings.detail.type")}
+                </span>
+                <span className="font-semibold text-foreground text-right">
+                  {posting.employmentType || t("jobPostings.notSpecified")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-2 text-[13.5px]">
+                <span className="text-muted-foreground">
+                  {t("jobPostings.detail.location")}
+                </span>
+                <span className="font-semibold text-foreground text-right">
+                  {posting.location || t("jobPostings.notSpecified")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-2 text-[13.5px]">
+                <span className="text-muted-foreground">
+                  {t("jobPostings.detail.openings")}
+                </span>
+                <span className="font-semibold text-foreground text-right">
+                  {posting.openings ?? t("jobPostings.notSpecified")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-2 text-[13.5px]">
+                <span className="text-muted-foreground">
+                  {t("jobPostings.detail.deadline")}
+                </span>
+                <span className="font-semibold text-foreground text-right">
+                  {posting.expiresAt
+                    ? formatDeadline(posting.expiresAt)
+                    : t("jobPostings.detail.notSet")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-2 text-[13.5px]">
+                <span className="text-muted-foreground">
+                  {t("jobPostings.detail.visibility")}
+                </span>
+                <span className="font-semibold text-foreground text-right">
+                  {visibilityText}
+                </span>
+              </div>
             </div>
-            <p className="m-0 text-[12.5px] leading-relaxed text-muted-foreground">
-              {t("jobPostings.detail.statusNote")}
-            </p>
-          </RailCard>
-          <RailCard
-            meta={String(applicationCount)}
-            title={t("jobPostings.detail.applicationsCard")}
-          >
-            <p className="m-0 text-[13.5px] font-semibold text-foreground">
-              {t("jobPostings.detail.applicationCount", {
-                count: applicationCount,
-              })}
-            </p>
-            <p className="m-0 text-[12.5px] leading-relaxed text-muted-foreground">
-              {t("jobPostings.detail.applicationNote")}
-            </p>
-          </RailCard>
-          <RailCard title={t("jobPostings.detail.recordCard")}>
-            <dl className="m-0">
-              <DetailRow
-                label={t("jobPostings.detail.company")}
-                value={posting.enterprise.name}
-              />
-              <DetailRow
-                label={t("jobPostings.detail.created")}
-                value={formatPostedDate(posting.createdAt)}
-              />
-              <DetailRow
-                label={t("jobPostings.detail.updated")}
-                value={formatPostedDate(posting.updatedAt)}
-              />
-            </dl>
-          </RailCard>
-          {history.isPending ? (
-            <Skeleton className="h-52 rounded-2xl" />
-          ) : history.isError ? (
-            <Callout
-              role="alert"
-              title={t("jobPostings.history.loadFailed")}
-              tone="error"
+          </section>
+
+          {/* APPLICATIONS METRIC CARD (Dark Card matching reference) */}
+          <section className="flex flex-col gap-1 rounded-xl bg-sidebar p-5 text-sidebar-foreground shadow-xs">
+            <span className="text-[11.5px] font-bold tracking-[0.05em] text-white/55 uppercase">
+              {t("jobPostings.detail.applicationsSection")}
+            </span>
+            <span className="itt-display text-4xl font-bold tracking-tight text-white leading-none mt-1">
+              {applicationCount}
+            </span>
+            <span className="mt-1 text-[12.5px] text-white/55">
+              {applicationCount > 0
+                ? t("jobPostings.detail.applicationCount", {
+                    count: applicationCount,
+                  })
+                : t("jobPostings.detail.noApplicationsYet")}
+            </span>
+            <Link
+              className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-bold text-primary hover:underline"
+              to={`/${actor}/applications?jobId=${posting.id}`}
             >
-              <Button
-                className="h-auto p-0 text-[13px] font-semibold"
-                onClick={() => void history.refetch()}
-                variant="link"
-              >
-                {t("actions.retry")}
-              </Button>
-            </Callout>
-          ) : historyEntries.length > 0 ? (
-            <Timeline
-              entries={historyEntries}
-              formatDate={(iso) =>
-                formatJobDateTime(iso, i18n.resolvedLanguage ?? i18n.language)
-              }
-              title={t("jobPostings.history.title")}
-            />
-          ) : (
-            <RailCard title={t("jobPostings.history.title")}>
+              {t("jobPostings.detail.viewApplications")}
+              <ArrowRight className="size-3.5" />
+            </Link>
+          </section>
+
+          {/* HISTORY RAIL CARD */}
+          <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-xs">
+            <span className="text-[11.5px] font-bold tracking-[0.05em] text-muted-foreground uppercase">
+              {t("jobPostings.detail.historySection")}
+            </span>
+            {historyItems.length === 0 ? (
               <p className="m-0 text-[13px] text-muted-foreground">
                 {t("jobPostings.history.empty")}
               </p>
-            </RailCard>
-          )}
-        </div>
+            ) : (
+              <ol className="m-0 flex list-none flex-col gap-3 p-0">
+                {historyItems.slice(0, 3).map((item, index) => {
+                  const isPublish = item.action === "publish";
+                  return (
+                    <li className="relative flex gap-3" key={item.id}>
+                      {index < Math.min(historyItems.length, 3) - 1 ? (
+                        <span
+                          aria-hidden="true"
+                          className="absolute top-4 left-[5px] bottom-0 w-px bg-border"
+                        />
+                      ) : null}
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "relative z-10 mt-1 size-2.5 shrink-0 rounded-full",
+                          isPublish
+                            ? "bg-(--status-success-fg)"
+                            : "bg-muted-foreground",
+                        )}
+                      />
+                      <div className="flex flex-col gap-0.5 text-[13px]">
+                        <span className="font-semibold text-foreground">
+                          {t(`jobPostings.history.actions.${item.action}`, {
+                            defaultValue: item.action,
+                          })}
+                        </span>
+                        <span className="text-[12px] text-muted-foreground">
+                          {formatPostedDate(item.occurredAt)} ·{" "}
+                          {t("jobPostings.history.actor", {
+                            id: item.actorUserId.slice(-6).toUpperCase(),
+                          })}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+            <button
+              className="mt-1 inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-bold text-foreground hover:text-fg-link text-left"
+              onClick={() => setHistoryModalOpen(true)}
+              type="button"
+            >
+              {t("jobPostings.detail.viewFullHistory")}
+              <ArrowRight className="size-3.5" />
+            </button>
+          </section>
+        </aside>
       </div>
 
-      {canManage && lifecycleAction ? (
-        <ActionConfirmDialog
-          action={
-            lifecycle.isPending
-              ? t("state.saving")
-              : t(`jobPostings.lifecycle.${lifecycleAction}.confirm`)
-          }
-          description={t(
-            `jobPostings.lifecycle.${lifecycleAction}.description`,
-          )}
-          disabled={lifecycle.isPending}
-          icon={
-            lifecycleAction === "archive"
-              ? Archive
-              : lifecycleAction === "close"
-                ? CirclePause
-                : lifecycleAction === "draft"
-                  ? FilePenLine
-                  : lifecycleAction === "restore"
-                    ? RotateCcw
-                    : lifecycleAction === "publish"
-                      ? Send
-                      : Play
-          }
-          keepOpenOnConfirm
-          onConfirm={() => lifecycle.mutate(lifecycleAction)}
-          onOpenChange={(open) => !open && setLifecycleAction(null)}
-          open
-          title={t(`jobPostings.lifecycle.${lifecycleAction}.title`, {
-            title: posting.title,
-          })}
-          variant={
-            lifecycleAction === "archive"
-              ? "destructive-solid"
-              : lifecycleAction === "close" || lifecycleAction === "draft"
-                ? "warning-solid"
-                : "success-solid"
-          }
-        />
-      ) : null}
-
+      {/* Confirmation & Modal Dialogs */}
       {canManage && confirmingDelete ? (
-        <ActionConfirmDialog
-          action={
-            deletion.isPending
-              ? t("jobPostings.delete.deleting")
-              : t("jobPostings.delete.confirm")
-          }
-          description={t("jobPostings.delete.description")}
+        <DeleteJobDialog
           disabled={deletion.isPending}
-          icon={Trash2}
           onConfirm={() => deletion.mutate()}
           onOpenChange={(open) => !open && setConfirmingDelete(false)}
           open
-          title={t("jobPostings.delete.title", { title: posting.title })}
-          variant="destructive-solid"
+          posting={posting}
         />
       ) : null}
+
+      {canManage && lifecycleAction === "close" ? (
+        <CloseJobDialog
+          disabled={lifecycle.isPending}
+          onConfirm={() => lifecycle.mutate("close")}
+          onOpenChange={(open) => !open && setLifecycleAction(null)}
+          open
+          posting={posting}
+        />
+      ) : null}
+
+      {canManage && lifecycleAction === "archive" ? (
+        <ArchiveJobDialog
+          disabled={lifecycle.isPending}
+          onConfirm={() => lifecycle.mutate("archive")}
+          onOpenChange={(open) => !open && setLifecycleAction(null)}
+          open
+          posting={posting}
+        />
+      ) : null}
+
+      {canManage && lifecycleAction === "restore" ? (
+        <UnarchiveJobDialog
+          disabled={lifecycle.isPending}
+          onConfirm={() => lifecycle.mutate("restore")}
+          onOpenChange={(open) => !open && setLifecycleAction(null)}
+          open
+          posting={posting}
+        />
+      ) : null}
+
+      {canManage && lifecycleAction === "reopen" ? (
+        <ReopenJobDialog
+          disabled={lifecycle.isPending}
+          onConfirm={() => lifecycle.mutate("reopen")}
+          onOpenChange={(open) => !open && setLifecycleAction(null)}
+          open
+          posting={posting}
+        />
+      ) : null}
+
+      {canManage && lifecycleAction === "publish" ? (
+        <PublishJobDialog
+          disabled={lifecycle.isPending}
+          onConfirm={() => lifecycle.mutate("publish")}
+          onOpenChange={(open) => !open && setLifecycleAction(null)}
+          open
+          posting={posting}
+        />
+      ) : null}
+
+      {canManage && lifecycleAction === "draft" ? (
+        <MoveToDraftDialog
+          disabled={lifecycle.isPending}
+          onConfirm={() => lifecycle.mutate("draft")}
+          onOpenChange={(open) => !open && setLifecycleAction(null)}
+          open
+          posting={posting}
+        />
+      ) : null}
+
+      {canManage && publishChecklistOpen ? (
+        <PublishChecklistDialog
+          editPath={`${basePath}/${posting.id}/edit`}
+          onOpenChange={setPublishChecklistOpen}
+          open={publishChecklistOpen}
+          posting={posting}
+        />
+      ) : null}
+
+      <JobPostingHistoryDialog
+        history={history.data}
+        onOpenChange={setHistoryModalOpen}
+        open={historyModalOpen}
+        posting={posting}
+      />
     </div>
   );
 }

@@ -633,7 +633,24 @@
           "description": "Khôi phục tin về trạng thái Đã đóng trước khi chỉnh sửa hoặc mở lại."
         }
       },
-      "recordCard": "Bản ghi"
+      "recordCard": "Bản ghi",
+      "aboutRole": "VỀ VAI TRÒ NÀY",
+      "descriptionSection": "MÔ TẢ CÔNG VIỆC",
+      "requirementsSection": "YÊU CẦU",
+      "benefitsSection": "QUYỀN LỢI",
+      "detailsSection": "CHI TIẾT",
+      "applicationsSection": "HỒ SƠ ỨNG TUYỂN",
+      "historySection": "LỊCH SỬ",
+      "visibility": "Hiển thị",
+      "visibilityPublic": "Công khai · đang mở",
+      "visibilityHiddenDraft": "Ẩn · bản nháp",
+      "visibilityClosed": "Đã đóng",
+      "visibilityArchived": "Đã lưu trữ · chỉ đọc",
+      "viewApplications": "Xem hồ sơ ứng tuyển",
+      "viewFullHistory": "Xem toàn bộ lịch sử",
+      "noApplicationsYet": "Chưa có hồ sơ nào",
+      "notSet": "Chưa thiết lập",
+      "notAddedYet": "Chưa thêm thông tin."
     },
     "delete": {
       "title": "Xóa “{{title}}”?",
@@ -729,7 +746,99 @@
       "railNotEditableTitle": "Không sửa tại đây",
       "railNotEditableBody": "Công ty và trạng thái do hệ thống đặt. Tin đóng vào cuối ngày hạn nộp và mở lại nếu bạn dời hạn nộp ra sau.",
       "railCurrentStatus": "Trạng thái hiện tại",
-      "fixErrors": "Kiểm tra các trường được đánh dấu rồi thử lại."
+      "fixErrors": "Kiểm tra các trường được đánh dấu rồi thử lại.",
+      "errorBanner": "Vui lòng xử lý các trường được đánh dấu trước khi tiếp tục. Chưa có gì được đăng.",
+      "aboutRole": "Về vai trò này",
+      "aboutRoleHint": "Tóm tắt tùy chọn về vai trò, đội ngũ và tác động của công việc.",
+      "titleDraftHint": "trường duy nhất bắt buộc cho Bản nháp",
+      "requiredToPublish": "bắt buộc để đăng",
+      "salaryRangeNegotiableHint": "Khoảng lương bị khóa khi bật Có thể thương lượng.",
+      "sidebarCallout": "Bản nháp chỉ cần tiêu đề. Đăng tin yêu cầu mô tả, yêu cầu, phúc lợi, địa điểm, loại công việc và hạn nộp. Mọi hành động đều được lưu vào lịch sử.",
+      "minSalaryPlaceholder": "Tối thiểu",
+      "maxSalaryPlaceholder": "Tối đa",
+      "datePlaceholder": "Chọn ngày",
+      "dateHint": "Hôm nay hoặc một ngày trong tương lai",
+      "toolbar": {
+        "bold": "In đậm",
+        "italic": "In nghiêng",
+        "underline": "Gạch chân",
+        "list": "Danh sách",
+        "link": "Liên kết"
+      }
+    },
+    "actions": {
+      "viewDetails": "Xem chi tiết",
+      "edit": "Chỉnh sửa",
+      "publish": "Đăng tin",
+      "close": "Đóng tin",
+      "unpublish": "Hủy đăng",
+      "reopen": "Mở lại tin",
+      "archive": "Lưu trữ",
+      "unarchive": "Khôi phục",
+      "delete": "Xóa",
+      "hasApplications": "Đã có hồ sơ",
+      "deadlinePassed": "Đã qua hạn nộp"
+    },
+    "dialogs": {
+      "close": {
+        "title": "Đóng {{title}}?",
+        "description": "Tin này sẽ ngừng nhận hồ sơ mới. Bạn có thể mở lại hoặc lưu trữ sau. {{count}} hồ sơ và các buổi phỏng vấn hiện tại vẫn được giữ nguyên.",
+        "keepOpen": "Hủy",
+        "confirm": "Đóng tin"
+      },
+      "archive": {
+        "title": "Lưu trữ “{{title}}”?",
+        "description": "Tin lưu trữ sẽ bị ẩn khỏi tìm kiếm của ứng viên và chuyển sang chế độ chỉ đọc. Hồ sơ và nhật ký kiểm toán được lưu vĩnh viễn. Bạn có thể khôi phục tin này sau.",
+        "keepClosed": "Hủy",
+        "confirm": "Lưu trữ tin"
+      },
+      "unarchive": {
+        "title": "Khôi phục “{{title}}”?",
+        "description": "Tin sẽ được khôi phục về trạng thái Đã đóng. Để nhận lại hồ sơ, bạn cần mở lại tin.",
+        "cancel": "Hủy",
+        "confirm": "Khôi phục tin"
+      },
+      "deleteDraft": {
+        "title": "Xóa bản nháp “{{title}}”?",
+        "description": "Bản nháp tin tuyển dụng này sẽ bị xóa vĩnh viễn. Không thể hoàn tác hành động này.",
+        "cancel": "Hủy",
+        "confirm": "Xóa"
+      },
+      "publishBlocked": {
+        "title": "Hoàn tất thông tin trước khi đăng",
+        "description": "{{title}} hiện vẫn là bản nháp. Chưa có gì được đăng.",
+        "cancel": "Hủy",
+        "openEditor": "Mở trình chỉnh sửa",
+        "checklist": {
+          "basics": "Tiêu đề, loại công việc và địa điểm",
+          "description": "Mô tả ít nhất 20 ký tự",
+          "requirements": "Yêu cầu công việc",
+          "benefits": "Quyền lợi",
+          "deadline": "Hạn nộp (hôm nay hoặc sau đó)"
+        }
+      },
+      "history": {
+        "title": "Lịch sử",
+        "subtitle": "{{title}} · {{id}}",
+        "olderEvents": "Xem sự kiện cũ hơn",
+        "timeNotice": "Thời gian theo ICT (UTC+7). Lịch sử chỉ ghi nối tiếp: không thể chỉnh sửa hay xóa, và ứng viên không bao giờ thấy.",
+        "close": "Đóng",
+        "salaryRangeEdited": "Đã sửa khoảng lương",
+        "requirementsEdited": "Đã sửa yêu cầu",
+        "descriptionEdited": "Đã sửa mô tả",
+        "publishedOpen": "Đã đăng · đang nhận hồ sơ",
+        "publishCheckPassed": "Đã qua kiểm tra đăng tin",
+        "draftCreated": "Đã tạo bản nháp",
+        "byActor": "bởi {{name}}",
+        "bySystem": "bởi Hệ thống"
+      }
+    },
+    "search": {
+      "validation": "Chỉ dùng chữ cái, số, dấu cách và các ký tự - . '",
+      "firstJobTitle": "Đăng tin tuyển dụng đầu tiên",
+      "firstJobDescription": "Bạn chưa có tin tuyển dụng nào. Hãy tạo một tin để bắt đầu nhận hồ sơ.",
+      "noResultsTitle": "Không có kết quả cho “{{query}}”",
+      "noResultsDescription": "Không có tin tuyển dụng nào khớp với từ khóa này. Kiểm tra lại chính tả hoặc thử tiêu đề, nội dung hoặc địa điểm khác."
     },
     "notSpecified": "Không chỉ định"
   },

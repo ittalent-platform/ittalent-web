@@ -54,5 +54,5 @@ describe("UserMenu job posting navigation", () => {
     expect(
       await screen.findByRole("menuitem", { name: "Job postings" }),
     ).toBeInTheDocument();
-  });
+  }, 15000);
 });

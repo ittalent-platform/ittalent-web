@@ -642,7 +642,24 @@
           "description": "Restore this job to Closed before editing or reopening it."
         }
       },
-      "recordCard": "Record"
+      "recordCard": "Record",
+      "aboutRole": "ABOUT THE ROLE",
+      "descriptionSection": "DESCRIPTION",
+      "requirementsSection": "REQUIREMENTS",
+      "benefitsSection": "BENEFITS",
+      "detailsSection": "DETAILS",
+      "applicationsSection": "APPLICATIONS",
+      "historySection": "HISTORY",
+      "visibility": "Visibility",
+      "visibilityPublic": "Public · open",
+      "visibilityHiddenDraft": "Hidden · draft",
+      "visibilityClosed": "Closed",
+      "visibilityArchived": "Archived · read-only",
+      "viewApplications": "View applications",
+      "viewFullHistory": "View full history",
+      "noApplicationsYet": "No applications yet",
+      "notSet": "Not set",
+      "notAddedYet": "Not added yet."
     },
     "delete": {
       "title": "Delete “{{title}}”?",
@@ -738,7 +755,99 @@
       "railNotEditableTitle": "Not editable here",
       "railNotEditableBody": "Company and status are set by the system. The job closes at the end of the deadline day and reopens if you move the deadline forward.",
       "railCurrentStatus": "Current status",
-      "fixErrors": "Check the highlighted fields and try again."
+      "fixErrors": "Check the highlighted fields and try again.",
+      "errorBanner": "Please resolve the highlighted fields before continuing. Nothing was published.",
+      "aboutRole": "About the role",
+      "aboutRoleHint": "Optional summary of the role, team, and impact.",
+      "titleDraftHint": "only field required for Draft",
+      "requiredToPublish": "required to publish",
+      "salaryRangeNegotiableHint": "Range is disabled while Negotiable is on.",
+      "sidebarCallout": "Draft needs only a title. Publish requires description, requirements, benefits, location, job type, and deadline. Every action is recorded in the job’s history.",
+      "minSalaryPlaceholder": "Min",
+      "maxSalaryPlaceholder": "Max",
+      "datePlaceholder": "Select date",
+      "dateHint": "Today or a future date",
+      "toolbar": {
+        "bold": "Bold",
+        "italic": "Italic",
+        "underline": "Underline",
+        "list": "List",
+        "link": "Link"
+      }
+    },
+    "actions": {
+      "viewDetails": "View details",
+      "edit": "Edit",
+      "publish": "Publish",
+      "close": "Close job",
+      "unpublish": "Unpublish",
+      "reopen": "Reopen job",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "delete": "Delete",
+      "hasApplications": "Has applications",
+      "deadlinePassed": "Deadline passed"
+    },
+    "dialogs": {
+      "close": {
+        "title": "Close {{title}}?",
+        "description": "This posting will stop accepting new applications. You can reopen or archive it afterward. The {{count}} applications and their interviews stay as they are.",
+        "keepOpen": "Cancel",
+        "confirm": "Close job"
+      },
+      "archive": {
+        "title": "Archive “{{title}}”?",
+        "description": "Archived postings are hidden from candidate searches and read-only. Applications and audit logs are preserved permanently. You can unarchive this posting later.",
+        "keepClosed": "Cancel",
+        "confirm": "Archive job"
+      },
+      "unarchive": {
+        "title": "Unarchive “{{title}}”?",
+        "description": "The posting will be restored to Closed status. To start accepting applications again, you will need to reopen it.",
+        "cancel": "Cancel",
+        "confirm": "Unarchive job"
+      },
+      "deleteDraft": {
+        "title": "Delete draft “{{title}}”?",
+        "description": "This draft job posting will be permanently deleted. This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "publishBlocked": {
+        "title": "Finish the job before publishing",
+        "description": "{{title}} is still a draft. Nothing was published.",
+        "cancel": "Cancel",
+        "openEditor": "Open editor",
+        "checklist": {
+          "basics": "Title, job type and location",
+          "description": "Description of at least 20 characters",
+          "requirements": "Requirements",
+          "benefits": "Benefits",
+          "deadline": "Deadline (today or later)"
+        }
+      },
+      "history": {
+        "title": "History",
+        "subtitle": "{{title}} · {{id}}",
+        "olderEvents": "Show older events",
+        "timeNotice": "Times in ICT (UTC+7). History is append-only: it can’t be edited or deleted, and candidates never see it.",
+        "close": "Close",
+        "salaryRangeEdited": "Salary range edited",
+        "requirementsEdited": "Requirements edited",
+        "descriptionEdited": "Description edited",
+        "publishedOpen": "Published · open for applications",
+        "publishCheckPassed": "Publish check passed",
+        "draftCreated": "Draft created",
+        "byActor": "by {{name}}",
+        "bySystem": "by System"
+      }
+    },
+    "search": {
+      "validation": "Use letters, numbers, spaces and - . ' only.",
+      "firstJobTitle": "Post your first job",
+      "firstJobDescription": "You don’t have any job postings yet. Create one to start receiving applications.",
+      "noResultsTitle": "No results for “{{query}}”",
+      "noResultsDescription": "No job postings match this keyword. Check the spelling or try a different title, content, or location."
     },
     "notSpecified": "Not specified"
   },
