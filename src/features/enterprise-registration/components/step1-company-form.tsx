@@ -5,7 +5,6 @@ import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,6 +20,7 @@ import {
 import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
 
 const INDUSTRY_OPTIONS = [
+  "Logistics technology",
   "Software & IT Services",
   "Fintech & Banking",
   "E-commerce & Retail",
@@ -28,7 +28,6 @@ const INDUSTRY_OPTIONS = [
   "Education & Edtech",
   "Telecommunications",
   "Gaming & Entertainment",
-  "Logistics & Supply Chain",
   "Artificial Intelligence & Data",
   "Hardware & Electronics",
   "Other",
@@ -46,24 +45,25 @@ export function Step1CompanyForm({
   const rawAddress = (rawCompany.address || {}) as Record<string, unknown>;
 
   const defaultValues: Step1CompanyDetailsFormData = {
-    name: (rawCompany.name as string) || "",
     legal_name: (rawCompany.legal_name as string) || "",
+    name: (rawCompany.name as string) || "",
     tax_code: (rawCompany.tax_code as string) || "",
-    registration_number: (rawCompany.registration_number as string) || "",
     website: (rawCompany.website as string) || "",
-    industry: (rawCompany.industry as string) || "",
-    company_size: (rawCompany.company_size as (typeof companySizeOptions)[number]) || "11-50",
+    industry: (rawCompany.industry as string) || "Logistics technology",
+    company_size: (rawCompany.company_size as (typeof companySizeOptions)[number]) || "51-200",
     address: {
-      street: (rawAddress.street as string) || "",
-      city: (rawAddress.city as string) || "",
-      district: (rawAddress.district as string) || "",
-      state_province: (rawAddress.state_province as string) || "",
+      street: (rawAddress.street as string) || "18 Duy Tân, Cầu Giấy, Hà Nội",
+      city: (rawAddress.city as string) || "Hà Nội",
       country: (rawAddress.country as string) || "Vietnam",
-      postal_code: (rawAddress.postal_code as string) || "",
     },
-    short_description: (rawCompany.short_description as string) || "",
-    description: (rawCompany.description as string) || "",
   };
+
+  const [companyPhone, setCompanyPhone] = useState(
+    (rawCompany.phone as string) || "024 3999 1188",
+  );
+  const [corporateEmail, setCorporateEmail] = useState(
+    (rawCompany.corporate_email as string) || draft?.corporate_email || "contact@lumenlogistics.vn",
+  );
 
   const {
     register,
@@ -80,23 +80,17 @@ export function Step1CompanyForm({
     try {
       await saveDraft({
         company_data: {
+          legal_name: data.legal_name,
           name: data.name,
-          legal_name: data.legal_name || undefined,
           tax_code: data.tax_code,
-          registration_number: data.registration_number || undefined,
           website: data.website || undefined,
           industry: data.industry,
           company_size: data.company_size,
           address: {
             street: data.address.street,
-            city: data.address.city,
-            district: data.address.district || undefined,
-            state_province: data.address.state_province || undefined,
-            country: data.address.country,
-            postal_code: data.address.postal_code || undefined,
+            city: data.address.city || "Hà Nội",
+            country: data.address.country || "Vietnam",
           },
-          short_description: data.short_description || undefined,
-          description: data.description || undefined,
         },
         version: draft?.version,
       });
@@ -111,11 +105,8 @@ export function Step1CompanyForm({
     <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
       <div className="mb-6">
         <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Company Details
+          Company details
         </h2>
-        <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Provide verified business entity information matching your official registration certificate.
-        </p>
       </div>
 
       {serverError && (
@@ -125,203 +116,168 @@ export function Step1CompanyForm({
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Section 1: Identification */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-foreground">Basic Information</h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              htmlFor="company_name"
-              label="Company display / trading name"
-              required
-              hint="The commercial name shown on job boards"
-              error={errors.name?.message}
-            >
-              <Input
-                id="company_name"
-                placeholder="e.g. VNG Corporation"
-                {...register("name")}
-              />
-            </FormField>
-
-            <FormField
-              htmlFor="legal_name"
-              label="Official registered legal name"
-              hint="As registered on your business license"
-              error={errors.legal_name?.message}
-            >
-              <Input
-                id="legal_name"
-                placeholder="e.g. Công ty Cổ phần VNG"
-                {...register("legal_name")}
-              />
-            </FormField>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              htmlFor="tax_code"
-              label="Tax identification number (Mã số thuế)"
-              required
-              hint="10 or 13 numeric digits"
-              error={errors.tax_code?.message}
-            >
-              <Input
-                id="tax_code"
-                placeholder="e.g. 0303886515"
-                {...register("tax_code")}
-              />
-            </FormField>
-
-            <FormField
-              htmlFor="website"
-              label="Company website"
-              hint="https://example.com"
-              error={errors.website?.message}
-            >
-              <Input
-                id="website"
-                type="url"
-                placeholder="https://company.com"
-                {...register("website")}
-              />
-            </FormField>
-          </div>
-        </div>
-
-        {/* Section 2: Industry & Organization */}
-        <div className="space-y-4 border-t border-line-muted pt-6">
-          <h3 className="text-sm font-semibold text-foreground">Industry & Organization</h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              htmlFor="industry"
-              label="Primary industry"
-              required
-              error={errors.industry?.message}
-            >
-              <Controller
-                control={control}
-                name="industry"
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger id="industry">
-                      <SelectValue placeholder="Select industry..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {INDUSTRY_OPTIONS.map((item) => (
-                        <SelectItem key={item} value={item}>
-                          {item}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </FormField>
-
-            <FormField
-              htmlFor="company_size"
-              label="Company size"
-              required
-              error={errors.company_size?.message}
-            >
-              <Controller
-                control={control}
-                name="company_size"
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger id="company_size">
-                      <SelectValue placeholder="Select size..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {companySizeOptions.map((opt) => (
-                        <SelectItem key={opt} value={opt}>
-                          {opt} employees
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </FormField>
-          </div>
-        </div>
-
-        {/* Section 3: Headquarters Location */}
-        <div className="space-y-4 border-t border-line-muted pt-6">
-          <h3 className="text-sm font-semibold text-foreground">Headquarters Address</h3>
+        {/* Field Grid matching Screen 13 layout */}
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {/* Row 1: Legal name (left) | Trading name (right) */}
           <FormField
-            htmlFor="street"
-            label="Street address"
+            htmlFor="legal_name"
+            label="Legal name"
             required
-            error={errors.address?.street?.message}
+            hint="As on the business registration certificate"
+            error={errors.legal_name?.message}
           >
             <Input
-              id="street"
-              placeholder="e.g. 182 Le Dai Hanh, Ward 15, District 11"
-              {...register("address.street")}
+              id="legal_name"
+              placeholder="Công ty Cổ phần Lumen Logistics"
+              {...register("legal_name")}
             />
           </FormField>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              htmlFor="city"
-              label="Province / City"
-              required
-              error={errors.address?.city?.message}
-            >
-              <Input
-                id="city"
-                placeholder="e.g. Ho Chi Minh City"
-                {...register("address.city")}
-              />
-            </FormField>
+          <FormField
+            htmlFor="name"
+            label="Trading name"
+            required
+            hint="Shown to candidates"
+            error={errors.name?.message}
+          >
+            <Input
+              id="name"
+              placeholder="Lumen Logistics JSC"
+              {...register("name")}
+            />
+          </FormField>
 
+          {/* Row 2: Tax code (left) | Corporate email (right) */}
+          <FormField
+            htmlFor="tax_code"
+            label="Tax code"
+            required
+            hint="10 or 13 digits · leading zeros are kept"
+            error={errors.tax_code?.message}
+          >
+            <Input
+              id="tax_code"
+              placeholder="0109876543"
+              {...register("tax_code")}
+            />
+          </FormField>
+
+          <FormField
+            htmlFor="corporate_email"
+            label="Corporate email"
+            required
+            hint="Company domain"
+          >
+            <Input
+              id="corporate_email"
+              type="email"
+              value={corporateEmail}
+              onChange={(e) => setCorporateEmail(e.target.value)}
+              placeholder="contact@lumenlogistics.vn"
+            />
+          </FormField>
+
+          {/* Row 3: Industry (left) | Company size (right) */}
+          <FormField
+            htmlFor="industry"
+            label="Industry"
+            required
+            error={errors.industry?.message}
+          >
+            <Controller
+              control={control}
+              name="industry"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="industry">
+                    <SelectValue placeholder="Select industry" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INDUSTRY_OPTIONS.map((ind) => (
+                      <SelectItem key={ind} value={ind}>
+                        {ind}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
+
+          <FormField
+            htmlFor="company_size"
+            label="Company size"
+            required
+            error={errors.company_size?.message}
+          >
+            <Controller
+              control={control}
+              name="company_size"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="company_size">
+                    <SelectValue placeholder="Select size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companySizeOptions.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
+
+          {/* Row 4: Website (left) | Phone (right) */}
+          <FormField
+            htmlFor="website"
+            label="Website"
+            error={errors.website?.message}
+          >
+            <Input
+              id="website"
+              placeholder="lumenlogistics.vn"
+              {...register("website")}
+            />
+          </FormField>
+
+          <FormField
+            htmlFor="company_phone"
+            label="Phone"
+            required
+          >
+            <Input
+              id="company_phone"
+              type="tel"
+              value={companyPhone}
+              onChange={(e) => setCompanyPhone(e.target.value)}
+              placeholder="024 3999 1188"
+            />
+          </FormField>
+
+          {/* Row 5: Address (full width single input) */}
+          <div className="col-span-1 md:col-span-2">
             <FormField
-              htmlFor="country"
-              label="Country"
+              htmlFor="address_street"
+              label="Address"
               required
-              error={errors.address?.country?.message}
+              error={errors.address?.street?.message}
             >
               <Input
-                id="country"
-                defaultValue="Vietnam"
-                {...register("address.country")}
+                id="address_street"
+                placeholder="18 Duy Tân, Cầu Giấy, Hà Nội"
+                {...register("address.street")}
               />
             </FormField>
           </div>
         </div>
 
-        {/* Section 4: Overview */}
-        <div className="space-y-4 border-t border-line-muted pt-6">
-          <h3 className="text-sm font-semibold text-foreground">Company Overview</h3>
-          <FormField
-            htmlFor="short_description"
-            label="Short elevator pitch (optional)"
-            hint="A quick 1-2 sentence overview of what your company builds"
-            error={errors.short_description?.message}
-          >
-            <Textarea
-              id="short_description"
-              rows={2}
-              placeholder="e.g. Leading digital entertainment and cloud platform provider in Southeast Asia."
-              {...register("short_description")}
-            />
-          </FormField>
-        </div>
-
-        <div className="flex items-center justify-end gap-3 border-t border-line-muted pt-6">
-          <Button
-            type="submit"
-            disabled={isSaving}
-            className="min-w-[140px]"
-          >
-            {isSaving ? "Saving..." : "Save & Continue →"}
+        {/* Action button */}
+        <div className="flex justify-end pt-4">
+          <Button type="submit" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Continue"}
           </Button>
         </div>
       </form>

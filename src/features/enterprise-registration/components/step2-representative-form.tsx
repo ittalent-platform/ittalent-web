@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Check } from "lucide-react";
 import { FormField } from "@/components/common/form-field";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import {
   type Step2RepresentativeFormData,
 } from "@/features/enterprise-registration/enterprise-registration.schemas";
 import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
+import { cn } from "@/lib/utils";
 
 export function Step2RepresentativeForm({
   onNext,
@@ -33,29 +35,38 @@ export function Step2RepresentativeForm({
     position: "",
   };
 
+  const [isLegalRep, setIsLegalRep] = useState<boolean>(isLegalRepresentative);
+
   const defaultValues: Step2RepresentativeFormData = {
-    full_name: rawRep.full_name || "",
-    phone: rawRep.phone || "",
-    position: rawRep.position || "",
+    full_name: rawRep.full_name || "Đỗ Minh Châu",
+    phone: rawRep.phone || "0912 778 456",
+    position: rawRep.position || "Head of Operations",
     is_legal_representative: isLegalRepresentative,
+    legal_representative_name: "Nguyễn Văn Lâm",
   };
 
   const {
     register,
-    watch,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<Step2RepresentativeFormData>({
     resolver: zodResolver(step2RepresentativeSchema),
     defaultValues,
   });
 
-  const isLegalRep = watch("is_legal_representative");
+  const verifiedEmail = draft?.corporate_email || "chau.do@lumenlogistics.vn";
+
+  const handleSelectLegalRep = (isLegal: boolean) => {
+    setIsLegalRep(isLegal);
+    setValue("is_legal_representative", isLegal);
+    setIsLegalRepresentative(isLegal);
+  };
 
   const onSubmit = async (data: Step2RepresentativeFormData) => {
     setServerError(null);
     try {
-      setIsLegalRepresentative(data.is_legal_representative);
+      setIsLegalRepresentative(isLegalRep);
       await saveDraft({
         representative: {
           full_name: data.full_name,
@@ -73,14 +84,32 @@ export function Step2RepresentativeForm({
     }
   };
 
+  const handleSaveDraftOnly = async () => {
+    setServerError(null);
+    try {
+      setIsLegalRepresentative(isLegalRep);
+      await saveDraft({
+        representative: {
+          full_name: defaultValues.full_name,
+          phone: defaultValues.phone,
+          position: defaultValues.position || undefined,
+        },
+        version: draft?.version,
+      });
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string };
+      setServerError(errorObj.message || "Failed to save draft. Please try again.");
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-border bg-card p-6 shadow-xs sm:p-8">
       <div className="mb-6">
         <h2 className="text-xl font-bold tracking-tight text-foreground">
-          Authorized Representative
+          Representative
         </h2>
         <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Specify the representative managing this enterprise workspace on ITTalent.
+          You will become the company&apos;s first Enterprise admin after approval.
         </p>
       </div>
 
@@ -91,97 +120,179 @@ export function Step2RepresentativeForm({
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {/* Row 1: Full name (left) | Work email with Verified pill (right) */}
           <FormField
             htmlFor="full_name"
-            label="Representative full name"
+            label="Full name"
             required
             error={errors.full_name?.message}
           >
             <Input
               id="full_name"
-              placeholder="e.g. Nguyễn Văn A"
+              placeholder="Đỗ Minh Châu"
               {...register("full_name")}
+            />
+          </FormField>
+
+          <div>
+            <label
+              htmlFor="verified_work_email"
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-foreground"
+            >
+              Work email <span className="text-destructive">*</span>
+            </label>
+            <div className="relative flex items-center">
+              <Input
+                id="verified_work_email"
+                type="email"
+                value={verifiedEmail}
+                readOnly
+                className="pr-24 bg-muted/30"
+              />
+              <span className="absolute right-2.5 inline-flex items-center gap-1 rounded-full bg-(--status-success-bg) px-2.5 py-0.5 text-xs font-medium text-(--status-success-fg)">
+                <Check className="h-3 w-3 stroke-[2.5]" /> Verified
+              </span>
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              Confirmed. The invitation goes here.
+            </p>
+          </div>
+
+          {/* Row 2: Position (left) | Phone (right) */}
+          <FormField
+            htmlFor="position"
+            label="Position"
+            required
+            error={errors.position?.message}
+          >
+            <Input
+              id="position"
+              placeholder="Head of Operations"
+              {...register("position")}
             />
           </FormField>
 
           <FormField
             htmlFor="phone"
-            label="Direct mobile phone"
+            label="Phone"
             required
-            hint="For urgent verification SMS or calls"
             error={errors.phone?.message}
           >
             <Input
               id="phone"
               type="tel"
-              placeholder="+84 901 234 567"
+              placeholder="0912 778 456"
               {...register("phone")}
             />
           </FormField>
         </div>
 
-        <FormField
-          htmlFor="position"
-          label="Job title / position"
-          hint="e.g. Talent Acquisition Director, HR Manager, General Director"
-          error={errors.position?.message}
-        >
-          <Input
-            id="position"
-            placeholder="e.g. Head of Talent Acquisition"
-            {...register("position")}
-          />
-        </FormField>
-
-        {/* Legal rep authorization checkbox card */}
-        <div className="rounded-xl border border-border bg-muted p-4.5">
-          <div className="flex items-start gap-3">
-            <input
-              id="is_legal_representative"
-              type="checkbox"
-              className="mt-1 size-4.5 shrink-0 accent-primary"
-              {...register("is_legal_representative")}
-            />
-            <div className="space-y-1">
-              <label
-                htmlFor="is_legal_representative"
-                className="cursor-pointer text-[13.5px] font-semibold text-foreground"
+        {/* Radio choice cards: Are you the company's legal representative? */}
+        <div className="space-y-2 pt-2">
+          <label className="block text-xs font-semibold tracking-wide text-foreground">
+            Are you the company&apos;s legal representative?{" "}
+            <span className="text-destructive">*</span>
+          </label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Yes card */}
+            <button
+              type="button"
+              onClick={() => handleSelectLegalRep(true)}
+              className={cn(
+                "flex items-start gap-3 rounded-xl border p-4 text-left transition-all",
+                isLegalRep
+                  ? "border-primary bg-primary/5 shadow-2xs"
+                  : "border-border bg-card hover:bg-muted/40",
+              )}
+            >
+              <div
+                className={cn(
+                  "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
+                  isLegalRep
+                    ? "border-primary bg-primary text-white"
+                    : "border-border",
+                )}
               >
-                I am the legal representative named on the Business License (Người đại diện theo pháp luật)
-              </label>
-              <p className="text-xs text-muted-foreground">
-                If checked, you only need to upload the Business Registration Certificate.
-              </p>
-            </div>
+                {isLegalRep && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+              </div>
+              <div className="text-xs">
+                <p className="font-semibold text-foreground text-sm">Yes</p>
+                <p className="mt-0.5 text-muted-foreground leading-relaxed">
+                  The person named on the business registration certificate.
+                </p>
+              </div>
+            </button>
+
+            {/* No card */}
+            <button
+              type="button"
+              onClick={() => handleSelectLegalRep(false)}
+              className={cn(
+                "flex items-start gap-3 rounded-xl border p-4 text-left transition-all",
+                !isLegalRep
+                  ? "border-primary bg-primary/5 shadow-2xs"
+                  : "border-border bg-card hover:bg-muted/40",
+              )}
+            >
+              <div
+                className={cn(
+                  "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border",
+                  !isLegalRep
+                    ? "border-primary bg-primary text-white"
+                    : "border-border",
+                )}
+              >
+                {!isLegalRep && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+              </div>
+              <div className="text-xs">
+                <p className="font-semibold text-foreground text-sm">No</p>
+                <p className="mt-0.5 text-muted-foreground leading-relaxed">
+                  You&apos;ll upload a letter of authorization in the next step.
+                </p>
+              </div>
+            </button>
           </div>
         </div>
 
+        {/* Conditional legal representative name field when "No" */}
         {!isLegalRep && (
-          <div>
-            <InlineBanner tone="warning">
-              <span className="font-semibold">Authorization requirement:</span> Because you are not the primary legal representative listed on official government records, you will be required to upload a signed Letter of Authorization (Giấy ủy quyền) in Step 3.
-            </InlineBanner>
+          <div className="pt-1">
+            <FormField
+              htmlFor="legal_representative_name"
+              label="Legal representative's name"
+              required
+              hint="As on the certificate"
+              error={errors.legal_representative_name?.message}
+            >
+              <Input
+                id="legal_representative_name"
+                placeholder="Nguyễn Văn Lâm"
+                {...register("legal_representative_name")}
+              />
+            </FormField>
           </div>
         )}
 
-        <div className="flex items-center justify-between gap-3 border-t border-line-muted pt-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onBack}
-            disabled={isSaving}
-          >
-            ← Back
+        {/* Footer actions */}
+        <div className="flex items-center justify-between border-t border-border pt-6">
+          <Button type="button" variant="outline" onClick={onBack}>
+            Back
           </Button>
 
-          <Button
-            type="submit"
-            disabled={isSaving}
-            className="min-w-[140px]"
-          >
-            {isSaving ? "Saving..." : "Save & Continue →"}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSaving}
+              onClick={handleSaveDraftOnly}
+            >
+              Save draft
+            </Button>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? "Saving..." : "Continue"}
+            </Button>
+          </div>
         </div>
       </form>
     </div>

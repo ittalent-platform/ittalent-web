@@ -179,19 +179,19 @@ describe("Employer Registration Flow Components", () => {
         </RegistrationWizardProvider>,
       );
 
-      expect(screen.getByLabelText(/company display \/ trading name/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/tax identification number/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/trading name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/tax code/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/address/i)).toBeInTheDocument();
 
-      await user.type(screen.getByLabelText(/company display \/ trading name/i), "Acme Corp");
-      await user.type(screen.getByLabelText(/tax identification number/i), "0303886515");
-      await user.type(screen.getByLabelText(/street address/i), "123 Main St");
-      await user.type(screen.getByLabelText(/province \/ city/i), "Ho Chi Minh City");
+      await user.type(screen.getByLabelText(/trading name/i), "Acme Corp");
+      await user.type(screen.getByLabelText(/tax code/i), "0303886515");
+      await user.type(screen.getByLabelText(/address/i), "123 Main St, Hanoi");
 
       // Select industry
-      await user.click(screen.getByRole("combobox", { name: /primary industry/i }));
+      await user.click(screen.getByRole("combobox", { name: /industry/i }));
       await user.click(screen.getByRole("option", { name: /software & it services/i }));
 
-      await user.click(screen.getByRole("button", { name: /save & continue/i }));
+      await user.click(screen.getByRole("button", { name: /continue/i }));
 
       await waitFor(() => {
         expect(mockedSaveDraft).toHaveBeenCalled();
@@ -213,7 +213,7 @@ describe("Employer Registration Flow Components", () => {
       },
     };
 
-    it("toggles legal representative notice when unchecked", async () => {
+    it("toggles legal representative notice when selecting No card", async () => {
       const user = userEvent.setup();
       const onNext = vi.fn();
       const onBack = vi.fn();
@@ -227,18 +227,16 @@ describe("Employer Registration Flow Components", () => {
         </RegistrationWizardProvider>,
       );
 
-      const checkbox = screen.getByRole("checkbox", {
-        name: /i am the legal representative/i,
-      });
-      expect(checkbox).toBeChecked();
+      // Initially Yes is selected, No card is available
+      const noButton = screen.getByRole("button", { name: /no.*upload a letter of authorization/i });
+      expect(noButton).toBeInTheDocument();
 
-      // Uncheck it
-      await user.click(checkbox);
-      expect(checkbox).not.toBeChecked();
+      // Click No
+      await user.click(noButton);
 
-      // Authorization notice shows up
+      // Conditional Legal representative's name field appears
       expect(
-        screen.getByText(/authorization requirement:/i),
+        screen.getByLabelText(/legal representative's name/i),
       ).toBeInTheDocument();
     });
   });
