@@ -61,7 +61,10 @@ export function RegisterCompanyPage() {
     (Boolean(resumeId) && Boolean(detailQuery.data)) ||
     view === "wizard";
 
-  if (token && verifyEmailQuery.isLoading) {
+  // The wizard seeds its state once, so wait for the saved draft instead of mounting it empty.
+  const waitingForDraft = Boolean(resolvedRegistrationId) && detailQuery.isLoading;
+
+  if ((token && verifyEmailQuery.isLoading) || waitingForDraft) {
     return <LoadingScreen />;
   }
 

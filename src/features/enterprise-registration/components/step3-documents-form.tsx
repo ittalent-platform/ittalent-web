@@ -22,7 +22,10 @@ import {
   type LegalDocumentType,
 } from "@/features/enterprise-registration/enterprise-registration.constants";
 import { useRegistrationWizard } from "@/features/enterprise-registration/context/registration-wizard-context";
-import { useUploadLegalDocumentMutation } from "@/features/enterprise-registration/enterprise-registration.queries";
+import {
+  useEnterpriseRegistrationDetailQuery,
+  useUploadLegalDocumentMutation,
+} from "@/features/enterprise-registration/enterprise-registration.queries";
 import { cn } from "@/lib/utils";
 
 import { StepActions } from "./step-actions";
@@ -71,6 +74,8 @@ export function Step3DocumentsForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadMutation = useUploadLegalDocumentMutation();
+  // The server bumps the draft version on every upload; re-read it so later saves and the submit carry the new one.
+  const detailQuery = useEnterpriseRegistrationDetailQuery(registrationId ?? "", { enabled: false });
 
   const documents = draft?.legal_documents || [];
 
@@ -108,23 +113,13 @@ export function Step3DocumentsForm({
     }
 
     try {
-      const uploadedDoc = await uploadMutation.mutateAsync({
+      await uploadMutation.mutateAsync({
         id: registrationId,
         documentType: docType,
         file,
       });
-
-      if (uploadedDoc && draft) {
-        // Append or replace the uploaded document in local draft
-        const filteredDocs = (draft.legal_documents || []).filter(
-          (d) => d.file_name !== uploadedDoc.file_name,
-        );
-        const nextDocs = [...filteredDocs, uploadedDoc];
-        setDraft({
-          ...draft,
-          legal_documents: nextDocs,
-        });
-      }
+      const { data: fresh } = await detailQuery.refetch();
+      if (fresh) setDraft(fresh);
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
       setErrorMessage(errorObj.message || t("enterpriseRegistration.step3.uploadFailed"));

@@ -130,7 +130,7 @@ export function Step4ReviewForm({
   return (
     <div className="flex flex-col gap-[18px]">
       <SectionCard description={t("enterpriseRegistration.step4.subtitle")} title={t("enterpriseRegistration.step4.title")}>
-        {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
+        {null}
       </SectionCard>
 
       <SectionCard title={t("enterpriseRegistration.step4.company")}>
@@ -176,6 +176,7 @@ export function Step4ReviewForm({
 
       <SectionCard>
         <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+          {serverError ? <InlineBanner tone="error">{serverError}</InlineBanner> : null}
           <ConsentCheckbox
             error={errors.agreed_to_terms?.message}
             hint={t("enterpriseRegistration.step4.certifyBody")}
