@@ -357,7 +357,12 @@ export function Step3DocumentsForm({
 
       {/* Footer Navigation on background */}
       <div className="flex items-center justify-between pt-1">
-        <Button type="button" variant="outline" onClick={onBack}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          className="h-11 rounded-xl px-5 text-[14px] font-semibold"
+        >
           Back
         </Button>
 
@@ -369,10 +374,16 @@ export function Step3DocumentsForm({
             onClick={async () => {
               if (draft) await saveDraft({ version: draft.version });
             }}
+            className="h-11 rounded-xl px-5 text-[14px] font-semibold"
           >
             Save draft
           </Button>
-          <Button type="submit" disabled={uploadMutation.isPending} onClick={handleProceed}>
+          <Button
+            type="submit"
+            disabled={uploadMutation.isPending}
+            onClick={handleProceed}
+            className="h-11 rounded-xl px-6 text-[14px] font-semibold"
+          >
             Continue
           </Button>
         </div>

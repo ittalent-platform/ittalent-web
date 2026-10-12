@@ -313,7 +313,12 @@ export function Step4ReviewForm({
 
         {/* Footer Navigation on background */}
         <div className="flex items-center justify-between pt-1">
-          <Button type="button" variant="outline" onClick={onBack}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+            className="h-11 rounded-xl px-5 text-[14px] font-semibold"
+          >
             Back
           </Button>
 
@@ -325,12 +330,14 @@ export function Step4ReviewForm({
               onClick={async () => {
                 if (draft) await saveDraft({ version: draft.version });
               }}
+              className="h-11 rounded-xl px-5 text-[14px] font-semibold"
             >
               Save draft
             </Button>
             <Button
               type="submit"
               disabled={submitMutation.isPending}
+              className="h-11 rounded-xl px-6 text-[14px] font-semibold"
             >
               {submitMutation.isPending ? "Submitting..." : "Submit registration"}
             </Button>
