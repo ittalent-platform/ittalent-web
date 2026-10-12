@@ -137,7 +137,7 @@ export function CertificatesPage() {
       {query.isLoading ? (
         <ul aria-busy className="flex flex-col gap-3">
           {Array.from({ length: 3 }, (_, index) => (
-            <li className="flex items-center justify-between rounded-2xl border border-border bg-card px-5 py-5" key={index}>
+            <li className="flex items-center justify-between surface-card px-5 py-5" key={index}>
               <div className="flex flex-col gap-2"><Skeleton className="h-4 w-64" /><Skeleton className="h-3 w-40" /></div>
               <Skeleton className="h-6 w-10 rounded-full" />
             </li>
@@ -236,5 +236,5 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 function Panel({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-2xl border border-border bg-card">{children}</div>;
+  return <div className="surface-card">{children}</div>;
 }

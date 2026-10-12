@@ -18,7 +18,7 @@ export function MarketplaceFooter() {
         <div className="flex flex-col gap-3.5">
           <div className="flex items-center gap-2.5">
             <MarketplaceLogo size={28} />
-            <span className="font-['Space_Grotesk',sans-serif] text-[17px] font-bold tracking-[0.04em]">
+            <span className="itt-display text-[17px] font-bold tracking-[0.04em]">
               ITTALENT
             </span>
           </div>

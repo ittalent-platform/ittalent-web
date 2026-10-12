@@ -31,7 +31,7 @@ export function MarketplaceHeader({ dark = false }: { dark?: boolean }) {
         to="/"
       >
         <MarketplaceLogo />
-        <span className="hidden font-['Space_Grotesk',sans-serif] text-[19px] font-bold tracking-[0.04em] sm:inline">
+        <span className="hidden itt-display text-[19px] font-bold tracking-[0.04em] sm:inline">
           ITTALENT
         </span>
       </Link>

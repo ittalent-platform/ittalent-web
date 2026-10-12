@@ -25,7 +25,7 @@ export function CertificateRow({ certificate, highlighted, onDelete, onEdit, onS
   const expired = isExpired(certificate);
   const switchId = `suggest-${certificate.id}`;
   return (
-    <li className={cn("flex gap-4 rounded-2xl border border-border bg-card px-5 py-[18px] transition-colors", highlighted && "border-primary/30 bg-primary/5")}>
+    <li className={cn("flex gap-4 surface-card px-5 py-[18px] transition-colors", highlighted && "border-primary/30 bg-primary/5")}>
       <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-xl bg-muted text-foreground">
         <Award className="size-5" />
       </span>

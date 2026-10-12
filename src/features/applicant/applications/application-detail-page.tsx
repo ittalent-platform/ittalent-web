@@ -26,7 +26,7 @@ import { HTTP_BAD_REQUEST, HTTP_NOT_FOUND } from "@/api/http-status";
 import { requestStatus } from "@/api/request-error";
 
 const PAGE = "mx-auto flex w-full max-w-[1264px] flex-col gap-5 px-4 pb-12 pt-8 sm:px-6";
-const CARD = "rounded-2xl border border-border bg-card";
+const CARD = "surface-card";
 
 /** UC-MYAPP-02 / 03: one owned application with its progress, documents and status history. */
 export function ApplicationDetailPage() {

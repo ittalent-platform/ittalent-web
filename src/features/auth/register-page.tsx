@@ -110,7 +110,7 @@ export function RegisterPage() {
       <div className="flex h-full flex-1 items-center justify-center px-5 py-8 sm:px-8 sm:py-10 lg:p-10">
           <div className="flex w-full max-w-[440px] flex-col gap-[22px]">
           <div className="flex flex-col gap-2">
-              <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[30px] font-semibold tracking-[-0.01em] text-foreground">
+              <h1 className="m-0 itt-display text-[30px] font-semibold tracking-[-0.01em] text-foreground">
                 {t("auth.register.title")}
               </h1>
               <p className="m-0 text-[14.5px] leading-[1.55] text-muted-foreground">{t("auth.register.subtitle")}</p>

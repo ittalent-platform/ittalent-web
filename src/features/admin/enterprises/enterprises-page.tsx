@@ -219,7 +219,7 @@ export function EnterprisesPage() {
       />
 
       {/* Enterprises Table Card */}
-      <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-2xs">
+      <div className="surface-card overflow-hidden shadow-2xs">
         <EnterprisesTable
           items={sortedItems}
           isLoading={listQuery.isLoading}

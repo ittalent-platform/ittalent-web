@@ -98,9 +98,9 @@ import { StateCard } from "./state-card";
 import { LogoTile } from "@/components/common/logo-tile";
 
 const h2Class =
-  "m-0 font-['Space_Grotesk',sans-serif] text-[21px] font-semibold";
+  "m-0 itt-display text-[21px] font-semibold";
 const cardClass =
-  "flex flex-col gap-3.5 rounded-2xl border border-mkt-line bg-white p-5 md:p-7";
+  "flex flex-col gap-3.5 market-card p-5 md:p-7";
 
 function linesOf(text?: string) {
   return (text ?? "")
@@ -384,7 +384,7 @@ export function CareerJobPage() {
         <div className="flex items-start gap-5">
           <LogoTile className="hidden size-[72px] rounded-2xl text-[22px] sm:grid" name={companyName ?? "?"} seed={job.enterpriseId ?? companyName} tone="tint" />
           <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-            <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[26px] font-semibold leading-[1.15] [overflow-wrap:anywhere] md:text-[32px]">
+            <h1 className="m-0 itt-display text-[26px] font-semibold leading-[1.15] [overflow-wrap:anywhere] md:text-[32px]">
               {job.title}
             </h1>
             <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-mkt-ink-2">
@@ -511,13 +511,13 @@ export function CareerJobPage() {
         <aside className="flex min-w-0 flex-col gap-4 lg:col-span-4">
           <section
             aria-label="Apply"
-            className="flex flex-col gap-[18px] rounded-2xl border border-mkt-line bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.07)]"
+            className="flex flex-col gap-[18px] market-card p-6 shadow-[0_2px_8px_rgba(0,0,0,0.07)]"
           >
             <div className="flex flex-col gap-1">
               <span className="text-[11.5px] font-bold tracking-[0.05em] text-mkt-label">
                 SALARY
               </span>
-              <span className="font-['Space_Grotesk',sans-serif] text-[26px] font-bold">
+              <span className="itt-display text-[26px] font-bold">
                 {salaryBig}
                 {salaryUnit ? (
                   <span className="ml-1 text-[15px] font-semibold text-mkt-muted">
@@ -582,12 +582,12 @@ export function CareerJobPage() {
           {company ? (
             <section
               aria-label="Company"
-              className="flex flex-col gap-4 rounded-2xl border border-mkt-line bg-white p-6"
+              className="flex flex-col gap-4 market-card p-6"
             >
               <div className="flex items-center gap-3.5">
                 <LogoTile className="size-[52px] rounded-xl text-[17px]" name={company.name} seed={job.enterpriseId ?? companyName} tone="tint" />
                 <div className="flex min-w-0 flex-col gap-0.5">
-                  <span className="font-['Space_Grotesk',sans-serif] text-[17px] font-semibold">
+                  <span className="itt-display text-[17px] font-semibold">
                     {company.name}
                   </span>
                   {company.industry ? (
@@ -624,7 +624,7 @@ export function CareerJobPage() {
       {company && otherJobs.length > 0 ? (
         <section className="flex flex-col gap-5 px-4 pb-[72px] md:px-12">
           <div className="flex items-end">
-            <h2 className="m-0 font-['Space_Grotesk',sans-serif] text-2xl font-semibold">
+            <h2 className="m-0 itt-display text-2xl font-semibold">
               More jobs at {company.name}
             </h2>
             <div className="flex-1" />
@@ -654,11 +654,11 @@ export function CareerJobPage() {
               const jd = formatDeadline(j.expires_at);
               return (
                 <Link
-                  className="flex flex-col gap-2.5 rounded-2xl border border-mkt-line bg-white p-5 text-mkt-ink hover:border-mkt-line-strong"
+                  className="flex flex-col gap-2.5 market-card p-5 text-mkt-ink hover:border-mkt-line-strong"
                   key={j._id}
                   to={`/career/${j.slug}`}
                 >
-                  <span className="font-['Space_Grotesk',sans-serif] text-[17px] font-semibold">
+                  <span className="itt-display text-[17px] font-semibold">
                     {j.title}
                   </span>
                   <span className="text-[13px] text-mkt-ink-2">{meta}</span>

@@ -94,7 +94,7 @@ export function AdminUserHistoryPage() {
           {feed.isLoading && !rangeError ? <LoadingScreen /> : null}
           {feed.data && events.length === 0 ? <EmptyState description={t(filtered ? "adminUsers.history.emptyFiltered" : "adminUsers.history.emptyDescription")} title={t("adminUsers.history.empty")} /> : null}
           {feed.data && events.length > 0 ? (
-            <div className="rounded-2xl border border-border bg-card px-7 pb-6 pt-6" data-testid="history-card">
+            <div className="surface-card px-7 pb-6 pt-6" data-testid="history-card">
               <div className="flex flex-col gap-10">
                 {days.map((dayEvents) => {
                   const heading = ictDayHeading(dayEvents[0].occurredAt);
@@ -142,7 +142,7 @@ export function AdminUserHistoryPage() {
           ) : null}
         </div>
 
-        <section aria-label={t("adminUsers.history.filterTitle")} className="flex min-w-0 flex-col gap-5 rounded-2xl border border-border bg-card p-5">
+        <section aria-label={t("adminUsers.history.filterTitle")} className="flex min-w-0 flex-col gap-5 surface-card p-5">
           <div className="flex items-center justify-between">
             <h2 className="text-[15px] font-bold text-foreground">{t("adminUsers.history.filterTitle")}</h2>
             <button className="rounded-md text-[13px] font-semibold text-fg-link underline-offset-4 hover:underline" onClick={() => setParams({}, { replace: true })} type="button">{t("adminUsers.history.resetShort")}</button>

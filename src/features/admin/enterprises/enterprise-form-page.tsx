@@ -473,7 +473,7 @@ function EnterpriseFormContent({
           {/* Main Form Sections */}
           <div className="flex flex-col gap-[18px]">
             {/* Section 1: Legal identity */}
-            <section className="p-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+            <section className="p-6 surface-card flex flex-col gap-[18px]">
               <div className="flex flex-col gap-1">
                 <h2 className="text-base font-bold text-foreground">Legal identity</h2>
                 <span className="text-[13px] text-muted-foreground">Must match the documents checked during offline vetting.</span>
@@ -575,7 +575,7 @@ function EnterpriseFormContent({
             </section>
 
             {/* Section 2: Contact */}
-            <section className="p-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+            <section className="p-6 surface-card flex flex-col gap-[18px]">
               <div className="flex flex-col gap-1">
                 <h2 className="text-base font-bold text-foreground">Contact</h2>
                 <span className="text-[13px] text-muted-foreground">The corporate email and tax code must not belong to another enterprise.</span>
@@ -637,7 +637,7 @@ function EnterpriseFormContent({
 
             {/* Section 3: Company admin (Create mode only) */}
             {!isEditMode && (
-              <section className="p-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+              <section className="p-6 surface-card flex flex-col gap-[18px]">
                 <div className="flex flex-col gap-1">
                   <h2 className="text-base font-bold text-foreground">Company admin</h2>
                   <span className="text-[13px] text-muted-foreground">The first person who can sign in for this company. They get an invitation email to set a password.</span>
@@ -697,7 +697,7 @@ function EnterpriseFormContent({
             )}
 
             {/* Section 4: Business */}
-            <section className="p-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+            <section className="p-6 surface-card flex flex-col gap-[18px]">
               <div className="flex flex-col gap-1">
                 <h2 className="text-base font-bold text-foreground">Business</h2>
                 <span className="text-[13px] text-muted-foreground">Used for filters on the public company list.</span>
@@ -788,7 +788,7 @@ function EnterpriseFormContent({
             </section>
 
             {/* Section 5: Headquarters address */}
-            <section className="p-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+            <section className="p-6 surface-card flex flex-col gap-[18px]">
               <div className="flex flex-col gap-1">
                 <h2 className="text-base font-bold text-foreground">Headquarters address</h2>
                 <span className="text-[13px] text-muted-foreground">Street, city and country are required.</span>
@@ -971,7 +971,7 @@ function EnterpriseFormContent({
             </section>
 
             {/* Section 6: Public profile */}
-            <section className="p-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+            <section className="p-6 surface-card flex flex-col gap-[18px]">
               <div className="flex flex-col gap-1">
                 <h2 className="text-base font-bold text-foreground">Public profile</h2>
                 <span className="text-[13px] text-muted-foreground">Optional. Shown on the public company page. Can be completed later.</span>
@@ -1186,7 +1186,7 @@ function EnterpriseFormContent({
           <aside className="sticky top-6 flex flex-col gap-4">
             {!isEditMode ? (
               <>
-                <section className="p-5 rounded-2xl border border-border bg-card flex flex-col gap-2">
+                <section className="p-5 surface-card flex flex-col gap-2">
                   <span className="text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle uppercase">
                     SET BY THE SYSTEM
                   </span>
@@ -1199,7 +1199,7 @@ function EnterpriseFormContent({
               </>
             ) : (
               <>
-                <section className="p-5 rounded-2xl border border-border bg-card flex flex-col gap-3">
+                <section className="p-5 surface-card flex flex-col gap-3">
                   <span className="text-[11.5px] font-bold tracking-[0.06em] text-slate-subtle uppercase">
                     NOT EDITABLE HERE
                   </span>
@@ -1212,7 +1212,7 @@ function EnterpriseFormContent({
                   </p>
                 </section>
 
-                <section className="p-5 rounded-2xl border border-border bg-card flex items-center justify-between gap-3">
+                <section className="p-5 surface-card flex items-center justify-between gap-3">
                   <span className="text-[13px] text-muted-foreground">Current status</span>
                   <EnterpriseStatusBadge status={initialData?.status} />
                 </section>

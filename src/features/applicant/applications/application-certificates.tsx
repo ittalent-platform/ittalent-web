@@ -17,7 +17,7 @@ export function ApplicationCertificates({ certificates }: { certificates: SentCe
   const locale = i18n.language;
 
   return (
-    <section aria-labelledby="application-certificates" className="rounded-2xl border border-border bg-card p-6">
+    <section aria-labelledby="application-certificates" className="surface-card p-6">
       <div className="mb-1 flex items-center justify-between">
         <h2 className="m-0 text-[11.5px] font-bold uppercase tracking-[0.06em] text-muted-foreground" id="application-certificates">{t("applications.certificates.title")}</h2>
         <span className="itt-mono text-[11px] text-muted-foreground">{certificates.length}</span>

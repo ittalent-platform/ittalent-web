@@ -208,7 +208,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
           title={t("jobPostings.loadFailed")}
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-2xs">
+        <div className="overflow-hidden surface-card shadow-2xs">
           <JobPostingTable
             basePath={basePath}
             canManage={actor === "recruiter"}

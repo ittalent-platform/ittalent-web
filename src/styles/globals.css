@@ -831,3 +831,13 @@
   background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1.2px, transparent 1.2px);
   background-size: 26px 26px;
 }
+
+/* The standard white card: every panel, list row group and sidebar card. */
+@utility surface-card {
+  @apply rounded-2xl border border-border bg-card;
+}
+
+/* Marketplace card: always light, on the fixed marketplace palette. */
+@utility market-card {
+  @apply rounded-2xl border border-mkt-line bg-white;
+}

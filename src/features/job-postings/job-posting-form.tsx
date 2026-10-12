@@ -199,7 +199,7 @@ function updatePayloadFrom(values: Values): UpdateJobPostingRequest {
 const NO_SELECTION = "__none__";
 const controlClass = "h-[46px] rounded-xl border-border";
 const sectionClass =
-  "flex flex-col gap-[18px] rounded-2xl border border-border bg-card p-6";
+  "flex flex-col gap-[18px] surface-card p-6";
 
 function FormSection({
   children,

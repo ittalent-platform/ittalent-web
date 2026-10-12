@@ -109,9 +109,9 @@ function hostname(url: string) {
 }
 
 const card =
-  "flex flex-col rounded-2xl border border-mkt-line bg-white";
+  "flex flex-col market-card";
 const h2 =
-  "font-['Space_Grotesk',sans-serif] text-[21px] font-semibold text-mkt-ink";
+  "itt-display text-[21px] font-semibold text-mkt-ink";
 
 function Fact({
   icon,
@@ -406,7 +406,7 @@ export function EnterpriseDetailPage() {
             seed={enterprise.id}
           />
           <div className="flex min-w-0 flex-1 flex-col gap-2 pb-1">
-            <h1 className="font-['Space_Grotesk',sans-serif] text-[32px] font-semibold leading-[1.25] text-mkt-ink [overflow-wrap:anywhere]">
+            <h1 className="itt-display text-[32px] font-semibold leading-[1.25] text-mkt-ink [overflow-wrap:anywhere]">
               {enterprise.name}
             </h1>
             {metaItems.length > 0 ? (
@@ -624,7 +624,7 @@ export function EnterpriseDetailPage() {
 
           {!session ? (
             <section className="flex flex-col gap-3 rounded-2xl bg-mkt-ink p-6 text-white">
-              <h2 className="font-['Space_Grotesk',sans-serif] text-[19px] font-semibold">
+              <h2 className="itt-display text-[19px] font-semibold">
                 Want to work here?
               </h2>
               <p className="text-[13.5px] leading-[1.55] text-mkt-on-dark">

@@ -269,7 +269,7 @@ function JobCard({
 
   return (
     <article
-      className="flex min-w-0 cursor-pointer flex-col gap-4 rounded-2xl border border-mkt-line bg-white px-[22px] py-5 transition-colors hover:border-mkt-line-strong sm:flex-row sm:gap-[18px]"
+      className="flex min-w-0 cursor-pointer flex-col gap-4 market-card px-[22px] py-5 transition-colors hover:border-mkt-line-strong sm:flex-row sm:gap-[18px]"
       onClick={onOpen}
     >
       <LogoTile className="size-[52px] rounded-xl text-base" name={companyName ?? "?"} seed={job.enterpriseId ?? companyName} tone="tint" />
@@ -277,7 +277,7 @@ function JobCard({
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex min-w-0 items-baseline gap-3">
           <Link
-            className="min-w-0 truncate font-['Space_Grotesk',sans-serif] text-[18px] font-semibold text-mkt-ink hover:text-mkt-accent-hover"
+            className="min-w-0 truncate itt-display text-[18px] font-semibold text-mkt-ink hover:text-mkt-accent-hover"
             onClick={(e) => e.stopPropagation()}
             title={job.title}
             to={`/career/${job.slug}`}
@@ -626,7 +626,7 @@ export function CareerPage() {
               <span className="size-[7px] rounded-full bg-mkt-brand" />
               Jobs past their deadline are never shown
             </span>
-            <h1 className="font-['Space_Grotesk',sans-serif] text-[36px] font-semibold leading-[1.08] md:text-[48px]">
+            <h1 className="itt-display text-[36px] font-semibold leading-[1.08] md:text-[48px]">
               Open IT roles,
               <br />
               <span className="text-mkt-brand">from every company.</span>
@@ -751,7 +751,7 @@ export function CareerPage() {
       <div className="mx-auto flex w-full max-w-[1440px] flex-col items-stretch gap-6 px-4 pb-16 pt-8 md:px-12 lg:flex-row lg:items-start">
         <aside
           aria-label="Filters"
-          className="box-border flex w-full shrink-0 flex-col gap-[22px] rounded-2xl border border-mkt-line bg-white p-[22px] lg:w-[296px]"
+          className="box-border flex w-full shrink-0 flex-col gap-[22px] market-card p-[22px] lg:w-[296px]"
         >
           <div className="flex items-center gap-2">
             <SlidersHorizontal

@@ -110,7 +110,7 @@ export function AdminUserDetailPage() {
         <div className="flex min-w-0 flex-col gap-5">
           <UserInvitationActions onReload={reload} user={user} />
 
-          <section aria-labelledby="user-personal" className="rounded-2xl border border-border bg-card p-[22px]">
+          <section aria-labelledby="user-personal" className="surface-card p-[22px]">
             <h2 className="mb-5 text-[15px] font-bold text-foreground" id="user-personal">{t("adminUsers.detail.personal")}</h2>
             <dl className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
               <Field label={t("adminUsers.detail.fullName")}><span className="wrap-anywhere">{user.fullName ?? "—"}</span></Field>
@@ -123,7 +123,7 @@ export function AdminUserDetailPage() {
             </dl>
           </section>
 
-          <section aria-labelledby="user-access" className="rounded-2xl border border-border bg-card p-[22px]">
+          <section aria-labelledby="user-access" className="surface-card p-[22px]">
             <h2 className="mb-5 text-[15px] font-bold text-foreground" id="user-access">{t("adminUsers.detail.access")}</h2>
             <dl className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
               <Field label={t("adminUsers.detail.accountStatus")}><StatusBadge status={user.status} /></Field>

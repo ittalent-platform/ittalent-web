@@ -37,7 +37,7 @@ export function AuthFormHeader({ description, title }: { description?: ReactNode
 export function AuthCenteredCard({ children }: { children: ReactNode }) {
   return (
     <main className="grid min-h-screen place-items-center bg-background px-5 py-10">
-      <div className="flex w-full max-w-[440px] flex-col gap-6 rounded-2xl border border-border bg-card p-8">
+      <div className="flex w-full max-w-[440px] flex-col gap-6 surface-card p-8">
         <BrandLogo />
         {children}
       </div>

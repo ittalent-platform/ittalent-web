@@ -215,7 +215,7 @@ export function AdminEnterpriseDetailPage() {
         {/* Left Column Cards */}
         <div className="flex flex-col gap-[18px]">
           {/* Legal identity Card */}
-          <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+          <section className="p-[22px] pb-6 surface-card flex flex-col gap-[18px]">
             <h2 className="text-[15px] font-bold text-foreground">
               {t("adminEnterprises.form.legalTax", "Legal identity")}
             </h2>
@@ -252,7 +252,7 @@ export function AdminEnterpriseDetailPage() {
           </section>
 
           {/* Contact Card */}
-          <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+          <section className="p-[22px] pb-6 surface-card flex flex-col gap-[18px]">
             <h2 className="text-[15px] font-bold text-foreground">
               {t("adminEnterprises.detail.contact", "Contact")}
             </h2>
@@ -295,7 +295,7 @@ export function AdminEnterpriseDetailPage() {
           </section>
 
           {/* Business Card */}
-          <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+          <section className="p-[22px] pb-6 surface-card flex flex-col gap-[18px]">
             <h2 className="text-[15px] font-bold text-foreground">
               Business
             </h2>
@@ -335,7 +335,7 @@ export function AdminEnterpriseDetailPage() {
 
           {/* Addresses Card */}
           {addresses.length > 0 ? (
-            <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+            <section className="p-[22px] pb-6 surface-card flex flex-col gap-[18px]">
               <h2 className="text-[15px] font-bold text-foreground">Addresses</h2>
               {addresses.map((item) => {
                 const postal = item.value.postal_code;
@@ -360,7 +360,7 @@ export function AdminEnterpriseDetailPage() {
           ) : null}
 
           {/* Public Profile Card */}
-          <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+          <section className="p-[22px] pb-6 surface-card flex flex-col gap-[18px]">
             <h2 className="text-[15px] font-bold text-foreground">
               Public profile
             </h2>
@@ -440,7 +440,7 @@ export function AdminEnterpriseDetailPage() {
         {/* Right Column (380px) Cards */}
         <div className="flex flex-col gap-[18px]">
           {/* Status Card */}
-          <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+          <section className="p-[22px] pb-6 surface-card flex flex-col gap-[18px]">
             <h2 className="text-[15px] font-bold text-foreground">Status</h2>
             <div className="flex items-center gap-2.5">
               <EnterpriseStatusBadge status={enterprise.status} />
@@ -457,7 +457,7 @@ export function AdminEnterpriseDetailPage() {
           </section>
 
           {/* Job Postings Card */}
-          <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+          <section className="p-[22px] pb-6 surface-card flex flex-col gap-[18px]">
             <h2 className="text-[15px] font-bold text-foreground">Job postings</h2>
             <div className="flex gap-2.5">
               {jobCounts.map((item) => (
@@ -470,7 +470,7 @@ export function AdminEnterpriseDetailPage() {
           </section>
 
           {/* Record Card */}
-          <section className="p-[22px] pb-6 rounded-2xl border border-border bg-card flex flex-col gap-[18px]">
+          <section className="p-[22px] pb-6 surface-card flex flex-col gap-[18px]">
             <h2 className="text-[15px] font-bold text-foreground">Record</h2>
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2.5 text-[13.5px] m-0">
               <dt className="text-muted-foreground">Created</dt>

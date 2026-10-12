@@ -30,7 +30,7 @@ import {
 type Actor = "admin" | "recruiter";
 
 const card =
-  "flex flex-col gap-[18px] rounded-2xl border border-border bg-card p-[22px] pb-6";
+  "flex flex-col gap-[18px] surface-card p-[22px] pb-6";
 
 function Field({ label, value }: { label: string; value?: ReactNode }) {
   const { t } = useTranslation();

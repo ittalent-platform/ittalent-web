@@ -38,7 +38,7 @@ function JobCard({ job }: { job: HomeJob }) {
     .join(" · ");
 
   return (
-    <article className="flex flex-col gap-3.5 rounded-2xl border border-mkt-line bg-white p-[22px]">
+    <article className="flex flex-col gap-3.5 market-card p-[22px]">
       <div className="flex items-center gap-3">
         <LogoTile tone="tint"
           className="size-11 rounded-xl text-[15px]"
@@ -112,7 +112,7 @@ export function HomeLatestJobs() {
         >
           {Array.from({ length: SKELETON_CARD_COUNT }, (_, index) => (
             <div
-              className="h-[210px] animate-pulse rounded-2xl border border-mkt-line bg-white"
+              className="h-[210px] animate-pulse market-card"
               key={index}
             />
           ))}
@@ -123,7 +123,7 @@ export function HomeLatestJobs() {
           onRetry={() => void refetch()}
         />
       ) : jobs.length === 0 ? (
-        <p className="rounded-2xl border border-mkt-line bg-white py-12 text-center text-mkt-ink-2">
+        <p className="market-card py-12 text-center text-mkt-ink-2">
           {t("home.latest.empty")}
         </p>
       ) : (

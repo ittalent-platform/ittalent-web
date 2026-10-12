@@ -136,7 +136,7 @@ function CompanyCard({
 
   return (
     <article
-      className="flex min-w-0 cursor-pointer flex-col gap-3.5 rounded-2xl border border-mkt-line bg-white p-[22px] text-mkt-ink transition-colors hover:border-mkt-line-strong"
+      className="flex min-w-0 cursor-pointer flex-col gap-3.5 market-card p-[22px] text-mkt-ink transition-colors hover:border-mkt-line-strong"
       onClick={onOpen}
     >
       <div className="flex items-center gap-3.5">
@@ -148,7 +148,7 @@ function CompanyCard({
         />
         <span className="flex min-w-0 flex-col gap-[3px]">
           <Link
-            className="truncate font-['Space_Grotesk',sans-serif] text-[17px] font-semibold text-mkt-ink hover:text-mkt-accent-hover"
+            className="truncate itt-display text-[17px] font-semibold text-mkt-ink hover:text-mkt-accent-hover"
             onClick={(e) => e.stopPropagation()}
             title={item.name}
             to={`/enterprises/${item.id}`}
@@ -392,7 +392,7 @@ export function EnterprisePage() {
               <span className="size-[7px] rounded-full bg-mkt-brand" />
               Approved companies only
             </span>
-            <h1 className="font-['Space_Grotesk',sans-serif] text-[36px] font-semibold leading-[1.08] md:text-[48px]">
+            <h1 className="itt-display text-[36px] font-semibold leading-[1.08] md:text-[48px]">
               Find the team
               <br />
               <span className="text-mkt-brand">you want to join.</span>

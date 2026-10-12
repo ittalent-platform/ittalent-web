@@ -18,7 +18,7 @@ import { useApplicationsParams } from "./use-applications-params";
 import { WithdrawApplicationsDialog, type WithdrawTarget } from "./withdraw-applications-dialog";
 
 const SKELETON_COLUMNS = 7;
-const CARD = "overflow-hidden rounded-2xl border border-border bg-card";
+const CARD = "overflow-hidden surface-card";
 
 function toTarget(item: ApplicationItem): WithdrawTarget {
   return { id: item.id, jobTitle: item.job.title, companyName: item.job.companyName, isReapplication: Boolean(item.reappliedFrom) };

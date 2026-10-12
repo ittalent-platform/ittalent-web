@@ -126,9 +126,9 @@ export function ApplyButton({ companyName, deadline, jobId, jobTitle }: ApplyBut
         {expired ? "Applications closed" : "Apply now"}
       </button>
       <Dialog onOpenChange={(next) => !apply.isPending && setOpen(next)} open={open}>
-        <DialogContent className="flex max-h-[92vh] max-w-[560px] flex-col rounded-2xl border border-mkt-line bg-white p-0 font-['Instrument_Sans',system-ui,sans-serif] text-mkt-ink">
+        <DialogContent className="flex max-h-[92vh] max-w-[560px] flex-col market-card p-0 font-sans text-mkt-ink">
           <DialogHeader className="flex flex-col gap-1 border-0 p-6 pb-2 pr-14 text-left">
-            <DialogTitle className="font-['Space_Grotesk',sans-serif] text-xl font-semibold">
+            <DialogTitle className="itt-display text-xl font-semibold">
               {jobTitle ? `Apply for ${jobTitle}` : "Apply for this job"}
             </DialogTitle>
             <DialogDescription className="text-[13.5px] text-mkt-muted">
