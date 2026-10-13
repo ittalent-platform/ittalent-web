@@ -1,4 +1,4 @@
-import { CheckCircle2, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -193,7 +193,7 @@ export function RegistrationAuditRail({
                 onClick={onApproveClick}
                 className="h-11 w-full rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-[14px] gap-2 shadow-xs"
               >
-                <ShieldCheck className="size-4.5" />
+                <Check className="size-4" />
                 <span>{t("admin.registrations.detail.approveBtn", "Approve registration")}</span>
               </Button>
 

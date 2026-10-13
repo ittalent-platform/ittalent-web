@@ -150,12 +150,7 @@ export function RegistrationDetailPage() {
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-full overflow-hidden">
       {/* Top Header */}
-      <RegistrationDetailHeader
-        registration={registration}
-        canApprove={canApprove}
-        onApproveClick={() => setIsApproveOpen(true)}
-        onRejectClick={() => setIsRejectOpen(true)}
-      />
+      <RegistrationDetailHeader registration={registration} />
 
       {/* Outcome Banner (if Approved) */}
       {isApproved ? (

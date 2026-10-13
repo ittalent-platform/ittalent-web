@@ -1,4 +1,4 @@
-import { Building2, User, FileText, ExternalLink, Download, CheckCircle2 } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { EnterpriseRegistrationDetail } from "@/features/enterprise-registration/enterprise-registration.types";
 import { LEGAL_DOCUMENT_TYPE_LABELS } from "@/features/enterprise-registration/enterprise-registration.constants";
@@ -34,15 +34,12 @@ export function RegistrationDossierCards({ registration }: RegistrationDossierCa
     <div className="flex flex-col gap-6">
       {/* 1. Company Snapshot Card */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
-        <div className="flex items-center gap-2 pb-4 border-b border-border">
-          <Building2 className="size-4.5 text-muted-foreground" />
-          <h2 className="font-semibold text-[15px] text-foreground">
-            {t("admin.registrations.detail.companySectionTitle", {
-              defaultValue: "Company · as submitted in version {{version}}",
-              version: registration.version,
-            })}
-          </h2>
-        </div>
+        <h2 className="font-semibold text-[15px] text-foreground">
+          {t("admin.registrations.detail.companySectionTitle", {
+            defaultValue: "Company · as submitted in version {{version}}",
+            version: registration.version,
+          })}
+        </h2>
 
         <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-8">
           <div>
@@ -90,10 +87,9 @@ export function RegistrationDossierCards({ registration }: RegistrationDossierCa
                 href={website.startsWith("http") ? website : `https://${website}`}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-1 inline-flex items-center gap-1.5 text-[14px] font-medium text-primary hover:underline"
+                className="mt-1 block text-[14px] font-medium text-primary hover:underline"
               >
-                <span>{website.replace(/^https?:\/\//, "")}</span>
-                <ExternalLink className="size-3.5" />
+                {website.replace(/^https?:\/\//, "")}
               </a>
             ) : (
               <span className="mt-1 block text-[14px] text-muted-foreground">—</span>
@@ -144,12 +140,9 @@ export function RegistrationDossierCards({ registration }: RegistrationDossierCa
 
       {/* 2. Representative Snapshot Card */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
-        <div className="flex items-center gap-2 pb-4 border-b border-border">
-          <User className="size-4.5 text-muted-foreground" />
-          <h2 className="font-semibold text-[15px] text-foreground">
-            {t("admin.registrations.detail.representativeTitle", "Representative")}
-          </h2>
-        </div>
+        <h2 className="font-semibold text-[15px] text-foreground">
+          {t("admin.registrations.detail.representativeTitle", "Representative")}
+        </h2>
 
         <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-8">
           <div>
@@ -169,9 +162,8 @@ export function RegistrationDossierCards({ registration }: RegistrationDossierCa
               <span className="text-[14px] font-semibold text-foreground">
                 {registration.corporate_email}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
-                <CheckCircle2 className="size-3" />
-                <span>{t("admin.registrations.detail.verified", "Verified")}</span>
+              <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+                {t("admin.registrations.detail.verified", "Verified")}
               </span>
             </div>
           </div>
@@ -207,12 +199,9 @@ export function RegistrationDossierCards({ registration }: RegistrationDossierCa
 
       {/* 3. Evidence / Legal Documents Card */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
-        <div className="flex items-center gap-2 pb-4 border-b border-border">
-          <FileText className="size-4.5 text-muted-foreground" />
-          <h2 className="font-semibold text-[15px] text-foreground">
-            {t("admin.registrations.detail.evidenceTitle", "Evidence")}
-          </h2>
-        </div>
+        <h2 className="font-semibold text-[15px] text-foreground">
+          {t("admin.registrations.detail.evidenceTitle", "Evidence")}
+        </h2>
 
         {docs.length === 0 ? (
           <p className="mt-4 text-[13.5px] text-muted-foreground italic">
