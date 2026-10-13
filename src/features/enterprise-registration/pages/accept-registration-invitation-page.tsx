@@ -18,8 +18,8 @@ import { Circle, Check as CheckIcon, X } from "lucide-react";
 import {
   acceptInvitationFormSchema,
   type AcceptInvitationFormData,
-} from "../enterprise-registration.schemas";
-import { useAcceptRegistrationInvitationMutation } from "../enterprise-registration.queries";
+} from "@/features/enterprise-registration/enterprise-registration.schemas";
+import { useAcceptRegistrationInvitationMutation } from "@/features/enterprise-registration/enterprise-registration.queries";
 
 function PasswordRuleList({ password }: { password: string }) {
   const { t } = useTranslation();
