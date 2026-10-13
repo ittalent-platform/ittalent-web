@@ -92,19 +92,16 @@ describe("DocumentsPage", () => {
     } as unknown as ReturnType<typeof documentQueries.useSetDefaultDocument>);
   });
 
-  it("sends URL-backed search, type, default and sort filters to the backend", async () => {
-    renderPage(
-      "/documents?search=resume&type=cv&default=true&sort_by=file_name&sort_order=asc",
-    );
+  it("sends the header search and document-type filter to the backend", async () => {
+    renderPage("/documents?search=resume&type=cv");
 
     await waitFor(() =>
       expect(documentQueries.useDocuments).toHaveBeenLastCalledWith({
-        is_default: "true",
         limit: 10,
         page: 1,
         search: "resume",
-        sort_by: "file_name",
-        sort_order: "asc",
+        sort_by: "created_at",
+        sort_order: "desc",
         type: "cv",
       }),
     );

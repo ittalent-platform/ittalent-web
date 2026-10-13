@@ -10,12 +10,11 @@ import { PageHeader } from "@/components/common/admin-page-header";
 import { DataTable, TableSurface } from "@/components/common/data-table";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
-import { ListToolbar } from "@/components/common/list-toolbar";
 import { useToast } from "@/components/toast/toast-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FilterSelect } from "@/components/ui/filter-select";
 import { Pagination } from "@/components/ui/pagination";
+import { SearchInput } from "@/components/common/search-input";
 import {
   Select,
   SelectContent,
@@ -35,11 +34,9 @@ import { cn } from "@/lib/utils";
 
 import {
   ALL_DOCUMENTS,
-  DOCUMENT_DEFAULT_STATES,
+  DOCUMENT_DEFAULT_SORT,
   DOCUMENT_LIST_DEFAULT_LIMIT,
   DOCUMENT_LIST_PARAMS,
-  DOCUMENT_SORT_FIELDS,
-  DOCUMENT_SORT_ORDERS,
   DOCUMENT_TYPES,
   OBJECT_URL_REVOKE_DELAY_MS,
 } from "./documents.constants";
@@ -83,30 +80,15 @@ export function DocumentsPage() {
       DOCUMENT_TYPES,
       searchParams.get(DOCUMENT_LIST_PARAMS.type),
     ) ?? ALL_DOCUMENTS;
-  const defaultState = selectedValue(
-    DOCUMENT_DEFAULT_STATES,
-    searchParams.get(DOCUMENT_LIST_PARAMS.defaultState),
-  );
-  const sortBy =
-    selectedValue(
-      DOCUMENT_SORT_FIELDS,
-      searchParams.get(DOCUMENT_LIST_PARAMS.sortBy),
-    ) ?? "created_at";
-  const sortOrder =
-    selectedValue(
-      DOCUMENT_SORT_ORDERS,
-      searchParams.get(DOCUMENT_LIST_PARAMS.sortOrder),
-    ) ?? "desc";
   const normalizedSearch = debouncedSearch.trim();
 
   const query = useDocuments({
     page,
     limit,
-    sort_by: sortBy,
-    sort_order: sortOrder,
+    sort_by: DOCUMENT_DEFAULT_SORT.by,
+    sort_order: DOCUMENT_DEFAULT_SORT.order,
     ...(normalizedSearch ? { search: normalizedSearch } : {}),
     ...(listType === ALL_DOCUMENTS ? {} : { type: listType }),
-    ...(defaultState ? { is_default: defaultState } : {}),
   });
   const upload = useUploadDocument();
   const deletion = useDeleteDocument();
@@ -228,24 +210,18 @@ export function DocumentsPage() {
   }
 
   const items = query.data?.items ?? [];
-  const hasFilters =
-    search !== "" ||
-    listType !== ALL_DOCUMENTS ||
-    Boolean(defaultState) ||
-    sortBy !== "created_at" ||
-    sortOrder !== "desc";
-  const clearFilters = () =>
-    setMany({
-      search: null,
-      [DOCUMENT_LIST_PARAMS.defaultState]: null,
-      [DOCUMENT_LIST_PARAMS.sortBy]: null,
-      [DOCUMENT_LIST_PARAMS.sortOrder]: null,
-      [DOCUMENT_LIST_PARAMS.type]: null,
-    });
-
+  const hasFilters = search !== "" || listType !== ALL_DOCUMENTS;
   return (
-    <main className="mx-auto flex w-full max-w-[1264px] flex-col gap-5 px-4 pb-12 pt-8 sm:px-6">
+    <main className="flex w-full flex-col gap-5">
       <PageHeader
+        actions={
+          <SearchInput
+            className="w-full sm:w-[20rem]"
+            onChange={(value) => set("search", value)}
+            placeholder={t("documents.searchPlaceholder")}
+            value={search}
+          />
+        }
         description={t("documents.subtitle")}
         title={t("documents.title")}
       />
@@ -339,61 +315,6 @@ export function DocumentsPage() {
           </Button>
         ))}
       </div>
-
-      <ListToolbar
-        onSearchChange={(value) => set("search", value)}
-        search={search}
-        searchPlaceholder={t("documents.searchPlaceholder")}
-      >
-        <div className="flex flex-wrap items-center gap-2.5">
-          <FilterSelect
-            onChange={(value) =>
-              set(
-                DOCUMENT_LIST_PARAMS.defaultState,
-                value === ALL_DOCUMENTS ? null : value,
-              )
-            }
-            options={[
-              {
-                label: t("documents.filters.allDefaults"),
-                value: ALL_DOCUMENTS,
-              },
-              { label: t("documents.filters.default"), value: "true" },
-              { label: t("documents.filters.notDefault"), value: "false" },
-            ]}
-            placeholder={t("documents.filters.allDefaults")}
-            value={defaultState ?? ALL_DOCUMENTS}
-          />
-          <FilterSelect
-            onChange={(value) => set(DOCUMENT_LIST_PARAMS.sortBy, value)}
-            options={DOCUMENT_SORT_FIELDS.map((value) => ({
-              label: t(`documents.sort.${value}`),
-              value,
-            }))}
-            placeholder={t("documents.sort.label")}
-            value={sortBy}
-          />
-          <FilterSelect
-            onChange={(value) => set(DOCUMENT_LIST_PARAMS.sortOrder, value)}
-            options={DOCUMENT_SORT_ORDERS.map((value) => ({
-              label: t(`documents.sort.${value}`),
-              value,
-            }))}
-            placeholder={t("documents.sort.order")}
-            value={sortOrder}
-          />
-          {hasFilters ? (
-            <Button
-              className="h-10 px-3 text-xs font-semibold text-muted-foreground hover:text-foreground"
-              onClick={clearFilters}
-              type="button"
-              variant="ghost"
-            >
-              {t("documents.clearFilters")}
-            </Button>
-          ) : null}
-        </div>
-      </ListToolbar>
 
       {query.isError ? (
         <ErrorState

@@ -14,5 +14,9 @@ export const DOCUMENT_SORT_FIELDS = [
 ] as const;
 export const DOCUMENT_SORT_ORDERS = ["asc", "desc"] as const;
 export const DOCUMENT_DEFAULT_STATES = ["true", "false"] as const;
+export const DOCUMENT_DEFAULT_SORT = {
+  by: "created_at",
+  order: "desc",
+} as const;
 export const ALL_DOCUMENTS = "all";
 export const OBJECT_URL_REVOKE_DELAY_MS = 1_000;
