@@ -80,6 +80,7 @@ Before creating a component, look in `components/ui`, `components/common`, `comp
 |---|---|
 | Page title + description + actions | `PageHeader` (`common/admin-page-header`) |
 | Search + filters row | `ListToolbar` + `FilterSelect` / `FilterMultiSelect` + `ViewToggle` |
+| Filter trigger with a muted "Label:" prefix | `prefixedFilterTrigger` (`common/prefixed-filter-trigger`) as `FilterSelect`'s `renderTrigger` |
 | Table / pagination / skeleton | `ui/table`, `ui/pagination`, `TableSkeletonRows` |
 | Empty, error, inline notice | `EmptyState`, `ErrorState`, `Callout`, `InlineBanner` |
 | Confirm dialog (any tone, optional body) | `ActionConfirmDialog` |
