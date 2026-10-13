@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { PersonAvatar } from "@/components/common/person-avatar";
@@ -29,9 +29,18 @@ type InterviewerEmailInputProps = {
 export function InterviewerEmailInput({ error, id, onChange, value }: InterviewerEmailInputProps) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
+  const blurTimerRef = useRef<number | null>(null);
   const [draft, setDraft] = useState("");
   const [focused, setFocused] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (blurTimerRef.current !== null && typeof window !== "undefined") {
+        window.clearTimeout(blurTimerRef.current);
+      }
+    };
+  }, []);
   const keyword = useDebouncedValue(draft, SEARCH_DELAY_MS);
   const suggestions = useInterviewerSearch(keyword, { enabled: focused });
   const findByEmail = useFindInterviewerByEmail();
@@ -102,7 +111,18 @@ export function InterviewerEmailInput({ error, id, onChange, value }: Interviewe
           className="min-w-[160px] flex-1 bg-transparent py-1 text-sm text-foreground outline-none placeholder:text-muted-foreground"
           id={id}
           onBlur={() => {
-            window.setTimeout(() => setFocused(false), BLUR_CLOSE_DELAY_MS);
+            if (typeof window !== "undefined") {
+              if (blurTimerRef.current !== null) {
+                window.clearTimeout(blurTimerRef.current);
+              }
+              blurTimerRef.current = window.setTimeout(() => {
+                if (typeof window !== "undefined") {
+                  setFocused(false);
+                }
+              }, BLUR_CLOSE_DELAY_MS);
+            } else {
+              setFocused(false);
+            }
             if (draft.trim()) void commit(draft);
           }}
           onChange={(event) => {
