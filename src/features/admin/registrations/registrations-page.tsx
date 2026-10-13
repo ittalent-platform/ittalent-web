@@ -119,11 +119,12 @@ export function RegistrationsPage() {
     return result;
   }, [items, timeFilter, now, sortOption]);
 
-  const fromEntry = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const toEntry = total === 0 ? 0 : Math.min(page * PAGE_SIZE, total);
+  const displayTotal = timeFilter !== "any" ? filteredAndSortedItems.length : total;
+  const fromEntry = displayTotal === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const toEntry = displayTotal === 0 ? 0 : Math.min(page * PAGE_SIZE, displayTotal);
 
   return (
-    <div className="flex flex-col gap-6 p-6 sm:p-8">
+    <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-full overflow-hidden">
       <AdminPageHeader
         title={t("admin.registrations.title", "Enterprise registrations")}
         description={t(
@@ -153,14 +154,14 @@ export function RegistrationsPage() {
         onClearFilters={handleClearFilters}
       />
 
-      {total > 0 ? (
+      {displayTotal > 0 ? (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
           <p className="text-[13px] text-muted-foreground">
             {t("admin.registrations.pagination.showing", {
               defaultValue: "Showing {{from}}-{{to}} of {{total}} entries",
               from: fromEntry,
               to: toEntry,
-              total,
+              total: displayTotal,
             })}
           </p>
 
