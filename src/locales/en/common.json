@@ -624,6 +624,7 @@
   },
   "sidebar": {
     "users": "Users",
+    "registrations": "Registrations",
     "jobPostings": "Job postings",
     "enterprises": "Enterprise Profiles",
     "collapse": "Collapse sidebar",
@@ -2039,5 +2040,42 @@
       "termsRequired": "You must agree to the Employer Terms of Service",
       "passwordsMismatch": "Passwords do not match"
     }
+  },
+  "admin": {
+    "registrations": {
+      "title": "Enterprise registrations",
+      "description": "Review, verify, and approve or reject employer onboarding submissions.",
+      "tabs": {
+        "pendingReview": "Pending review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "filters": {
+        "anyTime": "Submitted: Any time",
+        "last7Days": "Submitted: Last 7 days",
+        "last30Days": "Submitted: Last 30 days"
+      },
+      "sort": {
+        "oldestFirst": "Sort: Oldest first",
+        "newestFirst": "Sort: Newest first"
+      },
+      "searchPlaceholder": "Search by case ID, company, tax code or requester",
+      "table": {
+        "company": "COMPANY",
+        "requester": "REQUESTER",
+        "submitted": "SUBMITTED",
+        "version": "VERSION",
+        "waiting": "WAITING"
+      },
+      "viewDetails": "View details",
+      "noResultsSearch": "Try adjusting your search terms or filters.",
+      "noResults": "No registrations match your search",
+      "emptyTitle": "No registrations found",
+      "emptyDesc": "There are currently no registrations in this queue.",
+      "pagination": {
+        "showing": "Showing {{from}}-{{to}} of {{total}} entries"
+      }
+    }
   }
 }
+
