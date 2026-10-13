@@ -2126,7 +2126,8 @@
       "afterItEnds": "Sau khi kết thúc",
       "edit": "Chỉnh sửa chi tiết",
       "editShort": "Sửa",
-      "reschedule": "Đổi lịch"
+      "reschedule": "Đổi lịch",
+      "delete": "Xóa phỏng vấn"
     },
     "detail": {
       "information": "Thông tin phỏng vấn",
@@ -2312,6 +2313,35 @@
         "title": "Không thể thay đổi buổi phỏng vấn này",
         "description": "Buổi phỏng vấn không còn ở trạng thái đã lên lịch nên không thể sửa chi tiết hay thời gian.",
         "action": "Xem bản mới nhất"
+      }
+    },
+    "deleteDialog": {
+      "title": "Xóa phỏng vấn với {{name}}?",
+      "description": {
+        "scheduled": "{{when}}. Họ sẽ được thông báo là buổi phỏng vấn đã hủy. Buổi phỏng vấn bị xóa khỏi danh sách và lịch sử, hồ sơ không bị từ chối. Không thể hoàn tác.",
+        "closed": "{{when}}. Buổi phỏng vấn bị xóa khỏi danh sách và lịch sử. Hồ sơ không thay đổi. Không thể hoàn tác."
+      },
+      "confirm": "Xóa phỏng vấn",
+      "working": "Đang xóa…",
+      "keep": "Giữ lại",
+      "doneTitle": "Đã xóa phỏng vấn",
+      "doneMessage": {
+        "scheduled": "{{name}} đã được thông báo là buổi phỏng vấn đã hủy.",
+        "closed": "Đã xóa buổi phỏng vấn với {{name}}."
+      },
+      "failedTitle": "Xóa không thành công",
+      "failedMessage": "Không thể xóa buổi phỏng vấn này. Vui lòng thử lại.",
+      "stale": {
+        "changed": {
+          "title": "Buổi phỏng vấn này vừa được cập nhật",
+          "description": "Buổi phỏng vấn đã được thay đổi hoặc xóa trước khi thao tác của bạn được thực hiện nên chưa có gì bị xóa. Hãy xem bản mới nhất.",
+          "action": "Xem bản mới nhất"
+        },
+        "completed": {
+          "title": "Không thể xóa buổi phỏng vấn này",
+          "description": "Buổi phỏng vấn đã được đánh dấu hoàn thành và được giữ lại làm hồ sơ. Hãy xem bản mới nhất.",
+          "action": "Xem bản mới nhất"
+        }
       }
     }
   }

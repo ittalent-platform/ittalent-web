@@ -100,6 +100,9 @@ export const STALE_ERROR_CODES: readonly string[] = ["INTERVIEW_STATUS_FINAL", "
 export const NOT_ENDED_ERROR_CODE = "INTERVIEW_NOT_ENDED";
 /** The API refuses to change an interview that is no longer scheduled (cancelled, completed or no-show). */
 export const NOT_EDITABLE_ERROR_CODE = "INTERVIEW_NOT_EDITABLE";
+/** The API refuses to delete a completed interview: it stays as a record of work done. */
+export const COMPLETED_ERROR_CODE = "INTERVIEW_COMPLETED";
+export const UNDELETABLE_STATUS: InterviewStatus = "completed";
 
 /** Limits the API puts on a new interview, repeated here so the form says no before the API does. */
 export const SCHEDULE_LIMITS = { interviewers: 10, link: 2048, location: 255, notes: 2000 } as const;

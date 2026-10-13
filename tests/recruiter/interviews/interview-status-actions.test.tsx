@@ -10,6 +10,7 @@ import * as interviewQueries from "@/features/recruiter/interviews/interviews.qu
 const showToast = vi.hoisted(() => vi.fn());
 vi.mock("@/components/toast/toast-provider", () => ({ useToast: () => ({ dismissToast: vi.fn(), showToast }) }));
 vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({
+  useDeleteInterview: vi.fn(),
   useInterviewCalendar: vi.fn(),
   useInterviewList: vi.fn(),
   useUpdateInterview: () => ({ isPending: false, mutate: vi.fn() }),
@@ -41,7 +42,9 @@ const interview = (overrides: Partial<Item> = {}): Item => ({
 });
 
 type Mutate = (variables: { id: string; status: string }, options: { onError: (error: unknown) => void; onSuccess: () => void }) => void;
+type DeleteMutate = (id: string, options: { onError: (error: unknown) => void; onSuccess: () => void }) => void;
 let mutate: ReturnType<typeof vi.fn<Mutate>>;
+let deleteMutate: ReturnType<typeof vi.fn<DeleteMutate>>;
 
 function mockList(items: Item[]) {
   vi.mocked(interviewQueries.useInterviewList).mockReturnValue({
@@ -54,6 +57,10 @@ function mockList(items: Item[]) {
 
 function mockMutation(isPending = false) {
   vi.mocked(interviewQueries.useUpdateInterviewStatus).mockReturnValue({ isPending, mutate } as unknown as ReturnType<typeof interviewQueries.useUpdateInterviewStatus>);
+}
+
+function mockDeletion(isPending = false) {
+  vi.mocked(interviewQueries.useDeleteInterview).mockReturnValue({ isPending, mutate: deleteMutate } as unknown as ReturnType<typeof interviewQueries.useDeleteInterview>);
 }
 
 const failure = (status: number, code?: string) => Object.assign(new Error("failed"), { code, status });
@@ -71,8 +78,10 @@ describe("Interview status actions in the table", () => {
   beforeEach(() => {
     showToast.mockReset();
     mutate = vi.fn<Mutate>();
+    deleteMutate = vi.fn<DeleteMutate>();
     vi.mocked(interviewQueries.useInterviewList).mockReset();
     mockMutation();
+    mockDeletion();
     mockList([interview()]);
   });
 
@@ -93,7 +102,7 @@ describe("Interview status actions in the table", () => {
     expect(await screen.findByRole("menuitem", { name: "Edit details" })).toBeInTheDocument();
     expect(screen.getByRole("menuitem", { name: "Reschedule" })).toBeInTheDocument();
     const names = screen.getAllByRole("menuitem").map((item) => item.textContent ?? "");
-    expect(names.map((name) => name.split("After")[0])).toEqual(["View details", "Edit details", "Reschedule", "Mark as completed", "Cancel interview"]);
+    expect(names.map((name) => name.split("After")[0])).toEqual(["View details", "Edit details", "Reschedule", "Mark as completed", "Cancel interview", "Delete interview"]);
   });
 
   it("opens the edit dialog and the reschedule dialog from the menu", async () => {
@@ -126,12 +135,21 @@ describe("Interview status actions in the table", () => {
     expect(screen.queryByRole("menuitem", { name: "Reschedule" })).not.toBeInTheDocument();
   });
 
-  it.each(["completed", "no_show", "cancelled"] as const)("offers nothing but the details for a %s interview", async (status) => {
-    mockList([interview({ status })]);
+  it("offers nothing but the details for a completed interview, which is kept as a record", async () => {
+    mockList([interview({ status: "completed" })]);
     const user = userEvent.setup();
     await openMenu(user);
     expect(await screen.findByRole("menuitem", { name: "View details" })).toBeInTheDocument();
     expect(screen.getAllByRole("menuitem")).toHaveLength(1);
+  });
+
+  it.each(["no_show", "cancelled"] as const)("offers a %s interview to be deleted, and nothing else but the details", async (status) => {
+    mockList([interview({ status })]);
+    const user = userEvent.setup();
+    await openMenu(user);
+    expect(await screen.findByRole("menuitem", { name: "View details" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "Delete interview" })).toBeInTheDocument();
+    expect(screen.getAllByRole("menuitem")).toHaveLength(2);
   });
 
   it("completes an ended interview after confirming, then says so", async () => {
@@ -230,6 +248,106 @@ describe("Interview status actions in the table", () => {
     await user.click(await screen.findByRole("menuitem", { name: "Cancel interview" }));
     const dialog = await screen.findByRole("alertdialog");
     expect(within(dialog).getByRole("button", { name: "Cancelling…" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: "Keep interview" })).toBeDisabled();
+  });
+});
+
+describe("Deleting an interview from the table", () => {
+  beforeEach(() => {
+    showToast.mockReset();
+    mutate = vi.fn<Mutate>();
+    deleteMutate = vi.fn<DeleteMutate>();
+    vi.mocked(interviewQueries.useInterviewList).mockReset();
+    mockMutation();
+    mockDeletion();
+    mockList([interview()]);
+  });
+
+  async function openDelete(user: ReturnType<typeof userEvent.setup>) {
+    await openMenu(user);
+    await user.click(await screen.findByRole("menuitem", { name: "Delete interview" }));
+    return screen.findByRole("alertdialog", { name: "Delete interview with Phạm Minh Khoa?" });
+  }
+
+  it("asks first, says the applicant will be told when the interview is still scheduled, and changes nothing until confirmed", async () => {
+    const user = userEvent.setup();
+    const dialog = await openDelete(user);
+    expect(within(dialog).getByText(/Thu, 15 Oct · 10:00\. They'll be notified that it's cancelled\./)).toBeInTheDocument();
+    expect(within(dialog).getByText(/This can't be undone\./)).toBeInTheDocument();
+    expect(deleteMutate).not.toHaveBeenCalled();
+  });
+
+  it("deletes after confirming, then says the applicant has been notified", async () => {
+    deleteMutate.mockImplementation((_id, options) => options.onSuccess());
+    const user = userEvent.setup();
+    const dialog = await openDelete(user);
+    await user.click(within(dialog).getByRole("button", { name: "Delete interview" }));
+
+    expect(deleteMutate.mock.calls[0]![0]).toBe("i1");
+    expect(showToast).toHaveBeenCalledWith({ message: "Phạm Minh Khoa has been notified that it's cancelled.", title: "Interview deleted", tone: "success" });
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+  });
+
+  it("deletes a cancelled interview quietly, without promising a notification", async () => {
+    mockList([interview({ status: "cancelled" })]);
+    deleteMutate.mockImplementation((_id, options) => options.onSuccess());
+    const user = userEvent.setup();
+    const dialog = await openDelete(user);
+    expect(within(dialog).queryByText(/notified/)).not.toBeInTheDocument();
+    await user.click(within(dialog).getByRole("button", { name: "Delete interview" }));
+
+    expect(showToast).toHaveBeenCalledWith({ message: "The interview with Phạm Minh Khoa was removed.", title: "Interview deleted", tone: "success" });
+  });
+
+  it("keeps the interview when the recruiter changes their mind", async () => {
+    const user = userEvent.setup();
+    const dialog = await openDelete(user);
+    await user.click(within(dialog).getByRole("button", { name: "Keep interview" }));
+
+    expect(deleteMutate).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+  });
+
+  it("explains that a completed interview cannot be deleted when it was completed in the meantime", async () => {
+    deleteMutate.mockImplementation((_id, options) => options.onError(failure(409, "INTERVIEW_COMPLETED")));
+    const user = userEvent.setup();
+    const dialog = await openDelete(user);
+    await user.click(within(dialog).getByRole("button", { name: "Delete interview" }));
+
+    const stale = await screen.findByRole("alertdialog", { name: "This interview can't be deleted" });
+    expect(showToast).not.toHaveBeenCalled();
+    await user.click(within(stale).getByRole("button", { name: "Show latest" }));
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+  });
+
+  it.each([
+    [409, "INTERVIEW_STATE_CHANGED"],
+    [404, undefined],
+  ] as const)("says nothing was deleted when the interview changed or vanished first (%s)", async (status, code) => {
+    deleteMutate.mockImplementation((_id, options) => options.onError(failure(status, code)));
+    const user = userEvent.setup();
+    const dialog = await openDelete(user);
+    await user.click(within(dialog).getByRole("button", { name: "Delete interview" }));
+
+    expect(await screen.findByRole("alertdialog", { name: "This interview was already updated" })).toBeInTheDocument();
+    expect(showToast).not.toHaveBeenCalled();
+  });
+
+  it("tells the recruiter with a toast when deleting fails", async () => {
+    deleteMutate.mockImplementation((_id, options) => options.onError(failure(500)));
+    const user = userEvent.setup();
+    const dialog = await openDelete(user);
+    await user.click(within(dialog).getByRole("button", { name: "Delete interview" }));
+
+    expect(showToast).toHaveBeenCalledWith({ message: "Could not delete this interview. Please try again.", title: "Deletion failed", tone: "error" });
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+  });
+
+  it("locks the dialog while the interview is being deleted", async () => {
+    mockDeletion(true);
+    const user = userEvent.setup();
+    const dialog = await openDelete(user);
+    expect(within(dialog).getByRole("button", { name: "Deleting…" })).toBeDisabled();
     expect(within(dialog).getByRole("button", { name: "Keep interview" })).toBeDisabled();
   });
 });

@@ -7,7 +7,9 @@ import type { InterviewDetailDto } from "@/api/generated/types.gen";
 import { InterviewDetailPage } from "@/features/recruiter/interviews/interview-detail-page";
 import * as interviewQueries from "@/features/recruiter/interviews/interviews.queries";
 
+const deleteMutate = vi.hoisted(() => vi.fn());
 vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({
+  useDeleteInterview: () => ({ isPending: false, mutate: deleteMutate }),
   useFindInterviewerByEmail: () => vi.fn(),
   useInterviewDetail: vi.fn(),
   useInterviewerSearch: () => ({ data: { items: [] } }),
@@ -69,6 +71,7 @@ const failure = (status: number) => ({ error: Object.assign(new Error("failed"),
 describe("Recruiter interview detail", () => {
   beforeEach(() => {
     vi.mocked(interviewQueries.useInterviewDetail).mockReset();
+    deleteMutate.mockReset();
     mockDetail(detail());
   });
 
@@ -203,13 +206,55 @@ describe("Recruiter interview detail", () => {
     expect(await screen.findByRole("alertdialog", { name: "Mark interview as completed?" })).toBeInTheDocument();
   });
 
-  it("offers no actions once the interview is cancelled", () => {
-    mockDetail(detail({ status: "cancelled" }));
+  it.each(["cancelled", "no_show"] as const)("offers nothing but deleting once the interview is %s", async (status) => {
+    mockDetail(detail({ status }));
+    const user = userEvent.setup();
     renderPage();
-    expect(screen.queryByRole("button", { name: /Actions for/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Mark as completed" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Edit details" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Reschedule" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    expect(await screen.findAllByRole("menuitem")).toHaveLength(1);
+    expect(screen.getByRole("menuitem", { name: "Delete interview" })).toBeInTheDocument();
+  });
+
+  it("offers no actions at all once the interview is completed, since it is kept as a record", () => {
+    mockDetail(detail({ status: "completed" }));
+    renderPage();
+    expect(screen.queryByRole("button", { name: /Actions for/ })).not.toBeInTheDocument();
+  });
+
+  it("offers deleting last in the menu of an upcoming interview", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    const items = await screen.findAllByRole("menuitem");
+    expect(items.at(-1)).toHaveTextContent("Delete interview");
+  });
+
+  it("leaves for the list once the interview is deleted, so the page does not report a missing interview", async () => {
+    deleteMutate.mockImplementation((_id, options: { onSuccess: () => void }) => options.onSuccess());
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Delete interview" }));
+    await user.click(within(await screen.findByRole("alertdialog", { name: "Delete interview with Phạm Minh Khoa?" })).getByRole("button", { name: "Delete interview" }));
+
+    expect(deleteMutate.mock.calls[0]![0]).toBe("i1");
+    expect(await screen.findByText("Interviews list")).toBeInTheDocument();
+    expect(screen.queryByText("This interview isn't available")).not.toBeInTheDocument();
+  });
+
+  it("stays on the page when the interview cannot be deleted", async () => {
+    deleteMutate.mockImplementation((_id, options: { onError: (error: unknown) => void }) => options.onError(Object.assign(new Error("failed"), { code: "INTERVIEW_COMPLETED", status: 409 })));
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Delete interview" }));
+    await user.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Delete interview" }));
+
+    expect(await screen.findByRole("alertdialog", { name: "This interview can't be deleted" })).toBeInTheDocument();
+    expect(screen.queryByText("Interviews list")).not.toBeInTheDocument();
   });
 
   it("shows loading placeholders while the interview is on its way", () => {

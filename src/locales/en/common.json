@@ -2149,7 +2149,8 @@
       "afterItEnds": "After it ends",
       "edit": "Edit details",
       "editShort": "Edit",
-      "reschedule": "Reschedule"
+      "reschedule": "Reschedule",
+      "delete": "Delete interview"
     },
     "detail": {
       "information": "Interview information",
@@ -2336,6 +2337,35 @@
         "title": "This interview can't be changed",
         "description": "It's no longer scheduled, so its details and time can't be edited.",
         "action": "Show latest"
+      }
+    },
+    "deleteDialog": {
+      "title": "Delete interview with {{name}}?",
+      "description": {
+        "scheduled": "{{when}}. They'll be notified that it's cancelled. The interview is removed from your list and history, and the application isn't rejected. This can't be undone.",
+        "closed": "{{when}}. The interview is removed from your list and history. The application isn't changed. This can't be undone."
+      },
+      "confirm": "Delete interview",
+      "working": "Deleting…",
+      "keep": "Keep interview",
+      "doneTitle": "Interview deleted",
+      "doneMessage": {
+        "scheduled": "{{name}} has been notified that it's cancelled.",
+        "closed": "The interview with {{name}} was removed."
+      },
+      "failedTitle": "Deletion failed",
+      "failedMessage": "Could not delete this interview. Please try again.",
+      "stale": {
+        "changed": {
+          "title": "This interview was already updated",
+          "description": "It was changed or removed before your action went through, so nothing was deleted. Show the latest to see where it stands.",
+          "action": "Show latest"
+        },
+        "completed": {
+          "title": "This interview can't be deleted",
+          "description": "It was marked as completed, and a completed interview stays as a record. Show the latest to see where it stands.",
+          "action": "Show latest"
+        }
       }
     }
   }

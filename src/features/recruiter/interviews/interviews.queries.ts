@@ -1,6 +1,7 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
 
 import {
+  deleteApiV1InterviewsById,
   getApiV1Interviews,
   getApiV1InterviewsApplications,
   getApiV1InterviewsById,
@@ -38,6 +39,11 @@ export const interviewKeys = {
 function unwrap<T>(result: { data?: T; error?: unknown; response?: Response }, fallback: string): T {
   if (!result.error && result.data !== undefined) return result.data;
   throw requestError(result, fallback);
+}
+
+function isDetailOf(key: QueryKey, id: string): boolean {
+  const detail = interviewKeys.detail(id);
+  return key.length === detail.length && detail.every((part, index) => key[index] === part);
 }
 
 /** The company's interviews, one page at a time (List view). */
@@ -130,5 +136,22 @@ export function useUpdateInterview() {
     mutationFn: async ({ id, ...body }: UpdateInterviewRequest & { id: string }) =>
       unwrap(await patchApiV1InterviewsById({ body, path: { id } }), "Could not update this interview."),
     onSettled: () => queryClient.invalidateQueries({ queryKey: interviewKeys.all }),
+  });
+}
+
+/**
+ * Deletes an interview for good; the lists and the calendar refresh afterwards. The page of the deleted interview
+ * is left alone, since refreshing it would only report that the interview no longer exists. After a refusal it
+ * refreshes too, because the interview is not what the screen showed.
+ */
+export function useDeleteInterview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const result = await deleteApiV1InterviewsById({ path: { id } });
+      if (result.error || result.response?.ok === false) throw requestError(result, "Could not delete this interview.");
+    },
+    onError: () => queryClient.invalidateQueries({ queryKey: interviewKeys.all }),
+    onSuccess: (_data, id) => queryClient.invalidateQueries({ predicate: (query) => !isDetailOf(query.queryKey, id), queryKey: interviewKeys.all }),
   });
 }

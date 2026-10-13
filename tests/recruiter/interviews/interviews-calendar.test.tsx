@@ -8,6 +8,7 @@ import { InterviewsPage } from "@/features/recruiter/interviews/interviews-page"
 import * as interviewQueries from "@/features/recruiter/interviews/interviews.queries";
 
 vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({
+  useDeleteInterview: () => ({ isPending: false, mutate: vi.fn() }),
   useInterviewCalendar: vi.fn(),
   useInterviewList: vi.fn(),
   useUpdateInterview: () => ({ isPending: false, mutate: vi.fn() }),
@@ -156,6 +157,29 @@ describe("Recruiter interviews calendar", () => {
     await user.click(await screen.findByRole("button", { name: "Edit" }));
     expect(await screen.findByRole("dialog", { name: "Edit interview" })).toBeInTheDocument();
     expect(screen.queryByText("Thu, 15 Oct 2026 · 10:00 – 11:00 (1h)")).not.toBeInTheDocument();
+  });
+
+  it("deletes from the summary: the summary closes and the confirmation opens", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByText("10:00 · Applicant khoa"));
+    await user.click(await screen.findByRole("button", { name: "Delete interview" }));
+    expect(await screen.findByRole("alertdialog", { name: "Delete interview with Applicant khoa?" })).toBeInTheDocument();
+    expect(screen.queryByText("Thu, 15 Oct 2026 · 10:00 – 11:00 (1h)")).not.toBeInTheDocument();
+  });
+
+  it("offers a cancelled interview to be deleted from the summary, but not a completed one", async () => {
+    mockCalendar(response([interview("gone", { status: "cancelled" }), interview("done", { scheduledAt: "2026-10-16T03:00:00.000Z", status: "completed" })]));
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByText("10:00 · Applicant gone"));
+    expect(await screen.findByRole("button", { name: "Delete interview" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Cancel" })).not.toBeInTheDocument();
+    await user.keyboard("{Escape}");
+
+    await user.click(screen.getByText("10:00 · Applicant done"));
+    expect(await screen.findByRole("link", { name: "View details" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Delete interview" })).not.toBeInTheDocument();
   });
 
   it("opens the reschedule dialog from the summary", async () => {

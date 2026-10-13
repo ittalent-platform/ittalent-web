@@ -124,7 +124,8 @@ export function InterviewDetailPage() {
   const { t } = useTranslation();
   const { interviewId } = useParams<{ interviewId: string }>();
   const query = useInterviewDetail(interviewId);
-  const actions = useInterviewActions();
+  const navigate = useNavigate();
+  const actions = useInterviewActions({ onDeleted: () => navigate(RECRUITER_INTERVIEWS_PATH, { replace: true }) });
 
   if (query.isPending) return <DetailSkeleton />;
   if (query.isError || !query.data) return <DetailError error={query.error} onRetry={() => void query.refetch()} />;

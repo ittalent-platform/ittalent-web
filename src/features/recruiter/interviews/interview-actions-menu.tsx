@@ -1,4 +1,4 @@
-import { Ban, CalendarClock, CircleCheck, Eye, MoreVertical, Pencil, UserX, type LucideIcon } from "lucide-react";
+import { Ban, CalendarClock, CircleCheck, Eye, MoreVertical, Pencil, Trash2, UserX, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
@@ -6,28 +6,35 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { interviewPath } from "@/config/routes";
 import { cn } from "@/lib/utils";
 
-import type { InterviewItem } from "./interviews.constants";
+import { UNDELETABLE_STATUS, type InterviewItem } from "./interviews.constants";
 import { applicantName } from "./interviews.format";
 import type { InterviewAction } from "./use-interview-actions";
 
-const ITEM_ICON: Record<InterviewAction, LucideIcon> = { cancel: Ban, complete: CircleCheck, edit: Pencil, noShow: UserX, reschedule: CalendarClock };
-const ITEM_VARIANT = { cancel: "destructive", complete: "success", edit: "default", noShow: "default", reschedule: "default" } as const satisfies Record<InterviewAction, "default" | "destructive" | "success">;
+const ITEM_ICON: Record<InterviewAction, LucideIcon> = { cancel: Ban, complete: CircleCheck, delete: Trash2, edit: Pencil, noShow: UserX, reschedule: CalendarClock };
+const ITEM_VARIANT = { cancel: "destructive", complete: "success", delete: "destructive", edit: "default", noShow: "default", reschedule: "default" } as const satisfies Record<InterviewAction, "default" | "destructive" | "success">;
 
 export type InterviewMenuItem = { action: InterviewAction; disabled: boolean };
 
+/** Every interview can be deleted except a completed one, which stays as a record of work done. */
+export function canDeleteInterview(interview: Pick<InterviewItem, "status">): boolean {
+  return interview.status !== UNDELETABLE_STATUS;
+}
+
 /**
- * The actions an interview offers. Only a scheduled interview has any. It can be edited at any time and moved
- * until it ends; once it has ended it can be marked completed or no-show instead (completing shows, disabled,
- * until then). It can be cancelled at any time.
+ * The actions an interview offers. A scheduled interview can be edited at any time and moved until it ends; once
+ * it has ended it can be marked completed or no-show instead (completing shows, disabled, until then). It can be
+ * cancelled at any time. Deleting comes last, and is all that is left for a cancelled or no-show interview.
  */
 export function interviewMenuItems(interview: Pick<InterviewItem, "canComplete" | "status">): InterviewMenuItem[] {
-  if (interview.status !== "scheduled") return [];
+  const remove: InterviewMenuItem[] = canDeleteInterview(interview) ? [{ action: "delete", disabled: false }] : [];
+  if (interview.status !== "scheduled") return remove;
   return [
     { action: "edit", disabled: false },
     ...(interview.canComplete ? [] : [{ action: "reschedule" as const, disabled: false }]),
     { action: "complete", disabled: !interview.canComplete },
     ...(interview.canComplete ? [{ action: "noShow" as const, disabled: false }] : []),
     { action: "cancel", disabled: false },
+    ...remove,
   ];
 }
 

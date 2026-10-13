@@ -1,4 +1,4 @@
-import { Clock, Link2, MapPin, UserRound, X } from "lucide-react";
+import { Clock, Link2, MapPin, Trash2, UserRound, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { PopoverClose } from "@/components/ui/popover";
 import { interviewPath } from "@/config/routes";
 
+import { canDeleteInterview } from "./interview-actions-menu";
 import { InterviewStatusBadge } from "./interview-badges";
 import type { InterviewItem } from "./interviews.constants";
 import { applicantName, formatDurationShort, formatFullDay, formatTimeRange, initialsName } from "./interviews.format";
@@ -61,6 +62,17 @@ export function InterviewPeek({ interview, onAction }: { interview: InterviewIte
       </ul>
 
       <div className="flex flex-wrap items-center justify-end gap-x-1 gap-y-2 border-t border-border px-4 py-3">
+        {canDeleteInterview(interview) ? (
+          <Button
+            aria-label={t("interviews.actions.delete")}
+            className="mr-auto size-9 px-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            onClick={() => onAction("delete", interview)}
+            type="button"
+            variant="ghost"
+          >
+            <Trash2 aria-hidden className="size-4" />
+          </Button>
+        ) : null}
         {interview.status === "scheduled" ? (
           <>
             <Button className="h-9 px-2 text-[13px] font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => onAction("cancel", interview)} type="button" variant="ghost">
