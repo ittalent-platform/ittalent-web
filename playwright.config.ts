@@ -1,35 +1,23 @@
 import { defineConfig } from "@playwright/test";
 
+import {
+  backendEnv,
+  E2E_API_URL,
+  E2E_BACKEND_DIR,
+  E2E_WEB_PORT,
+  E2E_WEB_URL,
+  E2E_STORAGE_URL,
+} from "./e2e/environment";
+
+export { backendEnv, E2E_API_URL, E2E_WEB_PORT, E2E_WEB_URL } from "./e2e/environment";
+
 // The suite boots the real backend and the real Vite app on their own ports, against a dedicated database,
 // so it never touches the dev data on 3001/5173. MongoDB and Redis come from the backend's docker-compose.
-export const E2E_BACKEND_PORT = 3101;
-export const E2E_WEB_PORT = 5174;
-export const E2E_API_URL = `http://localhost:${E2E_BACKEND_PORT}`;
-export const E2E_WEB_URL = `http://localhost:${E2E_WEB_PORT}`;
-export const E2E_MONGODB_URI =
-  process.env.E2E_MONGODB_URI ??
-  "mongodb://127.0.0.1:27017/ittalent_myapps_e2e?replicaSet=rs0&directConnection=true";
-
-const backendDir = "../ittalent-backend";
-export const backendEnv = {
-  PORT: String(E2E_BACKEND_PORT),
-  MONGODB_URI: E2E_MONGODB_URI,
-  CORS_ORIGIN: E2E_WEB_URL,
-  APP_BASE_URL: E2E_WEB_URL,
-  WEB_URL: E2E_WEB_URL,
-  OPENAPI_SERVER_URL: E2E_API_URL,
-  NODE_ENV: "development",
-  JWT_ACCESS_SECRET: "e2e-access-secret-that-is-at-least-32-characters",
-  JWT_REFRESH_SECRET: "e2e-refresh-secret-that-is-at-least-32-characters",
-  BREVO_API_KEY: "",
-  // Global setup and the sign-in test log in several times per run; the default 5 per minute would fail back-to-back runs.
-  LOGIN_RATE_LIMIT_MAX_ATTEMPTS: "1000",
-};
-
 export default defineConfig({
   testDir: "./e2e",
   testMatch: "**/*.e2e.ts",
   globalSetup: "./e2e/global-setup.ts",
+  globalTeardown: "./e2e/global-teardown.ts",
   // Files run in order in one worker: the withdraw suite mutates data, so it sorts last.
   fullyParallel: false,
   workers: 1,
@@ -45,8 +33,14 @@ export default defineConfig({
   },
   webServer: [
     {
+      command: "npx tsx e2e/document-storage-server.ts",
+      url: `${E2E_STORAGE_URL}/health`,
+      reuseExistingServer: false,
+      timeout: 30_000,
+    },
+    {
       command: "npm run dev",
-      cwd: backendDir,
+      cwd: E2E_BACKEND_DIR,
       url: `${E2E_API_URL}/health`,
       env: backendEnv,
       reuseExistingServer: false,

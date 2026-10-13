@@ -184,10 +184,18 @@ export const appRoutes = [
       {
         element: <CandidateLayout />,
         children: [
-          { path: "/documents", element: <DocumentsPage /> },
-          { path: "/my-applications", element: <ApplicationsPage /> },
-          { path: "/my-applications/:id", element: <ApplicationDetailPage /> },
-          { element: <CandidateAccountLayout />, children: [{ path: "/certificates", element: <CertificatesPage /> }] },
+          {
+            element: <CandidateAccountLayout />,
+            children: [
+              { path: "documents", element: <DocumentsPage /> },
+              { path: "my-applications", element: <ApplicationsPage /> },
+              {
+                path: "my-applications/:id",
+                element: <ApplicationDetailPage />,
+              },
+              { path: "certificates", element: <CertificatesPage /> },
+            ],
+          },
         ],
       },
     ],

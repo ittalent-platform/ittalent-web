@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 
-import { backendEnv } from "../playwright.config";
+import { backendEnv } from "./environment";
 import { JOB_POSTING_ACCOUNTS, JOB_POSTING_E2E } from "./job-posting-data";
 import { PASSWORD } from "./support";
 
@@ -9,7 +9,7 @@ type BcryptModule = {
 };
 
 const requireFromBackend = createRequire(
-  new URL("../../ittalent-backend/package.json", import.meta.url),
+  new URL("../../ittalent-backend-cv/package.json", import.meta.url),
 );
 const bcrypt = requireFromBackend("bcryptjs") as BcryptModule;
 const DAY_MS = 86_400_000;
@@ -29,12 +29,12 @@ export async function seedEnterpriseAdminJobPostings(): Promise<void> {
     jobModule,
     userModule,
   ] = await Promise.all([
-    import("../../ittalent-backend/src/config/db.ts"),
-    import("../../ittalent-backend/src/models/account.model.ts"),
-    import("../../ittalent-backend/src/models/enterprise.model.ts"),
-    import("../../ittalent-backend/src/models/job-posting-audit.model.ts"),
-    import("../../ittalent-backend/src/models/job-posting.model.ts"),
-    import("../../ittalent-backend/src/models/user.model.ts"),
+    import("../../ittalent-backend-cv/src/config/db.ts"),
+    import("../../ittalent-backend-cv/src/models/account.model.ts"),
+    import("../../ittalent-backend-cv/src/models/enterprise.model.ts"),
+    import("../../ittalent-backend-cv/src/models/job-posting-audit.model.ts"),
+    import("../../ittalent-backend-cv/src/models/job-posting.model.ts"),
+    import("../../ittalent-backend-cv/src/models/user.model.ts"),
   ]);
   const { connectDatabase, disconnectDatabase } = databaseModule;
   const { Account } = accountModule;

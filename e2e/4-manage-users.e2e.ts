@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { expect, test } from "@playwright/test";
 
-import { backendEnv, E2E_API_URL } from "../playwright.config";
+import { backendEnv, E2E_API_URL, E2E_BACKEND_DIR } from "./environment";
 
 const ADMIN_EMAIL = "manage-users-e2e@example.test";
 const ADMIN_PASSWORD = "ManageUsers123!";
@@ -15,7 +15,7 @@ function seedAdmin() {
       ? ["/d", "/s", "/c", "npm.cmd", "run", "seed:admin"]
       : ["run", "seed:admin"],
     {
-      cwd: "../ittalent-backend",
+      cwd: E2E_BACKEND_DIR,
       env: {
         ...process.env,
         ...backendEnv,

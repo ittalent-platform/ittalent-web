@@ -183,6 +183,7 @@ export type Document = {
     fileName: string;
     mimeType: string;
     size: number;
+    isDefault: boolean;
     createdAt: string;
 };
 
@@ -196,6 +197,9 @@ export type UploadDocumentRequest = {
 
 export type DocumentListQuery = {
     type?: 'cv' | 'cover_letter';
+    search?: string;
+    is_default?: 'true' | 'false';
+    sort_by?: 'created_at' | 'file_name' | 'size';
     page?: number;
     limit?: number;
     sort_order?: 'asc' | 'desc';
@@ -210,12 +214,17 @@ export type PaginatedDocuments = {
         fileName: string;
         mimeType: string;
         size: number;
+        isDefault: boolean;
         createdAt: string;
     }>;
     page: number;
     limit: number;
     total: number;
     totalPages: number;
+};
+
+export type DocumentPreviewResponse = {
+    previewUrl: string;
 };
 
 export type JobPostingEnterpriseSummary = {
@@ -1526,11 +1535,42 @@ export type PostApiV1AuthChangePasswordResponses = {
 
 export type PostApiV1AuthChangePasswordResponse = PostApiV1AuthChangePasswordResponses[keyof PostApiV1AuthChangePasswordResponses];
 
+// Kept for compatibility with the admin-document endpoint exported by the
+// current client. The combined OpenAPI document does not yet declare it.
+export type GetApiV1AdminDocumentsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        type?: 'cv' | 'cover_letter';
+        search?: string;
+        is_default?: 'true' | 'false';
+        sort_by?: 'created_at' | 'file_name' | 'size';
+        page?: number;
+        limit?: number;
+        sort_order?: 'asc' | 'desc';
+    };
+    url: '/api/v1/admin/documents';
+};
+
+export type GetApiV1AdminDocumentsErrors = {
+    401: unknown;
+    403: unknown;
+};
+
+export type GetApiV1AdminDocumentsResponses = {
+    200: PaginatedDocuments;
+};
+
+export type GetApiV1AdminDocumentsResponse = GetApiV1AdminDocumentsResponses[keyof GetApiV1AdminDocumentsResponses];
+
 export type GetApiV1DocumentsData = {
     body?: never;
     path?: never;
     query?: {
         type?: 'cv' | 'cover_letter';
+        search?: string;
+        is_default?: 'true' | 'false';
+        sort_by?: 'created_at' | 'file_name' | 'size';
         page?: number;
         limit?: number;
         sort_order?: 'asc' | 'desc';
@@ -1547,6 +1587,10 @@ export type GetApiV1DocumentsErrors = {
      * Authentication required
      */
     401: unknown;
+    /**
+     * Document owner role required
+     */
+    403: unknown;
 };
 
 export type GetApiV1DocumentsResponses = {
@@ -1575,6 +1619,10 @@ export type PostApiV1DocumentsErrors = {
      */
     401: unknown;
     /**
+     * Document owner role required
+     */
+    403: unknown;
+    /**
      * Document storage upload failed
      */
     502: unknown;
@@ -1589,41 +1637,143 @@ export type PostApiV1DocumentsResponses = {
 
 export type PostApiV1DocumentsResponse = PostApiV1DocumentsResponses[keyof PostApiV1DocumentsResponses];
 
-export type GetApiV1AdminDocumentsData = {
+export type GetApiV1DocumentsByIdDownloadData = {
     body?: never;
-    path?: never;
-    query?: {
-        type?: 'cv' | 'cover_letter';
-        page?: number;
-        limit?: number;
-        sort_order?: 'asc' | 'desc';
+    path: {
+        id: string;
     };
-    url: '/api/v1/admin/documents';
+    query?: never;
+    url: '/api/v1/documents/{id}/download';
 };
 
-export type GetApiV1AdminDocumentsErrors = {
-    /**
-     * Invalid document list query
-     */
-    400: unknown;
+export type GetApiV1DocumentsByIdDownloadErrors = {
     /**
      * Authentication required
      */
     401: unknown;
     /**
-     * Administrator role required
+     * Document owner role required
      */
     403: unknown;
-};
-
-export type GetApiV1AdminDocumentsResponses = {
     /**
-     * Paginated documents across all owners
+     * Owned active document not found
      */
-    200: PaginatedDocuments;
+    404: unknown;
+    /**
+     * Storage file unavailable
+     */
+    502: unknown;
 };
 
-export type GetApiV1AdminDocumentsResponse = GetApiV1AdminDocumentsResponses[keyof GetApiV1AdminDocumentsResponses];
+export type GetApiV1DocumentsByIdDownloadResponses = {
+    /**
+     * Document file stream
+     */
+    200: unknown;
+};
+
+export type GetApiV1DocumentsByIdPreviewData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/documents/{id}/preview';
+};
+
+export type GetApiV1DocumentsByIdPreviewErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Document owner role required
+     */
+    403: unknown;
+    /**
+     * Owned active document not found
+     */
+    404: unknown;
+};
+
+export type GetApiV1DocumentsByIdPreviewResponses = {
+    /**
+     * Inline PDF stream or DOC/DOCX viewer URL
+     */
+    200: DocumentPreviewResponse;
+};
+
+export type GetApiV1DocumentsByIdPreviewResponse = GetApiV1DocumentsByIdPreviewResponses[keyof GetApiV1DocumentsByIdPreviewResponses];
+
+export type PatchApiV1DocumentsByIdDefaultData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/documents/{id}/default';
+};
+
+export type PatchApiV1DocumentsByIdDefaultErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Document owner role required
+     */
+    403: unknown;
+    /**
+     * Owned active document not found
+     */
+    404: unknown;
+};
+
+export type PatchApiV1DocumentsByIdDefaultResponses = {
+    /**
+     * Selected default document
+     */
+    200: Document;
+};
+
+export type PatchApiV1DocumentsByIdDefaultResponse = PatchApiV1DocumentsByIdDefaultResponses[keyof PatchApiV1DocumentsByIdDefaultResponses];
+
+export type DeleteApiV1DocumentsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/documents/{id}';
+};
+
+export type DeleteApiV1DocumentsByIdErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Document owner role required
+     */
+    403: unknown;
+    /**
+     * Owned active document not found
+     */
+    404: unknown;
+    /**
+     * Document is referenced by an application
+     */
+    409: unknown;
+};
+
+export type DeleteApiV1DocumentsByIdResponses = {
+    /**
+     * Document deleted from the active library
+     */
+    204: void;
+};
+
+export type DeleteApiV1DocumentsByIdResponse = DeleteApiV1DocumentsByIdResponses[keyof DeleteApiV1DocumentsByIdResponses];
 
 export type GetApiV1JobPostingsData = {
     body?: never;
