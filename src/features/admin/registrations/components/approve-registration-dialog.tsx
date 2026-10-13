@@ -39,7 +39,7 @@ export function ApproveRegistrationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[520px] rounded-2xl p-6">
+      <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto rounded-2xl p-6">
         <DialogHeader className="gap-3">
           <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
             <CheckCircle2 className="size-6" />

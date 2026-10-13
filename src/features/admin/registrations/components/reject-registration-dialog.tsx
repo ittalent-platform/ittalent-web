@@ -82,7 +82,7 @@ export function RejectRegistrationDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[560px] rounded-2xl p-6">
+      <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto rounded-2xl p-6">
         <DialogHeader className="gap-3">
           <div className="flex items-center gap-3">
             <div className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground font-semibold text-sm">
