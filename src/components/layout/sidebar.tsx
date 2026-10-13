@@ -1,6 +1,7 @@
 import {
   BriefcaseBusiness,
   Building2,
+  ClipboardCheck,
   PanelLeftClose,
   Users,
   X,
@@ -16,6 +17,7 @@ import { BrandLogo } from "./brand-logo";
 import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useEnterpriseRegistrationsListQuery } from "@/features/enterprise-registration/enterprise-registration.queries";
 
 // const adminNavItems = [
 //   { end: false, icon: Users, label: "Users", to: "/admin/users" },
@@ -38,6 +40,12 @@ import { useTranslation } from "react-i18next";
 
 const adminNavItems = [
   { end: false, icon: Users, labelKey: "sidebar.users", to: "/admin/users" },
+  {
+    end: false,
+    icon: ClipboardCheck,
+    labelKey: "sidebar.registrations",
+    to: "/admin/registrations",
+  },
   {
     end: false,
     icon: Building2,
@@ -90,6 +98,14 @@ export function Sidebar({
   onToggleCollapsed,
 }: SidebarProps) {
   const { t } = useTranslation();
+  const pendingRegistrationsQuery = useEnterpriseRegistrationsListQuery({
+    enabled: actor === "admin",
+    page: 1,
+    limit: 1,
+    status: "pending_review",
+  });
+  const pendingCount = pendingRegistrationsQuery.data?.total;
+
   const navItems = actor === "recruiter" ? recruiterNavItems : adminNavItems;
   return (
     <aside
@@ -137,6 +153,7 @@ export function Sidebar({
         items={navItems.map(({ labelKey, ...item }) => ({
           ...item,
           label: t(labelKey),
+          badge: item.to === "/admin/registrations" ? pendingCount : undefined,
         }))}
         onItemClick={onCloseMobile}
       />

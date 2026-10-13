@@ -616,6 +616,7 @@
   },
   "sidebar": {
     "users": "Người dùng",
+    "registrations": "Đăng ký doanh nghiệp",
     "jobPostings": "Tin tuyển dụng",
     "enterprises": "Hồ sơ doanh nghiệp",
     "employees": "Nhân viên",
@@ -2022,5 +2023,42 @@
       "termsRequired": "Bạn phải đồng ý với Điều khoản dịch vụ dành cho nhà tuyển dụng",
       "passwordsMismatch": "Mật khẩu không khớp"
     }
+  },
+  "admin": {
+    "registrations": {
+      "title": "Đăng ký doanh nghiệp",
+      "description": "Xem xét, xác minh và phê duyệt hoặc từ chối hồ sơ đăng ký của nhà tuyển dụng.",
+      "tabs": {
+        "pendingReview": "Chờ xét duyệt",
+        "approved": "Đã phê duyệt",
+        "rejected": "Đã từ chối"
+      },
+      "filters": {
+        "anyTime": "Thời gian nộp: Tất cả",
+        "last7Days": "Thời gian nộp: 7 ngày qua",
+        "last30Days": "Thời gian nộp: 30 ngày qua"
+      },
+      "sort": {
+        "oldestFirst": "Sắp xếp: Cũ nhất trước",
+        "newestFirst": "Sắp xếp: Mới nhất trước"
+      },
+      "searchPlaceholder": "Tìm theo mã hồ sơ, tên công ty, mã số thuế hoặc người yêu cầu",
+      "table": {
+        "company": "DOANH NGHIỆP",
+        "requester": "NGƯỜI YÊU CẦU",
+        "submitted": "THỜI GIAN NỘP",
+        "version": "PHIÊN BẢN",
+        "waiting": "CHỜ ĐỢI"
+      },
+      "viewDetails": "Xem chi tiết",
+      "noResultsSearch": "Hãy thử điều chỉnh từ khóa tìm kiếm hoặc bộ lọc.",
+      "noResults": "Không tìm thấy hồ sơ đăng ký phù hợp",
+      "emptyTitle": "Không có hồ sơ đăng ký",
+      "emptyDesc": "Hiện tại không có hồ sơ nào trong hàng chờ này.",
+      "pagination": {
+        "showing": "Hiển thị {{from}}-{{to}} trên tổng số {{total}} mục"
+      }
+    }
   }
 }
+
