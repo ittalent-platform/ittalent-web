@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 
 import { postApiV1AuthResendVerificationEmail } from "@/api/generated";
 
-import { getAuthErrorMessage } from "./auth-utils";
 import { MS_PER_SECOND, RESEND_COOLDOWN_SECONDS, RESEND_LIMIT, SECONDS_PER_MINUTE } from "./auth-status.constants";
+import { requestErrorMessage } from "@/api/request-error";
 
 type ResendStatus = "idle" | "loading" | "error";
 
@@ -40,12 +40,12 @@ export function useResendVerification() {
         const response = await postApiV1AuthResendVerificationEmail({ body: { email } });
         if (response.error) {
           setStatus("error");
-          setErrorMessage(getAuthErrorMessage(response.error, t("auth.verify.resendError")));
+          setErrorMessage(requestErrorMessage(response.error, t("auth.verify.resendError")));
           return false;
         }
       } catch (error) {
         setStatus("error");
-        setErrorMessage(getAuthErrorMessage(error, t("auth.verify.resendError")));
+        setErrorMessage(requestErrorMessage(error, t("auth.verify.resendError")));
         return false;
       }
       setStatus("idle");

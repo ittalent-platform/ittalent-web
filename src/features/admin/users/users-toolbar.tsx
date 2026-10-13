@@ -1,69 +1,54 @@
 import { useTranslation } from "react-i18next";
 
 import { ListToolbar } from "@/components/common/list-toolbar";
-import { FilterSelect } from "@/components/ui/filter-select";
+import { FilterMultiSelect } from "@/components/ui/filter-select";
 
-import {
-  ALL_FILTER,
-  type UserEmailFilter,
-  type UserRoleFilter,
-  type UserStatusFilter,
-  USER_EMAIL_FILTERS,
-  USER_ROLE_FILTERS,
-  USER_STATUS_FILTERS,
-} from "./users.constants";
+import { USER_EMAIL_FILTERS, USER_ROLE_FILTERS, USER_SEARCH_RANGE, USER_STATUS_FILTERS, type UserEmailFilter, type UserRole, type UserStatus } from "./users.constants";
 
 type UsersToolbarProps = {
-  email: UserEmailFilter;
-  onEmailChange: (email: UserEmailFilter) => void;
-  onRoleChange: (role: UserRoleFilter) => void;
+  companies: string[];
+  onCompanySearchChange: (query: string) => void;
+  companyOptions: Array<{ label: string; value: string }>;
+  emails: UserEmailFilter[];
+  onCompaniesChange: (values: string[]) => void;
+  onEmailsChange: (values: UserEmailFilter[]) => void;
+  onRolesChange: (values: UserRole[]) => void;
   onSearchChange: (value: string) => void;
-  onStatusChange: (status: UserStatusFilter) => void;
-  role: UserRoleFilter;
+  onStatusesChange: (values: UserStatus[]) => void;
+  roles: UserRole[];
   search: string;
-  status: UserStatusFilter;
+  searchInvalid: boolean;
+  statuses: UserStatus[];
 };
 
-/** "Role: All" style trigger: muted prefix, emphasised value (Users design). */
-function prefixedTrigger(prefix: string) {
-  return (selected: string) => (
-    <>
-      <span className="text-muted-foreground">{prefix}</span> <span className="text-foreground">{selected}</span>
-    </>
-  );
-}
-
-export function UsersToolbar({ email, onEmailChange, onRoleChange, onSearchChange, onStatusChange, role, search, status }: UsersToolbarProps) {
+export function UsersToolbar({ companies, companyOptions, emails, onCompaniesChange, onCompanySearchChange, onEmailsChange, onRolesChange, onSearchChange, onStatusesChange, roles, search, searchInvalid, statuses }: UsersToolbarProps) {
   const { t } = useTranslation();
-  const all = t("adminUsers.toolbar.all");
   return (
-    <ListToolbar onSearchChange={onSearchChange} search={search} searchPlaceholder={t("adminUsers.toolbar.search")}>
-      <FilterSelect
-        onChange={onRoleChange}
-        options={[
-          { label: all, value: ALL_FILTER },
-          ...USER_ROLE_FILTERS.map((value) => ({ label: t(`adminUsers.role.${value}`), value })),
-        ]}
-        renderTrigger={prefixedTrigger(`${t("adminUsers.toolbar.role")}:`)}
-        value={role}
+    <ListToolbar
+      onSearchChange={onSearchChange}
+      search={search}
+      searchError={searchInvalid ? t("adminUsers.toolbar.searchHint", USER_SEARCH_RANGE) : undefined}
+      searchMaxLength={USER_SEARCH_RANGE.max}
+      searchPlaceholder={t("adminUsers.toolbar.search")}
+    >
+      <FilterMultiSelect
+        onChange={onRolesChange}
+        options={USER_ROLE_FILTERS.map((value) => ({ label: t(`adminUsers.role.${value}`), value }))}
+        prefix={t("adminUsers.toolbar.role")}
+        values={roles}
       />
-      <FilterSelect
-        onChange={onEmailChange}
-        options={[
-          { label: all, value: ALL_FILTER },
-          ...USER_EMAIL_FILTERS.map((value) => ({ label: t(`adminUsers.emailStatus.${value}`), value })),
-        ]}
-        renderTrigger={prefixedTrigger(`${t("adminUsers.toolbar.email")}:`)}
-        value={email}
+      <FilterMultiSelect onChange={onCompaniesChange} onSearchChange={onCompanySearchChange} options={companyOptions} prefix={t("adminUsers.toolbar.company")} searchPlaceholder={t("adminUsers.toolbar.companySearch")} values={companies} />
+      <FilterMultiSelect
+        onChange={onEmailsChange}
+        options={USER_EMAIL_FILTERS.map((value) => ({ label: t(`adminUsers.emailStatus.${value}`), value }))}
+        prefix={t("adminUsers.toolbar.email")}
+        values={emails}
       />
-      <FilterSelect
-        onChange={onStatusChange}
-        options={[
-          { label: all, value: ALL_FILTER },
-          ...USER_STATUS_FILTERS.map((value) => ({ label: t(`adminUsers.status.${value}`), value })),
-        ]}
-        renderTrigger={prefixedTrigger(`${t("adminUsers.toolbar.status")}:`)}
-        value={status}
+      <FilterMultiSelect
+        onChange={onStatusesChange}
+        options={USER_STATUS_FILTERS.map((value) => ({ label: t(`adminUsers.status.${value}`), value }))}
+        prefix={t("adminUsers.toolbar.status")}
+        values={statuses}
       />
     </ListToolbar>
   );

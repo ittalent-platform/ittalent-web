@@ -12,6 +12,7 @@ import {
   TONE_CLASSES,
 } from "./home.constants";
 import { useFieldCount } from "./home.queries";
+import { SECTION_EYEBROW, SECTION_TITLE } from "@/features/public-site/shared/market-styles";
 
 const searchHref = (keyword: string) =>
   `${CAREER_PATH}?${SEARCH_PARAM}=${encodeURIComponent(keyword)}`;
@@ -34,10 +35,10 @@ export function HomeFields() {
     <section className="flex flex-col gap-7 px-4 py-[72px] md:px-12">
       <div className="flex items-end gap-6">
         <div className="flex flex-col gap-2">
-          <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-mkt-accent-hover">
+          <span className={SECTION_EYEBROW}>
             {t("home.fields.eyebrow")}
           </span>
-          <h2 className="itt-display text-[28px] font-semibold md:text-4xl">
+          <h2 className={SECTION_TITLE}>
             {t("home.fields.title")}
           </h2>
         </div>

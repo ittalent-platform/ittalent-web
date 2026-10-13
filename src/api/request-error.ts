@@ -1,13 +1,20 @@
-export type RequestError = Error & { status?: number };
+/** A failed API call: the server's message, plus the HTTP status and the error `code` when it sent one. */
+export type RequestError = Error & { status?: number; code?: string };
 
-export function requestError(result: {
-  data?: unknown;
-  error?: unknown;
-  response?: Response;
-}, fallback: string): RequestError {
+type ApiResult<T> = { data?: T; error?: unknown; response?: Response };
+
+export function requestError(result: ApiResult<unknown>, fallback: string): RequestError {
   const error = new Error(requestErrorMessage(result.error, fallback)) as RequestError;
   error.status = result.response?.status;
+  const code = typeof result.error === "object" && result.error !== null && "code" in result.error ? result.error.code : undefined;
+  if (typeof code === "string") error.code = code;
   return error;
+}
+
+/** The data of a generated-client call, or a thrown RequestError. */
+export function unwrap<T>(result: ApiResult<T>, fallback = "Unable to complete this request."): T {
+  if (!result.error && result.response?.ok !== false) return result.data as T;
+  throw requestError(result, fallback);
 }
 
 export function requestErrorMessage(error: unknown, fallback = "Unable to complete this request.") {
@@ -24,4 +31,9 @@ export function requestStatus(error: unknown): number | undefined {
     return error.status;
   }
   return undefined;
+}
+
+/** The machine-readable `code` the API adds to errors a screen has to tell apart (for example a 409). */
+export function requestCode(error: unknown): string | undefined {
+  return typeof error === "object" && error !== null && "code" in error && typeof error.code === "string" ? error.code : undefined;
 }

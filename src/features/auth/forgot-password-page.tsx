@@ -14,10 +14,9 @@ import { Input } from "@/components/ui/input";
 import { AuthCardPage, AuthFormHeader, AuthStatusCard } from "./auth-status-card";
 import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS } from "./auth-status.constants";
 import { forgotPasswordSchema, type ForgotPasswordFormValues } from "./forgot-password.schema";
-import { getAuthErrorMessage } from "./auth-utils";
+import { HTTP_TOO_MANY_REQUESTS, HTTP_SERVICE_UNAVAILABLE } from "@/api/http-status";
+import { requestErrorMessage } from "@/api/request-error";
 
-const HTTP_TOO_MANY_REQUESTS = 429;
-const HTTP_SERVICE_UNAVAILABLE = 503;
 
 type Banner = { message: string; tone: "error" | "warning" };
 
@@ -45,7 +44,7 @@ export function ForgotPasswordPage() {
             ? t("auth.forgot.sendFailed")
             : t("auth.forgot.errorFallback");
       setBanner({
-        message: getAuthErrorMessage(response.error, fallback),
+        message: requestErrorMessage(response.error, fallback),
         // Throttled requests are the visitor's to fix (red); an unavailable mailer is ours (amber).
         tone: status === HTTP_SERVICE_UNAVAILABLE ? "warning" : "error",
       });

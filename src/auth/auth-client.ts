@@ -6,8 +6,8 @@ import {
   refreshAuthTokens,
   type AuthTokens,
 } from "@/api/client";
+import { HTTP_UNAUTHORIZED } from "@/api/http-status";
 
-const HTTP_UNAUTHORIZED = 401;
 
 export async function getCurrentUser(): Promise<UserDto | null> {
   const tokens = getStoredTokens();

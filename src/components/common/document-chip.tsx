@@ -17,7 +17,7 @@ export function DocumentTypeBadge({ kind, label }: { kind: DocumentKind; label: 
 /** Outlined chip with a file icon: one submitted document in a list row or board card. */
 export function DocumentChip({ label, className }: { label: string; className?: string }) {
   return (
-    <span className={cn("inline-flex h-[26px] items-center gap-[5px] whitespace-nowrap rounded-[7px] border border-(--border-strong) px-2 text-xs font-semibold text-foreground", className)}>
+    <span className={cn("inline-flex h-[26px] items-center gap-[5px] whitespace-nowrap rounded-[7px] border border-border-strong px-2 text-xs font-semibold text-foreground", className)}>
       <FileText aria-hidden className="size-[13px]" />
       {label}
     </span>

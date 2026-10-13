@@ -26,8 +26,16 @@ export type RegisterResponse = {
         status: string;
         emailVerified: boolean;
         enterpriseId: string | null;
+        enterpriseName?: string | null;
+        invitation?: {
+            status: 'pending' | 'accepted' | 'revoked' | 'cancelled' | 'expired';
+            deliveryStatus: 'pending' | 'sent' | 'failed';
+            expiresAt: string;
+            sentAt?: string | null;
+        } | null;
         createdAt?: string;
         updatedAt?: string;
+        version?: number;
     };
     tokens: {
         accessToken: string;
@@ -56,8 +64,16 @@ export type AuthResponse = {
         status: string;
         emailVerified: boolean;
         enterpriseId: string | null;
+        enterpriseName?: string | null;
+        invitation?: {
+            status: 'pending' | 'accepted' | 'revoked' | 'cancelled' | 'expired';
+            deliveryStatus: 'pending' | 'sent' | 'failed';
+            expiresAt: string;
+            sentAt?: string | null;
+        } | null;
         createdAt?: string;
         updatedAt?: string;
+        version?: number;
     };
     tokens: {
         accessToken: string;
@@ -80,8 +96,16 @@ export type UserDto = {
     status: string;
     emailVerified: boolean;
     enterpriseId: string | null;
+    enterpriseName?: string | null;
+    invitation?: {
+        status: 'pending' | 'accepted' | 'revoked' | 'cancelled' | 'expired';
+        deliveryStatus: 'pending' | 'sent' | 'failed';
+        expiresAt: string;
+        sentAt?: string | null;
+    } | null;
     createdAt?: string;
     updatedAt?: string;
+    version?: number;
 };
 
 export type VerifyEmailQuery = {
@@ -231,9 +255,12 @@ export type JobPosting = {
     requirements?: string;
     benefits?: string;
     openings?: number;
-    status: 'draft' | 'published' | 'archived';
+    status: 'draft' | 'published' | 'closed' | 'archived';
     recruitmentStatus: 'open' | 'closed';
     applicationCount?: number;
+    publishedAt?: string;
+    closedAt?: string;
+    archivedAt?: string;
     expiresAt?: string;
     createdAt: string;
     updatedAt: string;
@@ -241,12 +268,13 @@ export type JobPosting = {
 
 export type CreateJobPostingRequest = {
     title: string;
-    location: string;
-    employment_type: 'Full-time' | 'Part-time' | 'Internship' | 'Contract' | 'Remote';
-    description: string;
-    requirements: string;
-    benefits: string;
-    expires_at: string;
+    publication_status?: 'draft' | 'published';
+    location?: string;
+    employment_type?: 'Full-time' | 'Part-time' | 'Internship' | 'Contract' | 'Remote';
+    description?: string;
+    requirements?: string;
+    benefits?: string;
+    expires_at?: string;
     salary_min?: number;
     salary_max?: number;
     salary_negotiable?: boolean;
@@ -269,6 +297,7 @@ export type UpdateJobPostingRequest = {
     currency?: string;
     level?: string | null;
     openings?: number | null;
+    publication_status?: 'draft' | 'published';
 };
 
 export type JobPostingListQuery = {
@@ -277,6 +306,8 @@ export type JobPostingListQuery = {
     employment_type?: string;
     level?: string;
     enterprise_id?: string;
+    publication_status?: 'draft' | 'published' | 'archived';
+    recruitment_status?: 'open' | 'closed';
     sort_by?: 'created_at' | 'title' | 'expires_at';
     sort_order?: 'asc' | 'desc';
     page?: number;
@@ -306,12 +337,29 @@ export type PaginatedJobPostings = {
         requirements?: string;
         benefits?: string;
         openings?: number;
-        status: 'draft' | 'published' | 'archived';
+        status: 'draft' | 'published' | 'closed' | 'archived';
         recruitmentStatus: 'open' | 'closed';
         applicationCount?: number;
+        publishedAt?: string;
+        closedAt?: string;
+        archivedAt?: string;
         expiresAt?: string;
         createdAt: string;
         updatedAt: string;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type JobPostingHistory = {
+    items: Array<{
+        id: string;
+        action: 'create' | 'update' | 'delete' | 'publish' | 'draft' | 'close' | 'reopen' | 'archive' | 'restore';
+        actorUserId: string;
+        occurredAt: string;
+        changedFields?: Array<string>;
     }>;
     page: number;
     limit: number;
@@ -330,8 +378,16 @@ export type UserListResponse = {
         status: string;
         emailVerified: boolean;
         enterpriseId: string | null;
+        enterpriseName?: string | null;
+        invitation?: {
+            status: 'pending' | 'accepted' | 'revoked' | 'cancelled' | 'expired';
+            deliveryStatus: 'pending' | 'sent' | 'failed';
+            expiresAt: string;
+            sentAt?: string | null;
+        } | null;
         createdAt?: string;
         updatedAt?: string;
+        version?: number;
     }>;
     page: number;
     limit: number;
@@ -342,7 +398,7 @@ export type UserListResponse = {
 export type UpdateUserRequest = {
     fullName?: string;
     phone?: string | null;
-    role?: 'admin' | 'user';
+    expectedVersion: number;
 };
 
 export type EnterpriseListResponse = {
@@ -523,11 +579,244 @@ export type EnterpriseMessageResponse = {
     message: string;
 };
 
+export type StartEnterpriseRegistrationRequest = {
+    corporate_email: string;
+    representative_name: string;
+    representative_phone: string;
+    representative_position?: string;
+};
+
+export type StartEnterpriseRegistrationResponse = {
+    message: string;
+    email: string;
+};
+
+export type VerifyEnterpriseRegistrationEmailResponse = {
+    message: string;
+    registration_id: string;
+    registration_code: string;
+    status: string;
+    version: number;
+    corporate_email: string;
+    representative: {
+        full_name: string;
+        phone: string;
+        position?: string;
+    };
+};
+
+export type SaveEnterpriseRegistrationDraftRequest = {
+    representative?: {
+        full_name?: string;
+        phone?: string;
+        position?: string;
+    };
+    company_data?: {
+        name?: string;
+        legal_name?: string;
+        tax_code?: string;
+        registration_number?: string;
+        website?: string | '';
+        industry?: string;
+        sub_industries?: Array<string>;
+        company_size?: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
+        company_type?: 'Product' | 'Outsourcing' | 'IT Service' | 'Consulting' | 'Agency' | 'Hybrid' | 'Other';
+        founded_year?: number;
+        address?: {
+            street?: string;
+            city?: string;
+            district?: string;
+            state_province?: string;
+            country?: string;
+            postal_code?: string;
+        };
+        short_description?: string;
+        description?: string;
+    };
+    legal_documents?: Array<{
+        document_type: 'business_license' | 'tax_registration' | 'power_of_attorney' | 'other';
+        file_name: string;
+        file_url: string;
+        file_size?: number;
+    }>;
+    version?: number;
+};
+
+export type UploadLegalDocumentFormRequest = {
+    document_type: 'business_license' | 'tax_registration' | 'power_of_attorney' | 'other';
+    /**
+     * Legal registration PDF document (business license, tax registration, power of attorney)
+     */
+    file: Blob | File;
+};
+
+export type LegalDocumentResponse = {
+    document_type: 'business_license' | 'tax_registration' | 'power_of_attorney' | 'other';
+    file_name: string;
+    file_url: string;
+    file_size?: number;
+    uploaded_at?: string | string;
+};
+
+export type SubmitEnterpriseRegistrationRequest = {
+    representative: {
+        full_name: string;
+        phone: string;
+        position?: string;
+    };
+    company_data: {
+        name: string;
+        legal_name?: string;
+        tax_code: string;
+        registration_number?: string;
+        website?: string | '';
+        industry: string;
+        sub_industries?: Array<string>;
+        company_size: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1000+';
+        company_type?: 'Product' | 'Outsourcing' | 'IT Service' | 'Consulting' | 'Agency' | 'Hybrid' | 'Other';
+        founded_year?: number;
+        address: {
+            street: string;
+            city: string;
+            district?: string;
+            state_province?: string;
+            country: string;
+            postal_code?: string;
+        };
+        short_description?: string;
+        description?: string;
+    };
+    legal_documents: Array<{
+        document_type: 'business_license' | 'tax_registration' | 'power_of_attorney' | 'other';
+        file_name: string;
+        file_url: string;
+        file_size?: number;
+    }>;
+    version: number;
+};
+
+export type SubmissionReceiptResponse = {
+    registration_code: string;
+    status: string;
+    version: number;
+    submitted_at: string;
+    estimated_sla_days: number;
+};
+
+export type PaginatedEnterpriseRegistrationSummary = {
+    items: Array<{
+        id: string;
+        registration_code: string;
+        corporate_email: string;
+        company_name: string | null;
+        tax_code: string | null;
+        representative_name: string;
+        representative_phone: string;
+        status: string;
+        version: number;
+        created_at: string | null;
+        submitted_at: string | null;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type EnterpriseRegistrationDetail = {
+    _id?: string;
+    registration_code: string;
+    version: number;
+    corporate_email: string;
+    representative: {
+        full_name: string;
+        phone: string;
+        position?: string;
+    };
+    company_data?: {
+        [key: string]: unknown;
+    };
+    legal_documents?: Array<{
+        document_type: 'business_license' | 'tax_registration' | 'power_of_attorney' | 'other';
+        file_name: string;
+        file_url: string;
+        file_size?: number;
+        uploaded_at?: string | string;
+    }>;
+    status: 'draft' | 'pending_review' | 'under_review' | 'approved' | 'rejected';
+    claim_locks?: {
+        tax_code?: string;
+        corporate_email?: string;
+        locked_at?: string | string;
+    };
+    review?: {
+        reviewed_by?: string;
+        reviewed_at?: string | string;
+        decision?: 'approved' | 'rejected';
+        rejection_reason?: string;
+        checklist?: {
+            tax_code_verified?: boolean;
+            legal_representative_verified?: boolean;
+            documents_verified?: boolean;
+        };
+    };
+    created_enterprise_id?: string;
+    createdAt?: string | string;
+    updatedAt?: string | string;
+};
+
+export type AdminDecisionRequest = {
+    decision: 'approved' | 'rejected';
+    version: number;
+    rejection_reason?: string;
+    checklist?: {
+        tax_code_verified: boolean;
+        legal_representative_verified: boolean;
+        documents_verified: boolean;
+    };
+};
+
+export type AdminDecisionResponse = {
+    message: string;
+    registration_code: string;
+    status: string;
+    version: number;
+    enterprise_id?: string;
+};
+
+export type AcceptInvitationRequest = {
+    token: string;
+    password: string;
+    username?: string;
+};
+
+export type AcceptInvitationResponse = {
+    message: string;
+    user: {
+        id: string;
+        email: string;
+        username: string;
+        fullName: string | null;
+        phone: string | null;
+        role: string;
+        status: string;
+        emailVerified: boolean;
+        enterpriseId: string | null;
+        createdAt?: string;
+        updatedAt?: string;
+    };
+    tokens: {
+        accessToken: string;
+        refreshToken: string;
+    };
+};
+
 export type CreateApplicationRequest = {
     jobPostingId: string;
     cvId: string;
     coverLetterId?: string;
     message?: string;
+    certificateLinkIds?: Array<string>;
 };
 
 export type ApplicationDto = {
@@ -573,6 +862,15 @@ export type ApplicationDetailDto = {
         mimeType: string;
         size: number;
         submittedAt: string;
+    }>;
+    certificates: Array<{
+        id: string;
+        version: number;
+        name: string;
+        url: string;
+        issuer: string | null;
+        issuedDate: string | null;
+        expiryDate: string | null;
     }>;
     version: number;
     createdAt: string;
@@ -633,6 +931,354 @@ export type ApplicationHistoryResponse = {
 export type WithdrawApplicationBody = {
     expectedVersion: number;
     reason?: string;
+};
+
+export type CreateInterviewRequest = {
+    applicationId: string;
+    interviewerIds: Array<string>;
+    scheduledAt: string;
+    durationMinutes?: number;
+    mode: 'online' | 'onsite';
+    meetingLink?: string;
+    location?: string;
+    notes?: string;
+};
+
+export type UpdateInterviewRequest = {
+    interviewerIds?: Array<string>;
+    scheduledAt?: string;
+    durationMinutes?: number;
+    mode?: 'online' | 'onsite';
+    meetingLink?: string | null;
+    location?: string | null;
+    notes?: string | null;
+};
+
+export type UpdateInterviewStatusRequest = {
+    status: 'completed' | 'cancelled' | 'no_show';
+    note?: string;
+};
+
+export type InterviewDetailDto = {
+    id: string;
+    status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+    scheduledAt: string;
+    endsAt: string;
+    durationMinutes: number;
+    mode: 'online' | 'onsite';
+    meetingLink: string | null;
+    location: string | null;
+    notes: string | null;
+    applicationId: string;
+    job: {
+        id: string;
+        title: string | null;
+    };
+    applicant: {
+        id: string;
+        fullName: string | null;
+        email: string | null;
+    };
+    interviewers: Array<{
+        id: string;
+        fullName: string | null;
+        email: string | null;
+    }>;
+    canComplete: boolean;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: string;
+    statusHistory: Array<{
+        status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+        changedAt: string;
+        changedBy: string;
+        note: string | null;
+    }>;
+};
+
+export type InterviewListResponse = {
+    items: Array<{
+        id: string;
+        status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+        scheduledAt: string;
+        endsAt: string;
+        durationMinutes: number;
+        mode: 'online' | 'onsite';
+        meetingLink: string | null;
+        location: string | null;
+        notes: string | null;
+        applicationId: string;
+        job: {
+            id: string;
+            title: string | null;
+        };
+        applicant: {
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        };
+        interviewers: Array<{
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        }>;
+        canComplete: boolean;
+        createdAt: string;
+        updatedAt: string;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type InterviewCalendarResponse = {
+    from: string;
+    to: string;
+    total: number;
+    truncated: boolean;
+    items: Array<{
+        id: string;
+        status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+        scheduledAt: string;
+        endsAt: string;
+        durationMinutes: number;
+        mode: 'online' | 'onsite';
+        meetingLink: string | null;
+        location: string | null;
+        notes: string | null;
+        applicationId: string;
+        job: {
+            id: string;
+            title: string | null;
+        };
+        applicant: {
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        };
+        interviewers: Array<{
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        }>;
+        canComplete: boolean;
+        createdAt: string;
+        updatedAt: string;
+    }>;
+};
+
+export type SchedulableApplicationListResponse = {
+    items: Array<{
+        id: string;
+        status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn';
+        appliedAt: string;
+        job: {
+            id: string;
+            title: string | null;
+        };
+        applicant: {
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        };
+    }>;
+};
+
+export type InterviewerListResponse = {
+    items: Array<{
+        id: string;
+        fullName: string | null;
+        email: string;
+    }>;
+};
+
+export type UpdateUserStatusRequest = {
+    status: 'suspended' | 'active';
+    reason: string;
+    expectedVersion: number;
+};
+
+export type UpdateUserRoleRequest = {
+    role: 'recruiter' | 'enterprise_admin';
+    reason: string;
+    expectedVersion: number;
+};
+
+export type EmergencyUserSuspensionRequest = {
+    reason: string;
+    expectedVersion: number;
+};
+
+export type UserInvitationStatusResponse = {
+    status: 'pending' | 'accepted' | 'revoked' | 'cancelled' | 'expired';
+    kind: 'new_account' | 'enterprise_membership';
+    role: 'user' | 'recruiter' | 'enterprise_admin';
+    expiresAt: string;
+    sentAt: string | null;
+    deliveryStatus: 'pending' | 'sent' | 'failed';
+    deliveryAttempts: number;
+} | null;
+
+export type InvitationPreviewResponse = {
+    email: string;
+    role: 'user' | 'recruiter' | 'enterprise_admin';
+    enterpriseName: string | null;
+    expiresAt: string;
+};
+
+export type AcceptedInvitationResponse = {
+    id: string;
+    email: string;
+    role: string;
+    status: string;
+};
+
+export type InvitationDeliveryResponse = {
+    deliveryStatus: 'sent' | 'failed';
+    expiresAt: string;
+};
+
+export type CreateAdminUserRequest = {
+    email: string;
+    username: string;
+    fullName: string;
+    phone?: string;
+    role: 'user' | 'recruiter' | 'enterprise_admin';
+    enterpriseId?: string;
+};
+
+export type CreateAdminUserResponse = {
+    user: {
+        id: string;
+        email: string;
+        username: string;
+        fullName: string | null;
+        phone: string | null;
+        role: string;
+        status: string;
+        emailVerified: boolean;
+        enterpriseId: string | null;
+        enterpriseName?: string | null;
+        invitation?: {
+            status: 'pending' | 'accepted' | 'revoked' | 'cancelled' | 'expired';
+            deliveryStatus: 'pending' | 'sent' | 'failed';
+            expiresAt: string;
+            sentAt?: string | null;
+        } | null;
+        createdAt?: string;
+        updatedAt?: string;
+        version?: number;
+    };
+    invitation: {
+        expiresAt: string;
+        deliveryStatus: 'sent' | 'failed';
+    };
+};
+
+export type AcceptNewAccountInvitationRequest = {
+    token: string;
+    password: string;
+};
+
+export type InvitationPreviewQuery = {
+    token: string;
+};
+
+export type CancelInvitationRequest = {
+    reason: string;
+    expectedVersion: number;
+};
+
+export type UserAuditHistoryResponse = {
+    items: Array<{
+        id: string;
+        actorId: string;
+        actorName?: string | null;
+        action: string;
+        result: 'success';
+        reason: string | null;
+        changes: {
+            [key: string]: string | null;
+        } | null;
+        version: number;
+        occurredAt: string;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type RequestUserEmailChange = {
+    newEmail: string;
+    expectedVersion: number;
+};
+
+export type ConfirmUserEmailChange = {
+    token: string;
+    currentPassword: string;
+};
+
+export type CreateCertificateLinkRequest = {
+    name: string;
+    url: string;
+    issuer?: string;
+    issuedDate?: string;
+    expiryDate?: string;
+};
+
+export type CertificateLink = {
+    id: string;
+    name: string;
+    url: string;
+    issuer: string | null;
+    issuedDate: string | null;
+    expiryDate: string | null;
+    version: number;
+    status: 'available';
+    suggested: boolean;
+    sentCount: number;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type CertificateLinkListQuery = {
+    page?: number;
+    limit?: number;
+    search?: string;
+};
+
+export type PaginatedCertificateLinks = {
+    items: Array<{
+        id: string;
+        name: string;
+        url: string;
+        issuer: string | null;
+        issuedDate: string | null;
+        expiryDate: string | null;
+        version: number;
+        status: 'available';
+        suggested: boolean;
+        sentCount: number;
+        createdAt: string;
+        updatedAt: string;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    suggestedTotal: number;
+};
+
+export type UpdateCertificateLinkRequest = {
+    expectedVersion: number;
+    name?: string;
+    url?: string;
+    issuer?: string | null;
+    issuedDate?: string | null;
+    expiryDate?: string | null;
+    suggested?: boolean;
 };
 
 export type GetHealthData = {
@@ -1110,6 +1756,8 @@ export type GetApiV1JobPostingsData = {
         employment_type?: string;
         level?: string;
         enterprise_id?: string;
+        publication_status?: 'draft' | 'published' | 'archived';
+        recruitment_status?: 'open' | 'closed';
         sort_by?: 'created_at' | 'title' | 'expires_at';
         sort_order?: 'asc' | 'desc';
         page?: number;
@@ -1203,6 +1851,8 @@ export type GetApiV1RecruiterJobPostingsData = {
         employment_type?: string;
         level?: string;
         enterprise_id?: string;
+        publication_status?: 'draft' | 'published' | 'archived';
+        recruitment_status?: 'open' | 'closed';
         sort_by?: 'created_at' | 'title' | 'expires_at';
         sort_order?: 'asc' | 'desc';
         page?: number;
@@ -1228,7 +1878,7 @@ export type GetApiV1RecruiterJobPostingsErrors = {
 
 export type GetApiV1RecruiterJobPostingsResponses = {
     /**
-     * Paginated job postings for the recruiter enterprise
+     * Paginated job postings for the enterprise assigned to the recruiter or enterprise administrator
      */
     200: PaginatedJobPostings;
 };
@@ -1244,6 +1894,8 @@ export type GetApiV1AdminJobPostingsData = {
         employment_type?: string;
         level?: string;
         enterprise_id?: string;
+        publication_status?: 'draft' | 'published' | 'archived';
+        recruitment_status?: 'open' | 'closed';
         sort_by?: 'created_at' | 'title' | 'expires_at';
         sort_order?: 'asc' | 'desc';
         page?: number;
@@ -1380,6 +2032,10 @@ export type PatchApiV1JobPostingsByIdErrors = {
      * Job posting not found
      */
     404: unknown;
+    /**
+     * Archived posting cannot be edited
+     */
+    409: unknown;
 };
 
 export type PatchApiV1JobPostingsByIdResponses = {
@@ -1391,6 +2047,190 @@ export type PatchApiV1JobPostingsByIdResponses = {
 
 export type PatchApiV1JobPostingsByIdResponse = PatchApiV1JobPostingsByIdResponses[keyof PatchApiV1JobPostingsByIdResponses];
 
+export type PatchApiV1JobPostingsByIdCloseData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}/close';
+};
+
+export type PatchApiV1JobPostingsByIdCloseErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
+     */
+    403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+    /**
+     * Invalid lifecycle transition
+     */
+    409: unknown;
+};
+
+export type PatchApiV1JobPostingsByIdCloseResponses = {
+    /**
+     * Closed job posting
+     */
+    200: JobPosting;
+};
+
+export type PatchApiV1JobPostingsByIdCloseResponse = PatchApiV1JobPostingsByIdCloseResponses[keyof PatchApiV1JobPostingsByIdCloseResponses];
+
+export type PatchApiV1JobPostingsByIdReopenData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}/reopen';
+};
+
+export type PatchApiV1JobPostingsByIdReopenErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
+     */
+    403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+    /**
+     * Invalid lifecycle transition or expired deadline
+     */
+    409: unknown;
+};
+
+export type PatchApiV1JobPostingsByIdReopenResponses = {
+    /**
+     * Reopened job posting
+     */
+    200: JobPosting;
+};
+
+export type PatchApiV1JobPostingsByIdReopenResponse = PatchApiV1JobPostingsByIdReopenResponses[keyof PatchApiV1JobPostingsByIdReopenResponses];
+
+export type PatchApiV1JobPostingsByIdArchiveData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}/archive';
+};
+
+export type PatchApiV1JobPostingsByIdArchiveErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
+     */
+    403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+    /**
+     * Only a closed posting can be archived
+     */
+    409: unknown;
+};
+
+export type PatchApiV1JobPostingsByIdArchiveResponses = {
+    /**
+     * Archived job posting
+     */
+    200: JobPosting;
+};
+
+export type PatchApiV1JobPostingsByIdArchiveResponse = PatchApiV1JobPostingsByIdArchiveResponses[keyof PatchApiV1JobPostingsByIdArchiveResponses];
+
+export type PatchApiV1JobPostingsByIdRestoreData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/job-postings/{id}/restore';
+};
+
+export type PatchApiV1JobPostingsByIdRestoreErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
+     */
+    403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+    /**
+     * Only an archived posting can be restored
+     */
+    409: unknown;
+};
+
+export type PatchApiV1JobPostingsByIdRestoreResponses = {
+    /**
+     * Restored closed job posting
+     */
+    200: JobPosting;
+};
+
+export type PatchApiV1JobPostingsByIdRestoreResponse = PatchApiV1JobPostingsByIdRestoreResponses[keyof PatchApiV1JobPostingsByIdRestoreResponses];
+
+export type GetApiV1JobPostingsByIdHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        page?: number;
+        limit?: number;
+    };
+    url: '/api/v1/job-postings/{id}/history';
+};
+
+export type GetApiV1JobPostingsByIdHistoryErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller lacks the required role or cannot manage this job posting
+     */
+    403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+};
+
+export type GetApiV1JobPostingsByIdHistoryResponses = {
+    /**
+     * Paginated job posting history
+     */
+    200: JobPostingHistory;
+};
+
+export type GetApiV1JobPostingsByIdHistoryResponse = GetApiV1JobPostingsByIdHistoryResponses[keyof GetApiV1JobPostingsByIdHistoryResponses];
+
 export type GetApiV1UsersData = {
     body?: never;
     path?: never;
@@ -1398,8 +2238,9 @@ export type GetApiV1UsersData = {
         page?: number;
         limit?: number;
         search?: string;
-        role?: 'user' | 'admin' | 'recruiter' | 'applicant' | 'interviewer';
-        status?: 'active' | 'inactive' | 'suspended' | 'blocked';
+        role?: Array<'user' | 'admin' | 'recruiter' | 'enterprise_admin' | 'applicant' | 'interviewer'>;
+        status?: Array<'active' | 'inactive' | 'invited' | 'suspended' | 'blocked'>;
+        enterpriseId?: Array<string>;
         emailVerified?: 'true' | 'false';
         sortBy?: 'createdAt' | 'id' | 'name' | 'username' | 'email';
         sortOrder?: 'asc' | 'desc';
@@ -1434,6 +2275,45 @@ export type GetApiV1UsersResponses = {
 };
 
 export type GetApiV1UsersResponse = GetApiV1UsersResponses[keyof GetApiV1UsersResponses];
+
+export type PostApiV1UsersData = {
+    body: CreateAdminUserRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users';
+};
+
+export type PostApiV1UsersErrors = {
+    /**
+     * Invalid role, user fields, or company context
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Email or username already exists
+     */
+    409: unknown;
+    /**
+     * Account storage unavailable
+     */
+    503: unknown;
+};
+
+export type PostApiV1UsersResponses = {
+    /**
+     * Account created; invitation delivery result is included
+     */
+    201: CreateAdminUserResponse;
+};
+
+export type PostApiV1UsersResponse = PostApiV1UsersResponses[keyof PostApiV1UsersResponses];
 
 export type GetApiV1UsersByIdData = {
     body?: never;
@@ -1686,6 +2566,33 @@ export type PatchApiV1EnterprisesByEnterpriseIdResponses = {
 
 export type PatchApiV1EnterprisesByEnterpriseIdResponse = PatchApiV1EnterprisesByEnterpriseIdResponses[keyof PatchApiV1EnterprisesByEnterpriseIdResponses];
 
+export type GetApiV1EnterprisesMyProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/enterprises/my-profile';
+};
+
+export type GetApiV1EnterprisesMyProfileErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Enterprise not found or user is not affiliated with an enterprise
+     */
+    404: unknown;
+};
+
+export type GetApiV1EnterprisesMyProfileResponses = {
+    /**
+     * Enterprise detailed profile
+     */
+    200: EnterpriseDetailDto;
+};
+
+export type GetApiV1EnterprisesMyProfileResponse = GetApiV1EnterprisesMyProfileResponses[keyof GetApiV1EnterprisesMyProfileResponses];
+
 export type PatchApiV1EnterprisesByEnterpriseIdStatusData = {
     body?: UpdateEnterpriseStatusDto;
     path: {
@@ -1722,6 +2629,302 @@ export type PatchApiV1EnterprisesByEnterpriseIdStatusResponses = {
 };
 
 export type PatchApiV1EnterprisesByEnterpriseIdStatusResponse = PatchApiV1EnterprisesByEnterpriseIdStatusResponses[keyof PatchApiV1EnterprisesByEnterpriseIdStatusResponses];
+
+export type PostApiV1EnterpriseRegistrationsStartData = {
+    body?: StartEnterpriseRegistrationRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/enterprise-registrations/start';
+};
+
+export type PostApiV1EnterpriseRegistrationsStartErrors = {
+    /**
+     * Invalid corporate email format or blocked personal/public webmail domain
+     */
+    400: unknown;
+    /**
+     * Corporate email or tax code is already registered or currently locked in active review
+     */
+    409: unknown;
+    /**
+     * Rate limit exceeded for registration initiation attempts
+     */
+    429: unknown;
+};
+
+export type PostApiV1EnterpriseRegistrationsStartResponses = {
+    /**
+     * Magic link dispatched successfully
+     */
+    200: StartEnterpriseRegistrationResponse;
+};
+
+export type PostApiV1EnterpriseRegistrationsStartResponse = PostApiV1EnterpriseRegistrationsStartResponses[keyof PostApiV1EnterpriseRegistrationsStartResponses];
+
+export type GetApiV1EnterpriseRegistrationsVerifyEmailData = {
+    body?: never;
+    path?: never;
+    query: {
+        token: string;
+    };
+    url: '/api/v1/enterprise-registrations/verify-email';
+};
+
+export type GetApiV1EnterpriseRegistrationsVerifyEmailErrors = {
+    /**
+     * Invalid, expired, or revoked verification token
+     */
+    400: unknown;
+};
+
+export type GetApiV1EnterpriseRegistrationsVerifyEmailResponses = {
+    /**
+     * Corporate email verified successfully
+     */
+    200: VerifyEnterpriseRegistrationEmailResponse;
+};
+
+export type GetApiV1EnterpriseRegistrationsVerifyEmailResponse = GetApiV1EnterpriseRegistrationsVerifyEmailResponses[keyof GetApiV1EnterpriseRegistrationsVerifyEmailResponses];
+
+export type PostApiV1EnterpriseRegistrationsInvitationsAcceptData = {
+    body?: AcceptInvitationRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/enterprise-registrations/invitations/accept';
+};
+
+export type PostApiV1EnterpriseRegistrationsInvitationsAcceptErrors = {
+    /**
+     * Invalid, expired, or already redeemed invitation token
+     */
+    400: unknown;
+    /**
+     * Invalid password for existing representative account
+     */
+    401: unknown;
+    /**
+     * Username already taken
+     */
+    409: unknown;
+};
+
+export type PostApiV1EnterpriseRegistrationsInvitationsAcceptResponses = {
+    /**
+     * Invitation accepted and account onboarding complete
+     */
+    200: AcceptInvitationResponse;
+};
+
+export type PostApiV1EnterpriseRegistrationsInvitationsAcceptResponse = PostApiV1EnterpriseRegistrationsInvitationsAcceptResponses[keyof PostApiV1EnterpriseRegistrationsInvitationsAcceptResponses];
+
+export type GetApiV1EnterpriseRegistrationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        status?: 'draft' | 'pending_review' | 'under_review' | 'approved' | 'rejected';
+        search?: string;
+    };
+    url: '/api/v1/enterprise-registrations';
+};
+
+export type GetApiV1EnterpriseRegistrationsErrors = {
+    /**
+     * Invalid pagination or filter parameters
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: administrative privilege required
+     */
+    403: unknown;
+};
+
+export type GetApiV1EnterpriseRegistrationsResponses = {
+    /**
+     * Paginated enterprise registration summaries
+     */
+    200: PaginatedEnterpriseRegistrationSummary;
+};
+
+export type GetApiV1EnterpriseRegistrationsResponse = GetApiV1EnterpriseRegistrationsResponses[keyof GetApiV1EnterpriseRegistrationsResponses];
+
+export type GetApiV1EnterpriseRegistrationsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprise-registrations/{id}';
+};
+
+export type GetApiV1EnterpriseRegistrationsByIdErrors = {
+    /**
+     * Invalid registration identifier format
+     */
+    400: unknown;
+    /**
+     * Registration case not found
+     */
+    404: unknown;
+};
+
+export type GetApiV1EnterpriseRegistrationsByIdResponses = {
+    /**
+     * Enterprise registration case details and snapshot
+     */
+    200: EnterpriseRegistrationDetail;
+};
+
+export type GetApiV1EnterpriseRegistrationsByIdResponse = GetApiV1EnterpriseRegistrationsByIdResponses[keyof GetApiV1EnterpriseRegistrationsByIdResponses];
+
+export type PatchApiV1EnterpriseRegistrationsByIdDraftData = {
+    body?: SaveEnterpriseRegistrationDraftRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprise-registrations/{id}/draft';
+};
+
+export type PatchApiV1EnterpriseRegistrationsByIdDraftErrors = {
+    /**
+     * Validation failed on draft fields
+     */
+    400: unknown;
+    /**
+     * Registration case not found
+     */
+    404: unknown;
+    /**
+     * Version mismatch or registration case is no longer editable
+     */
+    409: unknown;
+};
+
+export type PatchApiV1EnterpriseRegistrationsByIdDraftResponses = {
+    /**
+     * Registration draft updated successfully
+     */
+    200: EnterpriseRegistrationDetail;
+};
+
+export type PatchApiV1EnterpriseRegistrationsByIdDraftResponse = PatchApiV1EnterpriseRegistrationsByIdDraftResponses[keyof PatchApiV1EnterpriseRegistrationsByIdDraftResponses];
+
+export type PostApiV1EnterpriseRegistrationsByIdDocumentsData = {
+    body: UploadLegalDocumentFormRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprise-registrations/{id}/documents';
+};
+
+export type PostApiV1EnterpriseRegistrationsByIdDocumentsErrors = {
+    /**
+     * Missing document file, non-PDF format, or exceeded 5MB size limit
+     */
+    400: unknown;
+    /**
+     * Registration case not found
+     */
+    404: unknown;
+    /**
+     * Registration case already submitted and locked against modifications
+     */
+    409: unknown;
+    /**
+     * Cloud storage service unconfigured or unavailable
+     */
+    503: unknown;
+};
+
+export type PostApiV1EnterpriseRegistrationsByIdDocumentsResponses = {
+    /**
+     * Legal document uploaded and recorded on draft successfully
+     */
+    201: LegalDocumentResponse;
+};
+
+export type PostApiV1EnterpriseRegistrationsByIdDocumentsResponse = PostApiV1EnterpriseRegistrationsByIdDocumentsResponses[keyof PostApiV1EnterpriseRegistrationsByIdDocumentsResponses];
+
+export type PostApiV1EnterpriseRegistrationsByIdSubmitData = {
+    body?: SubmitEnterpriseRegistrationRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprise-registrations/{id}/submit';
+};
+
+export type PostApiV1EnterpriseRegistrationsByIdSubmitErrors = {
+    /**
+     * Incomplete company profile or missing mandatory business license document
+     */
+    400: unknown;
+    /**
+     * Registration case not found
+     */
+    404: unknown;
+    /**
+     * Version mismatch or exclusive tax code/corporate email claim collision
+     */
+    409: unknown;
+};
+
+export type PostApiV1EnterpriseRegistrationsByIdSubmitResponses = {
+    /**
+     * Enterprise registration submitted successfully
+     */
+    200: SubmissionReceiptResponse;
+};
+
+export type PostApiV1EnterpriseRegistrationsByIdSubmitResponse = PostApiV1EnterpriseRegistrationsByIdSubmitResponses[keyof PostApiV1EnterpriseRegistrationsByIdSubmitResponses];
+
+export type PostApiV1EnterpriseRegistrationsByIdDecisionData = {
+    body?: AdminDecisionRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprise-registrations/{id}/decision';
+};
+
+export type PostApiV1EnterpriseRegistrationsByIdDecisionErrors = {
+    /**
+     * Incomplete verification checklist or rejection explanation shorter than 20 characters
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: administrative privilege required
+     */
+    403: unknown;
+    /**
+     * Registration case not found
+     */
+    404: unknown;
+    /**
+     * Case is not awaiting decision or optimistic concurrency version mismatch
+     */
+    409: unknown;
+};
+
+export type PostApiV1EnterpriseRegistrationsByIdDecisionResponses = {
+    /**
+     * Administrative decision processed successfully
+     */
+    200: AdminDecisionResponse;
+};
+
+export type PostApiV1EnterpriseRegistrationsByIdDecisionResponse = PostApiV1EnterpriseRegistrationsByIdDecisionResponses[keyof PostApiV1EnterpriseRegistrationsByIdDecisionResponses];
 
 export type GetApiV1MeApplicationsData = {
     body?: never;
@@ -1921,3 +3124,951 @@ export type PatchApiV1MeApplicationsByIdWithdrawResponses = {
 };
 
 export type PatchApiV1MeApplicationsByIdWithdrawResponse = PatchApiV1MeApplicationsByIdWithdrawResponses[keyof PatchApiV1MeApplicationsByIdWithdrawResponses];
+
+export type GetApiV1InterviewsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        status?: string;
+        mode?: 'online' | 'onsite';
+        jobId?: string;
+        applicationId?: string;
+        interviewerId?: string;
+        search?: string;
+        from?: string | null;
+        to?: string | null;
+        sortBy?: 'scheduledAt' | 'createdAt' | 'status';
+        sortOrder?: 'asc' | 'desc';
+    };
+    url: '/api/v1/interviews';
+};
+
+export type GetApiV1InterviewsErrors = {
+    /**
+     * Invalid or contradictory filter, sort or paging values
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+};
+
+export type GetApiV1InterviewsResponses = {
+    /**
+     * Paginated interviews
+     */
+    200: InterviewListResponse;
+};
+
+export type GetApiV1InterviewsResponse = GetApiV1InterviewsResponses[keyof GetApiV1InterviewsResponses];
+
+export type PostApiV1InterviewsData = {
+    body: CreateInterviewRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/interviews';
+};
+
+export type PostApiV1InterviewsErrors = {
+    /**
+     * Validation failed, time in the past, or an interviewer is not eligible
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Application not found or not part of the recruiter's enterprise
+     */
+    404: unknown;
+    /**
+     * APPLICATION_NOT_SCHEDULABLE, APPLICANT_UNAVAILABLE, INTERVIEWER_CONFLICT or APPLICANT_CONFLICT
+     */
+    409: unknown;
+};
+
+export type PostApiV1InterviewsResponses = {
+    /**
+     * Interview scheduled
+     */
+    201: InterviewDetailDto;
+};
+
+export type PostApiV1InterviewsResponse = PostApiV1InterviewsResponses[keyof PostApiV1InterviewsResponses];
+
+export type GetApiV1InterviewsCalendarData = {
+    body?: never;
+    path?: never;
+    query?: {
+        status?: string;
+        mode?: 'online' | 'onsite';
+        jobId?: string;
+        applicationId?: string;
+        interviewerId?: string;
+        search?: string;
+        from?: string | null;
+        to?: string | null;
+    };
+    url: '/api/v1/interviews/calendar';
+};
+
+export type GetApiV1InterviewsCalendarErrors = {
+    /**
+     * Missing window, from after to, or a window longer than 62 days
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+};
+
+export type GetApiV1InterviewsCalendarResponses = {
+    /**
+     * Interviews in the window
+     */
+    200: InterviewCalendarResponse;
+};
+
+export type GetApiV1InterviewsCalendarResponse = GetApiV1InterviewsCalendarResponses[keyof GetApiV1InterviewsCalendarResponses];
+
+export type GetApiV1InterviewsApplicationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        search?: string;
+        limit?: number;
+    };
+    url: '/api/v1/interviews/applications';
+};
+
+export type GetApiV1InterviewsApplicationsErrors = {
+    /**
+     * Invalid search or limit
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+};
+
+export type GetApiV1InterviewsApplicationsResponses = {
+    /**
+     * Matching applications
+     */
+    200: SchedulableApplicationListResponse;
+};
+
+export type GetApiV1InterviewsApplicationsResponse = GetApiV1InterviewsApplicationsResponses[keyof GetApiV1InterviewsApplicationsResponses];
+
+export type GetApiV1InterviewsInterviewersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        search?: string;
+        limit?: number;
+    };
+    url: '/api/v1/interviews/interviewers';
+};
+
+export type GetApiV1InterviewsInterviewersErrors = {
+    /**
+     * Invalid search or limit
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+};
+
+export type GetApiV1InterviewsInterviewersResponses = {
+    /**
+     * Matching recruiters
+     */
+    200: InterviewerListResponse;
+};
+
+export type GetApiV1InterviewsInterviewersResponse = GetApiV1InterviewsInterviewersResponses[keyof GetApiV1InterviewsInterviewersResponses];
+
+export type DeleteApiV1InterviewsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/interviews/{id}';
+};
+
+export type DeleteApiV1InterviewsByIdErrors = {
+    /**
+     * Invalid interview ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Interview not found, or it belongs to another enterprise
+     */
+    404: unknown;
+    /**
+     * INTERVIEW_COMPLETED or INTERVIEW_STATE_CHANGED
+     */
+    409: unknown;
+};
+
+export type DeleteApiV1InterviewsByIdResponses = {
+    /**
+     * Interview deleted
+     */
+    204: void;
+};
+
+export type DeleteApiV1InterviewsByIdResponse = DeleteApiV1InterviewsByIdResponses[keyof DeleteApiV1InterviewsByIdResponses];
+
+export type GetApiV1InterviewsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/interviews/{id}';
+};
+
+export type GetApiV1InterviewsByIdErrors = {
+    /**
+     * Invalid interview ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Interview not found, or it belongs to another enterprise
+     */
+    404: unknown;
+};
+
+export type GetApiV1InterviewsByIdResponses = {
+    /**
+     * Interview detail
+     */
+    200: InterviewDetailDto;
+};
+
+export type GetApiV1InterviewsByIdResponse = GetApiV1InterviewsByIdResponses[keyof GetApiV1InterviewsByIdResponses];
+
+export type PatchApiV1InterviewsByIdData = {
+    body: UpdateInterviewRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/interviews/{id}';
+};
+
+export type PatchApiV1InterviewsByIdErrors = {
+    /**
+     * Validation failed, time in the past, or an interviewer is not eligible
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Interview not found, or it belongs to another enterprise
+     */
+    404: unknown;
+    /**
+     * INTERVIEW_NOT_EDITABLE, INTERVIEWER_CONFLICT, APPLICANT_CONFLICT or INTERVIEW_STATE_CHANGED
+     */
+    409: unknown;
+};
+
+export type PatchApiV1InterviewsByIdResponses = {
+    /**
+     * Interview updated
+     */
+    200: InterviewDetailDto;
+};
+
+export type PatchApiV1InterviewsByIdResponse = PatchApiV1InterviewsByIdResponses[keyof PatchApiV1InterviewsByIdResponses];
+
+export type PatchApiV1InterviewsByIdStatusData = {
+    body: UpdateInterviewStatusRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/interviews/{id}/status';
+};
+
+export type PatchApiV1InterviewsByIdStatusErrors = {
+    /**
+     * Unsupported status or invalid note
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Interview not found, or it belongs to another enterprise
+     */
+    404: unknown;
+    /**
+     * INTERVIEW_STATUS_FINAL, INTERVIEW_NOT_ENDED or INTERVIEW_STATE_CHANGED
+     */
+    409: unknown;
+};
+
+export type PatchApiV1InterviewsByIdStatusResponses = {
+    /**
+     * Status updated
+     */
+    200: InterviewDetailDto;
+};
+
+export type PatchApiV1InterviewsByIdStatusResponse = PatchApiV1InterviewsByIdStatusResponses[keyof PatchApiV1InterviewsByIdStatusResponses];
+
+export type PatchApiV1UsersByIdRoleData = {
+    body: UpdateUserRoleRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/role';
+};
+
+export type PatchApiV1UsersByIdRoleErrors = {
+    /**
+     * Invalid account ID or role change
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Account not found
+     */
+    404: unknown;
+    /**
+     * Invalid transition, stale version or final Enterprise Administrator
+     */
+    409: unknown;
+};
+
+export type PatchApiV1UsersByIdRoleResponses = {
+    /**
+     * Updated account role
+     */
+    200: UserDto;
+};
+
+export type PatchApiV1UsersByIdRoleResponse = PatchApiV1UsersByIdRoleResponses[keyof PatchApiV1UsersByIdRoleResponses];
+
+export type PatchApiV1UsersByIdEmergencySuspensionData = {
+    body: EmergencyUserSuspensionRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/emergency-suspension';
+};
+
+export type PatchApiV1UsersByIdEmergencySuspensionErrors = {
+    /**
+     * Invalid request
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Account not found
+     */
+    404: unknown;
+    /**
+     * Platform administrator cannot self-suspend or suspend the final platform administrator
+     */
+    409: unknown;
+};
+
+export type PatchApiV1UsersByIdEmergencySuspensionResponses = {
+    /**
+     * Account suspended and sessions revoked
+     */
+    200: UserDto;
+};
+
+export type PatchApiV1UsersByIdEmergencySuspensionResponse = PatchApiV1UsersByIdEmergencySuspensionResponses[keyof PatchApiV1UsersByIdEmergencySuspensionResponses];
+
+export type PatchApiV1UsersByIdStatusData = {
+    body: UpdateUserStatusRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/status';
+};
+
+export type PatchApiV1UsersByIdStatusErrors = {
+    /**
+     * Invalid status transition input
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Account not found
+     */
+    404: unknown;
+    /**
+     * Illegal transition, stale version, final System Administrator, or final Enterprise Administrator
+     */
+    409: unknown;
+};
+
+export type PatchApiV1UsersByIdStatusResponses = {
+    /**
+     * Updated account status
+     */
+    200: UserDto;
+};
+
+export type PatchApiV1UsersByIdStatusResponse = PatchApiV1UsersByIdStatusResponses[keyof PatchApiV1UsersByIdStatusResponses];
+
+export type GetApiV1UsersByIdInvitationData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/invitation';
+};
+
+export type GetApiV1UsersByIdInvitationErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Account not found
+     */
+    404: unknown;
+};
+
+export type GetApiV1UsersByIdInvitationResponses = {
+    /**
+     * Latest invitation delivery and lifecycle state, or null
+     */
+    200: UserInvitationStatusResponse;
+};
+
+export type GetApiV1UsersByIdInvitationResponse = GetApiV1UsersByIdInvitationResponses[keyof GetApiV1UsersByIdInvitationResponses];
+
+export type PatchApiV1UsersByIdInvitationData = {
+    body: CancelInvitationRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/invitation';
+};
+
+export type PatchApiV1UsersByIdInvitationErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Account is no longer invited or version is stale
+     */
+    409: unknown;
+    /**
+     * No pending invitation exists
+     */
+    410: unknown;
+};
+
+export type PatchApiV1UsersByIdInvitationResponses = {
+    /**
+     * Invitation cancelled
+     */
+    200: {
+        success: true;
+    };
+};
+
+export type PatchApiV1UsersByIdInvitationResponse = PatchApiV1UsersByIdInvitationResponses[keyof PatchApiV1UsersByIdInvitationResponses];
+
+export type GetApiV1UserInvitationsPreviewData = {
+    body?: never;
+    path?: never;
+    query: {
+        token: string;
+    };
+    url: '/api/v1/user-invitations/preview';
+};
+
+export type GetApiV1UserInvitationsPreviewErrors = {
+    /**
+     * Invalid token format
+     */
+    400: unknown;
+    /**
+     * Account or enterprise state no longer permits acceptance
+     */
+    409: unknown;
+    /**
+     * Invitation is expired, revoked or already used
+     */
+    410: unknown;
+};
+
+export type GetApiV1UserInvitationsPreviewResponses = {
+    /**
+     * Invitation recipient, role and company
+     */
+    200: InvitationPreviewResponse;
+};
+
+export type GetApiV1UserInvitationsPreviewResponse = GetApiV1UserInvitationsPreviewResponses[keyof GetApiV1UserInvitationsPreviewResponses];
+
+export type PostApiV1UsersByIdInvitationDeliveriesData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/invitation-deliveries';
+};
+
+export type PostApiV1UsersByIdInvitationDeliveriesErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * No resendable invitation exists
+     */
+    410: unknown;
+};
+
+export type PostApiV1UsersByIdInvitationDeliveriesResponses = {
+    /**
+     * Invitation replaced and delivery attempted
+     */
+    202: InvitationDeliveryResponse;
+};
+
+export type PostApiV1UsersByIdInvitationDeliveriesResponse = PostApiV1UsersByIdInvitationDeliveriesResponses[keyof PostApiV1UsersByIdInvitationDeliveriesResponses];
+
+export type PostApiV1UserInvitationsAcceptData = {
+    body: AcceptNewAccountInvitationRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/user-invitations/accept';
+};
+
+export type PostApiV1UserInvitationsAcceptErrors = {
+    /**
+     * Invalid invitation payload
+     */
+    400: unknown;
+    /**
+     * Account or enterprise state no longer permits acceptance
+     */
+    409: unknown;
+    /**
+     * Invitation is expired, revoked or already used
+     */
+    410: unknown;
+};
+
+export type PostApiV1UserInvitationsAcceptResponses = {
+    /**
+     * Account activated; credentials are now available to the invitee
+     */
+    200: AcceptedInvitationResponse;
+};
+
+export type PostApiV1UserInvitationsAcceptResponse = PostApiV1UserInvitationsAcceptResponses[keyof PostApiV1UserInvitationsAcceptResponses];
+
+export type GetApiV1UsersByIdHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        page?: number;
+        limit?: number;
+        action?: 'account_invited' | 'profile_updated' | 'role_changed' | 'status_suspended' | 'status_reopened' | 'invitation_accepted' | 'invitation_revoked' | 'email_change_requested' | 'email_changed';
+        group?: Array<'account' | 'profile' | 'email'>;
+        actor?: 'admin' | 'self';
+        from?: string | null;
+        to?: string | null;
+    };
+    url: '/api/v1/users/{id}/history';
+};
+
+export type GetApiV1UsersByIdHistoryErrors = {
+    /**
+     * Invalid account ID or pagination/filter input
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * Account not found
+     */
+    404: unknown;
+    /**
+     * History store unavailable
+     */
+    503: unknown;
+};
+
+export type GetApiV1UsersByIdHistoryResponses = {
+    /**
+     * Append-only account history
+     */
+    200: UserAuditHistoryResponse;
+};
+
+export type GetApiV1UsersByIdHistoryResponse = GetApiV1UsersByIdHistoryResponses[keyof GetApiV1UsersByIdHistoryResponses];
+
+export type PostApiV1UsersByIdEmailChangeRequestsData = {
+    body: RequestUserEmailChange;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{id}/email-change-requests';
+};
+
+export type PostApiV1UsersByIdEmailChangeRequestsErrors = {
+    /**
+     * Invalid email or version
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Active System Administrator required
+     */
+    403: unknown;
+    /**
+     * User not found
+     */
+    404: unknown;
+    /**
+     * Email is already used or account version is stale
+     */
+    409: unknown;
+};
+
+export type PostApiV1UsersByIdEmailChangeRequestsResponses = {
+    /**
+     * Request saved; email delivery was attempted
+     */
+    202: unknown;
+};
+
+export type PostApiV1UserEmailChangesConfirmData = {
+    body: ConfirmUserEmailChange;
+    path?: never;
+    query?: never;
+    url: '/api/v1/user-email-changes/confirm';
+};
+
+export type PostApiV1UserEmailChangesConfirmErrors = {
+    /**
+     * Invalid confirmation payload
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Request belongs to another user or current password is invalid
+     */
+    403: unknown;
+    /**
+     * Email conflict or stale account version
+     */
+    409: unknown;
+    /**
+     * Request is expired, revoked or already completed
+     */
+    410: unknown;
+    /**
+     * Too many failed confirmation attempts for this account or IP
+     */
+    429: unknown;
+};
+
+export type PostApiV1UserEmailChangesConfirmResponses = {
+    /**
+     * Email changed; old sessions and pending identity tokens are invalidated
+     */
+    200: unknown;
+};
+
+export type GetApiV1MeCertificateLinksData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        search?: string;
+    };
+    url: '/api/v1/me/certificate-links';
+};
+
+export type GetApiV1MeCertificateLinksErrors = {
+    /**
+     * Invalid pagination
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active verified Candidate account required
+     */
+    403: unknown;
+    /**
+     * Certificate link storage unavailable
+     */
+    503: unknown;
+};
+
+export type GetApiV1MeCertificateLinksResponses = {
+    /**
+     * Stable page of available owned links
+     */
+    200: PaginatedCertificateLinks;
+};
+
+export type GetApiV1MeCertificateLinksResponse = GetApiV1MeCertificateLinksResponses[keyof GetApiV1MeCertificateLinksResponses];
+
+export type PostApiV1MeCertificateLinksData = {
+    body: CreateCertificateLinkRequest;
+    headers: {
+        /**
+         * Unique operation key. Reuse only when retrying the exact same request.
+         */
+        'Idempotency-Key': string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/certificate-links';
+};
+
+export type PostApiV1MeCertificateLinksErrors = {
+    /**
+     * Invalid request or missing Idempotency-Key
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active verified Candidate account required
+     */
+    403: unknown;
+    /**
+     * Duplicate URL or idempotency key reused with different content
+     */
+    409: unknown;
+    /**
+     * Certificate link storage unavailable
+     */
+    503: unknown;
+};
+
+export type PostApiV1MeCertificateLinksResponses = {
+    /**
+     * Previously committed request replayed
+     */
+    200: CertificateLink;
+    /**
+     * Certificate link created
+     */
+    201: CertificateLink;
+};
+
+export type PostApiV1MeCertificateLinksResponse = PostApiV1MeCertificateLinksResponses[keyof PostApiV1MeCertificateLinksResponses];
+
+export type DeleteApiV1MeCertificateLinksByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query: {
+        expectedVersion: number;
+    };
+    url: '/api/v1/me/certificate-links/{id}';
+};
+
+export type DeleteApiV1MeCertificateLinksByIdErrors = {
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active verified Candidate account required
+     */
+    403: unknown;
+    /**
+     * Certificate link not found
+     */
+    404: unknown;
+    /**
+     * VERSION_CONFLICT
+     */
+    409: unknown;
+    /**
+     * Certificate link storage unavailable
+     */
+    503: unknown;
+};
+
+export type DeleteApiV1MeCertificateLinksByIdResponses = {
+    /**
+     * Certificate link deleted
+     */
+    204: void;
+};
+
+export type DeleteApiV1MeCertificateLinksByIdResponse = DeleteApiV1MeCertificateLinksByIdResponses[keyof DeleteApiV1MeCertificateLinksByIdResponses];
+
+export type PatchApiV1MeCertificateLinksByIdData = {
+    body: UpdateCertificateLinkRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/me/certificate-links/{id}';
+};
+
+export type PatchApiV1MeCertificateLinksByIdErrors = {
+    /**
+     * Invalid fields or expiry before issued date
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active verified Candidate account required
+     */
+    403: unknown;
+    /**
+     * Certificate link not found
+     */
+    404: unknown;
+    /**
+     * VERSION_CONFLICT or DUPLICATE_CERTIFICATE_URL
+     */
+    409: unknown;
+    /**
+     * Certificate link storage unavailable
+     */
+    503: unknown;
+};
+
+export type PatchApiV1MeCertificateLinksByIdResponses = {
+    /**
+     * Updated certificate link
+     */
+    200: CertificateLink;
+};
+
+export type PatchApiV1MeCertificateLinksByIdResponse = PatchApiV1MeCertificateLinksByIdResponses[keyof PatchApiV1MeCertificateLinksByIdResponses];

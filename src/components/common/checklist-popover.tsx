@@ -67,7 +67,7 @@ export function ChecklistPopover<T extends string>({
             return (
               <button
                 aria-pressed={active}
-                className={cn("h-7 cursor-pointer rounded-full border px-3 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-primary/40", active ? "border-foreground bg-foreground text-background" : "border-(--border-strong) bg-card text-foreground hover:bg-muted")}
+                className={cn("h-7 cursor-pointer rounded-full border px-3 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-primary/40", active ? "border-foreground bg-foreground text-background" : "border-border-strong bg-card text-foreground hover:bg-muted")}
                 key={preset.label}
                 onClick={() => commit(preset.values)}
                 type="button"
@@ -84,7 +84,7 @@ export function ChecklistPopover<T extends string>({
             return (
               <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-[13.5px] hover:bg-muted" key={option.value}>
                 <input checked={checked} className="peer sr-only" onChange={() => toggle(option.value)} type="checkbox" />
-                <span aria-hidden className={cn("grid size-[18px] shrink-0 place-items-center rounded-[5px] border-[1.5px] peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40", checked ? "border-foreground bg-foreground text-background" : "border-(--line-dashed) bg-card")}>
+                <span aria-hidden className={cn("grid size-[18px] shrink-0 place-items-center rounded-[5px] border-[1.5px] peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40", checked ? "border-foreground bg-foreground text-background" : "border-line-dashed bg-card")}>
                   {checked ? <Check className="size-3" strokeWidth={3} /> : null}
                 </span>
                 {option.dotClass ? <span aria-hidden className={cn("size-2 rounded-full", option.dotClass)} /> : null}

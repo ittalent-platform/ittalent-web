@@ -18,14 +18,44 @@ const DEFAULT_OPTIONS: ViewToggleOption<ViewMode>[] = [
 export function ViewToggle<T extends string = ViewMode>({
   onChange,
   options = DEFAULT_OPTIONS as ViewToggleOption<T>[],
+  showLabels = false,
   value,
 }: {
   onChange: (value: T) => void;
   options?: ViewToggleOption<T>[];
+  /** Write each option's label beside its icon; the selected option is then filled itself, as the options differ in width. */
+  showLabels?: boolean;
   value: T;
 }) {
   if (options.length === 0) {
     return null;
+  }
+
+  if (showLabels) {
+    return (
+      <div className="inline-flex rounded-full border border-(--border-strong) bg-card p-1" role="group">
+        {options.map((option) => {
+          const isSelected = option.value === value;
+          const Icon = option.icon;
+
+          return (
+            <button
+              aria-pressed={isSelected}
+              className={cn(
+                "inline-flex h-9 items-center justify-center gap-2 rounded-full px-4 text-[13.5px] font-semibold outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary/40",
+                isSelected ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+              )}
+              key={option.value}
+              onClick={() => onChange(option.value)}
+              type="button"
+            >
+              <Icon aria-hidden className="size-4" />
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    );
   }
 
   const selectedIndex = Math.max(
@@ -35,7 +65,7 @@ export function ViewToggle<T extends string = ViewMode>({
 
   return (
     <div
-      className="relative inline-grid rounded-full border border-(--border-strong) bg-card p-1"
+      className="relative inline-grid rounded-full border border-border-strong bg-card p-1"
       role="group"
       /* dynamic: runtime value */
       style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}

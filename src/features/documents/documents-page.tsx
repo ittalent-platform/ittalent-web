@@ -294,7 +294,7 @@ export function DocumentsPage() {
             </SelectContent>
           </Select>
           <Button
-            className="h-11 px-[22px] text-sm font-semibold"
+            className="font-semibold" size="xl"
             disabled={upload.isPending}
             onClick={() => input.current?.click()}
             shape="pill"

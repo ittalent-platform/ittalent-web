@@ -15,6 +15,7 @@ import {
   NEW_JOB_WINDOW_MS,
   TOP_COMPANIES_COUNT,
 } from "./home.constants";
+import { unwrap } from "@/api/request-error";
 
 export type HomeJob = JobPosting & { companyName: string };
 
@@ -36,20 +37,6 @@ export type HomeData = {
   latestJobs: HomeJob[];
   topCompanies: HomeCompany[];
 };
-
-function unwrap<T>(result: {
-  data?: T;
-  error?: unknown;
-  response?: Response;
-}): T {
-  if (result.error || !result.data) {
-    throw Object.assign(
-      result.error && typeof result.error === "object" ? result.error : {},
-      { status: result.response?.status },
-    );
-  }
-  return result.data;
-}
 
 /** One pair of requests feeds the hero cards, stats, city list, latest jobs and top companies. */
 export async function fetchHomeData(now = Date.now()): Promise<HomeData> {

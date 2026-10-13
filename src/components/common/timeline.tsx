@@ -11,6 +11,8 @@ export type TimelineTone = "error" | "info" | "neutral" | "orange" | "success" |
 export type TimelineEntry = {
   atIso: string;
   by?: string;
+  /** A short line under the date, e.g. the reason or an outcome ("Invitation sent to …"). */
+  detail?: string;
   label: string;
   message?: string;
   tone: TimelineTone;
@@ -28,17 +30,18 @@ const toneDotClass: Record<TimelineTone, string> = {
 
 const DEFAULT_MAX_VISIBLE = 5;
 
-function TimelineList({ entries, formatDate }: { entries: TimelineEntry[]; formatDate: (iso: string) => string }) {
+/** Dots (one per entry, coloured by tone) joined by a thin vertical line; bold title, muted "date · by who" below. */
+export function TimelineList({ entries, formatDate }: { entries: TimelineEntry[]; formatDate: (iso: string) => string }) {
   const { t } = useTranslation();
   const [messageEntry, setMessageEntry] = useState<TimelineEntry | null>(null);
   return (
-    <><ul className="flex flex-col">
+    <><ul className="flex flex-col" data-testid="timeline">
       {entries.map((entry, index) => (
-        <li className="flex min-w-0 gap-3 pb-5 last:pb-0" key={`${entry.label}-${entry.atIso}-${index}`}>
-          <div className="relative flex w-3 shrink-0 flex-col items-center">
-            <span className={cn("z-10 mt-1 size-3 shrink-0 rounded-full", toneDotClass[entry.tone])} />
+        <li className="flex min-w-0 gap-3 pb-4 last:pb-0" key={`${entry.label}-${entry.atIso}-${index}`}>
+          <div className="relative flex w-2.5 shrink-0 flex-col items-center">
+            <span aria-hidden data-tone={entry.tone} className={cn("z-10 mt-[5px] size-2.5 shrink-0 rounded-full", toneDotClass[entry.tone])} />
             {index < entries.length - 1 ? (
-              <span className="absolute top-4 -bottom-5 left-1/2 w-px -translate-x-1/2 bg-border" />
+              <span aria-hidden data-testid="timeline-line" className="absolute top-[19px] -bottom-5 left-1/2 w-px -translate-x-1/2 bg-border" />
             ) : null}
           </div>
           <div className="min-w-0">
@@ -47,6 +50,7 @@ function TimelineList({ entries, formatDate }: { entries: TimelineEntry[]; forma
               {formatDate(entry.atIso)}
               {entry.by ? ` · ${t("timeline.by", { name: entry.by })}` : null}
             </p>
+            {entry.detail ? <p className="wrap-anywhere text-[13px] text-muted-foreground">{entry.detail}</p> : null}
           </div>
         </li>
       ))}
@@ -59,10 +63,12 @@ type TimelineProps = {
   formatDate: (iso: string) => string;
   /** Entries beyond this count collapse behind a "View all" link that opens the full history in a dialog. */
   maxVisible?: number;
+  /** Hide the entry count beside the title; defaults to showing it. */
+  showCount?: boolean;
   title: string;
 };
 
-export function Timeline({ entries, formatDate, maxVisible = DEFAULT_MAX_VISIBLE, title }: TimelineProps) {
+export function Timeline({ entries, formatDate, maxVisible = DEFAULT_MAX_VISIBLE, showCount = true, title }: TimelineProps) {
   const { t } = useTranslation();
   const [isFullHistoryOpen, setIsFullHistoryOpen] = useState(false);
   const hasMore = entries.length > maxVisible;
@@ -73,7 +79,7 @@ export function Timeline({ entries, formatDate, maxVisible = DEFAULT_MAX_VISIBLE
       <Card className="min-w-0 rounded-2xl border-border bg-card shadow-none">
         <CardHeader className="flex-row items-center justify-between gap-2 p-5 pb-4">
           <p className="text-[11.5px] font-bold uppercase tracking-wider text-muted-foreground">{title}</p>
-          <span className="itt-mono text-[11px] text-muted-foreground">{entries.length}</span>
+          {showCount ? <span className="itt-mono text-[11px] text-muted-foreground">{entries.length}</span> : null}
         </CardHeader>
         <CardContent className="min-w-0 p-5 pt-0">
           <TimelineList entries={visibleEntries} formatDate={formatDate} />

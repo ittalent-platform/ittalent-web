@@ -7,7 +7,6 @@ import type {
   JobPosting,
   UpdateJobPostingRequest,
 } from "@/api/generated/types.gen";
-import { AdminPageHeader } from "@/components/common/admin-page-header";
 import { Breadcrumb } from "@/components/common/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/toast/toast-provider";
@@ -85,10 +84,6 @@ export function JobPostingCreatePage() {
           { label: t("jobPostings.createTitle") },
         ]}
       />
-      <AdminPageHeader
-        description={t("jobPostings.form.createDescription")}
-        title={t("jobPostings.createTitle")}
-      />
       <JobPostingEditor />
     </div>
   );
@@ -124,10 +119,6 @@ export function JobPostingEditPage() {
           },
           { label: t("jobPostings.editTitle") },
         ]}
-      />
-      <AdminPageHeader
-        description={t("jobPostings.form.editDescription")}
-        title={t("jobPostings.editTitle")}
       />
       <JobPostingEditor posting={query.data} />
     </div>

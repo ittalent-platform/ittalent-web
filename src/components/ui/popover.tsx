@@ -11,6 +11,10 @@ function PopoverTrigger(props: React.ComponentProps<typeof PopoverPrimitive.Trig
   return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
 }
 
+function PopoverClose(props: React.ComponentProps<typeof PopoverPrimitive.Close>) {
+  return <PopoverPrimitive.Close data-slot="popover-close" {...props} />
+}
+
 function PopoverContent({ align = "end", className, sideOffset = 8, ...props }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
   return (
     <PopoverPrimitive.Portal>
@@ -22,6 +26,9 @@ function PopoverContent({ align = "end", className, sideOffset = 8, ...props }: 
         )}
         collisionPadding={16}
         data-slot="popover-content"
+        // The portal sits outside an open Dialog, whose scroll lock would swallow the wheel/touch scroll of long lists.
+        onTouchMove={(event) => event.stopPropagation()}
+        onWheel={(event) => event.stopPropagation()}
         sideOffset={sideOffset}
         {...props}
       />
@@ -29,4 +36,4 @@ function PopoverContent({ align = "end", className, sideOffset = 8, ...props }: 
   )
 }
 
-export { Popover, PopoverContent, PopoverTrigger }
+export { Popover, PopoverClose, PopoverContent, PopoverTrigger }

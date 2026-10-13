@@ -16,92 +16,30 @@ import { Link, useNavigate, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { useSession } from "@/auth/use-session";
-import { getErrorStatus } from "@/lib/api-errors";
-import {
-  getApiV1EnterprisesByEnterpriseId,
-  getApiV1JobPostings,
-  getApiV1JobPostingsByIdPublic,
-  type EnterpriseDetailDto,
-  type JobPosting,
-} from "@/api/generated";
+import { HTTP_NOT_FOUND } from "@/api/http-status";
+import { requestStatus } from "@/api/request-error";
 
 import { ApplyButton } from "./apply-button";
-
-type Job = {
-  _id: string;
-  enterpriseId?: string;
-  title: string;
-  slug: string;
-  location?: string;
-  employment_type?: string;
-  salary_min?: number;
-  salary_max?: number;
-  currency?: string;
-  level?: string;
-  aboutTheRole?: string;
-  description?: string;
-  requirements?: string;
-  benefits?: string;
-  openings?: number;
-  expires_at?: string;
-  createdAt?: string;
-};
-
-const toJob = (dto: JobPosting): Job => ({
-  _id: dto.id,
-  enterpriseId: dto.enterpriseId,
-  title: dto.title,
-  slug: dto.id,
-  location: dto.location,
-  employment_type: dto.employmentType,
-  salary_min: dto.salaryMin,
-  salary_max: dto.salaryMax,
-  currency: dto.currency,
-  level: dto.level,
-  description: dto.description,
-  requirements: dto.requirements,
-  benefits: dto.benefits,
-  openings: dto.openings,
-  expires_at: dto.expiresAt,
-  createdAt: dto.createdAt,
-});
-
-type Enterprise = {
-  id: string;
-  name: string;
-  logoUrl?: string;
-  industry?: string;
-  location?: string;
-  shortDescription?: string;
-  description?: string;
-  website?: string;
-};
-
-const toEnterprise = (dto: EnterpriseDetailDto): Enterprise => ({
-  id: dto.id,
-  name: dto.name,
-  logoUrl: dto.logoUrl ?? undefined,
-  industry: dto.industry ?? undefined,
-  location: [dto.address.city, dto.address.country].filter(Boolean).join(", ") || undefined,
-  shortDescription: dto.shortDescription ?? undefined,
-  description: dto.description ?? undefined,
-  website: dto.website ?? undefined,
-});
 import {
-  companyInitials,
+  loadEnterprise,
+  loadEnterpriseOpenJobs,
+  loadPublicJob,
+  publicKeys,
+  type PublicJob as Job,
+} from "@/features/public-site/shared/public-site.data";
+import {
   EMPLOYMENT_LABELS,
   formatDeadline,
   formatSalaryCard,
   LEVEL_LABELS,
-  logoPalette,
   postedAgo,
 } from "./career-format";
 import { StateCard } from "./state-card";
+import { LogoTile } from "@/components/common/logo-tile";
+import { CARD_TITLE, PILL_PRIMARY, PILL_SECONDARY } from "@/features/public-site/shared/market-styles";
 
-const h2Class =
-  "m-0 font-['Space_Grotesk',sans-serif] text-[21px] font-semibold";
 const cardClass =
-  "flex flex-col gap-3.5 rounded-2xl border border-mkt-line bg-white p-5 md:p-7";
+  "flex flex-col gap-3.5 market-card p-5 md:p-7";
 
 function linesOf(text?: string) {
   return (text ?? "")
@@ -181,39 +119,22 @@ export function CareerJobPage() {
   const { data: session } = useSession();
 
   const { data, error, isError, isLoading, refetch } = useQuery({
-    queryKey: ["job", slug],
-    queryFn: async () => {
-      const result = await getApiV1JobPostingsByIdPublic({ path: { id: slug! } });
-      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      return toJob(result.data);
-    },
+    queryKey: publicKeys.job(slug),
+    queryFn: () => loadPublicJob(slug!),
     enabled: !!slug,
   });
   const job: Job | undefined = data;
 
   const enterpriseId = job?.enterpriseId;
   const { data: company } = useQuery({
-    queryKey: ["enterprise", enterpriseId],
-    queryFn: async () => {
-      const result = await getApiV1EnterprisesByEnterpriseId({ path: { enterpriseId: enterpriseId! } });
-      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      return toEnterprise(result.data);
-    },
+    queryKey: publicKeys.enterprise(enterpriseId),
+    queryFn: () => loadEnterprise(enterpriseId!),
     enabled: !!enterpriseId,
     staleTime: 60_000,
   });
   const { data: companyJobs } = useQuery({
-    queryKey: ["enterprise-jobs", enterpriseId],
-    queryFn: async () => {
-      const result = await getApiV1JobPostings({ query: { enterprise_id: enterpriseId!, limit: 100, page: 1 } });
-      if (result.error || !result.data) throw Object.assign(result.error ?? {}, { status: result.response?.status });
-      const now = Date.now();
-      const jobs = result.data.items
-        .filter((item) => item.enterpriseId === enterpriseId)
-        .filter((item) => !item.expiresAt || new Date(item.expiresAt).getTime() >= now)
-        .map(toJob);
-      return jobs;
-    },
+    queryKey: publicKeys.enterpriseJobs(enterpriseId),
+    queryFn: () => loadEnterpriseOpenJobs(enterpriseId!),
     enabled: !!enterpriseId,
     staleTime: 60_000,
   });
@@ -240,7 +161,7 @@ export function CareerJobPage() {
     );
   }
 
-  if (isError && getErrorStatus(error) !== 404) {
+  if (isError && requestStatus(error) !== HTTP_NOT_FOUND) {
     return (
       <PageShell>
         <div className="px-4 py-16 md:px-12">
@@ -252,12 +173,12 @@ export function CareerJobPage() {
                 className="size-[26px] text-mkt-danger"
               />
             }
-            iconBg="#fbe9e7"
+            iconClassName="bg-mkt-danger-bg"
             title="We couldn't load this job"
           >
             <div className="flex flex-wrap justify-center gap-2.5">
               <button
-                className="flex h-10 items-center gap-2 rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+                className={PILL_PRIMARY}
                 onClick={() => refetch()}
                 type="button"
               >
@@ -265,7 +186,7 @@ export function CareerJobPage() {
                 Try again
               </button>
               <Link
-                className="flex h-10 items-center rounded-full border border-mkt-line-strong bg-white px-[18px] text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+                className={PILL_SECONDARY}
                 to="/career"
               >
                 Back to job list
@@ -289,18 +210,18 @@ export function CareerJobPage() {
                 className="size-[26px] text-mkt-accent-hover"
               />
             }
-            iconBg="#fde8e0"
+            iconClassName="bg-mkt-accent-soft"
             title="This job is no longer available"
           >
             <div className="flex flex-wrap justify-center gap-2.5">
               <Link
-                className="flex h-10 items-center rounded-full bg-mkt-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
+                className={PILL_PRIMARY}
                 to="/career"
               >
                 Browse jobs
               </Link>
               <Link
-                className="flex h-10 items-center rounded-full border border-mkt-line-strong bg-white px-[18px] text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+                className={PILL_SECONDARY}
                 to="/enterprises"
               >
                 Browse companies
@@ -313,7 +234,6 @@ export function CareerJobPage() {
   }
 
   const companyName = company?.name;
-  const palette = logoPalette(job.enterpriseId ?? companyName);
   const type = job.employment_type
     ? (EMPLOYMENT_LABELS[job.employment_type] ?? job.employment_type)
     : null;
@@ -384,15 +304,9 @@ export function CareerJobPage() {
         </nav>
 
         <div className="flex items-start gap-5">
-          <span
-            aria-hidden="true"
-            className="hidden size-[72px] shrink-0 items-center justify-center rounded-2xl font-['Space_Grotesk',sans-serif] text-[22px] font-bold sm:flex"
-            style={{ background: palette.bg, color: palette.fg }}
-          >
-            {companyInitials(companyName)}
-          </span>
+          <LogoTile className="hidden size-[72px] rounded-2xl text-[22px] sm:grid" name={companyName ?? "?"} seed={job.enterpriseId ?? companyName} tone="tint" />
           <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-            <h1 className="m-0 font-['Space_Grotesk',sans-serif] text-[26px] font-semibold leading-[1.15] [overflow-wrap:anywhere] md:text-[32px]">
+            <h1 className="m-0 itt-display text-[26px] font-semibold leading-[1.15] [overflow-wrap:anywhere] md:text-[32px]">
               {job.title}
             </h1>
             <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-mkt-ink-2">
@@ -468,21 +382,21 @@ export function CareerJobPage() {
         <div className="flex min-w-0 flex-col gap-4 lg:col-span-8">
           {about ? (
             <section className={cardClass}>
-              <h2 className={h2Class}>About the role</h2>
+              <h2 className={CARD_TITLE}>About the role</h2>
               <TextBlock text={about} />
             </section>
           ) : null}
 
           {job.requirements ? (
             <section className={cardClass}>
-              <h2 className={h2Class}>Requirements</h2>
+              <h2 className={CARD_TITLE}>Requirements</h2>
               <TextBlock text={job.requirements} />
             </section>
           ) : null}
 
           {benefits.length > 0 ? (
             <section className={cardClass}>
-              <h2 className={h2Class}>Benefits</h2>
+              <h2 className={CARD_TITLE}>Benefits</h2>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {benefits.map((b, i) => (
                   <div
@@ -502,7 +416,7 @@ export function CareerJobPage() {
 
           {job.location ? (
             <section className={`${cardClass} gap-3`}>
-              <h2 className={h2Class}>Where you'll work</h2>
+              <h2 className={CARD_TITLE}>Where you'll work</h2>
               <div className="flex items-start gap-3 text-sm text-mkt-ink-2">
                 <MapPin
                   aria-hidden="true"
@@ -519,13 +433,13 @@ export function CareerJobPage() {
         <aside className="flex min-w-0 flex-col gap-4 lg:col-span-4">
           <section
             aria-label="Apply"
-            className="flex flex-col gap-[18px] rounded-2xl border border-mkt-line bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.07)]"
+            className="flex flex-col gap-[18px] market-card p-6 shadow-[0_2px_8px_rgba(0,0,0,0.07)]"
           >
             <div className="flex flex-col gap-1">
               <span className="text-[11.5px] font-bold tracking-[0.05em] text-mkt-label">
                 SALARY
               </span>
-              <span className="font-['Space_Grotesk',sans-serif] text-[26px] font-bold">
+              <span className="itt-display text-[26px] font-bold">
                 {salaryBig}
                 {salaryUnit ? (
                   <span className="ml-1 text-[15px] font-semibold text-mkt-muted">
@@ -590,18 +504,12 @@ export function CareerJobPage() {
           {company ? (
             <section
               aria-label="Company"
-              className="flex flex-col gap-4 rounded-2xl border border-mkt-line bg-white p-6"
+              className="flex flex-col gap-4 market-card p-6"
             >
               <div className="flex items-center gap-3.5">
-                <span
-                  aria-hidden="true"
-                  className="flex size-[52px] shrink-0 items-center justify-center rounded-xl font-['Space_Grotesk',sans-serif] text-[17px] font-bold"
-                  style={{ background: palette.bg, color: palette.fg }}
-                >
-                  {companyInitials(company.name)}
-                </span>
+                <LogoTile className="size-[52px] rounded-xl text-[17px]" name={company.name} seed={job.enterpriseId ?? companyName} tone="tint" />
                 <div className="flex min-w-0 flex-col gap-0.5">
-                  <span className="font-['Space_Grotesk',sans-serif] text-[17px] font-semibold">
+                  <span className="itt-display text-[17px] font-semibold">
                     {company.name}
                   </span>
                   {company.industry ? (
@@ -638,7 +546,7 @@ export function CareerJobPage() {
       {company && otherJobs.length > 0 ? (
         <section className="flex flex-col gap-5 px-4 pb-[72px] md:px-12">
           <div className="flex items-end">
-            <h2 className="m-0 font-['Space_Grotesk',sans-serif] text-2xl font-semibold">
+            <h2 className="m-0 itt-display text-2xl font-semibold">
               More jobs at {company.name}
             </h2>
             <div className="flex-1" />
@@ -668,11 +576,11 @@ export function CareerJobPage() {
               const jd = formatDeadline(j.expires_at);
               return (
                 <Link
-                  className="flex flex-col gap-2.5 rounded-2xl border border-mkt-line bg-white p-5 text-mkt-ink hover:border-mkt-line-strong"
+                  className="flex flex-col gap-2.5 market-card p-5 text-mkt-ink hover:border-mkt-line-strong"
                   key={j._id}
                   to={`/career/${j.slug}`}
                 >
-                  <span className="font-['Space_Grotesk',sans-serif] text-[17px] font-semibold">
+                  <span className="itt-display text-[17px] font-semibold">
                     {j.title}
                   </span>
                   <span className="text-[13px] text-mkt-ink-2">{meta}</span>
