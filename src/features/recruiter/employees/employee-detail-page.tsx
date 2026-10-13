@@ -331,6 +331,7 @@ export function RecruiterEmployeeDetailPage() {
         employee={employee}
       />
       <ChangeEmployeeStatusDialog
+        key={`${employee?.id}-${employee?.status}`}
         open={isStatusOpen}
         onOpenChange={setIsStatusOpen}
         employee={employee}

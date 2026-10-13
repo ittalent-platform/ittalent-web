@@ -489,6 +489,7 @@ export function RecruiterEmployeesPage() {
         employee={editingEmployee}
       />
       <ChangeEmployeeStatusDialog
+        key={statusEmployee?.id}
         open={Boolean(statusEmployee)}
         onOpenChange={(open) => !open && setStatusEmployee(null)}
         employee={statusEmployee}

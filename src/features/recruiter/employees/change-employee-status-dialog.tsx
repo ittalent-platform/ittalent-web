@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
@@ -51,13 +51,24 @@ export function ChangeEmployeeStatusDialog({
     },
   });
 
+  useEffect(() => {
+    if (open && employee) {
+      const nextTargetStatus =
+        employee.status === "active" ? "suspended" : "active";
+      reset({
+        status: nextTargetStatus,
+        reason: "",
+      });
+    }
+  }, [open, employee, reset]);
+
   if (!employee) return null;
 
   const onSubmit = async (values: ChangeEmployeeStatusFormValues) => {
     setErrorMessage(null);
     try {
       await statusMutation.mutateAsync({
-        status: values.status,
+        status: targetStatus,
         reason: values.reason,
       });
 
