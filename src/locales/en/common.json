@@ -624,6 +624,7 @@
   },
   "sidebar": {
     "users": "Users",
+    "registrations": "Registrations",
     "jobPostings": "Job postings",
     "enterprises": "Enterprise Profiles",
     "collapse": "Collapse sidebar",
