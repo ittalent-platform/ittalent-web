@@ -1,6 +1,7 @@
 import {
   BriefcaseBusiness,
   Building2,
+  CalendarDays,
   ClipboardCheck,
   PanelLeftClose,
   Users,
@@ -9,6 +10,7 @@ import {
 
 import {
   RECRUITER_JOB_POSTINGS_PATH,
+  RECRUITER_INTERVIEWS_PATH,
   RECRUITER_EMPLOYEES_PATH,
   RECRUITER_COMPANY_PROFILE_PATH,
 } from "@/config/routes";
@@ -18,25 +20,6 @@ import { UserMenu } from "./user-menu";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useEnterpriseRegistrationsListQuery } from "@/features/enterprise-registration/enterprise-registration.queries";
-
-// const adminNavItems = [
-//   { end: false, icon: Users, label: "Users", to: "/admin/users" },
-//   {
-//     end: false,
-//     icon: BriefcaseBusiness,
-//     label: "Job postings",
-//     to: "/admin/job-postings",
-//   },
-// ] as const;
-
-// const recruiterNavItems = [
-//   {
-//     end: false,
-//     icon: BriefcaseBusiness,
-//     label: "Job postings",
-//     to: "/recruiter/job-postings",
-//   },
-// ] as const;
 
 const adminNavItems = [
   { end: false, icon: Users, labelKey: "sidebar.users", to: "/admin/users" },
@@ -60,6 +43,12 @@ const recruiterNavItems = [
     icon: BriefcaseBusiness,
     labelKey: "sidebar.jobPostings",
     to: RECRUITER_JOB_POSTINGS_PATH,
+  },
+  {
+    end: false,
+    icon: CalendarDays,
+    labelKey: "sidebar.interviews",
+    to: RECRUITER_INTERVIEWS_PATH,
   },
   {
     end: false,

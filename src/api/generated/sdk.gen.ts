@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteApiV1EnterprisesByEnterpriseIdData, DeleteApiV1EnterprisesByEnterpriseIdErrors, DeleteApiV1EnterprisesByEnterpriseIdResponses, DeleteApiV1JobPostingsByIdData, DeleteApiV1JobPostingsByIdErrors, DeleteApiV1JobPostingsByIdResponses, DeleteApiV1MeCertificateLinksByIdData, DeleteApiV1MeCertificateLinksByIdErrors, DeleteApiV1MeCertificateLinksByIdResponses, GetApiV1AdminDocumentsData, GetApiV1AdminDocumentsErrors, GetApiV1AdminDocumentsResponses, GetApiV1AdminJobPostingsData, GetApiV1AdminJobPostingsErrors, GetApiV1AdminJobPostingsResponses, GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1DocumentsData, GetApiV1DocumentsErrors, GetApiV1DocumentsResponses, GetApiV1EnterpriseRegistrationsByIdData, GetApiV1EnterpriseRegistrationsByIdErrors, GetApiV1EnterpriseRegistrationsByIdResponses, GetApiV1EnterpriseRegistrationsData, GetApiV1EnterpriseRegistrationsErrors, GetApiV1EnterpriseRegistrationsResponses, GetApiV1EnterpriseRegistrationsVerifyEmailData, GetApiV1EnterpriseRegistrationsVerifyEmailErrors, GetApiV1EnterpriseRegistrationsVerifyEmailResponses, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesMyProfileData, GetApiV1EnterprisesMyProfileErrors, GetApiV1EnterprisesMyProfileResponses, GetApiV1EnterprisesResponses, GetApiV1JobPostingsByIdData, GetApiV1JobPostingsByIdErrors, GetApiV1JobPostingsByIdHistoryData, GetApiV1JobPostingsByIdHistoryErrors, GetApiV1JobPostingsByIdHistoryResponses, GetApiV1JobPostingsByIdPublicData, GetApiV1JobPostingsByIdPublicErrors, GetApiV1JobPostingsByIdPublicResponses, GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsData, GetApiV1JobPostingsErrors, GetApiV1JobPostingsResponses, GetApiV1MeApplicationsByIdData, GetApiV1MeApplicationsByIdErrors, GetApiV1MeApplicationsByIdHistoryData, GetApiV1MeApplicationsByIdHistoryErrors, GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsData, GetApiV1MeApplicationsErrors, GetApiV1MeApplicationsResponses, GetApiV1MeCertificateLinksData, GetApiV1MeCertificateLinksErrors, GetApiV1MeCertificateLinksResponses, GetApiV1RecruiterJobPostingsData, GetApiV1RecruiterJobPostingsErrors, GetApiV1RecruiterJobPostingsResponses, GetApiV1UserInvitationsPreviewData, GetApiV1UserInvitationsPreviewErrors, GetApiV1UserInvitationsPreviewResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdHistoryData, GetApiV1UsersByIdHistoryErrors, GetApiV1UsersByIdHistoryResponses, GetApiV1UsersByIdInvitationData, GetApiV1UsersByIdInvitationErrors, GetApiV1UsersByIdInvitationResponses, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PatchApiV1EnterpriseRegistrationsByIdDraftData, PatchApiV1EnterpriseRegistrationsByIdDraftErrors, PatchApiV1EnterpriseRegistrationsByIdDraftResponses, PatchApiV1EnterprisesByEnterpriseIdData, PatchApiV1EnterprisesByEnterpriseIdErrors, PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdStatusData, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1JobPostingsByIdArchiveData, PatchApiV1JobPostingsByIdArchiveErrors, PatchApiV1JobPostingsByIdArchiveResponses, PatchApiV1JobPostingsByIdCloseData, PatchApiV1JobPostingsByIdCloseErrors, PatchApiV1JobPostingsByIdCloseResponses, PatchApiV1JobPostingsByIdData, PatchApiV1JobPostingsByIdErrors, PatchApiV1JobPostingsByIdReopenData, PatchApiV1JobPostingsByIdReopenErrors, PatchApiV1JobPostingsByIdReopenResponses, PatchApiV1JobPostingsByIdResponses, PatchApiV1JobPostingsByIdRestoreData, PatchApiV1JobPostingsByIdRestoreErrors, PatchApiV1JobPostingsByIdRestoreResponses, PatchApiV1MeApplicationsByIdWithdrawData, PatchApiV1MeApplicationsByIdWithdrawErrors, PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1MeCertificateLinksByIdData, PatchApiV1MeCertificateLinksByIdErrors, PatchApiV1MeCertificateLinksByIdResponses, PatchApiV1UsersByIdData, PatchApiV1UsersByIdEmergencySuspensionData, PatchApiV1UsersByIdEmergencySuspensionErrors, PatchApiV1UsersByIdEmergencySuspensionResponses, PatchApiV1UsersByIdErrors, PatchApiV1UsersByIdInvitationData, PatchApiV1UsersByIdInvitationErrors, PatchApiV1UsersByIdInvitationResponses, PatchApiV1UsersByIdResponses, PatchApiV1UsersByIdRoleData, PatchApiV1UsersByIdRoleErrors, PatchApiV1UsersByIdRoleResponses, PatchApiV1UsersByIdStatusData, PatchApiV1UsersByIdStatusErrors, PatchApiV1UsersByIdStatusResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses, PostApiV1DocumentsData, PostApiV1DocumentsErrors, PostApiV1DocumentsResponses, PostApiV1EnterpriseRegistrationsByIdDecisionData, PostApiV1EnterpriseRegistrationsByIdDecisionErrors, PostApiV1EnterpriseRegistrationsByIdDecisionResponses, PostApiV1EnterpriseRegistrationsByIdDocumentsData, PostApiV1EnterpriseRegistrationsByIdDocumentsErrors, PostApiV1EnterpriseRegistrationsByIdDocumentsResponses, PostApiV1EnterpriseRegistrationsByIdSubmitData, PostApiV1EnterpriseRegistrationsByIdSubmitErrors, PostApiV1EnterpriseRegistrationsByIdSubmitResponses, PostApiV1EnterpriseRegistrationsInvitationsAcceptData, PostApiV1EnterpriseRegistrationsInvitationsAcceptErrors, PostApiV1EnterpriseRegistrationsInvitationsAcceptResponses, PostApiV1EnterpriseRegistrationsStartData, PostApiV1EnterpriseRegistrationsStartErrors, PostApiV1EnterpriseRegistrationsStartResponses, PostApiV1EnterprisesData, PostApiV1EnterprisesErrors, PostApiV1EnterprisesResponses, PostApiV1JobPostingsData, PostApiV1JobPostingsErrors, PostApiV1JobPostingsResponses, PostApiV1MeApplicationsData, PostApiV1MeApplicationsErrors, PostApiV1MeApplicationsResponses, PostApiV1MeCertificateLinksData, PostApiV1MeCertificateLinksErrors, PostApiV1MeCertificateLinksResponses, PostApiV1UserEmailChangesConfirmData, PostApiV1UserEmailChangesConfirmErrors, PostApiV1UserEmailChangesConfirmResponses, PostApiV1UserInvitationsAcceptData, PostApiV1UserInvitationsAcceptErrors, PostApiV1UserInvitationsAcceptResponses, PostApiV1UsersByIdEmailChangeRequestsData, PostApiV1UsersByIdEmailChangeRequestsErrors, PostApiV1UsersByIdEmailChangeRequestsResponses, PostApiV1UsersByIdInvitationDeliveriesData, PostApiV1UsersByIdInvitationDeliveriesErrors, PostApiV1UsersByIdInvitationDeliveriesResponses, PostApiV1UsersData, PostApiV1UsersErrors, PostApiV1UsersResponses } from './types.gen';
+import type { DeleteApiV1EnterprisesByEnterpriseIdData, DeleteApiV1EnterprisesByEnterpriseIdErrors, DeleteApiV1EnterprisesByEnterpriseIdResponses, DeleteApiV1InterviewsByIdData, DeleteApiV1InterviewsByIdErrors, DeleteApiV1InterviewsByIdResponses, DeleteApiV1JobPostingsByIdData, DeleteApiV1JobPostingsByIdErrors, DeleteApiV1JobPostingsByIdResponses, DeleteApiV1MeCertificateLinksByIdData, DeleteApiV1MeCertificateLinksByIdErrors, DeleteApiV1MeCertificateLinksByIdResponses, GetApiV1AdminDocumentsData, GetApiV1AdminDocumentsErrors, GetApiV1AdminDocumentsResponses, GetApiV1AdminJobPostingsData, GetApiV1AdminJobPostingsErrors, GetApiV1AdminJobPostingsResponses, GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1DocumentsData, GetApiV1DocumentsErrors, GetApiV1DocumentsResponses, GetApiV1EnterpriseRegistrationsByIdData, GetApiV1EnterpriseRegistrationsByIdErrors, GetApiV1EnterpriseRegistrationsByIdResponses, GetApiV1EnterpriseRegistrationsData, GetApiV1EnterpriseRegistrationsErrors, GetApiV1EnterpriseRegistrationsResponses, GetApiV1EnterpriseRegistrationsVerifyEmailData, GetApiV1EnterpriseRegistrationsVerifyEmailErrors, GetApiV1EnterpriseRegistrationsVerifyEmailResponses, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesMyProfileData, GetApiV1EnterprisesMyProfileErrors, GetApiV1EnterprisesMyProfileResponses, GetApiV1EnterprisesResponses, GetApiV1InterviewsApplicationsData, GetApiV1InterviewsApplicationsErrors, GetApiV1InterviewsApplicationsResponses, GetApiV1InterviewsByIdData, GetApiV1InterviewsByIdErrors, GetApiV1InterviewsByIdResponses, GetApiV1InterviewsCalendarData, GetApiV1InterviewsCalendarErrors, GetApiV1InterviewsCalendarResponses, GetApiV1InterviewsData, GetApiV1InterviewsErrors, GetApiV1InterviewsInterviewersData, GetApiV1InterviewsInterviewersErrors, GetApiV1InterviewsInterviewersResponses, GetApiV1InterviewsResponses, GetApiV1JobPostingsByIdData, GetApiV1JobPostingsByIdErrors, GetApiV1JobPostingsByIdHistoryData, GetApiV1JobPostingsByIdHistoryErrors, GetApiV1JobPostingsByIdHistoryResponses, GetApiV1JobPostingsByIdPublicData, GetApiV1JobPostingsByIdPublicErrors, GetApiV1JobPostingsByIdPublicResponses, GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsData, GetApiV1JobPostingsErrors, GetApiV1JobPostingsResponses, GetApiV1MeApplicationsByIdData, GetApiV1MeApplicationsByIdErrors, GetApiV1MeApplicationsByIdHistoryData, GetApiV1MeApplicationsByIdHistoryErrors, GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsData, GetApiV1MeApplicationsErrors, GetApiV1MeApplicationsResponses, GetApiV1MeCertificateLinksData, GetApiV1MeCertificateLinksErrors, GetApiV1MeCertificateLinksResponses, GetApiV1RecruiterJobPostingsData, GetApiV1RecruiterJobPostingsErrors, GetApiV1RecruiterJobPostingsResponses, GetApiV1UserInvitationsPreviewData, GetApiV1UserInvitationsPreviewErrors, GetApiV1UserInvitationsPreviewResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdHistoryData, GetApiV1UsersByIdHistoryErrors, GetApiV1UsersByIdHistoryResponses, GetApiV1UsersByIdInvitationData, GetApiV1UsersByIdInvitationErrors, GetApiV1UsersByIdInvitationResponses, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PatchApiV1EnterpriseRegistrationsByIdDraftData, PatchApiV1EnterpriseRegistrationsByIdDraftErrors, PatchApiV1EnterpriseRegistrationsByIdDraftResponses, PatchApiV1EnterprisesByEnterpriseIdData, PatchApiV1EnterprisesByEnterpriseIdErrors, PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdStatusData, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1InterviewsByIdData, PatchApiV1InterviewsByIdErrors, PatchApiV1InterviewsByIdResponses, PatchApiV1InterviewsByIdStatusData, PatchApiV1InterviewsByIdStatusErrors, PatchApiV1InterviewsByIdStatusResponses, PatchApiV1JobPostingsByIdArchiveData, PatchApiV1JobPostingsByIdArchiveErrors, PatchApiV1JobPostingsByIdArchiveResponses, PatchApiV1JobPostingsByIdCloseData, PatchApiV1JobPostingsByIdCloseErrors, PatchApiV1JobPostingsByIdCloseResponses, PatchApiV1JobPostingsByIdData, PatchApiV1JobPostingsByIdErrors, PatchApiV1JobPostingsByIdReopenData, PatchApiV1JobPostingsByIdReopenErrors, PatchApiV1JobPostingsByIdReopenResponses, PatchApiV1JobPostingsByIdResponses, PatchApiV1JobPostingsByIdRestoreData, PatchApiV1JobPostingsByIdRestoreErrors, PatchApiV1JobPostingsByIdRestoreResponses, PatchApiV1MeApplicationsByIdWithdrawData, PatchApiV1MeApplicationsByIdWithdrawErrors, PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1MeCertificateLinksByIdData, PatchApiV1MeCertificateLinksByIdErrors, PatchApiV1MeCertificateLinksByIdResponses, PatchApiV1UsersByIdData, PatchApiV1UsersByIdEmergencySuspensionData, PatchApiV1UsersByIdEmergencySuspensionErrors, PatchApiV1UsersByIdEmergencySuspensionResponses, PatchApiV1UsersByIdErrors, PatchApiV1UsersByIdInvitationData, PatchApiV1UsersByIdInvitationErrors, PatchApiV1UsersByIdInvitationResponses, PatchApiV1UsersByIdResponses, PatchApiV1UsersByIdRoleData, PatchApiV1UsersByIdRoleErrors, PatchApiV1UsersByIdRoleResponses, PatchApiV1UsersByIdStatusData, PatchApiV1UsersByIdStatusErrors, PatchApiV1UsersByIdStatusResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses, PostApiV1DocumentsData, PostApiV1DocumentsErrors, PostApiV1DocumentsResponses, PostApiV1EnterpriseRegistrationsByIdDecisionData, PostApiV1EnterpriseRegistrationsByIdDecisionErrors, PostApiV1EnterpriseRegistrationsByIdDecisionResponses, PostApiV1EnterpriseRegistrationsByIdDocumentsData, PostApiV1EnterpriseRegistrationsByIdDocumentsErrors, PostApiV1EnterpriseRegistrationsByIdDocumentsResponses, PostApiV1EnterpriseRegistrationsByIdSubmitData, PostApiV1EnterpriseRegistrationsByIdSubmitErrors, PostApiV1EnterpriseRegistrationsByIdSubmitResponses, PostApiV1EnterpriseRegistrationsInvitationsAcceptData, PostApiV1EnterpriseRegistrationsInvitationsAcceptErrors, PostApiV1EnterpriseRegistrationsInvitationsAcceptResponses, PostApiV1EnterpriseRegistrationsStartData, PostApiV1EnterpriseRegistrationsStartErrors, PostApiV1EnterpriseRegistrationsStartResponses, PostApiV1EnterprisesData, PostApiV1EnterprisesErrors, PostApiV1EnterprisesResponses, PostApiV1InterviewsData, PostApiV1InterviewsErrors, PostApiV1InterviewsResponses, PostApiV1JobPostingsData, PostApiV1JobPostingsErrors, PostApiV1JobPostingsResponses, PostApiV1MeApplicationsData, PostApiV1MeApplicationsErrors, PostApiV1MeApplicationsResponses, PostApiV1MeCertificateLinksData, PostApiV1MeCertificateLinksErrors, PostApiV1MeCertificateLinksResponses, PostApiV1UserEmailChangesConfirmData, PostApiV1UserEmailChangesConfirmErrors, PostApiV1UserEmailChangesConfirmResponses, PostApiV1UserInvitationsAcceptData, PostApiV1UserInvitationsAcceptErrors, PostApiV1UserInvitationsAcceptResponses, PostApiV1UsersByIdEmailChangeRequestsData, PostApiV1UsersByIdEmailChangeRequestsErrors, PostApiV1UsersByIdEmailChangeRequestsResponses, PostApiV1UsersByIdInvitationDeliveriesData, PostApiV1UsersByIdInvitationDeliveriesErrors, PostApiV1UsersByIdInvitationDeliveriesResponses, PostApiV1UsersData, PostApiV1UsersErrors, PostApiV1UsersResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -608,6 +608,117 @@ export const getApiV1MeApplicationsByIdHistory = <ThrowOnError extends boolean =
 export const patchApiV1MeApplicationsByIdWithdraw = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1MeApplicationsByIdWithdrawData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1MeApplicationsByIdWithdrawErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/me/applications/{id}/withdraw',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List interviews (List view) with search, filters, sorting and pagination
+ *
+ * Recruiter only: every interview of the recruiter's enterprise. Filters: `status` (one value or a comma-separated list), `mode`, `jobId`, `applicationId`, `interviewerId`, `from`/`to` on the start time, and `search` on the applicant or interviewer name/email and the job title. Sorted by start time, earliest first, by default.
+ */
+export const getApiV1Interviews = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1InterviewsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1InterviewsResponses, GetApiV1InterviewsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews',
+    ...options
+});
+
+/**
+ * Schedule an interview
+ *
+ * Recruiter only. Schedules an interview between the applicant of one application and one or more interviewers (active recruiters of the same enterprise), then emails the applicant and every interviewer. The time must be in the future and must not overlap another scheduled interview of the applicant or of any interviewer. An online interview needs a https `meetingLink`, an onsite one a `location`. The application status is not changed.
+ */
+export const postApiV1Interviews = <ThrowOnError extends boolean = false>(options: Options<PostApiV1InterviewsData, ThrowOnError>) => (options.client ?? client).post<PostApiV1InterviewsResponses, PostApiV1InterviewsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List interviews for a date window (Calendar view)
+ *
+ * Same access and filters as the list, but `from` and `to` are required (at most 62 days apart) and every interview overlapping that window is returned, earliest first, without paging. `truncated` is true when more interviews matched than the response holds.
+ */
+export const getApiV1InterviewsCalendar = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1InterviewsCalendarData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1InterviewsCalendarResponses, GetApiV1InterviewsCalendarErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews/calendar',
+    ...options
+});
+
+/**
+ * Find the applications an interview can be scheduled for
+ *
+ * Recruiter only. The submitted, under review and interviewing applications for the jobs of the recruiter's enterprise, newest first. `search` matches the applicant name/email and the job title; `limit` defaults to 20 (max 50). Feeds the "Select application" field of the Schedule interview dialog.
+ */
+export const getApiV1InterviewsApplications = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1InterviewsApplicationsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1InterviewsApplicationsResponses, GetApiV1InterviewsApplicationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews/applications',
+    ...options
+});
+
+/**
+ * Find the recruiters who can be added as interviewers
+ *
+ * Recruiter only. The active recruiters of the recruiter's enterprise (the caller included), sorted by name. `search` matches the name, email and username; `limit` defaults to 20 (max 50). Resolves the interviewer emails of the Schedule interview dialog to the ids the create and update endpoints take.
+ */
+export const getApiV1InterviewsInterviewers = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1InterviewsInterviewersData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1InterviewsInterviewersResponses, GetApiV1InterviewsInterviewersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews/interviewers',
+    ...options
+});
+
+/**
+ * Delete an interview
+ *
+ * Recruiter only. A completed interview cannot be deleted. Deleting an interview that was still scheduled emails the participants that it is cancelled.
+ */
+export const deleteApiV1InterviewsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1InterviewsByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1InterviewsByIdResponses, DeleteApiV1InterviewsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews/{id}',
+    ...options
+});
+
+/**
+ * View an interview
+ *
+ * Recruiter only. Includes the applicant, the interviewers, the job and the status history.
+ */
+export const getApiV1InterviewsById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1InterviewsByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1InterviewsByIdResponses, GetApiV1InterviewsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews/{id}',
+    ...options
+});
+
+/**
+ * Update the information of a scheduled interview
+ *
+ * Recruiter only, and only while the interview is `scheduled`. Send only the fields to change; `null` clears `meetingLink`, `location` or `notes`. A new time must be in the future and overlap nothing else. The participants are emailed the new details, and interviewers who were removed are told it no longer involves them.
+ */
+export const patchApiV1InterviewsById = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1InterviewsByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1InterviewsByIdResponses, PatchApiV1InterviewsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update the status of a scheduled interview
+ *
+ * Recruiter only. A scheduled interview becomes `completed`, `no_show` or `cancelled`; those statuses are final. `completed` and `no_show` are only accepted once the interview has ended (409 INTERVIEW_NOT_ENDED before). `cancelled` is accepted at any time and emails the participants.
+ */
+export const patchApiV1InterviewsByIdStatus = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1InterviewsByIdStatusData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1InterviewsByIdStatusResponses, PatchApiV1InterviewsByIdStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews/{id}/status',
     ...options,
     headers: {
         'Content-Type': 'application/json',

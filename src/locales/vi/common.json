@@ -622,7 +622,8 @@
     "employees": "Nhân viên",
     "companyProfile": "Hồ sơ công ty",
     "collapse": "Thu gọn thanh bên",
-    "closeMenu": "Đóng menu"
+    "closeMenu": "Đóng menu",
+    "interviews": "Phỏng vấn"
   },
   "jobPostings": {
     "title": "Tin tuyển dụng",
@@ -2057,6 +2058,292 @@
       "emptyDesc": "Hiện tại không có hồ sơ nào trong hàng chờ này.",
       "pagination": {
         "showing": "Hiển thị {{from}}-{{to}} trên tổng số {{total}} mục"
+      }
+    }
+  },
+  "interviews": {
+    "page": {
+      "title": "Phỏng vấn",
+      "count_other": "{{count}} buổi phỏng vấn · công ty của bạn",
+      "countInMonth_other": "{{count}} buổi phỏng vấn trong {{month}} · công ty của bạn"
+    },
+    "toolbar": {
+      "search": "Tìm theo ứng viên hoặc vị trí…",
+      "searchInvalid": "Từ khóa tìm kiếm chứa ký tự không hợp lệ. Vui lòng nhập lại.",
+      "all": "Tất cả",
+      "status": "Trạng thái",
+      "date": "Ngày"
+    },
+    "status": {
+      "scheduled": "Đã lên lịch",
+      "completed": "Hoàn thành",
+      "no_show": "Vắng mặt",
+      "cancelled": "Đã hủy"
+    },
+    "mode": {
+      "online": "Trực tuyến",
+      "onsite": "Tại văn phòng"
+    },
+    "dateFilter": {
+      "today": "Hôm nay",
+      "thisWeek": "Tuần này",
+      "thisMonth": "Tháng này",
+      "upcoming": "Sắp tới",
+      "past": "Đã qua"
+    },
+    "table": {
+      "applicant": "Ứng viên",
+      "job": "Vị trí",
+      "dateTime": "Ngày & giờ",
+      "mode": "Hình thức",
+      "location": "Địa điểm",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "duration": {
+      "minutes_other": "{{count}} phút",
+      "hours_other": "{{count}} giờ",
+      "hoursMinutes": "{{hours}} giờ {{minutes}} phút"
+    },
+    "empty": {
+      "title": "Chưa có buổi phỏng vấn nào",
+      "description": "Chưa có buổi phỏng vấn nào được lên lịch.",
+      "noMatchTitle": "Không có buổi phỏng vấn phù hợp",
+      "noResultsFor": "Không có kết quả cho “{{keyword}}”",
+      "noMatchDescription": "Không có buổi phỏng vấn nào khớp từ khóa hoặc bộ lọc này. Hãy thử ứng viên hoặc vị trí khác, hoặc xóa bộ lọc.",
+      "clearFilters": "Xóa bộ lọc"
+    },
+    "noAccess": {
+      "title": "Bạn không còn quyền truy cập",
+      "description": "Tài khoản của bạn chưa thuộc công ty nào, hoặc quyền HR đã bị gỡ hoặc công ty đang bị tạm dừng."
+    },
+    "loadFailed": "Không thể tải danh sách phỏng vấn. Vui lòng thử lại.",
+    "actions": {
+      "rowActions": "Thao tác cho {{name}}",
+      "view": "Xem chi tiết",
+      "complete": "Đánh dấu hoàn thành",
+      "noShow": "Đánh dấu vắng mặt",
+      "cancel": "Hủy phỏng vấn",
+      "cancelShort": "Hủy",
+      "afterItEnds": "Sau khi kết thúc",
+      "edit": "Chỉnh sửa chi tiết",
+      "editShort": "Sửa",
+      "reschedule": "Đổi lịch",
+      "delete": "Xóa phỏng vấn"
+    },
+    "detail": {
+      "information": "Thông tin phỏng vấn",
+      "date": "Ngày",
+      "time": "Giờ",
+      "duration": "Thời lượng",
+      "mode": "Hình thức",
+      "link": "Liên kết",
+      "openLink": "Mở liên kết cuộc họp",
+      "location": "Địa điểm",
+      "notes": "Ghi chú",
+      "interviewers": "Người phỏng vấn",
+      "history": "Lịch sử trạng thái",
+      "back": "Quay lại danh sách phỏng vấn",
+      "unavailableTitle": "Không thể xem buổi phỏng vấn này",
+      "unavailableDescription": "Buổi phỏng vấn có thể thuộc công ty khác hoặc đường dẫn không đúng.",
+      "loadFailedTitle": "Không tải được buổi phỏng vấn",
+      "loadFailed": "Đã xảy ra lỗi khi tải buổi phỏng vấn. Vui lòng thử lại.",
+      "cancelledNotice": "Buổi phỏng vấn này đã bị hủy và không thể chỉnh sửa nữa."
+    },
+    "view": {
+      "table": "Bảng",
+      "calendar": "Lịch"
+    },
+    "calendar": {
+      "fields": "Hiển thị",
+      "field": {
+        "time": "Giờ",
+        "applicant": "Ứng viên",
+        "job": "Vị trí"
+      },
+      "previous": "Tháng trước",
+      "next": "Tháng sau",
+      "today": "Hôm nay",
+      "more": "+{{count}} nữa",
+      "dayCount_other": "{{count}} buổi phỏng vấn",
+      "truncated": "Đang hiển thị {{count}} buổi phỏng vấn đầu tiên của tháng này. Hãy thu hẹp từ khóa hoặc trạng thái để xem phần còn lại.",
+      "scheduleOn": "Lên lịch phỏng vấn vào {{day}}",
+      "scheduleOnDay": "Lên lịch ngày này"
+    },
+    "statusDialog": {
+      "complete": {
+        "title": "Đánh dấu buổi phỏng vấn đã hoàn thành?",
+        "description": "{{name}} · {{when}}. Trạng thái hồ sơ không thay đổi.",
+        "confirm": "Hoàn thành",
+        "working": "Đang lưu…",
+        "keep": "Hủy",
+        "doneTitle": "Đã hoàn thành phỏng vấn",
+        "doneMessage": "Buổi phỏng vấn này đã được đánh dấu hoàn thành.",
+        "failedTitle": "Không thể hoàn thành",
+        "failedMessage": "Không thể đánh dấu hoàn thành buổi phỏng vấn này. Vui lòng thử lại."
+      },
+      "noShow": {
+        "title": "Đánh dấu vắng mặt?",
+        "description": "{{name}} · {{when}}. Trạng thái hồ sơ không thay đổi.",
+        "confirm": "Đánh dấu vắng mặt",
+        "working": "Đang lưu…",
+        "keep": "Hủy",
+        "doneTitle": "Đã đánh dấu vắng mặt",
+        "doneMessage": "Hồ sơ ứng tuyển không bị thay đổi.",
+        "failedTitle": "Không thể lưu",
+        "failedMessage": "Không thể đánh dấu vắng mặt cho buổi phỏng vấn này. Vui lòng thử lại."
+      },
+      "cancel": {
+        "title": "Hủy phỏng vấn với {{name}}?",
+        "description": "{{when}}. Ứng viên sẽ được thông báo. Buổi phỏng vấn vẫn nằm trong lịch sử và hồ sơ không bị từ chối.",
+        "confirm": "Hủy phỏng vấn",
+        "working": "Đang hủy…",
+        "keep": "Giữ lại",
+        "doneTitle": "Đã hủy phỏng vấn",
+        "doneMessage": "{{name}} đã được thông báo.",
+        "failedTitle": "Hủy không thành công",
+        "failedMessage": "Không thể hủy buổi phỏng vấn này. Vui lòng thử lại."
+      },
+      "stale": {
+        "title": "Buổi phỏng vấn này vừa được cập nhật",
+        "description": "Trạng thái đã thay đổi trước khi thao tác của bạn được thực hiện nên chưa có gì được áp dụng. Hãy xem bản mới nhất.",
+        "action": "Xem bản mới nhất"
+      },
+      "notEnded": "Buổi phỏng vấn chưa kết thúc. Bạn có thể đánh dấu sau khi buổi phỏng vấn kết thúc."
+    },
+    "schedule": {
+      "open": "Lên lịch phỏng vấn",
+      "title": "Lên lịch phỏng vấn",
+      "description": "Ứng viên và người phỏng vấn sẽ được thông báo qua email.",
+      "selectApplication": "Chọn hồ sơ",
+      "application": "Hồ sơ ứng tuyển",
+      "applications": "Hồ sơ ứng tuyển",
+      "applicationPlaceholder": "Tìm hồ sơ…",
+      "searching": "Đang tìm…",
+      "noApplications": "Không có hồ sơ nào có thể lên lịch khớp với tìm kiếm này.",
+      "job": "Vị trí",
+      "applicationStatus": "Trạng thái hồ sơ",
+      "statusUnchanged": "Việc lên lịch không thay đổi trạng thái hồ sơ.",
+      "schedule": "Lịch",
+      "date": "Ngày",
+      "startTime": "Giờ bắt đầu",
+      "duration": "Thời lượng",
+      "timezone": "Múi giờ",
+      "runs": "Diễn ra {{day}} · {{range}}",
+      "peopleAndPlace": "Người tham gia & địa điểm",
+      "interviewers": "Email người phỏng vấn",
+      "interviewersPlaceholder": "ten@congty.com",
+      "interviewerSuggestions": "Người phỏng vấn",
+      "removeInterviewer": "Xóa {{email}}",
+      "location": "Địa điểm",
+      "locationPlaceholder": "Địa chỉ văn phòng…",
+      "meetingLink": "Liên kết cuộc họp",
+      "linkPlaceholder": "https://meet.google.com/…",
+      "placeHint": "Nhập ít nhất một — địa điểm hoặc liên kết cuộc họp.",
+      "notesSection": "Ghi chú",
+      "notes": "Ghi chú",
+      "notesPlaceholder": "Điều người phỏng vấn cần biết…",
+      "notesHint": "Chỉ nhóm của bạn thấy ghi chú.",
+      "cancel": "Hủy",
+      "create": "Tạo lịch",
+      "creating": "Đang tạo…",
+      "discardTitle": "Bỏ các thay đổi chưa lưu?",
+      "discardDescription": "Buổi phỏng vấn này sẽ không được lên lịch.",
+      "keepEditing": "Tiếp tục chỉnh sửa",
+      "discard": "Bỏ",
+      "doneTitle": "Đã lên lịch phỏng vấn",
+      "doneMessage": "Buổi phỏng vấn đã được thêm vào lịch.",
+      "errors": {
+        "application": "Hãy chọn một hồ sơ.",
+        "date": "Hãy chọn ngày.",
+        "past": "Hãy chọn ngày và giờ trong tương lai.",
+        "time": "Hãy nhập giờ bắt đầu.",
+        "place": "Hãy nhập địa điểm hoặc liên kết cuộc họp.",
+        "locationLong": "Địa điểm không được dài quá 255 ký tự.",
+        "linkLong": "Liên kết không được dài quá 2048 ký tự.",
+        "linkInvalid": "Hãy nhập liên kết bắt đầu bằng https://.",
+        "notesLong": "Ghi chú không được dài quá 2000 ký tự.",
+        "emailInvalid": "Hãy nhập địa chỉ email hợp lệ.",
+        "emailDuplicate": "Người phỏng vấn này đã được thêm.",
+        "emailUnknown": "Không có nhà tuyển dụng đang hoạt động nào trong công ty có email này.",
+        "emailLookup": "Không kiểm tra được email này. Vui lòng thử lại.",
+        "interviewersRequired": "Hãy thêm ít nhất một người phỏng vấn.",
+        "interviewersMax": "Bạn chỉ có thể thêm tối đa {{count}} người phỏng vấn.",
+        "invalidInterviewers": "Mọi người phỏng vấn phải là nhà tuyển dụng đang hoạt động của công ty bạn.",
+        "notSchedulable": "Hồ sơ này không đủ điều kiện để lên lịch phỏng vấn.",
+        "applicantUnavailable": "Tài khoản của ứng viên này hiện không khả dụng.",
+        "interviewerConflict": "Một người phỏng vấn đã có buổi phỏng vấn khác vào giờ này. Hãy chọn giờ hoặc người phỏng vấn khác.",
+        "applicantConflict": "Ứng viên đã có buổi phỏng vấn khác vào giờ này. Hãy chọn giờ khác.",
+        "saveFailed": "Không thể tạo buổi phỏng vấn này. Hãy kiểm tra các trường và thử lại."
+      }
+    },
+    "edit": {
+      "title": "Chỉnh sửa buổi phỏng vấn",
+      "description": "Ngày và giờ bị khóa ở đây — hãy dùng Đổi lịch để thay đổi.",
+      "notice": "Khi lưu, {{name}} và những người phỏng vấn sẽ nhận email với thông tin cập nhật.",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu…",
+      "discardDescription": "Các thay đổi của bạn với buổi phỏng vấn này sẽ không được lưu.",
+      "doneTitle": "Đã cập nhật buổi phỏng vấn",
+      "doneMessage": "Các thay đổi của bạn đã được lưu.",
+      "errors": {
+        "interviewerConflict": "Một người phỏng vấn đã có buổi phỏng vấn khác vào giờ này. Hãy chọn người phỏng vấn khác hoặc rút ngắn thời lượng.",
+        "applicantConflict": "Ứng viên có buổi phỏng vấn khác trùng với buổi này. Hãy rút ngắn thời lượng.",
+        "saveFailed": "Không thể lưu các thay đổi. Hãy kiểm tra các trường và thử lại."
+      }
+    },
+    "reschedule": {
+      "title": "Đổi lịch phỏng vấn",
+      "description": "{{name}} · hiện tại {{current}}",
+      "runs": "Diễn ra {{day}} · {{range}} ({{zone}})",
+      "notice": "{{name}} và những người phỏng vấn sẽ nhận email về thời gian mới.",
+      "save": "Lưu giờ mới",
+      "saving": "Đang lưu…",
+      "doneTitle": "Đã đổi lịch phỏng vấn",
+      "doneMessage": "{{name}} đã được thông báo về thời gian mới: {{when}}.",
+      "errors": {
+        "saveFailed": "Không thể đổi lịch buổi phỏng vấn này. Hãy kiểm tra ngày giờ và thử lại."
+      }
+    },
+    "stale": {
+      "changed": {
+        "title": "Buổi phỏng vấn này vừa được cập nhật",
+        "description": "Buổi phỏng vấn đã được thay đổi trong lúc bạn chỉnh sửa nên chưa có gì được lưu. Hãy xem bản mới nhất trước khi thay đổi lại.",
+        "action": "Xem bản mới nhất"
+      },
+      "notEditable": {
+        "title": "Không thể thay đổi buổi phỏng vấn này",
+        "description": "Buổi phỏng vấn không còn ở trạng thái đã lên lịch nên không thể sửa chi tiết hay thời gian.",
+        "action": "Xem bản mới nhất"
+      }
+    },
+    "deleteDialog": {
+      "title": "Xóa phỏng vấn với {{name}}?",
+      "description": {
+        "scheduled": "{{when}}. Họ sẽ được thông báo là buổi phỏng vấn đã hủy. Buổi phỏng vấn bị xóa khỏi danh sách và lịch sử, hồ sơ không bị từ chối. Không thể hoàn tác.",
+        "closed": "{{when}}. Buổi phỏng vấn bị xóa khỏi danh sách và lịch sử. Hồ sơ không thay đổi. Không thể hoàn tác."
+      },
+      "confirm": "Xóa phỏng vấn",
+      "working": "Đang xóa…",
+      "keep": "Giữ lại",
+      "doneTitle": "Đã xóa phỏng vấn",
+      "doneMessage": {
+        "scheduled": "{{name}} đã được thông báo là buổi phỏng vấn đã hủy.",
+        "closed": "Đã xóa buổi phỏng vấn với {{name}}."
+      },
+      "failedTitle": "Xóa không thành công",
+      "failedMessage": "Không thể xóa buổi phỏng vấn này. Vui lòng thử lại.",
+      "stale": {
+        "changed": {
+          "title": "Buổi phỏng vấn này vừa được cập nhật",
+          "description": "Buổi phỏng vấn đã được thay đổi hoặc xóa trước khi thao tác của bạn được thực hiện nên chưa có gì bị xóa. Hãy xem bản mới nhất.",
+          "action": "Xem bản mới nhất"
+        },
+        "completed": {
+          "title": "Không thể xóa buổi phỏng vấn này",
+          "description": "Buổi phỏng vấn đã được đánh dấu hoàn thành và được giữ lại làm hồ sơ. Hãy xem bản mới nhất.",
+          "action": "Xem bản mới nhất"
+        }
       }
     }
   }

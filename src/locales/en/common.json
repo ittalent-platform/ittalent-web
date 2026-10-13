@@ -630,7 +630,8 @@
     "employees": "Employees",
     "companyProfile": "Company profile",
     "collapse": "Collapse sidebar",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "interviews": "Interviews"
   },
   "jobPostings": {
     "title": "Job postings",
@@ -2076,6 +2077,297 @@
       "emptyDesc": "There are currently no registrations in this queue.",
       "pagination": {
         "showing": "Showing {{from}}-{{to}} of {{total}} entries"
+      }
+    }
+  },
+  "interviews": {
+    "page": {
+      "title": "Interviews",
+      "count_one": "{{count}} interview · your company",
+      "count_other": "{{count}} interviews · your company",
+      "countInMonth_one": "{{count}} interview in {{month}} · your company",
+      "countInMonth_other": "{{count}} interviews in {{month}} · your company"
+    },
+    "toolbar": {
+      "search": "Search by applicant or job…",
+      "searchInvalid": "Search keyword contains invalid characters. Please revise your input.",
+      "all": "All",
+      "status": "Status",
+      "date": "Date"
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "no_show": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "mode": {
+      "online": "Online",
+      "onsite": "Onsite"
+    },
+    "dateFilter": {
+      "today": "Today",
+      "thisWeek": "This week",
+      "thisMonth": "This month",
+      "upcoming": "Upcoming",
+      "past": "Past"
+    },
+    "table": {
+      "applicant": "Applicant",
+      "job": "Job",
+      "dateTime": "Date & time",
+      "mode": "Mode",
+      "location": "Location",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "duration": {
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "hoursMinutes": "{{hours}} h {{minutes}} min"
+    },
+    "empty": {
+      "title": "No interviews yet",
+      "description": "No interviews are scheduled yet.",
+      "noMatchTitle": "No interviews match these filters",
+      "noResultsFor": "No results for “{{keyword}}”",
+      "noMatchDescription": "No interviews match this keyword or filter. Try a different applicant, job, or clear your filters.",
+      "clearFilters": "Clear filters"
+    },
+    "noAccess": {
+      "title": "You no longer have access",
+      "description": "Your account is not assigned to a company, or its HR access was removed or the company is on hold."
+    },
+    "loadFailed": "Could not load interviews. Please try again.",
+    "actions": {
+      "rowActions": "Actions for {{name}}",
+      "view": "View details",
+      "complete": "Mark as completed",
+      "noShow": "Mark as no-show",
+      "cancel": "Cancel interview",
+      "cancelShort": "Cancel",
+      "afterItEnds": "After it ends",
+      "edit": "Edit details",
+      "editShort": "Edit",
+      "reschedule": "Reschedule",
+      "delete": "Delete interview"
+    },
+    "detail": {
+      "information": "Interview information",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "mode": "Mode",
+      "link": "Link",
+      "openLink": "Open meeting link",
+      "location": "Location",
+      "notes": "Notes",
+      "interviewers": "Interviewers",
+      "history": "Status history",
+      "back": "Back to interviews",
+      "unavailableTitle": "This interview isn't available",
+      "unavailableDescription": "It may belong to another company, or the link is wrong.",
+      "loadFailedTitle": "Could not load this interview",
+      "loadFailed": "Something went wrong while loading the interview. Please try again.",
+      "cancelledNotice": "This interview is cancelled and can no longer be edited."
+    },
+    "view": {
+      "table": "Table",
+      "calendar": "Calendar"
+    },
+    "calendar": {
+      "fields": "Fields",
+      "field": {
+        "time": "Time",
+        "applicant": "Applicant",
+        "job": "Job"
+      },
+      "previous": "Previous month",
+      "next": "Next month",
+      "today": "Today",
+      "more": "+{{count}} more",
+      "dayCount_one": "{{count}} interview",
+      "dayCount_other": "{{count}} interviews",
+      "truncated": "Showing the first {{count}} interviews of this month. Narrow the search or the status to see the rest.",
+      "scheduleOn": "Schedule an interview on {{day}}",
+      "scheduleOnDay": "Schedule on this day"
+    },
+    "statusDialog": {
+      "complete": {
+        "title": "Mark interview as completed?",
+        "description": "{{name}} · {{when}}. The application status doesn't change.",
+        "confirm": "Complete",
+        "working": "Completing…",
+        "keep": "Cancel",
+        "doneTitle": "Interview completed",
+        "doneMessage": "This interview is now marked as completed.",
+        "failedTitle": "Could not complete",
+        "failedMessage": "Could not mark this interview as completed. Please try again."
+      },
+      "noShow": {
+        "title": "Mark as no-show?",
+        "description": "{{name}} · {{when}}. The application status doesn't change.",
+        "confirm": "Mark as no-show",
+        "working": "Saving…",
+        "keep": "Cancel",
+        "doneTitle": "Marked as no-show",
+        "doneMessage": "The application wasn't changed.",
+        "failedTitle": "Could not save",
+        "failedMessage": "Could not mark this interview as no-show. Please try again."
+      },
+      "cancel": {
+        "title": "Cancel interview with {{name}}?",
+        "description": "{{when}}. They'll be notified. The interview stays in history, and the application isn't rejected.",
+        "confirm": "Cancel interview",
+        "working": "Cancelling…",
+        "keep": "Keep interview",
+        "doneTitle": "Interview cancelled",
+        "doneMessage": "{{name}} has been notified.",
+        "failedTitle": "Cancellation failed",
+        "failedMessage": "Could not cancel this interview. Please try again."
+      },
+      "stale": {
+        "title": "This interview was already updated",
+        "description": "Its status changed before your action went through, so nothing was applied. Show the latest to see where it stands.",
+        "action": "Show latest"
+      },
+      "notEnded": "This interview hasn't ended yet. You can mark it once it ends."
+    },
+    "schedule": {
+      "open": "Schedule interview",
+      "title": "Schedule interview",
+      "description": "The applicant and the interviewers are notified by email.",
+      "selectApplication": "Select application",
+      "application": "Application",
+      "applications": "Applications",
+      "applicationPlaceholder": "Search applications…",
+      "searching": "Searching…",
+      "noApplications": "No applications to schedule match this search.",
+      "job": "Job",
+      "applicationStatus": "Application status",
+      "statusUnchanged": "Scheduling doesn't change the application status.",
+      "schedule": "Schedule",
+      "date": "Date",
+      "startTime": "Start time",
+      "duration": "Duration",
+      "timezone": "Timezone",
+      "runs": "Runs {{day}} · {{range}}",
+      "peopleAndPlace": "People & place",
+      "interviewers": "Interviewer emails",
+      "interviewersPlaceholder": "name@company.com",
+      "interviewerSuggestions": "Interviewers",
+      "removeInterviewer": "Remove {{email}}",
+      "location": "Location",
+      "locationPlaceholder": "Office address…",
+      "meetingLink": "Meeting link",
+      "linkPlaceholder": "https://meet.google.com/…",
+      "placeHint": "Provide at least one — location or meeting link.",
+      "notesSection": "Notes",
+      "notes": "Notes",
+      "notesPlaceholder": "Anything the interviewers should know…",
+      "notesHint": "Only your team sees notes.",
+      "cancel": "Cancel",
+      "create": "Create schedule",
+      "creating": "Creating…",
+      "discardTitle": "Discard unsaved changes?",
+      "discardDescription": "This interview won't be scheduled.",
+      "keepEditing": "Keep editing",
+      "discard": "Discard",
+      "doneTitle": "Interview scheduled",
+      "doneMessage": "The interview has been added to the schedule.",
+      "errors": {
+        "application": "Choose an application.",
+        "date": "Choose a date.",
+        "past": "Choose a future date and time.",
+        "time": "Enter a start time.",
+        "place": "Provide a location or a meeting link.",
+        "locationLong": "Location can't be longer than 255 characters.",
+        "linkLong": "The link can't be longer than 2048 characters.",
+        "linkInvalid": "Enter a link that starts with https://.",
+        "notesLong": "Notes can't be longer than 2000 characters.",
+        "emailInvalid": "Enter a valid email address.",
+        "emailDuplicate": "This interviewer is already added.",
+        "emailUnknown": "No active recruiter in your company has this email.",
+        "emailLookup": "Could not check this email. Please try again.",
+        "interviewersRequired": "Add at least one interviewer.",
+        "interviewersMax": "You can add up to {{count}} interviewers.",
+        "invalidInterviewers": "Every interviewer must be an active recruiter of your company.",
+        "notSchedulable": "This application isn't eligible for scheduling an interview.",
+        "applicantUnavailable": "This applicant's account isn't available.",
+        "interviewerConflict": "An interviewer already has another interview at this time. Choose another time or interviewer.",
+        "applicantConflict": "The applicant already has another interview at this time. Choose another time.",
+        "saveFailed": "Could not create this interview. Check the fields and try again."
+      }
+    },
+    "edit": {
+      "title": "Edit interview",
+      "description": "Date and time are locked here — use Reschedule to change them.",
+      "notice": "Saving sends {{name}} and the interviewers an email with the updated details.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "discardDescription": "Your changes to this interview won't be saved.",
+      "doneTitle": "Interview updated",
+      "doneMessage": "Your changes have been saved.",
+      "errors": {
+        "interviewerConflict": "An interviewer already has another interview at this time. Choose another interviewer or a shorter duration.",
+        "applicantConflict": "The applicant has another interview that overlaps this one. Choose a shorter duration.",
+        "saveFailed": "Could not save your changes. Check the fields and try again."
+      }
+    },
+    "reschedule": {
+      "title": "Reschedule interview",
+      "description": "{{name}} · currently {{current}}",
+      "runs": "Runs {{day}} · {{range}} ({{zone}})",
+      "notice": "{{name}} and the interviewers get an email with the new time.",
+      "save": "Save new time",
+      "saving": "Saving…",
+      "doneTitle": "Interview rescheduled",
+      "doneMessage": "{{name}} has been notified of the new time: {{when}}.",
+      "errors": {
+        "saveFailed": "Could not reschedule this interview. Check the date and time and try again."
+      }
+    },
+    "stale": {
+      "changed": {
+        "title": "This interview was updated",
+        "description": "It was changed while you were editing, so nothing was saved. Show the latest before changing it again.",
+        "action": "Show latest"
+      },
+      "notEditable": {
+        "title": "This interview can't be changed",
+        "description": "It's no longer scheduled, so its details and time can't be edited.",
+        "action": "Show latest"
+      }
+    },
+    "deleteDialog": {
+      "title": "Delete interview with {{name}}?",
+      "description": {
+        "scheduled": "{{when}}. They'll be notified that it's cancelled. The interview is removed from your list and history, and the application isn't rejected. This can't be undone.",
+        "closed": "{{when}}. The interview is removed from your list and history. The application isn't changed. This can't be undone."
+      },
+      "confirm": "Delete interview",
+      "working": "Deleting…",
+      "keep": "Keep interview",
+      "doneTitle": "Interview deleted",
+      "doneMessage": {
+        "scheduled": "{{name}} has been notified that it's cancelled.",
+        "closed": "The interview with {{name}} was removed."
+      },
+      "failedTitle": "Deletion failed",
+      "failedMessage": "Could not delete this interview. Please try again.",
+      "stale": {
+        "changed": {
+          "title": "This interview was already updated",
+          "description": "It was changed or removed before your action went through, so nothing was deleted. Show the latest to see where it stands.",
+          "action": "Show latest"
+        },
+        "completed": {
+          "title": "This interview can't be deleted",
+          "description": "It was marked as completed, and a completed interview stays as a record. Show the latest to see where it stands.",
+          "action": "Show latest"
+        }
       }
     }
   }

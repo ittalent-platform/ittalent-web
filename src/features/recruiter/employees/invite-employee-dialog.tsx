@@ -101,8 +101,8 @@ export function InviteEmployeeDialog({
   };
 
   const handleCopyLink = () => {
-    const fakeLink = `${window.location.origin}/register?invite_email=${encodeURIComponent(invitedEmail)}`;
-    void navigator.clipboard.writeText(fakeLink);
+    const inviteLink = `${window.location.origin}/forgot-password?email=${encodeURIComponent(invitedEmail)}`;
+    void navigator.clipboard.writeText(inviteLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
