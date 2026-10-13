@@ -12,7 +12,10 @@ vi.mock("@/components/toast/toast-provider", () => ({ useToast: () => ({ dismiss
 vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({
   useInterviewCalendar: vi.fn(),
   useInterviewList: vi.fn(),
+  useUpdateInterview: () => ({ isPending: false, mutate: vi.fn() }),
   useUpdateInterviewStatus: vi.fn(),
+  useFindInterviewerByEmail: () => vi.fn(),
+  useInterviewerSearch: () => ({ data: { items: [] } }),
 }));
 
 type Item = InterviewListResponse["items"][number];
@@ -84,6 +87,28 @@ describe("Interview status actions in the table", () => {
     expect(screen.getByRole("menuitem", { name: "Cancel interview" })).toBeInTheDocument();
   });
 
+  it("offers an upcoming interview to be edited and rescheduled, in that order after its details", async () => {
+    const user = userEvent.setup();
+    await openMenu(user);
+    expect(await screen.findByRole("menuitem", { name: "Edit details" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "Reschedule" })).toBeInTheDocument();
+    const names = screen.getAllByRole("menuitem").map((item) => item.textContent ?? "");
+    expect(names.map((name) => name.split("After")[0])).toEqual(["View details", "Edit details", "Reschedule", "Mark as completed", "Cancel interview"]);
+  });
+
+  it("opens the edit dialog and the reschedule dialog from the menu", async () => {
+    const user = userEvent.setup();
+    await openMenu(user);
+    await user.click(await screen.findByRole("menuitem", { name: "Edit details" }));
+    expect(await screen.findByRole("dialog", { name: "Edit interview" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Edit interview" })).not.toBeInTheDocument());
+
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Reschedule" }));
+    expect(await screen.findByRole("dialog", { name: "Reschedule interview" })).toBeInTheDocument();
+  });
+
   it("offers an ended interview to be completed, marked no-show or cancelled", async () => {
     mockList([interview({ canComplete: true })]);
     const user = userEvent.setup();
@@ -91,6 +116,14 @@ describe("Interview status actions in the table", () => {
     expect(await screen.findByRole("menuitem", { name: "Mark as completed" })).not.toHaveAttribute("aria-disabled", "true");
     expect(screen.getByRole("menuitem", { name: "Mark as no-show" })).toBeInTheDocument();
     expect(screen.getByRole("menuitem", { name: "Cancel interview" })).toBeInTheDocument();
+  });
+
+  it("lets an ended interview be edited (its notes, say) but not moved", async () => {
+    mockList([interview({ canComplete: true })]);
+    const user = userEvent.setup();
+    await openMenu(user);
+    expect(await screen.findByRole("menuitem", { name: "Edit details" })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Reschedule" })).not.toBeInTheDocument();
   });
 
   it.each(["completed", "no_show", "cancelled"] as const)("offers nothing but the details for a %s interview", async (status) => {

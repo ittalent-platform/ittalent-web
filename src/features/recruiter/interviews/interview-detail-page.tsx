@@ -148,12 +148,23 @@ export function InterviewDetailPage() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          {interview.canComplete ? (
-            <Button className="h-11 rounded-xl px-5 text-sm font-semibold" onClick={() => actions.run("complete", interview)} type="button" variant="success-solid">
-              {t("interviews.actions.complete")}
-            </Button>
+          {interview.status === "scheduled" ? (
+            interview.canComplete ? (
+              <Button className="h-11 rounded-xl px-5 text-sm font-semibold" onClick={() => actions.run("complete", interview)} type="button" variant="success-solid">
+                {t("interviews.actions.complete")}
+              </Button>
+            ) : (
+              <>
+                <Button className="h-11 rounded-xl px-5 text-sm font-semibold" onClick={() => actions.run("edit", interview)} type="button" variant="outline">
+                  {t("interviews.actions.edit")}
+                </Button>
+                <Button className="h-11 rounded-xl px-5 text-sm font-semibold" onClick={() => actions.run("reschedule", interview)} type="button">
+                  {t("interviews.actions.reschedule")}
+                </Button>
+              </>
+            )
           ) : null}
-          <InterviewActionsMenu hide={interview.canComplete ? ["complete"] : []} interview={interview} onAction={actions.run} placement="page" withView={false} />
+          <InterviewActionsMenu hide={interview.canComplete ? ["complete"] : ["edit", "reschedule"]} interview={interview} onAction={actions.run} placement="page" withView={false} />
         </div>
       </div>
 

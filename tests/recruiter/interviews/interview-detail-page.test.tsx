@@ -7,7 +7,13 @@ import type { InterviewDetailDto } from "@/api/generated/types.gen";
 import { InterviewDetailPage } from "@/features/recruiter/interviews/interview-detail-page";
 import * as interviewQueries from "@/features/recruiter/interviews/interviews.queries";
 
-vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({ useInterviewDetail: vi.fn(), useUpdateInterviewStatus: () => ({ isPending: false, mutate: vi.fn() }) }));
+vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({
+  useFindInterviewerByEmail: () => vi.fn(),
+  useInterviewDetail: vi.fn(),
+  useInterviewerSearch: () => ({ data: { items: [] } }),
+  useUpdateInterview: () => ({ isPending: false, mutate: vi.fn() }),
+  useUpdateInterviewStatus: () => ({ isPending: false, mutate: vi.fn() }),
+}));
 vi.mock("@/components/toast/toast-provider", () => ({ useToast: () => ({ dismissToast: vi.fn(), showToast: vi.fn() }) }));
 vi.mock("@/auth/use-session", () => ({
   useSession: () => ({ data: { user: { email: "tran.bao@novafintech.vn", fullName: "Trần Bảo", id: "u-me" } } }),
@@ -146,6 +152,38 @@ describe("Recruiter interview detail", () => {
     expect(screen.queryByRole("menuitem", { name: "View details" })).not.toBeInTheDocument();
   });
 
+  it("puts Edit details and Reschedule in the header of an upcoming interview, not in the menu", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    expect(screen.getByRole("button", { name: "Edit details" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reschedule" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    await screen.findByRole("menuitem", { name: "Cancel interview" });
+    expect(screen.queryByRole("menuitem", { name: "Edit details" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Reschedule" })).not.toBeInTheDocument();
+  });
+
+  it("opens the edit dialog and the reschedule dialog from the header", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByRole("button", { name: "Edit details" }));
+    expect(await screen.findByRole("dialog", { name: "Edit interview" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    await user.click(screen.getByRole("button", { name: "Reschedule" }));
+    expect(await screen.findByRole("dialog", { name: "Reschedule interview" })).toBeInTheDocument();
+  });
+
+  it("offers an ended interview to be edited from the menu, with no Reschedule", async () => {
+    mockDetail(detail({ canComplete: true }));
+    const user = userEvent.setup();
+    renderPage();
+    expect(screen.queryByRole("button", { name: "Edit details" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Reschedule" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    expect(await screen.findByRole("menuitem", { name: "Edit details" })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Reschedule" })).not.toBeInTheDocument();
+  });
+
   it("puts completing in the header once the interview has ended, and leaves no-show and cancel in the menu", async () => {
     mockDetail(detail({ canComplete: true }));
     const user = userEvent.setup();
@@ -170,6 +208,8 @@ describe("Recruiter interview detail", () => {
     renderPage();
     expect(screen.queryByRole("button", { name: /Actions for/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Mark as completed" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Edit details" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Reschedule" })).not.toBeInTheDocument();
   });
 
   it("shows loading placeholders while the interview is on its way", () => {

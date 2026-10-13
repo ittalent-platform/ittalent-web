@@ -6,10 +6,17 @@ import {
   getApiV1InterviewsById,
   getApiV1InterviewsCalendar,
   getApiV1InterviewsInterviewers,
+  patchApiV1InterviewsById,
   patchApiV1InterviewsByIdStatus,
   postApiV1Interviews,
 } from "@/api/generated";
-import type { CreateInterviewRequest, GetApiV1InterviewsCalendarData, GetApiV1InterviewsData, UpdateInterviewStatusRequest } from "@/api/generated/types.gen";
+import type {
+  CreateInterviewRequest,
+  GetApiV1InterviewsCalendarData,
+  GetApiV1InterviewsData,
+  UpdateInterviewRequest,
+  UpdateInterviewStatusRequest,
+} from "@/api/generated/types.gen";
 import { requestError } from "@/api/request-error";
 
 import { LOOKUP_LIMIT } from "./interviews.constants";
@@ -113,5 +120,15 @@ export function useCreateInterview() {
   return useMutation({
     mutationFn: async (body: CreateInterviewRequest) => unwrap(await postApiV1Interviews({ body }), "Could not create this interview."),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: interviewKeys.all }),
+  });
+}
+
+/** Changes what a scheduled interview says (people, place, notes, duration, time); every list, the calendar and the detail refresh afterwards. */
+export function useUpdateInterview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...body }: UpdateInterviewRequest & { id: string }) =>
+      unwrap(await patchApiV1InterviewsById({ body, path: { id } }), "Could not update this interview."),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: interviewKeys.all }),
   });
 }

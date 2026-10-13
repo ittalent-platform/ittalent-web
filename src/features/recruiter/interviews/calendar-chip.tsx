@@ -40,7 +40,7 @@ export function CalendarChip({ fields, interview, onAction, onOpenChange, open }
           {second ? <span className="block w-full truncate text-[11px] leading-tight opacity-80">{second}</span> : null}
         </button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-[340px] p-0" side="right">
+      <PopoverContent align="start" className="w-[380px] p-0" side="right">
         <InterviewPeek interview={interview} onAction={onAction} />
       </PopoverContent>
     </Popover>

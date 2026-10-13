@@ -38,26 +38,29 @@ export function isHttpsUrl(value: string): boolean {
 }
 
 /**
- * What the form checks before it asks the API. A message here is a key under `interviews.schedule.errors`,
+ * The fields the forms share, checked before the API is asked. A message is a key under `interviews.schedule.errors`,
  * not a sentence, so the screen words it in the language in use.
  */
-export const scheduleSchema = z
-  .object({
-    applicationId: z.string().min(1, "application"),
-    date: z.string().regex(DATE_PATTERN, "date"),
-    durationMinutes: z.string().min(1),
-    location: z.string().trim().max(SCHEDULE_LIMITS.location, "locationLong"),
-    meetingLink: z
-      .string()
-      .trim()
-      .max(SCHEDULE_LIMITS.link, "linkLong")
-      .refine((value) => value === "" || isHttpsUrl(value), "linkInvalid"),
-    notes: z.string().trim().max(SCHEDULE_LIMITS.notes, "notesLong"),
-    startTime: z.string().regex(TIME_PATTERN, "time"),
-  })
-  .superRefine((values, ctx) => {
-    if (!values.location && !values.meetingLink) ctx.addIssue({ code: "custom", message: "place", path: ["location"] });
-  });
+export const scheduleFields = {
+  applicationId: z.string().min(1, "application"),
+  date: z.string().regex(DATE_PATTERN, "date"),
+  durationMinutes: z.string().min(1),
+  location: z.string().trim().max(SCHEDULE_LIMITS.location, "locationLong"),
+  meetingLink: z
+    .string()
+    .trim()
+    .max(SCHEDULE_LIMITS.link, "linkLong")
+    .refine((value) => value === "" || isHttpsUrl(value), "linkInvalid"),
+  notes: z.string().trim().max(SCHEDULE_LIMITS.notes, "notesLong"),
+  startTime: z.string().regex(TIME_PATTERN, "time"),
+};
+
+/** An interview takes place somewhere: a location, a meeting link, or both. */
+export function requirePlace(values: Pick<ScheduleValues, "location" | "meetingLink">, ctx: z.RefinementCtx): void {
+  if (!values.location && !values.meetingLink) ctx.addIssue({ code: "custom", message: "place", path: ["location"] });
+}
+
+export const scheduleSchema = z.object(scheduleFields).superRefine(requirePlace);
 
 /** Whether a Vietnam-time date and time that the form accepted is still ahead of `now`. */
 export function startsInFuture(values: Pick<ScheduleValues, "date" | "startTime">, now: Date): boolean {

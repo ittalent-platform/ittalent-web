@@ -60,11 +60,21 @@ export function InterviewPeek({ interview, onAction }: { interview: InterviewIte
         {interviewers.length > 0 ? <Fact icon={UserRound}>{interviewers.join(", ")}</Fact> : null}
       </ul>
 
-      <div className="flex items-center justify-end gap-2 border-t border-border px-4 py-3">
+      <div className="flex flex-wrap items-center justify-end gap-x-1 gap-y-2 border-t border-border px-4 py-3">
         {interview.status === "scheduled" ? (
-          <Button className="h-9 px-3 text-[13px] font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => onAction("cancel", interview)} type="button" variant="ghost">
-            {t("interviews.actions.cancelShort")}
-          </Button>
+          <>
+            <Button className="h-9 px-2 text-[13px] font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => onAction("cancel", interview)} type="button" variant="ghost">
+              {t("interviews.actions.cancelShort")}
+            </Button>
+            <Button className="h-9 px-2 text-[13px] font-semibold" onClick={() => onAction("edit", interview)} type="button" variant="ghost">
+              {t("interviews.actions.editShort")}
+            </Button>
+            {interview.canComplete ? null : (
+              <Button className="h-9 px-2 text-[13px] font-semibold" onClick={() => onAction("reschedule", interview)} type="button" variant="ghost">
+                {t("interviews.actions.reschedule")}
+              </Button>
+            )}
+          </>
         ) : null}
         <Button asChild className="h-9 px-4 text-[13px] font-semibold" shape="pill">
           <Link to={interviewPath(interview.id)}>{t("interviews.actions.view")}</Link>

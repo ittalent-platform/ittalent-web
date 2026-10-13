@@ -1,4 +1,4 @@
-import { Ban, CircleCheck, Eye, MoreVertical, UserX, type LucideIcon } from "lucide-react";
+import { Ban, CalendarClock, CircleCheck, Eye, MoreVertical, Pencil, UserX, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
@@ -6,22 +6,25 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { interviewPath } from "@/config/routes";
 import { cn } from "@/lib/utils";
 
-import type { InterviewItem, StatusAction } from "./interviews.constants";
+import type { InterviewItem } from "./interviews.constants";
 import { applicantName } from "./interviews.format";
 import type { InterviewAction } from "./use-interview-actions";
 
-const ITEM_ICON: Record<StatusAction, LucideIcon> = { cancel: Ban, complete: CircleCheck, noShow: UserX };
-const ITEM_VARIANT = { cancel: "destructive", complete: "success", noShow: "default" } as const satisfies Record<StatusAction, "default" | "destructive" | "success">;
+const ITEM_ICON: Record<InterviewAction, LucideIcon> = { cancel: Ban, complete: CircleCheck, edit: Pencil, noShow: UserX, reschedule: CalendarClock };
+const ITEM_VARIANT = { cancel: "destructive", complete: "success", edit: "default", noShow: "default", reschedule: "default" } as const satisfies Record<InterviewAction, "default" | "destructive" | "success">;
 
-export type StatusMenuItem = { action: StatusAction; disabled: boolean };
+export type InterviewMenuItem = { action: InterviewAction; disabled: boolean };
 
 /**
- * The status actions an interview offers. Only a scheduled interview has any: it can be cancelled at any time,
- * and once it has ended it can be marked completed or no-show (completing shows, disabled, until then).
+ * The actions an interview offers. Only a scheduled interview has any. It can be edited at any time and moved
+ * until it ends; once it has ended it can be marked completed or no-show instead (completing shows, disabled,
+ * until then). It can be cancelled at any time.
  */
-export function statusMenuItems(interview: Pick<InterviewItem, "canComplete" | "status">): StatusMenuItem[] {
+export function interviewMenuItems(interview: Pick<InterviewItem, "canComplete" | "status">): InterviewMenuItem[] {
   if (interview.status !== "scheduled") return [];
   return [
+    { action: "edit", disabled: false },
+    ...(interview.canComplete ? [] : [{ action: "reschedule" as const, disabled: false }]),
     { action: "complete", disabled: !interview.canComplete },
     ...(interview.canComplete ? [{ action: "noShow" as const, disabled: false }] : []),
     { action: "cancel", disabled: false },
@@ -30,7 +33,7 @@ export function statusMenuItems(interview: Pick<InterviewItem, "canComplete" | "
 
 type InterviewActionsMenuProps = {
   /** Actions the screen already shows as buttons of its own. */
-  hide?: readonly StatusAction[];
+  hide?: readonly InterviewAction[];
   interview: InterviewItem;
   onAction: (action: InterviewAction, interview: InterviewItem) => void;
   /** "row" is the quiet icon of a table row; "page" is the bordered square beside a page's buttons. */
@@ -43,7 +46,7 @@ type InterviewActionsMenuProps = {
 export function InterviewActionsMenu({ hide = [], interview, onAction, placement = "row", withView = true }: InterviewActionsMenuProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const items = statusMenuItems(interview).filter(({ action }) => !hide.includes(action));
+  const items = interviewMenuItems(interview).filter(({ action }) => !hide.includes(action));
   if (!withView && items.length === 0) return null;
 
   return (

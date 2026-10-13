@@ -13,6 +13,8 @@ import {
 } from "./interviews.constants";
 
 const DATE_LENGTH = "YYYY-MM-DD".length;
+/** Where `HH:mm` ends in an ISO string: `YYYY-MM-DDTHH:mm`. */
+const CLOCK_END = "YYYY-MM-DDTHH:mm".length;
 
 function localeOf(language: string): string {
   return language === "vi" ? "vi-VN" : "en-GB";
@@ -82,6 +84,11 @@ export function formatDurationShort(minutes: number): string {
 /** `YYYY-MM-DD` of an instant in Vietnam time. */
 export function vietnamDay(value: string | number | Date): string {
   return new Date(new Date(value).getTime() + INTERVIEW_UTC_OFFSET_HOURS * MS_PER_HOUR).toISOString().slice(0, DATE_LENGTH);
+}
+
+/** The clock time (`HH:mm`, 24-hour) of an instant in Vietnam time, as a time input holds it. */
+export function vietnamClock(value: string | number | Date): string {
+  return new Date(new Date(value).getTime() + INTERVIEW_UTC_OFFSET_HOURS * MS_PER_HOUR).toISOString().slice(DATE_LENGTH + 1, CLOCK_END);
 }
 
 /** The UTC instant at which `YYYY-MM-DD` starts in Vietnam time. */

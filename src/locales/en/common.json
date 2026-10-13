@@ -2146,7 +2146,10 @@
       "noShow": "Mark as no-show",
       "cancel": "Cancel interview",
       "cancelShort": "Cancel",
-      "afterItEnds": "After it ends"
+      "afterItEnds": "After it ends",
+      "edit": "Edit details",
+      "editShort": "Edit",
+      "reschedule": "Reschedule"
     },
     "detail": {
       "information": "Interview information",
@@ -2293,6 +2296,46 @@
         "interviewerConflict": "An interviewer already has another interview at this time. Choose another time or interviewer.",
         "applicantConflict": "The applicant already has another interview at this time. Choose another time.",
         "saveFailed": "Could not create this interview. Check the fields and try again."
+      }
+    },
+    "edit": {
+      "title": "Edit interview",
+      "description": "Date and time are locked here — use Reschedule to change them.",
+      "notice": "Saving sends {{name}} and the interviewers an email with the updated details.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "discardDescription": "Your changes to this interview won't be saved.",
+      "doneTitle": "Interview updated",
+      "doneMessage": "Your changes have been saved.",
+      "errors": {
+        "interviewerConflict": "An interviewer already has another interview at this time. Choose another interviewer or a shorter duration.",
+        "applicantConflict": "The applicant has another interview that overlaps this one. Choose a shorter duration.",
+        "saveFailed": "Could not save your changes. Check the fields and try again."
+      }
+    },
+    "reschedule": {
+      "title": "Reschedule interview",
+      "description": "{{name}} · currently {{current}}",
+      "runs": "Runs {{day}} · {{range}} ({{zone}})",
+      "notice": "{{name}} and the interviewers get an email with the new time.",
+      "save": "Save new time",
+      "saving": "Saving…",
+      "doneTitle": "Interview rescheduled",
+      "doneMessage": "{{name}} has been notified of the new time: {{when}}.",
+      "errors": {
+        "saveFailed": "Could not reschedule this interview. Check the date and time and try again."
+      }
+    },
+    "stale": {
+      "changed": {
+        "title": "This interview was updated",
+        "description": "It was changed while you were editing, so nothing was saved. Show the latest before changing it again.",
+        "action": "Show latest"
+      },
+      "notEditable": {
+        "title": "This interview can't be changed",
+        "description": "It's no longer scheduled, so its details and time can't be edited.",
+        "action": "Show latest"
       }
     }
   }

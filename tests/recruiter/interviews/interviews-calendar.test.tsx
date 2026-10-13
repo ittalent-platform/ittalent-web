@@ -10,7 +10,10 @@ import * as interviewQueries from "@/features/recruiter/interviews/interviews.qu
 vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({
   useInterviewCalendar: vi.fn(),
   useInterviewList: vi.fn(),
+  useUpdateInterview: () => ({ isPending: false, mutate: vi.fn() }),
   useUpdateInterviewStatus: () => ({ isPending: false, mutate: vi.fn() }),
+  useFindInterviewerByEmail: () => vi.fn(),
+  useInterviewerSearch: () => ({ data: { items: [] } }),
 }));
 vi.mock("@/components/toast/toast-provider", () => ({ useToast: () => ({ dismissToast: vi.fn(), showToast: vi.fn() }) }));
 
@@ -142,6 +145,34 @@ describe("Recruiter interviews calendar", () => {
     await user.click(screen.getByText("10:00 · Applicant done"));
     expect(await screen.findByRole("link", { name: "View details" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Cancel" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Edit" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Reschedule" })).not.toBeInTheDocument();
+  });
+
+  it("offers to edit and reschedule from the summary of an upcoming interview", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByText("10:00 · Applicant khoa"));
+    await user.click(await screen.findByRole("button", { name: "Edit" }));
+    expect(await screen.findByRole("dialog", { name: "Edit interview" })).toBeInTheDocument();
+    expect(screen.queryByText("Thu, 15 Oct 2026 · 10:00 – 11:00 (1h)")).not.toBeInTheDocument();
+  });
+
+  it("opens the reschedule dialog from the summary", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByText("10:00 · Applicant khoa"));
+    await user.click(await screen.findByRole("button", { name: "Reschedule" }));
+    expect(await screen.findByRole("dialog", { name: "Reschedule interview" })).toBeInTheDocument();
+  });
+
+  it("offers an ended interview to be edited but not rescheduled from the summary", async () => {
+    mockCalendar(response([interview("over", { canComplete: true })]));
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByText("10:00 · Applicant over"));
+    expect(await screen.findByRole("button", { name: "Edit" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Reschedule" })).not.toBeInTheDocument();
   });
 
   it("shows three interviews of a day and lists the rest in a dialog", async () => {

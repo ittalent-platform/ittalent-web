@@ -2123,7 +2123,10 @@
       "noShow": "Đánh dấu vắng mặt",
       "cancel": "Hủy phỏng vấn",
       "cancelShort": "Hủy",
-      "afterItEnds": "Sau khi kết thúc"
+      "afterItEnds": "Sau khi kết thúc",
+      "edit": "Chỉnh sửa chi tiết",
+      "editShort": "Sửa",
+      "reschedule": "Đổi lịch"
     },
     "detail": {
       "information": "Thông tin phỏng vấn",
@@ -2269,6 +2272,46 @@
         "interviewerConflict": "Một người phỏng vấn đã có buổi phỏng vấn khác vào giờ này. Hãy chọn giờ hoặc người phỏng vấn khác.",
         "applicantConflict": "Ứng viên đã có buổi phỏng vấn khác vào giờ này. Hãy chọn giờ khác.",
         "saveFailed": "Không thể tạo buổi phỏng vấn này. Hãy kiểm tra các trường và thử lại."
+      }
+    },
+    "edit": {
+      "title": "Chỉnh sửa buổi phỏng vấn",
+      "description": "Ngày và giờ bị khóa ở đây — hãy dùng Đổi lịch để thay đổi.",
+      "notice": "Khi lưu, {{name}} và những người phỏng vấn sẽ nhận email với thông tin cập nhật.",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu…",
+      "discardDescription": "Các thay đổi của bạn với buổi phỏng vấn này sẽ không được lưu.",
+      "doneTitle": "Đã cập nhật buổi phỏng vấn",
+      "doneMessage": "Các thay đổi của bạn đã được lưu.",
+      "errors": {
+        "interviewerConflict": "Một người phỏng vấn đã có buổi phỏng vấn khác vào giờ này. Hãy chọn người phỏng vấn khác hoặc rút ngắn thời lượng.",
+        "applicantConflict": "Ứng viên có buổi phỏng vấn khác trùng với buổi này. Hãy rút ngắn thời lượng.",
+        "saveFailed": "Không thể lưu các thay đổi. Hãy kiểm tra các trường và thử lại."
+      }
+    },
+    "reschedule": {
+      "title": "Đổi lịch phỏng vấn",
+      "description": "{{name}} · hiện tại {{current}}",
+      "runs": "Diễn ra {{day}} · {{range}} ({{zone}})",
+      "notice": "{{name}} và những người phỏng vấn sẽ nhận email về thời gian mới.",
+      "save": "Lưu giờ mới",
+      "saving": "Đang lưu…",
+      "doneTitle": "Đã đổi lịch phỏng vấn",
+      "doneMessage": "{{name}} đã được thông báo về thời gian mới: {{when}}.",
+      "errors": {
+        "saveFailed": "Không thể đổi lịch buổi phỏng vấn này. Hãy kiểm tra ngày giờ và thử lại."
+      }
+    },
+    "stale": {
+      "changed": {
+        "title": "Buổi phỏng vấn này vừa được cập nhật",
+        "description": "Buổi phỏng vấn đã được thay đổi trong lúc bạn chỉnh sửa nên chưa có gì được lưu. Hãy xem bản mới nhất trước khi thay đổi lại.",
+        "action": "Xem bản mới nhất"
+      },
+      "notEditable": {
+        "title": "Không thể thay đổi buổi phỏng vấn này",
+        "description": "Buổi phỏng vấn không còn ở trạng thái đã lên lịch nên không thể sửa chi tiết hay thời gian.",
+        "action": "Xem bản mới nhất"
       }
     }
   }
