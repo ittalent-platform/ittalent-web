@@ -41,6 +41,13 @@ const RegisterCompanyPage = lazy(() =>
     }),
   ),
 );
+const AcceptRegistrationInvitationPage = lazy(() =>
+  import("@/features/enterprise-registration/pages/accept-registration-invitation-page").then(
+    (m) => ({
+      default: m.AcceptRegistrationInvitationPage,
+    }),
+  ),
+);
 const AcceptInvitationPage = lazy(() =>
   import("@/features/auth/accept-invitation-page").then((m) => ({ default: m.AcceptInvitationPage })),
 );
@@ -168,6 +175,7 @@ export const appRoutes = [
   { path: "/register-company", element: <RegisterCompanyPage /> },
   // The confirmation email links here (APP_BASE_URL/enterprise-registration/verify?token=...).
   { path: "/enterprise-registration/verify", element: <RedirectKeepingSearch to="/register-company" /> },
+  { path: "/enterprise-registration/invitation", element: <AcceptRegistrationInvitationPage /> },
   { path: "/verify-email", element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
