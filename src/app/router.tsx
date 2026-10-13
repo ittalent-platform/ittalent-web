@@ -90,6 +90,16 @@ const RecruiterEditJobPostingPage = lazy(() =>
     default: m.RecruiterEditJobPostingPage,
   })),
 );
+const RecruiterInterviewsPage = lazy(() =>
+  import("@/features/recruiter/interviews/interviews-page").then((m) => ({
+    default: m.InterviewsPage,
+  })),
+);
+const RecruiterInterviewDetailPage = lazy(() =>
+  import("@/features/recruiter/interviews/interview-detail-page").then((m) => ({
+    default: m.InterviewDetailPage,
+  })),
+);
 const DocumentsPage = lazy(() =>
   import("@/features/documents/documents-page").then((m) => ({
     default: m.DocumentsPage,
@@ -118,6 +128,11 @@ const AdminEnterpriseDetailPage = lazy(() =>
 const EnterpriseFormPage = lazy(() =>
   import("@/features/admin/enterprises/enterprise-form-page").then((m) => ({
     default: m.EnterpriseFormPage,
+  })),
+);
+const AdminRegistrationsPage = lazy(() =>
+  import("@/features/admin/registrations").then((m) => ({
+    default: m.RegistrationsPage,
   })),
 );
 
@@ -198,6 +213,7 @@ export const appRoutes = [
           { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
           { path: "enterprises/new", element: <EnterpriseFormPage /> },
+          { path: "registrations", element: <AdminRegistrationsPage /> },
           {
             path: "enterprises/:enterpriseId",
             element: <AdminEnterpriseDetailPage />,
@@ -238,6 +254,11 @@ export const appRoutes = [
           {
             path: "job-postings/:jobPostingId/edit",
             element: <RecruiterEditJobPostingPage />,
+          },
+          { path: "interviews", element: <RecruiterInterviewsPage /> },
+          {
+            path: "interviews/:interviewId",
+            element: <RecruiterInterviewDetailPage />,
           },
         ],
       },

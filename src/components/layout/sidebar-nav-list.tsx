@@ -3,6 +3,7 @@ import { NavLink } from "react-router";
 import { cn } from "@/lib/utils";
 
 export interface SidebarNavItem {
+  badge?: number | string;
   end: boolean;
   icon: LucideIcon;
   label: string;
@@ -67,6 +68,16 @@ export function SidebarNavList({
           >
             <Icon className={iconClassName} />
             <span className={cn(collapsed && "lg:hidden")}>{item.label}</span>
+            {item.badge !== undefined && item.badge !== null && item.badge !== 0 ? (
+              <span
+                className={cn(
+                  "ml-auto inline-flex items-center justify-center rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold leading-none text-white",
+                  collapsed && "lg:hidden",
+                )}
+              >
+                {item.badge}
+              </span>
+            ) : null}
           </NavLink>
         );
       })}

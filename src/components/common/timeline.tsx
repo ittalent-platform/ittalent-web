@@ -11,6 +11,8 @@ export type TimelineTone = "error" | "info" | "neutral" | "orange" | "success" |
 export type TimelineEntry = {
   atIso: string;
   by?: string;
+  /** A short line under the date, e.g. the reason or an outcome ("Invitation sent to …"). */
+  detail?: string;
   label: string;
   message?: string;
   tone: TimelineTone;
@@ -48,6 +50,7 @@ export function TimelineList({ entries, formatDate }: { entries: TimelineEntry[]
               {formatDate(entry.atIso)}
               {entry.by ? ` · ${t("timeline.by", { name: entry.by })}` : null}
             </p>
+            {entry.detail ? <p className="wrap-anywhere text-[13px] text-muted-foreground">{entry.detail}</p> : null}
           </div>
         </li>
       ))}
@@ -60,10 +63,12 @@ type TimelineProps = {
   formatDate: (iso: string) => string;
   /** Entries beyond this count collapse behind a "View all" link that opens the full history in a dialog. */
   maxVisible?: number;
+  /** Hide the entry count beside the title; defaults to showing it. */
+  showCount?: boolean;
   title: string;
 };
 
-export function Timeline({ entries, formatDate, maxVisible = DEFAULT_MAX_VISIBLE, title }: TimelineProps) {
+export function Timeline({ entries, formatDate, maxVisible = DEFAULT_MAX_VISIBLE, showCount = true, title }: TimelineProps) {
   const { t } = useTranslation();
   const [isFullHistoryOpen, setIsFullHistoryOpen] = useState(false);
   const hasMore = entries.length > maxVisible;
@@ -74,7 +79,7 @@ export function Timeline({ entries, formatDate, maxVisible = DEFAULT_MAX_VISIBLE
       <Card className="min-w-0 rounded-2xl border-border bg-card shadow-none">
         <CardHeader className="flex-row items-center justify-between gap-2 p-5 pb-4">
           <p className="text-[11.5px] font-bold uppercase tracking-wider text-muted-foreground">{title}</p>
-          <span className="itt-mono text-[11px] text-muted-foreground">{entries.length}</span>
+          {showCount ? <span className="itt-mono text-[11px] text-muted-foreground">{entries.length}</span> : null}
         </CardHeader>
         <CardContent className="min-w-0 p-5 pt-0">
           <TimelineList entries={visibleEntries} formatDate={formatDate} />

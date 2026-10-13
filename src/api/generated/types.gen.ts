@@ -933,6 +933,166 @@ export type WithdrawApplicationBody = {
     reason?: string;
 };
 
+export type CreateInterviewRequest = {
+    applicationId: string;
+    interviewerIds: Array<string>;
+    scheduledAt: string;
+    durationMinutes?: number;
+    mode: 'online' | 'onsite';
+    meetingLink?: string;
+    location?: string;
+    notes?: string;
+};
+
+export type UpdateInterviewRequest = {
+    interviewerIds?: Array<string>;
+    scheduledAt?: string;
+    durationMinutes?: number;
+    mode?: 'online' | 'onsite';
+    meetingLink?: string | null;
+    location?: string | null;
+    notes?: string | null;
+};
+
+export type UpdateInterviewStatusRequest = {
+    status: 'completed' | 'cancelled' | 'no_show';
+    note?: string;
+};
+
+export type InterviewDetailDto = {
+    id: string;
+    status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+    scheduledAt: string;
+    endsAt: string;
+    durationMinutes: number;
+    mode: 'online' | 'onsite';
+    meetingLink: string | null;
+    location: string | null;
+    notes: string | null;
+    applicationId: string;
+    job: {
+        id: string;
+        title: string | null;
+    };
+    applicant: {
+        id: string;
+        fullName: string | null;
+        email: string | null;
+    };
+    interviewers: Array<{
+        id: string;
+        fullName: string | null;
+        email: string | null;
+    }>;
+    canComplete: boolean;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: string;
+    statusHistory: Array<{
+        status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+        changedAt: string;
+        changedBy: string;
+        note: string | null;
+    }>;
+};
+
+export type InterviewListResponse = {
+    items: Array<{
+        id: string;
+        status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+        scheduledAt: string;
+        endsAt: string;
+        durationMinutes: number;
+        mode: 'online' | 'onsite';
+        meetingLink: string | null;
+        location: string | null;
+        notes: string | null;
+        applicationId: string;
+        job: {
+            id: string;
+            title: string | null;
+        };
+        applicant: {
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        };
+        interviewers: Array<{
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        }>;
+        canComplete: boolean;
+        createdAt: string;
+        updatedAt: string;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type InterviewCalendarResponse = {
+    from: string;
+    to: string;
+    total: number;
+    truncated: boolean;
+    items: Array<{
+        id: string;
+        status: 'scheduled' | 'completed' | 'cancelled' | 'no_show';
+        scheduledAt: string;
+        endsAt: string;
+        durationMinutes: number;
+        mode: 'online' | 'onsite';
+        meetingLink: string | null;
+        location: string | null;
+        notes: string | null;
+        applicationId: string;
+        job: {
+            id: string;
+            title: string | null;
+        };
+        applicant: {
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        };
+        interviewers: Array<{
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        }>;
+        canComplete: boolean;
+        createdAt: string;
+        updatedAt: string;
+    }>;
+};
+
+export type SchedulableApplicationListResponse = {
+    items: Array<{
+        id: string;
+        status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn';
+        appliedAt: string;
+        job: {
+            id: string;
+            title: string | null;
+        };
+        applicant: {
+            id: string;
+            fullName: string | null;
+            email: string | null;
+        };
+    }>;
+};
+
+export type InterviewerListResponse = {
+    items: Array<{
+        id: string;
+        fullName: string | null;
+        email: string;
+    }>;
+};
+
 export type UpdateUserStatusRequest = {
     status: 'suspended' | 'active';
     reason: string;
@@ -2992,6 +3152,357 @@ export type PatchApiV1MeApplicationsByIdWithdrawResponses = {
 };
 
 export type PatchApiV1MeApplicationsByIdWithdrawResponse = PatchApiV1MeApplicationsByIdWithdrawResponses[keyof PatchApiV1MeApplicationsByIdWithdrawResponses];
+
+export type GetApiV1InterviewsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        status?: string;
+        mode?: 'online' | 'onsite';
+        jobId?: string;
+        applicationId?: string;
+        interviewerId?: string;
+        search?: string;
+        from?: string | null;
+        to?: string | null;
+        sortBy?: 'scheduledAt' | 'createdAt' | 'status';
+        sortOrder?: 'asc' | 'desc';
+    };
+    url: '/api/v1/interviews';
+};
+
+export type GetApiV1InterviewsErrors = {
+    /**
+     * Invalid or contradictory filter, sort or paging values
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+};
+
+export type GetApiV1InterviewsResponses = {
+    /**
+     * Paginated interviews
+     */
+    200: InterviewListResponse;
+};
+
+export type GetApiV1InterviewsResponse = GetApiV1InterviewsResponses[keyof GetApiV1InterviewsResponses];
+
+export type PostApiV1InterviewsData = {
+    body: CreateInterviewRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/interviews';
+};
+
+export type PostApiV1InterviewsErrors = {
+    /**
+     * Validation failed, time in the past, or an interviewer is not eligible
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Application not found or not part of the recruiter's enterprise
+     */
+    404: unknown;
+    /**
+     * APPLICATION_NOT_SCHEDULABLE, APPLICANT_UNAVAILABLE, INTERVIEWER_CONFLICT or APPLICANT_CONFLICT
+     */
+    409: unknown;
+};
+
+export type PostApiV1InterviewsResponses = {
+    /**
+     * Interview scheduled
+     */
+    201: InterviewDetailDto;
+};
+
+export type PostApiV1InterviewsResponse = PostApiV1InterviewsResponses[keyof PostApiV1InterviewsResponses];
+
+export type GetApiV1InterviewsCalendarData = {
+    body?: never;
+    path?: never;
+    query?: {
+        status?: string;
+        mode?: 'online' | 'onsite';
+        jobId?: string;
+        applicationId?: string;
+        interviewerId?: string;
+        search?: string;
+        from?: string | null;
+        to?: string | null;
+    };
+    url: '/api/v1/interviews/calendar';
+};
+
+export type GetApiV1InterviewsCalendarErrors = {
+    /**
+     * Missing window, from after to, or a window longer than 62 days
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+};
+
+export type GetApiV1InterviewsCalendarResponses = {
+    /**
+     * Interviews in the window
+     */
+    200: InterviewCalendarResponse;
+};
+
+export type GetApiV1InterviewsCalendarResponse = GetApiV1InterviewsCalendarResponses[keyof GetApiV1InterviewsCalendarResponses];
+
+export type GetApiV1InterviewsApplicationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        search?: string;
+        limit?: number;
+    };
+    url: '/api/v1/interviews/applications';
+};
+
+export type GetApiV1InterviewsApplicationsErrors = {
+    /**
+     * Invalid search or limit
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+};
+
+export type GetApiV1InterviewsApplicationsResponses = {
+    /**
+     * Matching applications
+     */
+    200: SchedulableApplicationListResponse;
+};
+
+export type GetApiV1InterviewsApplicationsResponse = GetApiV1InterviewsApplicationsResponses[keyof GetApiV1InterviewsApplicationsResponses];
+
+export type GetApiV1InterviewsInterviewersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        search?: string;
+        limit?: number;
+    };
+    url: '/api/v1/interviews/interviewers';
+};
+
+export type GetApiV1InterviewsInterviewersErrors = {
+    /**
+     * Invalid search or limit
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+};
+
+export type GetApiV1InterviewsInterviewersResponses = {
+    /**
+     * Matching recruiters
+     */
+    200: InterviewerListResponse;
+};
+
+export type GetApiV1InterviewsInterviewersResponse = GetApiV1InterviewsInterviewersResponses[keyof GetApiV1InterviewsInterviewersResponses];
+
+export type DeleteApiV1InterviewsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/interviews/{id}';
+};
+
+export type DeleteApiV1InterviewsByIdErrors = {
+    /**
+     * Invalid interview ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Interview not found, or it belongs to another enterprise
+     */
+    404: unknown;
+    /**
+     * INTERVIEW_COMPLETED or INTERVIEW_STATE_CHANGED
+     */
+    409: unknown;
+};
+
+export type DeleteApiV1InterviewsByIdResponses = {
+    /**
+     * Interview deleted
+     */
+    204: void;
+};
+
+export type DeleteApiV1InterviewsByIdResponse = DeleteApiV1InterviewsByIdResponses[keyof DeleteApiV1InterviewsByIdResponses];
+
+export type GetApiV1InterviewsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/interviews/{id}';
+};
+
+export type GetApiV1InterviewsByIdErrors = {
+    /**
+     * Invalid interview ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Interview not found, or it belongs to another enterprise
+     */
+    404: unknown;
+};
+
+export type GetApiV1InterviewsByIdResponses = {
+    /**
+     * Interview detail
+     */
+    200: InterviewDetailDto;
+};
+
+export type GetApiV1InterviewsByIdResponse = GetApiV1InterviewsByIdResponses[keyof GetApiV1InterviewsByIdResponses];
+
+export type PatchApiV1InterviewsByIdData = {
+    body: UpdateInterviewRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/interviews/{id}';
+};
+
+export type PatchApiV1InterviewsByIdErrors = {
+    /**
+     * Validation failed, time in the past, or an interviewer is not eligible
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Interview not found, or it belongs to another enterprise
+     */
+    404: unknown;
+    /**
+     * INTERVIEW_NOT_EDITABLE, INTERVIEWER_CONFLICT, APPLICANT_CONFLICT or INTERVIEW_STATE_CHANGED
+     */
+    409: unknown;
+};
+
+export type PatchApiV1InterviewsByIdResponses = {
+    /**
+     * Interview updated
+     */
+    200: InterviewDetailDto;
+};
+
+export type PatchApiV1InterviewsByIdResponse = PatchApiV1InterviewsByIdResponses[keyof PatchApiV1InterviewsByIdResponses];
+
+export type PatchApiV1InterviewsByIdStatusData = {
+    body: UpdateInterviewStatusRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/interviews/{id}/status';
+};
+
+export type PatchApiV1InterviewsByIdStatusErrors = {
+    /**
+     * Unsupported status or invalid note
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Forbidden: wrong role, or the account is not assigned to an enterprise
+     */
+    403: unknown;
+    /**
+     * Interview not found, or it belongs to another enterprise
+     */
+    404: unknown;
+    /**
+     * INTERVIEW_STATUS_FINAL, INTERVIEW_NOT_ENDED or INTERVIEW_STATE_CHANGED
+     */
+    409: unknown;
+};
+
+export type PatchApiV1InterviewsByIdStatusResponses = {
+    /**
+     * Status updated
+     */
+    200: InterviewDetailDto;
+};
+
+export type PatchApiV1InterviewsByIdStatusResponse = PatchApiV1InterviewsByIdStatusResponses[keyof PatchApiV1InterviewsByIdStatusResponses];
 
 export type PatchApiV1UsersByIdRoleData = {
     body: UpdateUserRoleRequest;

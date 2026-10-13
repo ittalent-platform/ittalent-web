@@ -32,3 +32,8 @@ export function requestStatus(error: unknown): number | undefined {
   }
   return undefined;
 }
+
+/** The machine-readable `code` the API adds to errors a screen has to tell apart (for example a 409). */
+export function requestCode(error: unknown): string | undefined {
+  return typeof error === "object" && error !== null && "code" in error && typeof error.code === "string" ? error.code : undefined;
+}
