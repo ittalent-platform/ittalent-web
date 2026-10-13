@@ -223,10 +223,6 @@ export type PaginatedDocuments = {
     totalPages: number;
 };
 
-export type DocumentPreviewResponse = {
-    previewUrl: string;
-};
-
 export type JobPostingEnterpriseSummary = {
     id: string;
     name: string;
@@ -1281,6 +1277,264 @@ export type UpdateCertificateLinkRequest = {
     suggested?: boolean;
 };
 
+export type DocumentPreviewResponse = {
+    previewUrl: string;
+};
+
+export type RecruiterNextInterviewDto = {
+    id: string;
+    scheduledAt: string;
+    mode: string;
+};
+
+export type RecruiterApplicationSummaryDto = {
+    id: string;
+    job: {
+        id: string;
+        title: string;
+    };
+    applicant: {
+        id: string;
+        fullName: string | null;
+        email: string;
+        phone: string | null;
+    };
+    status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+    reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
+    submittedDocuments: Array<'cv' | 'cover_letter'>;
+    nextInterview: {
+        id: string;
+        scheduledAt: string;
+        mode: string;
+    } | null;
+    notesCount: number;
+    submittedAt: string;
+    latestStatusAt: string;
+};
+
+export type RecruiterApplicationListResponse = {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    items: Array<{
+        id: string;
+        job: {
+            id: string;
+            title: string;
+        };
+        applicant: {
+            id: string;
+            fullName: string | null;
+            email: string;
+            phone: string | null;
+        };
+        status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+        reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
+        submittedDocuments: Array<'cv' | 'cover_letter'>;
+        nextInterview: {
+            id: string;
+            scheduledAt: string;
+            mode: string;
+        } | null;
+        notesCount: number;
+        submittedAt: string;
+        latestStatusAt: string;
+    }>;
+    statusCounts: {
+        submitted: number;
+        under_review: number;
+        interviewing: number;
+        offered: number;
+        hired: number;
+        rejected: number;
+        withdrawn: number;
+        position_filled: number;
+    };
+};
+
+export type RecruiterAttachmentDto = {
+    documentId: string;
+    type: 'cv' | 'cover_letter';
+    fileName: string;
+    mimeType: string;
+    size: number;
+    submittedAt: string;
+};
+
+export type RecruiterInterviewTimelineEntryDto = {
+    id: string;
+    scheduledAt: string;
+    endsAt: string;
+    durationMinutes: number;
+    mode: 'online' | 'onsite';
+    meetingLink: string | null;
+    location: string | null;
+    status: 'scheduled' | 'reschedule_requested' | 'completed' | 'cancelled' | 'no_show';
+    notes: string | null;
+};
+
+export type RecruiterNoteEntryDto = {
+    authorId: string;
+    authorName: string;
+    content: string;
+    createdAt: string;
+};
+
+export type RecruiterStatusHistoryEntryDto = {
+    status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+    reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
+    actorRole: string | null;
+    note: string | null;
+    messageToCandidate: string | null;
+    rejectionReason: string | null;
+    occurredAt: string;
+};
+
+export type CreateRecruiterNoteBody = {
+    content: string;
+};
+
+export type RecruiterNotesListResponse = {
+    items: Array<{
+        authorId: string;
+        authorName: string;
+        content: string;
+        createdAt: string;
+    }>;
+    total: number;
+};
+
+export type RecruiterApplicationDetailDto = {
+    id: string;
+    job: {
+        id: string;
+        title: string;
+        location: string | null;
+        employmentType: string | null;
+        department: string | null;
+        status: string;
+        expiresAt: string | null;
+    };
+    applicant: {
+        id: string;
+        fullName: string | null;
+        email: string;
+        phone: string | null;
+        role: string;
+        status: string;
+    };
+    status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+    reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
+    message: string | null;
+    withdrawalReason: string | null;
+    attachments: Array<{
+        documentId: string;
+        type: 'cv' | 'cover_letter';
+        fileName: string;
+        mimeType: string;
+        size: number;
+        submittedAt: string;
+    }>;
+    interviews: Array<{
+        id: string;
+        scheduledAt: string;
+        endsAt: string;
+        durationMinutes: number;
+        mode: 'online' | 'onsite';
+        meetingLink: string | null;
+        location: string | null;
+        status: 'scheduled' | 'reschedule_requested' | 'completed' | 'cancelled' | 'no_show';
+        notes: string | null;
+    }>;
+    notes: Array<{
+        authorId: string;
+        authorName: string;
+        content: string;
+        createdAt: string;
+    }>;
+    statusHistory: Array<{
+        status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+        reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
+        actorRole: string | null;
+        note: string | null;
+        messageToCandidate: string | null;
+        rejectionReason: string | null;
+        occurredAt: string;
+    }>;
+    version: number;
+    submittedAt: string;
+    latestStatusAt: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type RecruiterApplicationCvMetadataDto = {
+    documentId: string;
+    fileName: string;
+    mimeType: string;
+    size: number;
+    fileUrl: string;
+};
+
+export type UpdateRecruiterApplicationStatusBody = {
+    status: 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected';
+    note?: string;
+    messageToCandidate?: string;
+    rejectionReason?: string;
+    expectedVersion?: number;
+};
+
+export type RecruiterCompanyApplicationHistoryItemDto = {
+    id: string;
+    job: {
+        id: string;
+        title: string;
+        location: string | null;
+        employmentType: string | null;
+        status: string;
+    };
+    status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+    reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
+    submittedDocuments: Array<'cv' | 'cover_letter'>;
+    rejectionReason: string | null;
+    withdrawalReason: string | null;
+    notesCount: number;
+    submittedAt: string;
+    latestStatusAt: string;
+    isCurrentApplication: boolean;
+};
+
+export type RecruiterApplicantCompanyHistoryResponse = {
+    applicant: {
+        id: string;
+        fullName: string | null;
+        email: string;
+        phone: string | null;
+    };
+    isFirstTimeApplicant: boolean;
+    totalSubmissionsToCompany: number;
+    items: Array<{
+        id: string;
+        job: {
+            id: string;
+            title: string;
+            location: string | null;
+            employmentType: string | null;
+            status: string;
+        };
+        status: 'submitted' | 'under_review' | 'interviewing' | 'offered' | 'hired' | 'rejected' | 'withdrawn' | 'position_filled';
+        reviewStage: 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | null;
+        submittedDocuments: Array<'cv' | 'cover_letter'>;
+        rejectionReason: string | null;
+        withdrawalReason: string | null;
+        notesCount: number;
+        submittedAt: string;
+        latestStatusAt: string;
+        isCurrentApplication: boolean;
+    }>;
+};
+
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -1535,34 +1789,6 @@ export type PostApiV1AuthChangePasswordResponses = {
 
 export type PostApiV1AuthChangePasswordResponse = PostApiV1AuthChangePasswordResponses[keyof PostApiV1AuthChangePasswordResponses];
 
-// Kept for compatibility with the admin-document endpoint exported by the
-// current client. The combined OpenAPI document does not yet declare it.
-export type GetApiV1AdminDocumentsData = {
-    body?: never;
-    path?: never;
-    query?: {
-        type?: 'cv' | 'cover_letter';
-        search?: string;
-        is_default?: 'true' | 'false';
-        sort_by?: 'created_at' | 'file_name' | 'size';
-        page?: number;
-        limit?: number;
-        sort_order?: 'asc' | 'desc';
-    };
-    url: '/api/v1/admin/documents';
-};
-
-export type GetApiV1AdminDocumentsErrors = {
-    401: unknown;
-    403: unknown;
-};
-
-export type GetApiV1AdminDocumentsResponses = {
-    200: PaginatedDocuments;
-};
-
-export type GetApiV1AdminDocumentsResponse = GetApiV1AdminDocumentsResponses[keyof GetApiV1AdminDocumentsResponses];
-
 export type GetApiV1DocumentsData = {
     body?: never;
     path?: never;
@@ -1637,143 +1863,41 @@ export type PostApiV1DocumentsResponses = {
 
 export type PostApiV1DocumentsResponse = PostApiV1DocumentsResponses[keyof PostApiV1DocumentsResponses];
 
-export type GetApiV1DocumentsByIdDownloadData = {
+export type GetApiV1AdminDocumentsData = {
     body?: never;
-    path: {
-        id: string;
+    path?: never;
+    query?: {
+        type?: 'cv' | 'cover_letter';
+        page?: number;
+        limit?: number;
+        sort_order?: 'asc' | 'desc';
     };
-    query?: never;
-    url: '/api/v1/documents/{id}/download';
+    url: '/api/v1/admin/documents';
 };
 
-export type GetApiV1DocumentsByIdDownloadErrors = {
+export type GetApiV1AdminDocumentsErrors = {
+    /**
+     * Invalid document list query
+     */
+    400: unknown;
     /**
      * Authentication required
      */
     401: unknown;
     /**
-     * Document owner role required
+     * Administrator role required
      */
     403: unknown;
-    /**
-     * Owned active document not found
-     */
-    404: unknown;
-    /**
-     * Storage file unavailable
-     */
-    502: unknown;
 };
 
-export type GetApiV1DocumentsByIdDownloadResponses = {
+export type GetApiV1AdminDocumentsResponses = {
     /**
-     * Document file stream
+     * Paginated documents across all owners
      */
-    200: unknown;
+    200: PaginatedDocuments;
 };
 
-export type GetApiV1DocumentsByIdPreviewData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/api/v1/documents/{id}/preview';
-};
-
-export type GetApiV1DocumentsByIdPreviewErrors = {
-    /**
-     * Authentication required
-     */
-    401: unknown;
-    /**
-     * Document owner role required
-     */
-    403: unknown;
-    /**
-     * Owned active document not found
-     */
-    404: unknown;
-};
-
-export type GetApiV1DocumentsByIdPreviewResponses = {
-    /**
-     * Inline PDF stream or DOC/DOCX viewer URL
-     */
-    200: DocumentPreviewResponse;
-};
-
-export type GetApiV1DocumentsByIdPreviewResponse = GetApiV1DocumentsByIdPreviewResponses[keyof GetApiV1DocumentsByIdPreviewResponses];
-
-export type PatchApiV1DocumentsByIdDefaultData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/api/v1/documents/{id}/default';
-};
-
-export type PatchApiV1DocumentsByIdDefaultErrors = {
-    /**
-     * Authentication required
-     */
-    401: unknown;
-    /**
-     * Document owner role required
-     */
-    403: unknown;
-    /**
-     * Owned active document not found
-     */
-    404: unknown;
-};
-
-export type PatchApiV1DocumentsByIdDefaultResponses = {
-    /**
-     * Selected default document
-     */
-    200: Document;
-};
-
-export type PatchApiV1DocumentsByIdDefaultResponse = PatchApiV1DocumentsByIdDefaultResponses[keyof PatchApiV1DocumentsByIdDefaultResponses];
-
-export type DeleteApiV1DocumentsByIdData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/api/v1/documents/{id}';
-};
-
-export type DeleteApiV1DocumentsByIdErrors = {
-    /**
-     * Authentication required
-     */
-    401: unknown;
-    /**
-     * Document owner role required
-     */
-    403: unknown;
-    /**
-     * Owned active document not found
-     */
-    404: unknown;
-    /**
-     * Document is referenced by an application
-     */
-    409: unknown;
-};
-
-export type DeleteApiV1DocumentsByIdResponses = {
-    /**
-     * Document deleted from the active library
-     */
-    204: void;
-};
-
-export type DeleteApiV1DocumentsByIdResponse = DeleteApiV1DocumentsByIdResponses[keyof DeleteApiV1DocumentsByIdResponses];
+export type GetApiV1AdminDocumentsResponse = GetApiV1AdminDocumentsResponses[keyof GetApiV1AdminDocumentsResponses];
 
 export type GetApiV1JobPostingsData = {
     body?: never;
@@ -4100,3 +4224,409 @@ export type PatchApiV1MeCertificateLinksByIdResponses = {
 };
 
 export type PatchApiV1MeCertificateLinksByIdResponse = PatchApiV1MeCertificateLinksByIdResponses[keyof PatchApiV1MeCertificateLinksByIdResponses];
+
+export type GetApiV1DocumentsByIdDownloadData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/documents/{id}/download';
+};
+
+export type GetApiV1DocumentsByIdDownloadErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Document owner role required
+     */
+    403: unknown;
+    /**
+     * Owned active document not found
+     */
+    404: unknown;
+    /**
+     * Storage file unavailable
+     */
+    502: unknown;
+};
+
+export type GetApiV1DocumentsByIdDownloadResponses = {
+    /**
+     * Document file stream
+     */
+    200: unknown;
+};
+
+export type GetApiV1DocumentsByIdPreviewData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/documents/{id}/preview';
+};
+
+export type GetApiV1DocumentsByIdPreviewErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Document owner role required
+     */
+    403: unknown;
+    /**
+     * Owned active document not found
+     */
+    404: unknown;
+};
+
+export type GetApiV1DocumentsByIdPreviewResponses = {
+    /**
+     * Inline PDF stream or DOC/DOCX viewer URL
+     */
+    200: DocumentPreviewResponse;
+};
+
+export type GetApiV1DocumentsByIdPreviewResponse = GetApiV1DocumentsByIdPreviewResponses[keyof GetApiV1DocumentsByIdPreviewResponses];
+
+export type PatchApiV1DocumentsByIdDefaultData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/documents/{id}/default';
+};
+
+export type PatchApiV1DocumentsByIdDefaultErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Document owner role required
+     */
+    403: unknown;
+    /**
+     * Owned active document not found
+     */
+    404: unknown;
+};
+
+export type PatchApiV1DocumentsByIdDefaultResponses = {
+    /**
+     * Selected default document
+     */
+    200: Document;
+};
+
+export type PatchApiV1DocumentsByIdDefaultResponse = PatchApiV1DocumentsByIdDefaultResponses[keyof PatchApiV1DocumentsByIdDefaultResponses];
+
+export type DeleteApiV1DocumentsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/documents/{id}';
+};
+
+export type DeleteApiV1DocumentsByIdErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Document owner role required
+     */
+    403: unknown;
+    /**
+     * Owned active document not found
+     */
+    404: unknown;
+    /**
+     * Document is referenced by an application
+     */
+    409: unknown;
+};
+
+export type DeleteApiV1DocumentsByIdResponses = {
+    /**
+     * Document deleted from the active library
+     */
+    204: void;
+};
+
+export type DeleteApiV1DocumentsByIdResponse = DeleteApiV1DocumentsByIdResponses[keyof DeleteApiV1DocumentsByIdResponses];
+
+export type GetApiV1RecruiterApplicationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        search?: string;
+        status?: string;
+        jobId?: string;
+        documentType?: 'cv' | 'cover_letter';
+        sortBy?: 'submittedAt' | 'latestStatusAt' | 'id';
+        sortOrder?: 'asc' | 'desc';
+        submittedFrom?: string | null;
+        submittedTo?: string | null;
+    };
+    url: '/api/v1/recruiter/applications';
+};
+
+export type GetApiV1RecruiterApplicationsErrors = {
+    /**
+     * Validation failed (e.g. invalid status name, malformed ObjectId, or invalid date range)
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment
+     */
+    403: unknown;
+};
+
+export type GetApiV1RecruiterApplicationsResponses = {
+    /**
+     * Paginated recruiter applications list with status counts
+     */
+    200: RecruiterApplicationListResponse;
+};
+
+export type GetApiV1RecruiterApplicationsResponse = GetApiV1RecruiterApplicationsResponses[keyof GetApiV1RecruiterApplicationsResponses];
+
+export type GetApiV1RecruiterApplicationsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/recruiter/applications/{id}';
+};
+
+export type GetApiV1RecruiterApplicationsByIdErrors = {
+    /**
+     * Malformed application ID parameter
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment
+     */
+    403: unknown;
+    /**
+     * Application not found or inaccessible (opaque 404)
+     */
+    404: unknown;
+};
+
+export type GetApiV1RecruiterApplicationsByIdResponses = {
+    /**
+     * Complete recruiter application details
+     */
+    200: RecruiterApplicationDetailDto;
+};
+
+export type GetApiV1RecruiterApplicationsByIdResponse = GetApiV1RecruiterApplicationsByIdResponses[keyof GetApiV1RecruiterApplicationsByIdResponses];
+
+export type GetApiV1RecruiterApplicationsByIdCvData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/recruiter/applications/{id}/cv';
+};
+
+export type GetApiV1RecruiterApplicationsByIdCvErrors = {
+    /**
+     * Malformed application ID parameter
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment
+     */
+    403: unknown;
+    /**
+     * Application or CV not found (opaque 404)
+     */
+    404: unknown;
+};
+
+export type GetApiV1RecruiterApplicationsByIdCvResponses = {
+    /**
+     * Binary CV file stream or metadata object
+     */
+    200: RecruiterApplicationCvMetadataDto;
+};
+
+export type GetApiV1RecruiterApplicationsByIdCvResponse = GetApiV1RecruiterApplicationsByIdCvResponses[keyof GetApiV1RecruiterApplicationsByIdCvResponses];
+
+export type GetApiV1RecruiterApplicationsByIdNotesData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/recruiter/applications/{id}/notes';
+};
+
+export type GetApiV1RecruiterApplicationsByIdNotesErrors = {
+    /**
+     * Malformed application ID parameter
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment
+     */
+    403: unknown;
+    /**
+     * Application not found or inaccessible (opaque 404)
+     */
+    404: unknown;
+};
+
+export type GetApiV1RecruiterApplicationsByIdNotesResponses = {
+    /**
+     * Chronological list of internal notes
+     */
+    200: RecruiterNotesListResponse;
+};
+
+export type GetApiV1RecruiterApplicationsByIdNotesResponse = GetApiV1RecruiterApplicationsByIdNotesResponses[keyof GetApiV1RecruiterApplicationsByIdNotesResponses];
+
+export type PostApiV1RecruiterApplicationsByIdNotesData = {
+    body?: CreateRecruiterNoteBody;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/recruiter/applications/{id}/notes';
+};
+
+export type PostApiV1RecruiterApplicationsByIdNotesErrors = {
+    /**
+     * Validation failed (e.g. malformed ObjectId, empty or >2000 characters note content)
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment
+     */
+    403: unknown;
+    /**
+     * Application not found or inaccessible (opaque 404)
+     */
+    404: unknown;
+};
+
+export type PostApiV1RecruiterApplicationsByIdNotesResponses = {
+    /**
+     * Internal note successfully appended
+     */
+    201: RecruiterNoteEntryDto;
+};
+
+export type PostApiV1RecruiterApplicationsByIdNotesResponse = PostApiV1RecruiterApplicationsByIdNotesResponses[keyof PostApiV1RecruiterApplicationsByIdNotesResponses];
+
+export type PatchApiV1RecruiterApplicationsByIdStatusData = {
+    body?: UpdateRecruiterApplicationStatusBody;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/recruiter/applications/{id}/status';
+};
+
+export type PatchApiV1RecruiterApplicationsByIdStatusErrors = {
+    /**
+     * Validation failed (e.g. invalid target status, non-permitted transition, missing interview prerequisite, or rejection reason out of bounds)
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment
+     */
+    403: unknown;
+    /**
+     * Application not found or inaccessible (opaque 404)
+     */
+    404: unknown;
+    /**
+     * Vacancy limit reached (cannot hire more applicants than job openings) or optimistic concurrency conflict
+     */
+    409: unknown;
+};
+
+export type PatchApiV1RecruiterApplicationsByIdStatusResponses = {
+    /**
+     * Application status successfully updated
+     */
+    200: RecruiterApplicationDetailDto;
+};
+
+export type PatchApiV1RecruiterApplicationsByIdStatusResponse = PatchApiV1RecruiterApplicationsByIdStatusResponses[keyof PatchApiV1RecruiterApplicationsByIdStatusResponses];
+
+export type GetApiV1RecruiterApplicationsByIdCompanyHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/recruiter/applications/{id}/company-history';
+};
+
+export type GetApiV1RecruiterApplicationsByIdCompanyHistoryErrors = {
+    /**
+     * Malformed application ID parameter
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment
+     */
+    403: unknown;
+    /**
+     * Application not found or inaccessible (opaque 404)
+     */
+    404: unknown;
+};
+
+export type GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses = {
+    /**
+     * Candidate cross-job company application history
+     */
+    200: RecruiterApplicantCompanyHistoryResponse;
+};
+
+export type GetApiV1RecruiterApplicationsByIdCompanyHistoryResponse = GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses[keyof GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses];

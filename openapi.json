@@ -699,6 +699,9 @@
           "size": {
             "type": "number"
           },
+          "isDefault": {
+            "type": "boolean"
+          },
           "createdAt": {
             "type": "string"
           }
@@ -711,6 +714,7 @@
           "fileName",
           "mimeType",
           "size",
+          "isDefault",
           "createdAt"
         ]
       },
@@ -743,6 +747,26 @@
             "enum": [
               "cv",
               "cover_letter"
+            ]
+          },
+          "search": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "is_default": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          "sort_by": {
+            "type": "string",
+            "enum": [
+              "created_at",
+              "file_name",
+              "size"
             ]
           },
           "page": {
@@ -800,6 +824,9 @@
                 "size": {
                   "type": "number"
                 },
+                "isDefault": {
+                  "type": "boolean"
+                },
                 "createdAt": {
                   "type": "string"
                 }
@@ -812,6 +839,7 @@
                 "fileName",
                 "mimeType",
                 "size",
+                "isDefault",
                 "createdAt"
               ]
             }
@@ -5697,6 +5725,1242 @@
           "expectedVersion"
         ],
         "additionalProperties": false
+      },
+      "DocumentPreviewResponse": {
+        "type": "object",
+        "properties": {
+          "previewUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "previewUrl"
+        ]
+      },
+      "RecruiterNextInterviewDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scheduledAt": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "scheduledAt",
+          "mode"
+        ]
+      },
+      "RecruiterApplicationSummaryDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "job": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "title"
+            ]
+          },
+          "applicant": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "fullName",
+              "email",
+              "phone"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "under_review",
+              "interviewing",
+              "offered",
+              "hired",
+              "rejected",
+              "withdrawn",
+              "position_filled"
+            ]
+          },
+          "reviewStage": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "screening",
+              "interview",
+              "offer",
+              "hired",
+              "rejected",
+              null
+            ]
+          },
+          "submittedDocuments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "cv",
+                "cover_letter"
+              ]
+            }
+          },
+          "nextInterview": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "scheduledAt": {
+                "type": "string"
+              },
+              "mode": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "scheduledAt",
+              "mode"
+            ]
+          },
+          "notesCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "submittedAt": {
+            "type": "string"
+          },
+          "latestStatusAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "job",
+          "applicant",
+          "status",
+          "reviewStage",
+          "submittedDocuments",
+          "nextInterview",
+          "notesCount",
+          "submittedAt",
+          "latestStatusAt"
+        ]
+      },
+      "RecruiterApplicationListResponse": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "job": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title"
+                  ]
+                },
+                "applicant": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "fullName": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "phone": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "fullName",
+                    "email",
+                    "phone"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "under_review",
+                    "interviewing",
+                    "offered",
+                    "hired",
+                    "rejected",
+                    "withdrawn",
+                    "position_filled"
+                  ]
+                },
+                "reviewStage": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "screening",
+                    "interview",
+                    "offer",
+                    "hired",
+                    "rejected",
+                    null
+                  ]
+                },
+                "submittedDocuments": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "cv",
+                      "cover_letter"
+                    ]
+                  }
+                },
+                "nextInterview": {
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "scheduledAt": {
+                      "type": "string"
+                    },
+                    "mode": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "scheduledAt",
+                    "mode"
+                  ]
+                },
+                "notesCount": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "submittedAt": {
+                  "type": "string"
+                },
+                "latestStatusAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "job",
+                "applicant",
+                "status",
+                "reviewStage",
+                "submittedDocuments",
+                "nextInterview",
+                "notesCount",
+                "submittedAt",
+                "latestStatusAt"
+              ]
+            }
+          },
+          "statusCounts": {
+            "type": "object",
+            "properties": {
+              "submitted": {
+                "type": "number"
+              },
+              "under_review": {
+                "type": "number"
+              },
+              "interviewing": {
+                "type": "number"
+              },
+              "offered": {
+                "type": "number"
+              },
+              "hired": {
+                "type": "number"
+              },
+              "rejected": {
+                "type": "number"
+              },
+              "withdrawn": {
+                "type": "number"
+              },
+              "position_filled": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "submitted",
+              "under_review",
+              "interviewing",
+              "offered",
+              "hired",
+              "rejected",
+              "withdrawn",
+              "position_filled"
+            ]
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages",
+          "items",
+          "statusCounts"
+        ]
+      },
+      "RecruiterAttachmentDTO": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "cv",
+              "cover_letter"
+            ]
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "submittedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "documentId",
+          "type",
+          "fileName",
+          "mimeType",
+          "size",
+          "submittedAt"
+        ]
+      },
+      "RecruiterInterviewTimelineEntryDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scheduledAt": {
+            "type": "string"
+          },
+          "endsAt": {
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "online",
+              "onsite"
+            ]
+          },
+          "meetingLink": {
+            "type": "string",
+            "nullable": true
+          },
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "reschedule_requested",
+              "completed",
+              "cancelled",
+              "no_show"
+            ]
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "scheduledAt",
+          "endsAt",
+          "durationMinutes",
+          "mode",
+          "meetingLink",
+          "location",
+          "status",
+          "notes"
+        ]
+      },
+      "RecruiterNoteEntryDTO": {
+        "type": "object",
+        "properties": {
+          "authorId": {
+            "type": "string"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "authorId",
+          "authorName",
+          "content",
+          "createdAt"
+        ]
+      },
+      "RecruiterStatusHistoryEntryDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "under_review",
+              "interviewing",
+              "offered",
+              "hired",
+              "rejected",
+              "withdrawn",
+              "position_filled"
+            ]
+          },
+          "reviewStage": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "screening",
+              "interview",
+              "offer",
+              "hired",
+              "rejected",
+              null
+            ]
+          },
+          "actorRole": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "messageToCandidate": {
+            "type": "string",
+            "nullable": true
+          },
+          "rejectionReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "occurredAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "reviewStage",
+          "actorRole",
+          "note",
+          "messageToCandidate",
+          "rejectionReason",
+          "occurredAt"
+        ]
+      },
+      "CreateRecruiterNoteBody": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "additionalProperties": false
+      },
+      "RecruiterNotesListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "authorId": {
+                  "type": "string"
+                },
+                "authorName": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authorId",
+                "authorName",
+                "content",
+                "createdAt"
+              ]
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ]
+      },
+      "RecruiterApplicationDetailDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "job": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string",
+                "nullable": true
+              },
+              "employmentType": {
+                "type": "string",
+                "nullable": true
+              },
+              "department": {
+                "type": "string",
+                "nullable": true
+              },
+              "status": {
+                "type": "string"
+              },
+              "expiresAt": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "location",
+              "employmentType",
+              "department",
+              "status",
+              "expiresAt"
+            ]
+          },
+          "applicant": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              },
+              "role": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "fullName",
+              "email",
+              "phone",
+              "role",
+              "status"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "under_review",
+              "interviewing",
+              "offered",
+              "hired",
+              "rejected",
+              "withdrawn",
+              "position_filled"
+            ]
+          },
+          "reviewStage": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "screening",
+              "interview",
+              "offer",
+              "hired",
+              "rejected",
+              null
+            ]
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "withdrawalReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "documentId": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "cv",
+                    "cover_letter"
+                  ]
+                },
+                "fileName": {
+                  "type": "string"
+                },
+                "mimeType": {
+                  "type": "string"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "submittedAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "documentId",
+                "type",
+                "fileName",
+                "mimeType",
+                "size",
+                "submittedAt"
+              ]
+            }
+          },
+          "interviews": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "scheduledAt": {
+                  "type": "string"
+                },
+                "endsAt": {
+                  "type": "string"
+                },
+                "durationMinutes": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "online",
+                    "onsite"
+                  ]
+                },
+                "meetingLink": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "location": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "scheduled",
+                    "reschedule_requested",
+                    "completed",
+                    "cancelled",
+                    "no_show"
+                  ]
+                },
+                "notes": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "scheduledAt",
+                "endsAt",
+                "durationMinutes",
+                "mode",
+                "meetingLink",
+                "location",
+                "status",
+                "notes"
+              ]
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "authorId": {
+                  "type": "string"
+                },
+                "authorName": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "authorId",
+                "authorName",
+                "content",
+                "createdAt"
+              ]
+            }
+          },
+          "statusHistory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "under_review",
+                    "interviewing",
+                    "offered",
+                    "hired",
+                    "rejected",
+                    "withdrawn",
+                    "position_filled"
+                  ]
+                },
+                "reviewStage": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "screening",
+                    "interview",
+                    "offer",
+                    "hired",
+                    "rejected",
+                    null
+                  ]
+                },
+                "actorRole": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "note": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "messageToCandidate": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "rejectionReason": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "occurredAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "status",
+                "reviewStage",
+                "actorRole",
+                "note",
+                "messageToCandidate",
+                "rejectionReason",
+                "occurredAt"
+              ]
+            }
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "submittedAt": {
+            "type": "string"
+          },
+          "latestStatusAt": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "job",
+          "applicant",
+          "status",
+          "reviewStage",
+          "message",
+          "withdrawalReason",
+          "attachments",
+          "interviews",
+          "notes",
+          "statusHistory",
+          "version",
+          "submittedAt",
+          "latestStatusAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "RecruiterApplicationCvMetadataDTO": {
+        "type": "object",
+        "properties": {
+          "documentId": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "fileUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "documentId",
+          "fileName",
+          "mimeType",
+          "size",
+          "fileUrl"
+        ]
+      },
+      "UpdateRecruiterApplicationStatusBody": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "under_review",
+              "interviewing",
+              "offered",
+              "hired",
+              "rejected"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "messageToCandidate": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "rejectionReason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 1000
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "RecruiterCompanyApplicationHistoryItemDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "job": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string",
+                "nullable": true
+              },
+              "employmentType": {
+                "type": "string",
+                "nullable": true
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "location",
+              "employmentType",
+              "status"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "under_review",
+              "interviewing",
+              "offered",
+              "hired",
+              "rejected",
+              "withdrawn",
+              "position_filled"
+            ]
+          },
+          "reviewStage": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "screening",
+              "interview",
+              "offer",
+              "hired",
+              "rejected",
+              null
+            ]
+          },
+          "submittedDocuments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "cv",
+                "cover_letter"
+              ]
+            }
+          },
+          "rejectionReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "withdrawalReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "notesCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "submittedAt": {
+            "type": "string"
+          },
+          "latestStatusAt": {
+            "type": "string"
+          },
+          "isCurrentApplication": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "job",
+          "status",
+          "reviewStage",
+          "submittedDocuments",
+          "rejectionReason",
+          "withdrawalReason",
+          "notesCount",
+          "submittedAt",
+          "latestStatusAt",
+          "isCurrentApplication"
+        ]
+      },
+      "RecruiterApplicantCompanyHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "applicant": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "fullName",
+              "email",
+              "phone"
+            ]
+          },
+          "isFirstTimeApplicant": {
+            "type": "boolean"
+          },
+          "totalSubmissionsToCompany": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "job": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "employmentType": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "location",
+                    "employmentType",
+                    "status"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "under_review",
+                    "interviewing",
+                    "offered",
+                    "hired",
+                    "rejected",
+                    "withdrawn",
+                    "position_filled"
+                  ]
+                },
+                "reviewStage": {
+                  "type": "string",
+                  "nullable": true,
+                  "enum": [
+                    "screening",
+                    "interview",
+                    "offer",
+                    "hired",
+                    "rejected",
+                    null
+                  ]
+                },
+                "submittedDocuments": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "cv",
+                      "cover_letter"
+                    ]
+                  }
+                },
+                "rejectionReason": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "withdrawalReason": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "notesCount": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "submittedAt": {
+                  "type": "string"
+                },
+                "latestStatusAt": {
+                  "type": "string"
+                },
+                "isCurrentApplication": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "job",
+                "status",
+                "reviewStage",
+                "submittedDocuments",
+                "rejectionReason",
+                "withdrawalReason",
+                "notesCount",
+                "submittedAt",
+                "latestStatusAt",
+                "isCurrentApplication"
+              ]
+            }
+          }
+        },
+        "required": [
+          "applicant",
+          "isFirstTimeApplicant",
+          "totalSubmissionsToCompany",
+          "items"
+        ]
       }
     },
     "parameters": {}
@@ -6088,6 +7352,9 @@
           "401": {
             "description": "Authentication required"
           },
+          "403": {
+            "description": "Document owner role required"
+          },
           "502": {
             "description": "Document storage upload failed"
           }
@@ -6114,6 +7381,41 @@
             },
             "required": false,
             "name": "type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "required": false,
+            "name": "is_default",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "file_name",
+                "size"
+              ]
+            },
+            "required": false,
+            "name": "sort_by",
             "in": "query"
           },
           {
@@ -6167,6 +7469,9 @@
           },
           "401": {
             "description": "Authentication required"
+          },
+          "403": {
+            "description": "Document owner role required"
           }
         }
       }
@@ -10142,7 +11447,7 @@
         "tags": [
           "Certificate Links"
         ],
-        "summary": "List the current Candidate’s private certificate links",
+        "summary": "List the current Candidate\u2019s private certificate links",
         "security": [
           {
             "bearerAuth": []
@@ -10320,6 +11625,648 @@
           },
           "503": {
             "description": "Certificate link storage unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/documents/{id}/download": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Download an owned active document",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document file stream"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Document owner role required"
+          },
+          "404": {
+            "description": "Owned active document not found"
+          },
+          "502": {
+            "description": "Storage file unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/documents/{id}/preview": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Preview an owned active document",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inline PDF stream or DOC/DOCX viewer URL",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentPreviewResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Document owner role required"
+          },
+          "404": {
+            "description": "Owned active document not found"
+          }
+        }
+      }
+    },
+    "/api/v1/documents/{id}/default": {
+      "patch": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Set an owned active document as the default for its type",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Selected default document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Document owner role required"
+          },
+          "404": {
+            "description": "Owned active document not found"
+          }
+        }
+      }
+    },
+    "/api/v1/documents/{id}": {
+      "delete": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Soft-delete an owned active document",
+        "description": "Deletion is blocked while any application references the document. Deleting a default promotes the newest remaining active document of the same type.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Document deleted from the active library"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Document owner role required"
+          },
+          "404": {
+            "description": "Owned active document not found"
+          },
+          "409": {
+            "description": "Document is referenced by an application"
+          }
+        }
+      }
+    },
+    "/api/v1/recruiter/applications": {
+      "get": {
+        "tags": [
+          "Recruiter Applications"
+        ],
+        "summary": "View applicant application list (with search, filter, and board counts)",
+        "description": "Recruiter and Enterprise Admin only. Returns paginated applicant applications submitted to job postings owned by the caller's enterprise. Supports keyword search across applicant name/email, job title, or application ID, multi-status filters, document type filters, and submission date ranges.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": false,
+            "name": "jobId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cv",
+                "cover_letter"
+              ]
+            },
+            "required": false,
+            "name": "documentType",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "submittedAt",
+                "latestStatusAt",
+                "id"
+              ],
+              "default": "submittedAt"
+            },
+            "required": false,
+            "name": "sortBy",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "required": false,
+            "name": "sortOrder",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "submittedFrom",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "nullable": true,
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "submittedTo",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated recruiter applications list with status counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecruiterApplicationListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (e.g. invalid status name, malformed ObjectId, or invalid date range)"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment"
+          }
+        }
+      }
+    },
+    "/api/v1/recruiter/applications/{id}": {
+      "get": {
+        "tags": [
+          "Recruiter Applications"
+        ],
+        "summary": "View applicant application detail",
+        "description": "Recruiter and Enterprise Admin only. Returns comprehensive candidate application details including job context snapshot, candidate profile, submitted documents, interview history, notes, and full status audit timeline. Returns opaque 404 if application not found or belongs to another company.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Complete recruiter application details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecruiterApplicationDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed application ID parameter"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment"
+          },
+          "404": {
+            "description": "Application not found or inaccessible (opaque 404)"
+          }
+        }
+      }
+    },
+    "/api/v1/recruiter/applications/{id}/cv": {
+      "get": {
+        "tags": [
+          "Recruiter Applications"
+        ],
+        "summary": "Download applicant CV",
+        "description": "Recruiter and Enterprise Admin only. Delivers the attached CV file stream or metadata for candidate evaluation. Returns opaque 404 if application not found, belongs to another company, or CV deleted.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary CV file stream or metadata object",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecruiterApplicationCvMetadataDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed application ID parameter"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment"
+          },
+          "404": {
+            "description": "Application or CV not found (opaque 404)"
+          }
+        }
+      }
+    },
+    "/api/v1/recruiter/applications/{id}/notes": {
+      "post": {
+        "tags": [
+          "Recruiter Applications"
+        ],
+        "summary": "Add internal recruiter note to application",
+        "description": "Recruiter and Enterprise Admin only. Appends an internal note visible to hiring team members for the specified application. Author attribution is securely derived from the authenticated recruiter session. Enforces strict enterprise data isolation (opaque 404).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRecruiterNoteBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Internal note successfully appended",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecruiterNoteEntryDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (e.g. malformed ObjectId, empty or >2000 characters note content)"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment"
+          },
+          "404": {
+            "description": "Application not found or inaccessible (opaque 404)"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Recruiter Applications"
+        ],
+        "summary": "List internal recruiter notes for application",
+        "description": "Recruiter and Enterprise Admin only. Returns chronological internal notes recorded by hiring team members for this candidate application. Enforces strict enterprise data isolation (opaque 404).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chronological list of internal notes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecruiterNotesListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed application ID parameter"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment"
+          },
+          "404": {
+            "description": "Application not found or inaccessible (opaque 404)"
+          }
+        }
+      }
+    },
+    "/api/v1/recruiter/applications/{id}/status": {
+      "patch": {
+        "tags": [
+          "Recruiter Applications"
+        ],
+        "summary": "Update applicant application status workflow",
+        "description": "Recruiter and Enterprise Admin only. Advances application through hiring stages (under_review, interviewing, offered, hired) or rejects (rejected). Enforces forward progression (BR-17), interview prerequisites (BR-37), vacancy limit checks (BR-18, EX5), auto-closing job posting and cascading position_filled when final opening is filled, and logs audit history (BR-24). Enforces strict enterprise data isolation (opaque 404).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRecruiterApplicationStatusBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Application status successfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecruiterApplicationDetailDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (e.g. invalid target status, non-permitted transition, missing interview prerequisite, or rejection reason out of bounds)"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment"
+          },
+          "404": {
+            "description": "Application not found or inaccessible (opaque 404)"
+          },
+          "409": {
+            "description": "Vacancy limit reached (cannot hire more applicants than job openings) or optimistic concurrency conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/recruiter/applications/{id}/company-history": {
+      "get": {
+        "tags": [
+          "Recruiter Applications"
+        ],
+        "summary": "View candidate cross-job application history for company",
+        "description": "Recruiter and Enterprise Admin only. Returns chronological history of all applications submitted by the candidate across all job postings published by the caller's enterprise. Enforces strict multi-tenant candidate data privacy (submissions to competitor companies remain hidden). Indicates if candidate is a first-time applicant (UC-S2-AA-07, BR-06).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidate cross-job company application history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecruiterApplicantCompanyHistoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed application ID parameter"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Caller is not a recruiter/enterprise administrator or lacks active enterprise assignment"
+          },
+          "404": {
+            "description": "Application not found or inaccessible (opaque 404)"
           }
         }
       }
