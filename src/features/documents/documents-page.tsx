@@ -1,18 +1,16 @@
-import { Download, Eye, FileText, Star, Trash2, Upload } from "lucide-react";
+import { Download, Eye, FileText, Upload } from "lucide-react";
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 
 import { requestErrorMessage } from "@/api/request-error";
 import type { Document } from "@/api/generated/types.gen";
-import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { PageHeader } from "@/components/common/admin-page-header";
 import { DataTable, TableSurface } from "@/components/common/data-table";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { ListToolbar } from "@/components/common/list-toolbar";
 import { useToast } from "@/components/toast/toast-provider";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FilterSelect } from "@/components/ui/filter-select";
 import { Pagination } from "@/components/ui/pagination";
@@ -35,25 +33,16 @@ import { cn } from "@/lib/utils";
 
 import {
   ALL_DOCUMENTS,
-  DOCUMENT_DEFAULT_STATES,
   DOCUMENT_LIST_DEFAULT_LIMIT,
   DOCUMENT_LIST_PARAMS,
-  DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_ORDERS,
   DOCUMENT_TYPES,
-  OBJECT_URL_REVOKE_DELAY_MS,
 } from "./documents.constants";
 import {
-  downloadDocument,
-  previewDocument,
   type DocumentType,
-  useDeleteDocument,
   useDocuments,
-  useSetDefaultDocument,
   useUploadDocument,
 } from "./documents.queries";
-
-type BusyAction = "download" | "preview";
 
 function selectedValue<const T extends readonly string[]>(
   values: T,
@@ -70,11 +59,6 @@ export function DocumentsPage() {
   const [searchParams] = useSearchParams();
   const [uploadType, setUploadType] = useState<DocumentType>("cv");
   const [dragging, setDragging] = useState(false);
-  const [pendingDelete, setPendingDelete] = useState<Document | null>(null);
-  const [busyAction, setBusyAction] = useState<{
-    action: BusyAction;
-    id: string;
-  } | null>(null);
   const input = useRef<HTMLInputElement>(null);
   const toast = useToast();
 
@@ -83,34 +67,27 @@ export function DocumentsPage() {
       DOCUMENT_TYPES,
       searchParams.get(DOCUMENT_LIST_PARAMS.type),
     ) ?? ALL_DOCUMENTS;
-  const defaultState = selectedValue(
-    DOCUMENT_DEFAULT_STATES,
-    searchParams.get(DOCUMENT_LIST_PARAMS.defaultState),
-  );
-  const sortBy =
-    selectedValue(
-      DOCUMENT_SORT_FIELDS,
-      searchParams.get(DOCUMENT_LIST_PARAMS.sortBy),
-    ) ?? "created_at";
   const sortOrder =
     selectedValue(
       DOCUMENT_SORT_ORDERS,
       searchParams.get(DOCUMENT_LIST_PARAMS.sortOrder),
     ) ?? "desc";
-  const normalizedSearch = debouncedSearch.trim();
+  const normalizedSearch = debouncedSearch.trim().toLowerCase();
 
   const query = useDocuments({
     page,
     limit,
-    sort_by: sortBy,
     sort_order: sortOrder,
-    ...(normalizedSearch ? { search: normalizedSearch } : {}),
     ...(listType === ALL_DOCUMENTS ? {} : { type: listType }),
-    ...(defaultState ? { is_default: defaultState } : {}),
   });
   const upload = useUploadDocument();
-  const deletion = useDeleteDocument();
-  const setDefault = useSetDefaultDocument();
+  const items = query.data?.items ?? [];
+  const visibleItems = normalizedSearch
+    ? items.filter((row) => {
+        const haystack = `${row.fileName} ${row.type}`.toLowerCase();
+        return haystack.includes(normalizedSearch);
+      })
+    : items;
 
   const selectFile = (file?: File) => {
     if (!file || upload.isPending) return;
@@ -159,35 +136,20 @@ export function DocumentsPage() {
     selectFile(event.dataTransfer.files[0]);
   };
 
-  async function handleDownload(document: Document): Promise<void> {
-    setBusyAction({ action: "download", id: document.id });
-    try {
-      const blob = await downloadDocument(document.id);
-      const url = URL.createObjectURL(blob);
-      const anchor = window.document.createElement("a");
-      anchor.download = document.fileName;
-      anchor.href = url;
-      anchor.click();
-      window.setTimeout(
-        () => URL.revokeObjectURL(url),
-        OBJECT_URL_REVOKE_DELAY_MS,
-      );
-    } catch (error) {
-      toast.showToast({
-        title: t("documents.downloadFailedTitle"),
-        message: requestErrorMessage(
-          error,
-          t("documents.downloadFailedMessage"),
-        ),
-        tone: "error",
-      });
-    } finally {
-      setBusyAction(null);
-    }
+  function handleDownload(document: Document): void {
+    const anchor = window.document.createElement("a");
+    anchor.download = document.fileName;
+    anchor.href = document.fileUrl;
+    anchor.rel = "noreferrer";
+    anchor.click();
   }
 
-  async function handlePreview(document: Document): Promise<void> {
-    const previewWindow = window.open("about:blank", "_blank");
+  function handlePreview(document: Document): void {
+    const previewWindow = window.open(
+      document.fileUrl,
+      "_blank",
+      "noopener,noreferrer",
+    );
     if (!previewWindow) {
       toast.showToast({
         title: t("documents.previewFailedTitle"),
@@ -196,49 +158,15 @@ export function DocumentsPage() {
       });
       return;
     }
-    previewWindow.opener = null;
-    setBusyAction({ action: "preview", id: document.id });
-    try {
-      const preview = await previewDocument(document.id);
-      if (preview instanceof Blob) {
-        const url = URL.createObjectURL(preview);
-        previewWindow.addEventListener("beforeunload", () =>
-          URL.revokeObjectURL(url),
-        );
-        previewWindow.location.replace(url);
-      } else {
-        const url = new URL(preview.previewUrl);
-        if (url.protocol !== "https:" && url.protocol !== "http:")
-          throw new Error(t("documents.previewInvalidUrl"));
-        previewWindow.location.replace(url.toString());
-      }
-    } catch (error) {
-      previewWindow.close();
-      toast.showToast({
-        title: t("documents.previewFailedTitle"),
-        message: requestErrorMessage(
-          error,
-          t("documents.previewFailedMessage"),
-        ),
-        tone: "error",
-      });
-    } finally {
-      setBusyAction(null);
-    }
   }
 
-  const items = query.data?.items ?? [];
   const hasFilters =
     search !== "" ||
     listType !== ALL_DOCUMENTS ||
-    Boolean(defaultState) ||
-    sortBy !== "created_at" ||
     sortOrder !== "desc";
   const clearFilters = () =>
     setMany({
       search: null,
-      [DOCUMENT_LIST_PARAMS.defaultState]: null,
-      [DOCUMENT_LIST_PARAMS.sortBy]: null,
       [DOCUMENT_LIST_PARAMS.sortOrder]: null,
       [DOCUMENT_LIST_PARAMS.type]: null,
     });
@@ -347,33 +275,6 @@ export function DocumentsPage() {
       >
         <div className="flex flex-wrap items-center gap-2.5">
           <FilterSelect
-            onChange={(value) =>
-              set(
-                DOCUMENT_LIST_PARAMS.defaultState,
-                value === ALL_DOCUMENTS ? null : value,
-              )
-            }
-            options={[
-              {
-                label: t("documents.filters.allDefaults"),
-                value: ALL_DOCUMENTS,
-              },
-              { label: t("documents.filters.default"), value: "true" },
-              { label: t("documents.filters.notDefault"), value: "false" },
-            ]}
-            placeholder={t("documents.filters.allDefaults")}
-            value={defaultState ?? ALL_DOCUMENTS}
-          />
-          <FilterSelect
-            onChange={(value) => set(DOCUMENT_LIST_PARAMS.sortBy, value)}
-            options={DOCUMENT_SORT_FIELDS.map((value) => ({
-              label: t(`documents.sort.${value}`),
-              value,
-            }))}
-            placeholder={t("documents.sort.label")}
-            value={sortBy}
-          />
-          <FilterSelect
             onChange={(value) => set(DOCUMENT_LIST_PARAMS.sortOrder, value)}
             options={DOCUMENT_SORT_ORDERS.map((value) => ({
               label: t(`documents.sort.${value}`),
@@ -414,9 +315,6 @@ export function DocumentsPage() {
                     <span className="truncate font-medium text-foreground">
                       {row.fileName}
                     </span>
-                    {row.isDefault ? (
-                      <Badge variant="success">{t("documents.default")}</Badge>
-                    ) : null}
                   </span>
                 ),
               },
@@ -443,8 +341,8 @@ export function DocumentsPage() {
                       aria-label={t("documents.preview", {
                         name: row.fileName,
                       })}
-                      disabled={Boolean(busyAction)}
-                      onClick={() => void handlePreview(row)}
+                      disabled={upload.isPending}
+                      onClick={() => handlePreview(row)}
                       size="icon"
                       title={t("documents.preview", { name: row.fileName })}
                       variant="ghost"
@@ -455,56 +353,13 @@ export function DocumentsPage() {
                       aria-label={t("documents.download", {
                         name: row.fileName,
                       })}
-                      disabled={Boolean(busyAction)}
-                      onClick={() => void handleDownload(row)}
+                      disabled={upload.isPending}
+                      onClick={() => handleDownload(row)}
                       size="icon"
                       title={t("documents.download", { name: row.fileName })}
                       variant="ghost"
                     >
                       <Download />
-                    </Button>
-                    {!row.isDefault ? (
-                      <Button
-                        aria-label={t("documents.setDefault", {
-                          name: row.fileName,
-                        })}
-                        disabled={setDefault.isPending}
-                        onClick={() =>
-                          setDefault.mutate(row.id, {
-                            onError: (error) =>
-                              toast.showToast({
-                                title: t("documents.defaultFailedTitle"),
-                                message: requestErrorMessage(error),
-                                tone: "error",
-                              }),
-                            onSuccess: () =>
-                              toast.showToast({
-                                title: t("documents.defaultDoneTitle"),
-                                message: t("documents.defaultDoneMessage", {
-                                  name: row.fileName,
-                                }),
-                                tone: "success",
-                              }),
-                          })
-                        }
-                        size="icon"
-                        title={t("documents.setDefault", {
-                          name: row.fileName,
-                        })}
-                        variant="ghost"
-                      >
-                        <Star />
-                      </Button>
-                    ) : null}
-                    <Button
-                      aria-label={t("documents.delete", { name: row.fileName })}
-                      disabled={deletion.isPending}
-                      onClick={() => setPendingDelete(row)}
-                      size="icon"
-                      title={t("documents.delete", { name: row.fileName })}
-                      variant="ghost"
-                    >
-                      <Trash2 className="text-destructive" />
                     </Button>
                   </div>
                 ),
@@ -526,7 +381,7 @@ export function DocumentsPage() {
             }
             isLoading={query.isPending}
             rowKey={(row) => row.id}
-            rows={items}
+            rows={visibleItems}
           />
         </TableSurface>
       )}
@@ -540,46 +395,6 @@ export function DocumentsPage() {
           page={page}
           total={query.data.total}
           totalPages={query.data.totalPages}
-        />
-      ) : null}
-
-      {pendingDelete ? (
-        <ActionConfirmDialog
-          action={
-            deletion.isPending
-              ? t("documents.deleting")
-              : t("documents.confirmDelete")
-          }
-          description={t("documents.deleteDescription")}
-          disabled={deletion.isPending}
-          icon={Trash2}
-          keepOpenOnConfirm
-          onConfirm={() =>
-            deletion.mutate(pendingDelete.id, {
-              onError: (error) =>
-                toast.showToast({
-                  title: t("documents.deleteFailedTitle"),
-                  message: requestErrorMessage(error),
-                  tone: "error",
-                }),
-              onSuccess: () => {
-                toast.showToast({
-                  title: t("documents.deletedTitle"),
-                  message: t("documents.deletedMessage", {
-                    name: pendingDelete.fileName,
-                  }),
-                  tone: "success",
-                });
-                setPendingDelete(null);
-              },
-            })
-          }
-          onOpenChange={(open) => !open && setPendingDelete(null)}
-          open
-          title={t("documents.deleteTitle", {
-            name: pendingDelete.fileName,
-          })}
-          variant="destructive-solid"
         />
       ) : null}
     </main>
