@@ -4,6 +4,10 @@ export const CERTIFICATES_PATH = "/certificates";
 export const RECRUITER_JOB_POSTINGS_PATH = "/recruiter/job-postings";
 export const RECRUITER_INTERVIEWS_PATH = "/recruiter/interviews";
 
+export function interviewPath(interviewId: string): string {
+  return `${RECRUITER_INTERVIEWS_PATH}/${interviewId}`;
+}
+
 /** Public job page and its apply flow (UC-BJOB-03); applications link here to view or apply again. */
 export function jobPath(jobId: string): string {
   return `/career/${jobId}`;

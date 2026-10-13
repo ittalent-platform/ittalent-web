@@ -1,12 +1,15 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 
 import { DataTable, type DataTableColumn } from "@/components/common/data-table";
 import { PersonAvatar } from "@/components/common/person-avatar";
+import { interviewPath } from "@/config/routes";
 
+import { InterviewActionsMenu } from "./interview-actions-menu";
 import { InterviewModeBadge, InterviewStatusBadge } from "./interview-badges";
 import { INTERVIEW_SKELETON_ROWS, type InterviewItem, type InterviewSortOrder } from "./interviews.constants";
-import { formatShortDay, formatTimeRange, initialsName } from "./interviews.format";
+import { applicantName, formatShortDay, formatTimeRange, initialsName } from "./interviews.format";
 
 const DATE_COLUMN = "dateTime";
 
@@ -17,11 +20,6 @@ type InterviewsTableProps = {
   onSort: () => void;
   sortOrder: InterviewSortOrder;
 };
-
-/** The applicant's name, or the email when the account has no name. */
-export function applicantName(interview: InterviewItem): string {
-  return interview.applicant.fullName?.trim() || interview.applicant.email || "—";
-}
 
 /** Where the interview takes place: the room link for an online one, the address for an onsite one. */
 function Place({ interview }: { interview: InterviewItem }) {
@@ -50,8 +48,10 @@ export function InterviewsTable({ emptyState, isLoading, items, onSort, sortOrde
     {
       cell: (interview) => (
         <div className="flex min-w-0 items-center gap-2.5">
-          <PersonAvatar className="size-9 text-[13px]" name={initialsName(applicantName(interview))} tone="peach" />
-          <span className="truncate font-bold text-foreground">{applicantName(interview)}</span>
+          <PersonAvatar className="size-9 text-[13px]" name={initialsName(applicantName(interview.applicant))} tone="peach" />
+          <Link className="truncate font-bold text-foreground hover:underline" to={interviewPath(interview.id)}>
+            {applicantName(interview.applicant)}
+          </Link>
         </div>
       ),
       className: "min-w-[220px]",
@@ -82,6 +82,12 @@ export function InterviewsTable({ emptyState, isLoading, items, onSort, sortOrde
     { cell: (interview) => <InterviewModeBadge mode={interview.mode} />, header: t("interviews.table.mode"), key: "mode" },
     { cell: (interview) => <Place interview={interview} />, header: t("interviews.table.location"), key: "location" },
     { cell: (interview) => <InterviewStatusBadge status={interview.status} />, header: t("interviews.table.status"), key: "status" },
+    {
+      cell: (interview) => <InterviewActionsMenu interview={interview} />,
+      className: "w-12 pr-3 text-right",
+      header: <span className="sr-only">{t("interviews.table.actions")}</span>,
+      key: "actions",
+    },
   ];
 
   return (

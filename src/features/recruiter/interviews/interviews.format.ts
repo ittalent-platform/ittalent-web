@@ -23,6 +23,11 @@ function partsOf(iso: string, language: string, options: Intl.DateTimeFormatOpti
   return Object.fromEntries(formatter.formatToParts(new Date(iso)).map((part) => [part.type, part.value]));
 }
 
+/** The applicant's name, or the email when the account has no name. */
+export function applicantName(applicant: { email: string | null; fullName: string | null }): string {
+  return applicant.fullName?.trim() || applicant.email || "—";
+}
+
 /** First and last word of a name, so "Trịnh Văn Long" gets the initials "TL". */
 export function initialsName(name: string): string {
   const words = name.split(/\s+/).filter(Boolean);
@@ -45,6 +50,12 @@ export function formatFullDay(iso: string, language: string): string {
 export function formatTime(iso: string, language: string): string {
   const parts = partsOf(iso, language, { hour: "2-digit", minute: "2-digit" });
   return `${parts.hour}:${parts.minute}`;
+}
+
+/** "7 Oct 2026, 10:02": an instant of the history, in Vietnam time. */
+export function formatDateTime(iso: string, language: string): string {
+  const parts = partsOf(iso, language, { day: "numeric", hour: "2-digit", minute: "2-digit", month: "short", year: "numeric" });
+  return `${parts.day} ${parts.month} ${parts.year}, ${parts.hour}:${parts.minute}`;
 }
 
 /** "10:00 – 11:00". */

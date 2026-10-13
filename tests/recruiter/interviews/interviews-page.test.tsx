@@ -80,6 +80,14 @@ describe("Recruiter interviews table", () => {
     expect(within(onsite).getByText("Completed")).toBeInTheDocument();
   });
 
+  it("links the applicant to the interview and offers View details in the row menu", async () => {
+    renderPage();
+    expect(screen.getByRole("link", { name: "Phạm Minh Khoa" })).toHaveAttribute("href", "/recruiter/interviews/i1");
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    expect(await screen.findByRole("menuitem", { name: "View details" })).toBeInTheDocument();
+  });
+
   it("falls back to the email when the applicant has no name", () => {
     mockList(page([interview({ applicant: { email: "no.name@gmail.com", fullName: null, id: "a3" } })]));
     renderPage();

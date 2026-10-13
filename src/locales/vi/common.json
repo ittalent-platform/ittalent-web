@@ -2094,7 +2094,8 @@
       "dateTime": "Ngày & giờ",
       "mode": "Hình thức",
       "location": "Địa điểm",
-      "status": "Trạng thái"
+      "status": "Trạng thái",
+      "actions": "Thao tác"
     },
     "duration": {
       "minutes_other": "{{count}} phút",
@@ -2113,7 +2114,30 @@
       "title": "Bạn không còn quyền truy cập",
       "description": "Tài khoản của bạn chưa thuộc công ty nào, hoặc quyền HR đã bị gỡ hoặc công ty đang bị tạm dừng."
     },
-    "loadFailed": "Không thể tải danh sách phỏng vấn. Vui lòng thử lại."
+    "loadFailed": "Không thể tải danh sách phỏng vấn. Vui lòng thử lại.",
+    "actions": {
+      "rowActions": "Thao tác cho {{name}}",
+      "view": "Xem chi tiết"
+    },
+    "detail": {
+      "information": "Thông tin phỏng vấn",
+      "date": "Ngày",
+      "time": "Giờ",
+      "duration": "Thời lượng",
+      "mode": "Hình thức",
+      "link": "Liên kết",
+      "openLink": "Mở liên kết cuộc họp",
+      "location": "Địa điểm",
+      "notes": "Ghi chú",
+      "interviewers": "Người phỏng vấn",
+      "history": "Lịch sử trạng thái",
+      "back": "Quay lại danh sách phỏng vấn",
+      "unavailableTitle": "Không thể xem buổi phỏng vấn này",
+      "unavailableDescription": "Buổi phỏng vấn có thể thuộc công ty khác hoặc đường dẫn không đúng.",
+      "loadFailedTitle": "Không tải được buổi phỏng vấn",
+      "loadFailed": "Đã xảy ra lỗi khi tải buổi phỏng vấn. Vui lòng thử lại.",
+      "cancelledNotice": "Buổi phỏng vấn này đã bị hủy và không thể chỉnh sửa nữa."
+    }
   }
 }
 

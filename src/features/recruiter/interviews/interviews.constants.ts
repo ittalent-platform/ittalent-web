@@ -1,8 +1,10 @@
-import type { InterviewListResponse } from "@/api/generated/types.gen";
+import type { InterviewDetailDto, InterviewListResponse } from "@/api/generated/types.gen";
+import type { TimelineTone } from "@/components/common/timeline";
 
 export type InterviewItem = InterviewListResponse["items"][number];
 export type InterviewStatus = InterviewItem["status"];
 export type InterviewMode = InterviewItem["mode"];
+export type InterviewDetail = InterviewDetailDto;
 
 export const INTERVIEW_STATUSES: readonly InterviewStatus[] = ["scheduled", "completed", "no_show", "cancelled"];
 
@@ -29,7 +31,8 @@ export const INTERVIEW_SKELETON_ROWS = 5;
 /** Interviews are always shown in Vietnam time, whatever the time zone of the browser. */
 export const INTERVIEW_TIME_ZONE = "Asia/Ho_Chi_Minh";
 export const INTERVIEW_UTC_OFFSET_HOURS = 7;
-export const INTERVIEW_TIME_ZONE_LABEL = "Asia/Ho Chi Minh (GMT+7)";
+export const INTERVIEW_TIME_ZONE_NAME = "Asia/Ho Chi Minh";
+export const INTERVIEW_TIME_ZONE_LABEL = `${INTERVIEW_TIME_ZONE_NAME} (GMT+7)`;
 
 export const MINUTES_PER_HOUR = 60;
 export const MS_PER_MINUTE = 60_000;
@@ -47,7 +50,19 @@ export const STATUS_BADGE_VARIANT = {
   scheduled: "info",
 } as const satisfies Record<InterviewStatus, string>;
 
+/** Dot colour of each status in the history, matching the status badge. */
+export const HISTORY_TONE = {
+  cancelled: "error",
+  completed: "success",
+  no_show: "warning",
+  scheduled: "info",
+} as const satisfies Record<InterviewStatus, TimelineTone>;
+
 export const MODE_BADGE_VARIANT = { online: "blocked", onsite: "warning" } as const satisfies Record<InterviewMode, string>;
 
 /** HTTP status the API answers with when the account has no enterprise (or HR access was removed). */
 export const FORBIDDEN_STATUS = 403;
+
+/** HTTP statuses the API answers with when an interview is missing, belongs to another company or the id is malformed. */
+export const NOT_FOUND_STATUS = 404;
+export const BAD_REQUEST_STATUS = 400;

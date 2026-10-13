@@ -2114,7 +2114,8 @@
       "dateTime": "Date & time",
       "mode": "Mode",
       "location": "Location",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Actions"
     },
     "duration": {
       "minutes_one": "{{count}} minute",
@@ -2135,7 +2136,30 @@
       "title": "You no longer have access",
       "description": "Your account is not assigned to a company, or its HR access was removed or the company is on hold."
     },
-    "loadFailed": "Could not load interviews. Please try again."
+    "loadFailed": "Could not load interviews. Please try again.",
+    "actions": {
+      "rowActions": "Actions for {{name}}",
+      "view": "View details"
+    },
+    "detail": {
+      "information": "Interview information",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "mode": "Mode",
+      "link": "Link",
+      "openLink": "Open meeting link",
+      "location": "Location",
+      "notes": "Notes",
+      "interviewers": "Interviewers",
+      "history": "Status history",
+      "back": "Back to interviews",
+      "unavailableTitle": "This interview isn't available",
+      "unavailableDescription": "It may belong to another company, or the link is wrong.",
+      "loadFailedTitle": "Could not load this interview",
+      "loadFailed": "Something went wrong while loading the interview. Please try again.",
+      "cancelledNotice": "This interview is cancelled and can no longer be edited."
+    }
   }
 }
 

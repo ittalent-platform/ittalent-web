@@ -95,6 +95,11 @@ const RecruiterInterviewsPage = lazy(() =>
     default: m.InterviewsPage,
   })),
 );
+const RecruiterInterviewDetailPage = lazy(() =>
+  import("@/features/recruiter/interviews/interview-detail-page").then((m) => ({
+    default: m.InterviewDetailPage,
+  })),
+);
 const DocumentsPage = lazy(() =>
   import("@/features/documents/documents-page").then((m) => ({
     default: m.DocumentsPage,
@@ -243,6 +248,10 @@ export const appRoutes = [
             element: <RecruiterEditJobPostingPage />,
           },
           { path: "interviews", element: <RecruiterInterviewsPage /> },
+          {
+            path: "interviews/:interviewId",
+            element: <RecruiterInterviewDetailPage />,
+          },
         ],
       },
     ],
