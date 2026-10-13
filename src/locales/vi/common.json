@@ -620,7 +620,8 @@
     "jobPostings": "Tin tuyển dụng",
     "enterprises": "Hồ sơ doanh nghiệp",
     "collapse": "Thu gọn thanh bên",
-    "closeMenu": "Đóng menu"
+    "closeMenu": "Đóng menu",
+    "interviews": "Phỏng vấn"
   },
   "jobPostings": {
     "title": "Tin tuyển dụng",
@@ -2057,6 +2058,62 @@
         "showing": "Hiển thị {{from}}-{{to}} trên tổng số {{total}} mục"
       }
     }
+  },
+  "interviews": {
+    "page": {
+      "title": "Phỏng vấn",
+      "count_other": "{{count}} buổi phỏng vấn · công ty của bạn"
+    },
+    "toolbar": {
+      "search": "Tìm theo ứng viên hoặc vị trí…",
+      "searchInvalid": "Từ khóa tìm kiếm chứa ký tự không hợp lệ. Vui lòng nhập lại.",
+      "all": "Tất cả",
+      "status": "Trạng thái",
+      "date": "Ngày"
+    },
+    "status": {
+      "scheduled": "Đã lên lịch",
+      "completed": "Hoàn thành",
+      "no_show": "Vắng mặt",
+      "cancelled": "Đã hủy"
+    },
+    "mode": {
+      "online": "Trực tuyến",
+      "onsite": "Tại văn phòng"
+    },
+    "dateFilter": {
+      "today": "Hôm nay",
+      "thisWeek": "Tuần này",
+      "thisMonth": "Tháng này",
+      "upcoming": "Sắp tới",
+      "past": "Đã qua"
+    },
+    "table": {
+      "applicant": "Ứng viên",
+      "job": "Vị trí",
+      "dateTime": "Ngày & giờ",
+      "mode": "Hình thức",
+      "location": "Địa điểm",
+      "status": "Trạng thái"
+    },
+    "duration": {
+      "minutes_other": "{{count}} phút",
+      "hours_other": "{{count}} giờ",
+      "hoursMinutes": "{{hours}} giờ {{minutes}} phút"
+    },
+    "empty": {
+      "title": "Chưa có buổi phỏng vấn nào",
+      "description": "Chưa có buổi phỏng vấn nào được lên lịch.",
+      "noMatchTitle": "Không có buổi phỏng vấn phù hợp",
+      "noResultsFor": "Không có kết quả cho “{{keyword}}”",
+      "noMatchDescription": "Không có buổi phỏng vấn nào khớp từ khóa hoặc bộ lọc này. Hãy thử ứng viên hoặc vị trí khác, hoặc xóa bộ lọc.",
+      "clearFilters": "Xóa bộ lọc"
+    },
+    "noAccess": {
+      "title": "Bạn không còn quyền truy cập",
+      "description": "Tài khoản của bạn chưa thuộc công ty nào, hoặc quyền HR đã bị gỡ hoặc công ty đang bị tạm dừng."
+    },
+    "loadFailed": "Không thể tải danh sách phỏng vấn. Vui lòng thử lại."
   }
 }
 

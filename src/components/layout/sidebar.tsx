@@ -1,13 +1,14 @@
 import {
   BriefcaseBusiness,
   Building2,
+  CalendarDays,
   ClipboardCheck,
   PanelLeftClose,
   Users,
   X,
 } from "lucide-react";
 
-import { RECRUITER_JOB_POSTINGS_PATH } from "@/config/routes";
+import { RECRUITER_INTERVIEWS_PATH, RECRUITER_JOB_POSTINGS_PATH } from "@/config/routes";
 import { SidebarNavList } from "./sidebar-nav-list";
 import { BrandLogo } from "./brand-logo";
 import { UserMenu } from "./user-menu";
@@ -42,6 +43,7 @@ const adminNavItems = [
 
 const recruiterNavItems = [
   { end: false, icon: BriefcaseBusiness, labelKey: "sidebar.jobPostings", to: RECRUITER_JOB_POSTINGS_PATH },
+  { end: false, icon: CalendarDays, labelKey: "sidebar.interviews", to: RECRUITER_INTERVIEWS_PATH },
 ] as const;
 
 type SidebarProps = {

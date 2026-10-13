@@ -628,7 +628,8 @@
     "jobPostings": "Job postings",
     "enterprises": "Enterprise Profiles",
     "collapse": "Collapse sidebar",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "interviews": "Interviews"
   },
   "jobPostings": {
     "title": "Job postings",
@@ -2076,6 +2077,65 @@
         "showing": "Showing {{from}}-{{to}} of {{total}} entries"
       }
     }
+  },
+  "interviews": {
+    "page": {
+      "title": "Interviews",
+      "count_one": "{{count}} interview · your company",
+      "count_other": "{{count}} interviews · your company"
+    },
+    "toolbar": {
+      "search": "Search by applicant or job…",
+      "searchInvalid": "Search keyword contains invalid characters. Please revise your input.",
+      "all": "All",
+      "status": "Status",
+      "date": "Date"
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "no_show": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "mode": {
+      "online": "Online",
+      "onsite": "Onsite"
+    },
+    "dateFilter": {
+      "today": "Today",
+      "thisWeek": "This week",
+      "thisMonth": "This month",
+      "upcoming": "Upcoming",
+      "past": "Past"
+    },
+    "table": {
+      "applicant": "Applicant",
+      "job": "Job",
+      "dateTime": "Date & time",
+      "mode": "Mode",
+      "location": "Location",
+      "status": "Status"
+    },
+    "duration": {
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "hoursMinutes": "{{hours}} h {{minutes}} min"
+    },
+    "empty": {
+      "title": "No interviews yet",
+      "description": "No interviews are scheduled yet.",
+      "noMatchTitle": "No interviews match these filters",
+      "noResultsFor": "No results for “{{keyword}}”",
+      "noMatchDescription": "No interviews match this keyword or filter. Try a different applicant, job, or clear your filters.",
+      "clearFilters": "Clear filters"
+    },
+    "noAccess": {
+      "title": "You no longer have access",
+      "description": "Your account is not assigned to a company, or its HR access was removed or the company is on hold."
+    },
+    "loadFailed": "Could not load interviews. Please try again."
   }
 }
 
