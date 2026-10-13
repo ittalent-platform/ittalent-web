@@ -120,6 +120,11 @@ const EnterpriseFormPage = lazy(() =>
     default: m.EnterpriseFormPage,
   })),
 );
+const AdminRegistrationsPage = lazy(() =>
+  import("@/features/admin/registrations").then((m) => ({
+    default: m.RegistrationsPage,
+  })),
+);
 
 const CareerPage = lazy(() =>
   import("@/features/public-site/career/career-page").then((m) => ({
@@ -190,6 +195,7 @@ export const appRoutes = [
           { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
           { path: "enterprises/new", element: <EnterpriseFormPage /> },
+          { path: "registrations", element: <AdminRegistrationsPage /> },
           {
             path: "enterprises/:enterpriseId",
             element: <AdminEnterpriseDetailPage />,
