@@ -189,7 +189,7 @@ export function RegistrationsTable({
                 <TableCell>
                   <span
                     className={cn(
-                      "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11.5px] font-semibold",
+                      "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11.5px] font-semibold whitespace-nowrap shrink-0",
                       waiting.isUrgent
                         ? "bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50"
                         : "bg-muted text-muted-foreground",

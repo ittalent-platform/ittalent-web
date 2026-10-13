@@ -54,7 +54,7 @@ export function RegistrationsToolbar({
   return (
     <div className="flex flex-col gap-4">
       {/* Tabs Row */}
-      <div className="flex items-center gap-6 border-b border-border">
+      <div className="flex items-center gap-6 border-b border-border overflow-x-auto no-scrollbar max-w-full">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
@@ -63,7 +63,7 @@ export function RegistrationsToolbar({
               type="button"
               onClick={() => onTabChange(tab.key)}
               className={cn(
-                "group -mb-px flex items-center gap-2 pb-3 pt-1 text-[14px] transition-colors cursor-pointer",
+                "group -mb-px flex items-center gap-2 pb-3 pt-1 text-[14px] transition-colors cursor-pointer shrink-0 whitespace-nowrap",
                 isActive
                   ? "border-b-2 border-primary font-semibold text-foreground"
                   : "border-b-2 border-transparent font-medium text-muted-foreground hover:text-foreground",
@@ -90,7 +90,7 @@ export function RegistrationsToolbar({
       {/* Controls Row */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         {/* Search */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={searchTerm}
@@ -101,13 +101,13 @@ export function RegistrationsToolbar({
         </div>
 
         {/* Filters & Sort */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <FilterSelect
             value={timeFilter}
             onChange={(v) => onTimeFilterChange(v as QueueTimeFilter)}
             options={timeOptions}
             size="md"
-            className="h-10 rounded-xl min-w-[170px]"
+            className="h-10 rounded-xl flex-1 sm:flex-initial sm:min-w-[170px]"
           />
 
           <FilterSelect
@@ -115,7 +115,7 @@ export function RegistrationsToolbar({
             onChange={(v) => onSortOptionChange(v as QueueSortOption)}
             options={sortOptions}
             size="md"
-            className="h-10 rounded-xl min-w-[150px]"
+            className="h-10 rounded-xl flex-1 sm:flex-initial sm:min-w-[150px]"
           />
         </div>
       </div>

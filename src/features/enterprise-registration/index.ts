@@ -15,3 +15,4 @@ export * from "./components/step4-review-form";
 export * from "./components/registration-submitted-receipt";
 export * from "./context/registration-wizard-context";
 export * from "./pages/register-company-page";
+export * from "./pages/accept-registration-invitation-page";

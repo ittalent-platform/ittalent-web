@@ -41,6 +41,13 @@ const RegisterCompanyPage = lazy(() =>
     }),
   ),
 );
+const AcceptRegistrationInvitationPage = lazy(() =>
+  import("@/features/enterprise-registration/pages/accept-registration-invitation-page").then(
+    (m) => ({
+      default: m.AcceptRegistrationInvitationPage,
+    }),
+  ),
+);
 const AcceptInvitationPage = lazy(() =>
   import("@/features/auth/accept-invitation-page").then((m) => ({ default: m.AcceptInvitationPage })),
 );
@@ -135,6 +142,11 @@ const AdminRegistrationsPage = lazy(() =>
     default: m.RegistrationsPage,
   })),
 );
+const AdminRegistrationDetailPage = lazy(() =>
+  import("@/features/admin/registrations").then((m) => ({
+    default: m.RegistrationDetailPage,
+  })),
+);
 
 const CareerPage = lazy(() =>
   import("@/features/public-site/career/career-page").then((m) => ({
@@ -173,6 +185,7 @@ export const appRoutes = [
   { path: "/register-company", element: <RegisterCompanyPage /> },
   // The confirmation email links here (APP_BASE_URL/enterprise-registration/verify?token=...).
   { path: "/enterprise-registration/verify", element: <RedirectKeepingSearch to="/register-company" /> },
+  { path: "/enterprise-registration/invitation", element: <AcceptRegistrationInvitationPage /> },
   { path: "/verify-email", element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
@@ -214,6 +227,10 @@ export const appRoutes = [
           { path: "enterprises", element: <EnterprisesPage /> },
           { path: "enterprises/new", element: <EnterpriseFormPage /> },
           { path: "registrations", element: <AdminRegistrationsPage /> },
+          {
+            path: "registrations/:registrationId",
+            element: <AdminRegistrationDetailPage />,
+          },
           {
             path: "enterprises/:enterpriseId",
             element: <AdminEnterpriseDetailPage />,
