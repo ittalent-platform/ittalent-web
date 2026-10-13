@@ -10,6 +10,7 @@ import { InterviewActionsMenu } from "./interview-actions-menu";
 import { InterviewModeBadge, InterviewStatusBadge } from "./interview-badges";
 import { INTERVIEW_SKELETON_ROWS, type InterviewItem, type InterviewSortOrder } from "./interviews.constants";
 import { applicantName, formatShortDay, formatTimeRange, initialsName } from "./interviews.format";
+import type { InterviewAction } from "./use-interview-actions";
 
 const DATE_COLUMN = "dateTime";
 
@@ -17,6 +18,7 @@ type InterviewsTableProps = {
   emptyState: ReactNode;
   isLoading: boolean;
   items: InterviewItem[];
+  onAction: (action: InterviewAction, interview: InterviewItem) => void;
   onSort: () => void;
   sortOrder: InterviewSortOrder;
 };
@@ -41,7 +43,7 @@ function Place({ interview }: { interview: InterviewItem }) {
   );
 }
 
-export function InterviewsTable({ emptyState, isLoading, items, onSort, sortOrder }: InterviewsTableProps) {
+export function InterviewsTable({ emptyState, isLoading, items, onAction, onSort, sortOrder }: InterviewsTableProps) {
   const { t, i18n } = useTranslation();
 
   const columns: DataTableColumn<InterviewItem>[] = [
@@ -83,7 +85,7 @@ export function InterviewsTable({ emptyState, isLoading, items, onSort, sortOrde
     { cell: (interview) => <Place interview={interview} />, header: t("interviews.table.location"), key: "location" },
     { cell: (interview) => <InterviewStatusBadge status={interview.status} />, header: t("interviews.table.status"), key: "status" },
     {
-      cell: (interview) => <InterviewActionsMenu interview={interview} />,
+      cell: (interview) => <InterviewActionsMenu interview={interview} onAction={onAction} />,
       className: "w-12 pr-3 text-right",
       header: <span className="sr-only">{t("interviews.table.actions")}</span>,
       key: "actions",

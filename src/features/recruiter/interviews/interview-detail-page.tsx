@@ -11,14 +11,17 @@ import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { PersonAvatar } from "@/components/common/person-avatar";
 import { RailCard } from "@/components/common/rail-card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RECRUITER_INTERVIEWS_PATH } from "@/config/routes";
 
+import { InterviewActionsMenu } from "./interview-actions-menu";
 import { InterviewHistory } from "./interview-history";
 import { InterviewModeBadge, InterviewStatusBadge } from "./interview-badges";
 import { BAD_REQUEST_STATUS, FORBIDDEN_STATUS, INTERVIEW_TIME_ZONE_NAME, NOT_FOUND_STATUS, type InterviewDetail } from "./interviews.constants";
 import { applicantName, formatDuration, formatFullDay, formatTimeRange, initialsName } from "./interviews.format";
 import { useInterviewDetail } from "./interviews.queries";
+import { useInterviewActions } from "./use-interview-actions";
 
 const CARD_SURFACE = "overflow-hidden rounded-2xl border border-border bg-card";
 const LINK_CLASS = "font-semibold text-fg-link underline-offset-2 hover:underline";
@@ -121,6 +124,7 @@ export function InterviewDetailPage() {
   const { t } = useTranslation();
   const { interviewId } = useParams<{ interviewId: string }>();
   const query = useInterviewDetail(interviewId);
+  const actions = useInterviewActions();
 
   if (query.isPending) return <DetailSkeleton />;
   if (query.isError || !query.data) return <DetailError error={query.error} onRetry={() => void query.refetch()} />;
@@ -143,6 +147,14 @@ export function InterviewDetailPage() {
             <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{interview.job.title ?? "—"}</p>
           </div>
         </div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {interview.canComplete ? (
+            <Button className="h-11 rounded-xl px-5 text-sm font-semibold" onClick={() => actions.run("complete", interview)} type="button" variant="success-solid">
+              {t("interviews.actions.complete")}
+            </Button>
+          ) : null}
+          <InterviewActionsMenu hide={interview.canComplete ? ["complete"] : []} interview={interview} onAction={actions.run} placement="page" withView={false} />
+        </div>
       </div>
 
       {interview.status === "cancelled" ? <Callout role="status" title={t("interviews.detail.cancelledNotice")} tone="warning" /> : null}
@@ -154,6 +166,7 @@ export function InterviewDetailPage() {
         </div>
         <InterviewHistory history={interview.statusHistory} />
       </div>
+      {actions.dialog}
     </div>
   );
 }

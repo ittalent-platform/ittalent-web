@@ -7,7 +7,8 @@ import type { InterviewListResponse } from "@/api/generated/types.gen";
 import { InterviewsPage } from "@/features/recruiter/interviews/interviews-page";
 import * as interviewQueries from "@/features/recruiter/interviews/interviews.queries";
 
-vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({ useInterviewList: vi.fn() }));
+vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({ useInterviewList: vi.fn(), useUpdateInterviewStatus: () => ({ isPending: false, mutate: vi.fn() }) }));
+vi.mock("@/components/toast/toast-provider", () => ({ useToast: () => ({ dismissToast: vi.fn(), showToast: vi.fn() }) }));
 
 type Item = InterviewListResponse["items"][number];
 

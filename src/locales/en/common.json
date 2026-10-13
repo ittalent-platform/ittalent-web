@@ -2141,7 +2141,12 @@
     "loadFailed": "Could not load interviews. Please try again.",
     "actions": {
       "rowActions": "Actions for {{name}}",
-      "view": "View details"
+      "view": "View details",
+      "complete": "Mark as completed",
+      "noShow": "Mark as no-show",
+      "cancel": "Cancel interview",
+      "cancelShort": "Cancel",
+      "afterItEnds": "After it ends"
     },
     "detail": {
       "information": "Interview information",
@@ -2180,6 +2185,47 @@
       "dayCount_one": "{{count}} interview",
       "dayCount_other": "{{count}} interviews",
       "truncated": "Showing the first {{count}} interviews of this month. Narrow the search or the status to see the rest."
+    },
+    "statusDialog": {
+      "complete": {
+        "title": "Mark interview as completed?",
+        "description": "{{name}} · {{when}}. The application status doesn't change.",
+        "confirm": "Complete",
+        "working": "Completing…",
+        "keep": "Cancel",
+        "doneTitle": "Interview completed",
+        "doneMessage": "This interview is now marked as completed.",
+        "failedTitle": "Could not complete",
+        "failedMessage": "Could not mark this interview as completed. Please try again."
+      },
+      "noShow": {
+        "title": "Mark as no-show?",
+        "description": "{{name}} · {{when}}. The application status doesn't change.",
+        "confirm": "Mark as no-show",
+        "working": "Saving…",
+        "keep": "Cancel",
+        "doneTitle": "Marked as no-show",
+        "doneMessage": "The application wasn't changed.",
+        "failedTitle": "Could not save",
+        "failedMessage": "Could not mark this interview as no-show. Please try again."
+      },
+      "cancel": {
+        "title": "Cancel interview with {{name}}?",
+        "description": "{{when}}. They'll be notified. The interview stays in history, and the application isn't rejected.",
+        "confirm": "Cancel interview",
+        "working": "Cancelling…",
+        "keep": "Keep interview",
+        "doneTitle": "Interview cancelled",
+        "doneMessage": "{{name}} has been notified.",
+        "failedTitle": "Cancellation failed",
+        "failedMessage": "Could not cancel this interview. Please try again."
+      },
+      "stale": {
+        "title": "This interview was already updated",
+        "description": "Its status changed before your action went through, so nothing was applied. Show the latest to see where it stands.",
+        "action": "Show latest"
+      },
+      "notEnded": "This interview hasn't ended yet. You can mark it once it ends."
     }
   }
 }

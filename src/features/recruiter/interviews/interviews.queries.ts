@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getApiV1Interviews, getApiV1InterviewsById, getApiV1InterviewsCalendar } from "@/api/generated";
-import type { GetApiV1InterviewsCalendarData, GetApiV1InterviewsData } from "@/api/generated/types.gen";
+import { getApiV1Interviews, getApiV1InterviewsById, getApiV1InterviewsCalendar, patchApiV1InterviewsByIdStatus } from "@/api/generated";
+import type { GetApiV1InterviewsCalendarData, GetApiV1InterviewsData, UpdateInterviewStatusRequest } from "@/api/generated/types.gen";
 import { requestError } from "@/api/request-error";
 
 export type InterviewListParams = NonNullable<GetApiV1InterviewsData["query"]>;
@@ -43,5 +43,15 @@ export function useInterviewCalendar(params: InterviewCalendarParams, options: {
     enabled: options.enabled ?? true,
     queryFn: async () => unwrap(await getApiV1InterviewsCalendar({ query: params }), "Could not load interviews."),
     queryKey: interviewKeys.calendar(params),
+  });
+}
+
+/** Moves a scheduled interview to its final status; every list, the calendar and the detail refresh afterwards. */
+export function useUpdateInterviewStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...body }: UpdateInterviewStatusRequest & { id: string }) =>
+      unwrap(await patchApiV1InterviewsByIdStatus({ body, path: { id } }), "Could not update this interview."),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: interviewKeys.all }),
   });
 }

@@ -11,6 +11,7 @@ import { interviewPath } from "@/config/routes";
 import { InterviewStatusBadge } from "./interview-badges";
 import type { InterviewItem } from "./interviews.constants";
 import { applicantName, formatDurationShort, formatFullDay, formatTimeRange, initialsName } from "./interviews.format";
+import type { InterviewAction } from "./use-interview-actions";
 
 function Fact({ children, icon: Icon }: { children: ReactNode; icon: typeof Clock }) {
   return (
@@ -22,7 +23,7 @@ function Fact({ children, icon: Icon }: { children: ReactNode; icon: typeof Cloc
 }
 
 /** What a calendar chip opens: the interview at a glance, and the way on to its page. */
-export function InterviewPeek({ interview }: { interview: InterviewItem }) {
+export function InterviewPeek({ interview, onAction }: { interview: InterviewItem; onAction: (action: InterviewAction, interview: InterviewItem) => void }) {
   const { t, i18n } = useTranslation();
   const name = applicantName(interview.applicant);
   const interviewers = interview.interviewers.map((person) => person.email ?? person.fullName).filter(Boolean);
@@ -60,6 +61,11 @@ export function InterviewPeek({ interview }: { interview: InterviewItem }) {
       </ul>
 
       <div className="flex items-center justify-end gap-2 border-t border-border px-4 py-3">
+        {interview.status === "scheduled" ? (
+          <Button className="h-9 px-3 text-[13px] font-semibold text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => onAction("cancel", interview)} type="button" variant="ghost">
+            {t("interviews.actions.cancelShort")}
+          </Button>
+        ) : null}
         <Button asChild className="h-9 px-4 text-[13px] font-semibold" shape="pill">
           <Link to={interviewPath(interview.id)}>{t("interviews.actions.view")}</Link>
         </Button>

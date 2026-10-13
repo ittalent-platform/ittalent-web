@@ -10,6 +10,7 @@ import { CalendarFieldsMenu } from "./calendar-fields-menu";
 import { groupByDay, monthTitle, shiftMonth, weekdayNames, type CalendarDay } from "./interviews.calendar";
 import { CALENDAR_CHIPS_PER_DAY, type CalendarField, type InterviewItem } from "./interviews.constants";
 import { vietnamDay } from "./interviews.format";
+import type { InterviewAction } from "./use-interview-actions";
 
 type InterviewsCalendarProps = {
   currentMonth: string;
@@ -18,6 +19,7 @@ type InterviewsCalendarProps = {
   isLoading: boolean;
   items: InterviewItem[];
   month: string;
+  onAction: (action: InterviewAction, interview: InterviewItem) => void;
   onFieldToggle: (field: CalendarField) => void;
   onMonthChange: (month: string) => void;
 };
@@ -25,7 +27,7 @@ type InterviewsCalendarProps = {
 const NAV_BUTTON = "grid size-9 place-items-center rounded-lg text-muted-foreground outline-none transition hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40";
 
 /** A month of interviews as a Sunday-to-Saturday grid, in Vietnam time. */
-export function InterviewsCalendar({ currentMonth, days, fields, isLoading, items, month, onFieldToggle, onMonthChange }: InterviewsCalendarProps) {
+export function InterviewsCalendar({ currentMonth, days, fields, isLoading, items, month, onAction, onFieldToggle, onMonthChange }: InterviewsCalendarProps) {
   const { t, i18n } = useTranslation();
   const [openId, setOpenId] = useState<string | null>(null);
   const [dayOpen, setDayOpen] = useState<string | null>(null);
@@ -87,7 +89,15 @@ export function InterviewsCalendar({ currentMonth, days, fields, isLoading, item
                     {cell.dayOfMonth}
                   </span>
                   {interviews.slice(0, CALENDAR_CHIPS_PER_DAY).map((interview) => (
-                    <CalendarChip fields={fields} interview={interview} key={interview.id} onOpenChange={(open) => setOpenId(open ? interview.id : null)} open={openId === interview.id} />
+                    <CalendarChip
+                      fields={fields}
+                      interview={interview}
+                      key={interview.id}
+                      onAction={(action, target) => {
+                        setOpenId(null);
+                        onAction(action, target);
+                      }}
+                      onOpenChange={(open) => setOpenId(open ? interview.id : null)} open={openId === interview.id} />
                   ))}
                   {hidden > 0 ? (
                     <button

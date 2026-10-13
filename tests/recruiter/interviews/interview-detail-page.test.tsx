@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -6,7 +7,8 @@ import type { InterviewDetailDto } from "@/api/generated/types.gen";
 import { InterviewDetailPage } from "@/features/recruiter/interviews/interview-detail-page";
 import * as interviewQueries from "@/features/recruiter/interviews/interviews.queries";
 
-vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({ useInterviewDetail: vi.fn() }));
+vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({ useInterviewDetail: vi.fn(), useUpdateInterviewStatus: () => ({ isPending: false, mutate: vi.fn() }) }));
+vi.mock("@/components/toast/toast-provider", () => ({ useToast: () => ({ dismissToast: vi.fn(), showToast: vi.fn() }) }));
 vi.mock("@/auth/use-session", () => ({
   useSession: () => ({ data: { user: { email: "tran.bao@novafintech.vn", fullName: "Trần Bảo", id: "u-me" } } }),
 }));
@@ -132,6 +134,42 @@ describe("Recruiter interview detail", () => {
   it("does not show that notice for an interview that is still scheduled", () => {
     renderPage();
     expect(screen.queryByText(/can no longer be edited/)).not.toBeInTheDocument();
+  });
+
+  it("offers an upcoming interview to be cancelled, with completing waiting for its end", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    expect(screen.queryByRole("button", { name: "Mark as completed" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    expect(await screen.findByRole("menuitem", { name: /Mark as completed/ })).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByRole("menuitem", { name: "Cancel interview" })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "View details" })).not.toBeInTheDocument();
+  });
+
+  it("puts completing in the header once the interview has ended, and leaves no-show and cancel in the menu", async () => {
+    mockDetail(detail({ canComplete: true }));
+    const user = userEvent.setup();
+    renderPage();
+    expect(screen.getByRole("button", { name: "Mark as completed" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Actions for Phạm Minh Khoa" }));
+    expect(await screen.findByRole("menuitem", { name: "Mark as no-show" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "Cancel interview" })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Mark as completed" })).not.toBeInTheDocument();
+  });
+
+  it("opens the confirmation from the header button", async () => {
+    mockDetail(detail({ canComplete: true }));
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByRole("button", { name: "Mark as completed" }));
+    expect(await screen.findByRole("alertdialog", { name: "Mark interview as completed?" })).toBeInTheDocument();
+  });
+
+  it("offers no actions once the interview is cancelled", () => {
+    mockDetail(detail({ status: "cancelled" }));
+    renderPage();
+    expect(screen.queryByRole("button", { name: /Actions for/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Mark as completed" })).not.toBeInTheDocument();
   });
 
   it("shows loading placeholders while the interview is on its way", () => {

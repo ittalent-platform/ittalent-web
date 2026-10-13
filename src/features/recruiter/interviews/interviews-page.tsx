@@ -17,11 +17,13 @@ import { InterviewsTable } from "./interviews-table";
 import { InterviewsToolbar } from "./interviews-toolbar";
 import { ALL_OPTION, FORBIDDEN_STATUS, INTERVIEW_PAGE_SIZE_OPTIONS, INTERVIEW_PARAMS, type InterviewView } from "./interviews.constants";
 import { useInterviewList } from "./interviews.queries";
+import { useInterviewActions } from "./use-interview-actions";
 import { useInterviewsParams } from "./use-interviews-params";
 
 function InterviewsListView({ onViewChange }: { onViewChange: (view: InterviewView) => void }) {
   const { t } = useTranslation();
   const params = useInterviewsParams();
+  const actions = useInterviewActions();
   const { date, hasFilters, limit, page, query: listParams, search, set, setMany, sortOrder, status } = params;
   const commitSearch = useCallback((value: string) => set("search", value), [set]);
   const [searchText, setSearchText] = useUrlSearchInput(search, commitSearch);
@@ -74,6 +76,7 @@ function InterviewsListView({ onViewChange }: { onViewChange: (view: InterviewVi
             emptyState={emptyState}
             isLoading={interviews.isPending && !searchInvalid}
             items={items}
+            onAction={actions.run}
             onSort={() => set(INTERVIEW_PARAMS.sortOrder, sortOrder === "asc" ? "desc" : "asc")}
             sortOrder={sortOrder}
           />
@@ -89,6 +92,7 @@ function InterviewsListView({ onViewChange }: { onViewChange: (view: InterviewVi
         total={total}
         totalPages={interviews.data?.totalPages ?? 1}
       />
+      {actions.dialog}
     </div>
   );
 }

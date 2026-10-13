@@ -2118,7 +2118,12 @@
     "loadFailed": "Không thể tải danh sách phỏng vấn. Vui lòng thử lại.",
     "actions": {
       "rowActions": "Thao tác cho {{name}}",
-      "view": "Xem chi tiết"
+      "view": "Xem chi tiết",
+      "complete": "Đánh dấu hoàn thành",
+      "noShow": "Đánh dấu vắng mặt",
+      "cancel": "Hủy phỏng vấn",
+      "cancelShort": "Hủy",
+      "afterItEnds": "Sau khi kết thúc"
     },
     "detail": {
       "information": "Thông tin phỏng vấn",
@@ -2156,6 +2161,47 @@
       "more": "+{{count}} nữa",
       "dayCount_other": "{{count}} buổi phỏng vấn",
       "truncated": "Đang hiển thị {{count}} buổi phỏng vấn đầu tiên của tháng này. Hãy thu hẹp từ khóa hoặc trạng thái để xem phần còn lại."
+    },
+    "statusDialog": {
+      "complete": {
+        "title": "Đánh dấu buổi phỏng vấn đã hoàn thành?",
+        "description": "{{name}} · {{when}}. Trạng thái hồ sơ không thay đổi.",
+        "confirm": "Hoàn thành",
+        "working": "Đang lưu…",
+        "keep": "Hủy",
+        "doneTitle": "Đã hoàn thành phỏng vấn",
+        "doneMessage": "Buổi phỏng vấn này đã được đánh dấu hoàn thành.",
+        "failedTitle": "Không thể hoàn thành",
+        "failedMessage": "Không thể đánh dấu hoàn thành buổi phỏng vấn này. Vui lòng thử lại."
+      },
+      "noShow": {
+        "title": "Đánh dấu vắng mặt?",
+        "description": "{{name}} · {{when}}. Trạng thái hồ sơ không thay đổi.",
+        "confirm": "Đánh dấu vắng mặt",
+        "working": "Đang lưu…",
+        "keep": "Hủy",
+        "doneTitle": "Đã đánh dấu vắng mặt",
+        "doneMessage": "Hồ sơ ứng tuyển không bị thay đổi.",
+        "failedTitle": "Không thể lưu",
+        "failedMessage": "Không thể đánh dấu vắng mặt cho buổi phỏng vấn này. Vui lòng thử lại."
+      },
+      "cancel": {
+        "title": "Hủy phỏng vấn với {{name}}?",
+        "description": "{{when}}. Ứng viên sẽ được thông báo. Buổi phỏng vấn vẫn nằm trong lịch sử và hồ sơ không bị từ chối.",
+        "confirm": "Hủy phỏng vấn",
+        "working": "Đang hủy…",
+        "keep": "Giữ lại",
+        "doneTitle": "Đã hủy phỏng vấn",
+        "doneMessage": "{{name}} đã được thông báo.",
+        "failedTitle": "Hủy không thành công",
+        "failedMessage": "Không thể hủy buổi phỏng vấn này. Vui lòng thử lại."
+      },
+      "stale": {
+        "title": "Buổi phỏng vấn này vừa được cập nhật",
+        "description": "Trạng thái đã thay đổi trước khi thao tác của bạn được thực hiện nên chưa có gì được áp dụng. Hãy xem bản mới nhất.",
+        "action": "Xem bản mới nhất"
+      },
+      "notEnded": "Buổi phỏng vấn chưa kết thúc. Bạn có thể đánh dấu sau khi buổi phỏng vấn kết thúc."
     }
   }
 }

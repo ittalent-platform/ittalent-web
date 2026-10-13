@@ -17,12 +17,14 @@ import { monthName } from "./interviews.calendar";
 import { ALL_OPTION, CALENDAR_FIELDS, FORBIDDEN_STATUS, INTERVIEW_PARAMS, INTERVIEW_SEARCH_MAX_LENGTH, INTERVIEW_STATUSES, type CalendarField, type InterviewView } from "./interviews.constants";
 import { vietnamDay } from "./interviews.format";
 import { useInterviewCalendar } from "./interviews.queries";
+import { useInterviewActions } from "./use-interview-actions";
 import { useCalendarParams } from "./use-calendar-params";
 
 /** The month of interviews as a calendar. It only narrows by keyword and status: the month is the window. */
 export function InterviewsCalendarView({ onViewChange }: { onViewChange: (view: InterviewView) => void }) {
   const { t, i18n } = useTranslation();
   const { currentMonth, grid, month, query, search, set, status } = useCalendarParams();
+  const actions = useInterviewActions();
   const commitSearch = useCallback((value: string) => set("search", value), [set]);
   const [searchText, setSearchText] = useUrlSearchInput(search, commitSearch);
   const [fields, setFields] = useState<ReadonlySet<CalendarField>>(() => new Set(CALENDAR_FIELDS));
@@ -82,11 +84,13 @@ export function InterviewsCalendarView({ onViewChange }: { onViewChange: (view: 
             isLoading={calendar.isPending && !searchInvalid}
             items={items}
             month={month}
+            onAction={actions.run}
             onFieldToggle={toggleField}
             onMonthChange={(next) => set(INTERVIEW_PARAMS.month, next === currentMonth ? null : next)}
           />
         </>
       )}
+      {actions.dialog}
     </div>
   );
 }

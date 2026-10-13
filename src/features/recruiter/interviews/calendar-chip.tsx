@@ -6,16 +6,18 @@ import { cn } from "@/lib/utils";
 import { InterviewPeek } from "./interview-peek";
 import { CHIP_TONE_CLASS, type CalendarField, type InterviewItem } from "./interviews.constants";
 import { applicantName, formatTime } from "./interviews.format";
+import type { InterviewAction } from "./use-interview-actions";
 
 type CalendarChipProps = {
   fields: ReadonlySet<CalendarField>;
   interview: InterviewItem;
+  onAction: (action: InterviewAction, interview: InterviewItem) => void;
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
 
 /** One interview in a day of the calendar: coloured by status, opens a summary when clicked. */
-export function CalendarChip({ fields, interview, onOpenChange, open }: CalendarChipProps) {
+export function CalendarChip({ fields, interview, onAction, onOpenChange, open }: CalendarChipProps) {
   const { i18n } = useTranslation();
   const headline = [fields.has("time") ? formatTime(interview.scheduledAt, i18n.language) : null, fields.has("applicant") ? applicantName(interview.applicant) : null]
     .filter(Boolean)
@@ -39,7 +41,7 @@ export function CalendarChip({ fields, interview, onOpenChange, open }: Calendar
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-[340px] p-0" side="right">
-        <InterviewPeek interview={interview} />
+        <InterviewPeek interview={interview} onAction={onAction} />
       </PopoverContent>
     </Popover>
   );

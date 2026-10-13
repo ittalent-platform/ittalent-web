@@ -7,7 +7,12 @@ import type { InterviewCalendarResponse, InterviewListResponse } from "@/api/gen
 import { InterviewsPage } from "@/features/recruiter/interviews/interviews-page";
 import * as interviewQueries from "@/features/recruiter/interviews/interviews.queries";
 
-vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({ useInterviewCalendar: vi.fn(), useInterviewList: vi.fn() }));
+vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({
+  useInterviewCalendar: vi.fn(),
+  useInterviewList: vi.fn(),
+  useUpdateInterviewStatus: () => ({ isPending: false, mutate: vi.fn() }),
+}));
+vi.mock("@/components/toast/toast-provider", () => ({ useToast: () => ({ dismissToast: vi.fn(), showToast: vi.fn() }) }));
 
 type Item = InterviewCalendarResponse["items"][number];
 
@@ -119,6 +124,24 @@ describe("Recruiter interviews calendar", () => {
     expect(screen.getByText("meet.google.com/kqr-pmzt-bvx")).toBeInTheDocument();
     expect(screen.getByText("nam.bui@novafintech.vn, tran.b@novafintech.vn")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "View details" })).toHaveAttribute("href", "/recruiter/interviews/khoa");
+  });
+
+  it("cancels from the summary: the summary closes and the confirmation opens", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByText("10:00 · Applicant khoa"));
+    await user.click(await screen.findByRole("button", { name: "Cancel" }));
+    expect(await screen.findByRole("alertdialog", { name: "Cancel interview with Applicant khoa?" })).toBeInTheDocument();
+    expect(screen.queryByText("Thu, 15 Oct 2026 · 10:00 – 11:00 (1h)")).not.toBeInTheDocument();
+  });
+
+  it("offers no cancel on the summary of an interview that is no longer scheduled", async () => {
+    mockCalendar(response([interview("done", { status: "completed" })]));
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByText("10:00 · Applicant done"));
+    expect(await screen.findByRole("link", { name: "View details" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Cancel" })).not.toBeInTheDocument();
   });
 
   it("shows three interviews of a day and lists the rest in a dialog", async () => {

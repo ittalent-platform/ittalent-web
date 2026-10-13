@@ -87,3 +87,12 @@ export const CHIP_TONE_CLASS = {
 /** What a calendar chip shows besides the interview's colour. */
 export type CalendarField = "time" | "applicant" | "job";
 export const CALENDAR_FIELDS: readonly CalendarField[] = ["time", "applicant", "job"];
+
+/** The final statuses a recruiter can give a scheduled interview, and the dialog / menu action that gives each. */
+export type StatusAction = "cancel" | "complete" | "noShow";
+export const STATUS_OF_ACTION = { cancel: "cancelled", complete: "completed", noShow: "no_show" } as const satisfies Record<StatusAction, InterviewStatus>;
+
+/** HTTP status and error codes of an interview that is no longer in the state the screen showed. */
+export const CONFLICT_STATUS = 409;
+export const STALE_ERROR_CODES: readonly string[] = ["INTERVIEW_STATUS_FINAL", "INTERVIEW_STATE_CHANGED"];
+export const NOT_ENDED_ERROR_CODE = "INTERVIEW_NOT_ENDED";
