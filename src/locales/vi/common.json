@@ -2062,7 +2062,8 @@
   "interviews": {
     "page": {
       "title": "Phỏng vấn",
-      "count_other": "{{count}} buổi phỏng vấn · công ty của bạn"
+      "count_other": "{{count}} buổi phỏng vấn · công ty của bạn",
+      "countInMonth_other": "{{count}} buổi phỏng vấn trong {{month}} · công ty của bạn"
     },
     "toolbar": {
       "search": "Tìm theo ứng viên hoặc vị trí…",
@@ -2137,6 +2138,24 @@
       "loadFailedTitle": "Không tải được buổi phỏng vấn",
       "loadFailed": "Đã xảy ra lỗi khi tải buổi phỏng vấn. Vui lòng thử lại.",
       "cancelledNotice": "Buổi phỏng vấn này đã bị hủy và không thể chỉnh sửa nữa."
+    },
+    "view": {
+      "table": "Bảng",
+      "calendar": "Lịch"
+    },
+    "calendar": {
+      "fields": "Hiển thị",
+      "field": {
+        "time": "Giờ",
+        "applicant": "Ứng viên",
+        "job": "Vị trí"
+      },
+      "previous": "Tháng trước",
+      "next": "Tháng sau",
+      "today": "Hôm nay",
+      "more": "+{{count}} nữa",
+      "dayCount_other": "{{count}} buổi phỏng vấn",
+      "truncated": "Đang hiển thị {{count}} buổi phỏng vấn đầu tiên của tháng này. Hãy thu hẹp từ khóa hoặc trạng thái để xem phần còn lại."
     }
   }
 }

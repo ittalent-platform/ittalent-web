@@ -15,8 +15,12 @@ export const ALL_OPTION = "all";
 export const INTERVIEW_DATE_FILTERS = ["today", "thisWeek", "thisMonth", "upcoming", "past"] as const;
 export type InterviewDateFilter = (typeof INTERVIEW_DATE_FILTERS)[number];
 
-/** Query-string keys that hold the list state, so links and reloads keep it. */
-export const INTERVIEW_PARAMS = { date: "date", sortOrder: "sortOrder", status: "status" } as const;
+/** The two ways to look at the interviews; the table is the default. */
+export const INTERVIEW_VIEWS = ["table", "calendar"] as const;
+export type InterviewView = (typeof INTERVIEW_VIEWS)[number];
+
+/** Query-string keys that hold the view's state, so links and reloads keep it. */
+export const INTERVIEW_PARAMS = { date: "date", month: "month", sortOrder: "sortOrder", status: "status", view: "view" } as const;
 
 export type InterviewSortOrder = "asc" | "desc";
 export const DEFAULT_SORT_ORDER: InterviewSortOrder = "asc";
@@ -66,3 +70,20 @@ export const FORBIDDEN_STATUS = 403;
 /** HTTP statuses the API answers with when an interview is missing, belongs to another company or the id is malformed. */
 export const NOT_FOUND_STATUS = 404;
 export const BAD_REQUEST_STATUS = 400;
+
+/** Most interview chips a day of the calendar shows before "+N more". */
+export const CALENDAR_CHIPS_PER_DAY = 3;
+/** Interviews are listed from the first day of the week; the calendar starts on Sunday. */
+export const SUNDAY = 0;
+
+/** Chip colours of the calendar, one per status (the same tones as the status badge). */
+export const CHIP_TONE_CLASS = {
+  cancelled: "bg-(--status-neutral-bg) text-(--status-neutral-fg)",
+  completed: "bg-(--status-success-bg) text-(--status-success-fg)",
+  no_show: "bg-(--status-warning-bg) text-(--status-warning-fg)",
+  scheduled: "bg-(--status-info-bg) text-(--status-info-fg)",
+} as const satisfies Record<InterviewStatus, string>;
+
+/** What a calendar chip shows besides the interview's colour. */
+export type CalendarField = "time" | "applicant" | "job";
+export const CALENDAR_FIELDS: readonly CalendarField[] = ["time", "applicant", "job"];

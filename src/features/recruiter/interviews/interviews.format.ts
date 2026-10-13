@@ -72,6 +72,13 @@ export function formatDuration(minutes: number, t: TFunction): string {
   return t("interviews.duration.hoursMinutes", { hours, minutes: rest });
 }
 
+/** "1h", "45m" or "1h 30m": the compact length used where space is tight. */
+export function formatDurationShort(minutes: number): string {
+  const hours = Math.floor(minutes / MINUTES_PER_HOUR);
+  const rest = minutes % MINUTES_PER_HOUR;
+  return [hours > 0 ? `${hours}h` : "", rest > 0 ? `${rest}m` : ""].filter(Boolean).join(" ");
+}
+
 /** `YYYY-MM-DD` of an instant in Vietnam time. */
 export function vietnamDay(value: string | number | Date): string {
   return new Date(new Date(value).getTime() + INTERVIEW_UTC_OFFSET_HOURS * MS_PER_HOUR).toISOString().slice(0, DATE_LENGTH);

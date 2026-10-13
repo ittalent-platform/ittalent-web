@@ -1,8 +1,8 @@
 import { CalendarDays, Lock, Search } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router";
 
-import { AdminPageHeader } from "@/components/common/admin-page-header";
 import { TableSurface } from "@/components/common/data-table";
 import { EmptyState } from "@/components/common/empty-state";
 import { InlineBanner } from "@/components/common/inline-banner";
@@ -11,13 +11,15 @@ import { requestStatus } from "@/api/request-error";
 import { useUrlSearchInput } from "@/hooks/use-url-search-input";
 import { hasUnsafeSearchText } from "@/lib/search-validation";
 
+import { InterviewsCalendarView } from "./interviews-calendar-view";
+import { InterviewsHeader } from "./interviews-header";
 import { InterviewsTable } from "./interviews-table";
 import { InterviewsToolbar } from "./interviews-toolbar";
-import { ALL_OPTION, FORBIDDEN_STATUS, INTERVIEW_PAGE_SIZE_OPTIONS, INTERVIEW_PARAMS } from "./interviews.constants";
+import { ALL_OPTION, FORBIDDEN_STATUS, INTERVIEW_PAGE_SIZE_OPTIONS, INTERVIEW_PARAMS, type InterviewView } from "./interviews.constants";
 import { useInterviewList } from "./interviews.queries";
 import { useInterviewsParams } from "./use-interviews-params";
 
-export function InterviewsPage() {
+function InterviewsListView({ onViewChange }: { onViewChange: (view: InterviewView) => void }) {
   const { t } = useTranslation();
   const params = useInterviewsParams();
   const { date, hasFilters, limit, page, query: listParams, search, set, setMany, sortOrder, status } = params;
@@ -46,10 +48,7 @@ export function InterviewsPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <AdminPageHeader
-        description={interviews.data ? t("interviews.page.count", { count: total }) : undefined}
-        title={t("interviews.page.title")}
-      />
+      <InterviewsHeader description={interviews.data ? t("interviews.page.count", { count: total }) : undefined} onViewChange={onViewChange} view="table" />
 
       <InterviewsToolbar
         date={date}
@@ -92,4 +91,25 @@ export function InterviewsPage() {
       />
     </div>
   );
+}
+
+/** The company's interviews, as a table (default) or as a month calendar, chosen in the address with `view`. */
+export function InterviewsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const view: InterviewView = searchParams.get(INTERVIEW_PARAMS.view) === "calendar" ? "calendar" : "table";
+
+  // The keyword and status carry over; paging and the date preset belong to the table.
+  const changeView = useCallback(
+    (next: InterviewView) =>
+      setSearchParams((prev) => {
+        const params = new URLSearchParams(prev);
+        params.delete("page");
+        if (next === "calendar") params.set(INTERVIEW_PARAMS.view, next);
+        else params.delete(INTERVIEW_PARAMS.view);
+        return params;
+      }),
+    [setSearchParams],
+  );
+
+  return view === "calendar" ? <InterviewsCalendarView onViewChange={changeView} /> : <InterviewsListView onViewChange={changeView} />;
 }

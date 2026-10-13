@@ -2082,7 +2082,9 @@
     "page": {
       "title": "Interviews",
       "count_one": "{{count}} interview · your company",
-      "count_other": "{{count}} interviews · your company"
+      "count_other": "{{count}} interviews · your company",
+      "countInMonth_one": "{{count}} interview in {{month}} · your company",
+      "countInMonth_other": "{{count}} interviews in {{month}} · your company"
     },
     "toolbar": {
       "search": "Search by applicant or job…",
@@ -2159,6 +2161,25 @@
       "loadFailedTitle": "Could not load this interview",
       "loadFailed": "Something went wrong while loading the interview. Please try again.",
       "cancelledNotice": "This interview is cancelled and can no longer be edited."
+    },
+    "view": {
+      "table": "Table",
+      "calendar": "Calendar"
+    },
+    "calendar": {
+      "fields": "Fields",
+      "field": {
+        "time": "Time",
+        "applicant": "Applicant",
+        "job": "Job"
+      },
+      "previous": "Previous month",
+      "next": "Next month",
+      "today": "Today",
+      "more": "+{{count}} more",
+      "dayCount_one": "{{count}} interview",
+      "dayCount_other": "{{count}} interviews",
+      "truncated": "Showing the first {{count}} interviews of this month. Narrow the search or the status to see the rest."
     }
   }
 }
