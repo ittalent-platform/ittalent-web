@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { CalendarChip } from "./calendar-chip";
 import { CalendarDayDialog } from "./calendar-day-dialog";
 import { CalendarFieldsMenu } from "./calendar-fields-menu";
-import { groupByDay, monthTitle, shiftMonth, weekdayNames, type CalendarDay } from "./interviews.calendar";
+import { groupByDay, longDayTitle, monthTitle, shiftMonth, weekdayNames, type CalendarDay } from "./interviews.calendar";
 import { CALENDAR_CHIPS_PER_DAY, type CalendarField, type InterviewItem } from "./interviews.constants";
 import { vietnamDay } from "./interviews.format";
 import type { InterviewAction } from "./use-interview-actions";
@@ -22,12 +22,14 @@ type InterviewsCalendarProps = {
   onAction: (action: InterviewAction, interview: InterviewItem) => void;
   onFieldToggle: (field: CalendarField) => void;
   onMonthChange: (month: string) => void;
+  /** Starts scheduling an interview on a day (`YYYY-MM-DD`). */
+  onSchedule: (day: string) => void;
 };
 
 const NAV_BUTTON = "grid size-9 place-items-center rounded-lg text-muted-foreground outline-none transition hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40";
 
 /** A month of interviews as a Sunday-to-Saturday grid, in Vietnam time. */
-export function InterviewsCalendar({ currentMonth, days, fields, isLoading, items, month, onAction, onFieldToggle, onMonthChange }: InterviewsCalendarProps) {
+export function InterviewsCalendar({ currentMonth, days, fields, isLoading, items, month, onAction, onFieldToggle, onMonthChange, onSchedule }: InterviewsCalendarProps) {
   const { t, i18n } = useTranslation();
   const [openId, setOpenId] = useState<string | null>(null);
   const [dayOpen, setDayOpen] = useState<string | null>(null);
@@ -76,10 +78,20 @@ export function InterviewsCalendar({ currentMonth, days, fields, isLoading, item
               const hidden = interviews.length - CALENDAR_CHIPS_PER_DAY;
               return (
                 <div
-                  className={cn("flex min-h-30 min-w-0 flex-col gap-1 border-b border-r border-border p-1.5 nth-[7n]:border-r-0", !cell.inMonth && "bg-muted/40")}
+                  className={cn("group relative flex min-h-30 min-w-0 flex-col gap-1 border-b border-r border-border p-1.5 nth-[7n]:border-r-0", !cell.inMonth && "bg-muted/40")}
                   data-day={cell.day}
                   key={cell.day}
                 >
+                  {cell.day >= today ? (
+                    <button
+                      aria-label={t("interviews.calendar.scheduleOn", { day: longDayTitle(cell.day, i18n.language) })}
+                      className="absolute left-1.5 top-1.5 grid size-6 cursor-pointer place-items-center rounded-full bg-foreground text-background opacity-0 outline-none transition focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary/50 group-hover:opacity-100"
+                      onClick={() => onSchedule(cell.day)}
+                      type="button"
+                    >
+                      <Plus aria-hidden className="size-3.5" />
+                    </button>
+                  ) : null}
                   <span
                     className={cn(
                       "grid size-6 shrink-0 place-items-center self-end rounded-full text-[12.5px]",
@@ -115,7 +127,18 @@ export function InterviewsCalendar({ currentMonth, days, fields, isLoading, item
         </div>
       </div>
 
-      {dayOpen ? <CalendarDayDialog day={dayOpen} interviews={byDay.get(dayOpen) ?? []} onOpenChange={(open) => !open && setDayOpen(null)} /> : null}
+      {dayOpen ? (
+        <CalendarDayDialog
+          canSchedule={dayOpen >= today}
+          day={dayOpen}
+          interviews={byDay.get(dayOpen) ?? []}
+          onOpenChange={(open) => !open && setDayOpen(null)}
+          onSchedule={() => {
+            setDayOpen(null);
+            onSchedule(dayOpen);
+          }}
+        />
+      ) : null}
     </section>
   );
 }

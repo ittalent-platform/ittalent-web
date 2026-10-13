@@ -1,3 +1,4 @@
+import { CalendarPlus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
@@ -11,13 +12,16 @@ import { CHIP_TONE_CLASS, type InterviewItem } from "./interviews.constants";
 import { applicantName, formatTime } from "./interviews.format";
 
 type CalendarDayDialogProps = {
+  /** A day that is already over cannot get a new interview. */
+  canSchedule: boolean;
   day: string;
   interviews: InterviewItem[];
   onOpenChange: (open: boolean) => void;
+  onSchedule: () => void;
 };
 
 /** Every interview of one day, for the days that do not fit in their cell. */
-export function CalendarDayDialog({ day, interviews, onOpenChange }: CalendarDayDialogProps) {
+export function CalendarDayDialog({ canSchedule, day, interviews, onOpenChange, onSchedule }: CalendarDayDialogProps) {
   const { t, i18n } = useTranslation();
 
   return (
@@ -49,6 +53,12 @@ export function CalendarDayDialog({ day, interviews, onOpenChange }: CalendarDay
               {t("actions.close")}
             </Button>
           </DialogClose>
+          {canSchedule ? (
+            <Button className="h-10 px-5 text-sm font-semibold" onClick={onSchedule} type="button">
+              <CalendarPlus className="size-4" />
+              {t("interviews.calendar.scheduleOnDay")}
+            </Button>
+          ) : null}
         </DialogFooter>
       </DialogContent>
     </Dialog>

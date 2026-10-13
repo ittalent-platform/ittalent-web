@@ -1,10 +1,12 @@
-import type { InterviewDetailDto, InterviewListResponse } from "@/api/generated/types.gen";
+import type { InterviewDetailDto, InterviewListResponse, InterviewerListResponse, SchedulableApplicationListResponse } from "@/api/generated/types.gen";
 import type { TimelineTone } from "@/components/common/timeline";
 
 export type InterviewItem = InterviewListResponse["items"][number];
 export type InterviewStatus = InterviewItem["status"];
 export type InterviewMode = InterviewItem["mode"];
 export type InterviewDetail = InterviewDetailDto;
+export type SchedulableApplication = SchedulableApplicationListResponse["items"][number];
+export type InterviewerOption = InterviewerListResponse["items"][number];
 
 export const INTERVIEW_STATUSES: readonly InterviewStatus[] = ["scheduled", "completed", "no_show", "cancelled"];
 
@@ -96,3 +98,22 @@ export const STATUS_OF_ACTION = { cancel: "cancelled", complete: "completed", no
 export const CONFLICT_STATUS = 409;
 export const STALE_ERROR_CODES: readonly string[] = ["INTERVIEW_STATUS_FINAL", "INTERVIEW_STATE_CHANGED"];
 export const NOT_ENDED_ERROR_CODE = "INTERVIEW_NOT_ENDED";
+
+/** Limits the API puts on a new interview, repeated here so the form says no before the API does. */
+export const SCHEDULE_LIMITS = { interviewers: 10, link: 2048, location: 255, notes: 2000 } as const;
+/** How long an interview can be scheduled for, in minutes (the API takes 15 to 480). */
+export const DURATION_OPTIONS_MINUTES = [15, 30, 45, 60, 90, 120, 180, 240] as const;
+export const DEFAULT_DURATION_MINUTES = 60;
+/** Suggestions listed under a search box, and applications offered while choosing one. */
+export const LOOKUP_LIMIT = 8;
+export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
+/** Error codes of a scheduling that the form can say more about than "it failed". */
+export const SCHEDULE_ERROR_CODES = {
+  applicantConflict: "APPLICANT_CONFLICT",
+  applicantUnavailable: "APPLICANT_UNAVAILABLE",
+  invalidInterviewers: "INVALID_INTERVIEWERS",
+  interviewerConflict: "INTERVIEWER_CONFLICT",
+  notSchedulable: "APPLICATION_NOT_SCHEDULABLE",
+  timeInPast: "INTERVIEW_TIME_IN_PAST",
+} as const;

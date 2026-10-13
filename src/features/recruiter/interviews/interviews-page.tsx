@@ -18,12 +18,14 @@ import { InterviewsToolbar } from "./interviews-toolbar";
 import { ALL_OPTION, FORBIDDEN_STATUS, INTERVIEW_PAGE_SIZE_OPTIONS, INTERVIEW_PARAMS, type InterviewView } from "./interviews.constants";
 import { useInterviewList } from "./interviews.queries";
 import { useInterviewActions } from "./use-interview-actions";
+import { useScheduleInterview } from "./use-schedule-interview";
 import { useInterviewsParams } from "./use-interviews-params";
 
 function InterviewsListView({ onViewChange }: { onViewChange: (view: InterviewView) => void }) {
   const { t } = useTranslation();
   const params = useInterviewsParams();
   const actions = useInterviewActions();
+  const schedule = useScheduleInterview();
   const { date, hasFilters, limit, page, query: listParams, search, set, setMany, sortOrder, status } = params;
   const commitSearch = useCallback((value: string) => set("search", value), [set]);
   const [searchText, setSearchText] = useUrlSearchInput(search, commitSearch);
@@ -45,12 +47,17 @@ function InterviewsListView({ onViewChange }: { onViewChange: (view: InterviewVi
       title={keyword ? t("interviews.empty.noResultsFor", { keyword }) : t("interviews.empty.noMatchTitle")}
     />
   ) : (
-    <EmptyState description={t("interviews.empty.description")} icon={CalendarDays} title={t("interviews.empty.title")} />
+    <EmptyState
+      action={{ label: t("interviews.schedule.open"), onClick: () => schedule.open() }}
+      description={t("interviews.empty.description")}
+      icon={CalendarDays}
+      title={t("interviews.empty.title")}
+    />
   );
 
   return (
     <div className="flex flex-col gap-5">
-      <InterviewsHeader description={interviews.data ? t("interviews.page.count", { count: total }) : undefined} onViewChange={onViewChange} view="table" />
+      <InterviewsHeader description={interviews.data ? t("interviews.page.count", { count: total }) : undefined} onSchedule={() => schedule.open()} onViewChange={onViewChange} view="table" />
 
       <InterviewsToolbar
         date={date}
@@ -93,6 +100,7 @@ function InterviewsListView({ onViewChange }: { onViewChange: (view: InterviewVi
         totalPages={interviews.data?.totalPages ?? 1}
       />
       {actions.dialog}
+      {schedule.dialog}
     </div>
   );
 }

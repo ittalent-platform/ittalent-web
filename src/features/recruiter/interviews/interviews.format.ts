@@ -127,3 +127,9 @@ export function dateWindow(filter: InterviewDateFilter, now: Date): DateWindow {
       return { to: now.toISOString() };
   }
 }
+
+/** The instant (ISO, with the +07:00 offset) a Vietnam-time `YYYY-MM-DD` date and `HH:mm` time stand for. */
+export function toScheduledAt(day: string, time: string): string {
+  const offset = `+${String(INTERVIEW_UTC_OFFSET_HOURS).padStart(2, "0")}:00`;
+  return new Date(`${day}T${time}:00${offset}`).toISOString();
+}
