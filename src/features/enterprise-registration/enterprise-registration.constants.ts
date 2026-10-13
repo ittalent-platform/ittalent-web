@@ -21,6 +21,13 @@ export const adminDecisionTypes = ["approved", "rejected"] as const;
 
 export type AdminDecisionType = (typeof adminDecisionTypes)[number];
 
+export const LEGAL_DOCUMENT_TYPE_LABELS: Record<string, string> = {
+  business_license: "Business Registration Certificate",
+  tax_registration: "Tax Registration Certificate",
+  power_of_attorney: "Letter of Authorization",
+  other: "Other Supporting Document",
+};
+
 /**
  * Common consumer and personal email domains blocked for corporate registration (BR-39).
  */
