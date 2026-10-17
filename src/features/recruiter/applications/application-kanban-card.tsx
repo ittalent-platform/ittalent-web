@@ -7,6 +7,7 @@ import { PersonAvatar } from "@/components/common/person-avatar";
 import { cn } from "@/lib/utils";
 import {
   RECRUITER_APPLICATIONS_PATH,
+  STATUS_TONES,
   isKanbanDraggable,
   type ApplicationItem,
 } from "./applications.constants";
@@ -41,6 +42,7 @@ export function ApplicationKanbanCard({
   const candidateName = candidateDisplayName(application.applicant);
   const detailPath = `${RECRUITER_APPLICATIONS_PATH}/${application.id}`;
   const draggable = isKanbanDraggable(application.status);
+  const tone = STATUS_TONES[application.status];
   const hasCv = application.submittedDocuments.includes("cv");
   const hasCoverLetter = application.submittedDocuments.includes("cover_letter");
 
@@ -49,7 +51,8 @@ export function ApplicationKanbanCard({
       aria-grabbed={isDragging}
       aria-label={`${candidateName} - ${application.job.title}`}
       className={cn(
-        "group flex flex-col gap-2 rounded-xl border border-border bg-card p-3.5 shadow-xs transition-all duration-150 select-none",
+        "group flex flex-col gap-2 rounded-xl border border-border border-t-[3px] bg-card p-3.5 shadow-xs transition-all duration-150 select-none",
+        tone.border,
         draggable
           ? "cursor-grab active:cursor-grabbing hover:border-(--border-strong) hover:shadow-sm"
           : "cursor-pointer hover:border-(--border-strong)",
