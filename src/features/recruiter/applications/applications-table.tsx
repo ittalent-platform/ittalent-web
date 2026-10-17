@@ -56,7 +56,7 @@ export function ApplicationsTable({
     <Table className="min-w-[960px]">
       <TableHead>
         <TableHeaderRow>
-          <TableHeaderCell className="w-[300px]">
+          <TableHeaderCell className="w-[280px]">
             <SortableHeaderButton
               active={sortBy === "id"}
               direction={sortBy === "id" ? sortOrder : null}
@@ -64,10 +64,10 @@ export function ApplicationsTable({
               onClick={() => onSort("id")}
             />
           </TableHeaderCell>
-          <TableHeaderCell className="w-[200px]">
+          <TableHeaderCell className="w-[220px]">
             {t("recruiterApplications.columns.job")}
           </TableHeaderCell>
-          <TableHeaderCell className="w-[140px]">
+          <TableHeaderCell className="w-[130px]">
             <SortableHeaderButton
               active={sortBy === "submittedAt"}
               direction={sortBy === "submittedAt" ? sortOrder : null}
@@ -75,7 +75,7 @@ export function ApplicationsTable({
               onClick={() => onSort("submittedAt")}
             />
           </TableHeaderCell>
-          <TableHeaderCell className="w-[150px]">
+          <TableHeaderCell className="w-[140px]">
             {t("recruiterApplications.columns.documents")}
           </TableHeaderCell>
           <TableHeaderCell className="w-[180px]">
@@ -86,10 +86,10 @@ export function ApplicationsTable({
               onClick={() => onSort("latestStatusAt")}
             />
           </TableHeaderCell>
-          <TableHeaderCell className="w-[140px]">
+          <TableHeaderCell className="w-[130px]">
             {t("recruiterApplications.columns.status")}
           </TableHeaderCell>
-          <TableHeaderCell className="w-[60px] text-right">
+          <TableHeaderCell className="w-[50px] text-right">
             <span className="sr-only">{t("recruiterApplications.columns.actions")}</span>
           </TableHeaderCell>
         </TableHeaderRow>
@@ -109,14 +109,15 @@ export function ApplicationsTable({
               key={item.id}
               onClick={() => navigate(detailPath)}
             >
-              <TableCell className="max-w-[300px]">
-                <div className="flex items-center gap-3">
-                  <PersonAvatar className="size-9 text-xs" name={candidateName} />
-                  <div className="flex min-w-0 flex-col">
-                    <div className="flex items-center gap-1.5">
+              <TableCell className="max-w-[280px]">
+                <div className="flex min-w-0 items-center gap-3">
+                  <PersonAvatar className="size-9 shrink-0 text-xs" name={candidateName} />
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="flex min-w-0 items-center gap-1.5">
                       <Link
                         className="truncate text-[13.5px] font-semibold text-foreground group-hover:underline"
                         onClick={(e) => e.stopPropagation()}
+                        title={candidateName}
                         to={detailPath}
                       >
                         {candidateName}
@@ -127,15 +128,21 @@ export function ApplicationsTable({
                         </span>
                       ) : null}
                     </div>
-                    <span className="truncate text-[12.5px] text-muted-foreground">
+                    <span
+                      className="truncate text-[12.5px] text-muted-foreground"
+                      title={item.applicant.email}
+                    >
                       {item.applicant.email}
                     </span>
                   </div>
                 </div>
               </TableCell>
 
-              <TableCell className="max-w-[200px]">
-                <span className="truncate text-[13.5px] font-medium text-foreground">
+              <TableCell className="max-w-[220px]">
+                <span
+                  className="block truncate text-[13.5px] font-medium text-foreground"
+                  title={item.job.title}
+                >
                   {item.job.title}
                 </span>
               </TableCell>
