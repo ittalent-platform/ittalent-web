@@ -62,6 +62,24 @@ export function formatInterviewSchedule(iso: string, locale: string): string {
   return `${datePart} · ${timePart}`;
 }
 
+/** Formats dates as "7 Oct, 16:02" */
+export function formatShortDateTime(iso: string, locale: string): string {
+  if (!iso) return "—";
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return "—";
+  const timePart = formatTime(iso, locale);
+  return timePart ? `${formatShortDate(iso, locale)}, ${timePart}` : formatShortDate(iso, locale);
+}
+
+/** Formats dates as "8 Oct 2026, 09:40" */
+export function formatFullDateTime(iso: string, locale: string): string {
+  if (!iso) return "—";
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return "—";
+  const timePart = formatTime(iso, locale);
+  return timePart ? `${formatDate(iso, locale)}, ${timePart}` : formatDate(iso, locale);
+}
+
 export function candidateDisplayName(applicant: { fullName: string | null; email: string }): string {
   return applicant.fullName?.trim() || applicant.email;
 }
