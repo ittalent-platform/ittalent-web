@@ -113,12 +113,14 @@ function SortIcon({ active, direction }: { active: boolean; direction: SortState
 export function SortableHeaderButton({
   active = false,
   ariaLabel,
+  className,
   direction,
   label,
   onClick,
 }: {
   active?: boolean;
   ariaLabel?: string;
+  className?: string;
   direction: SortState;
   label: string;
   onClick: () => void;
@@ -126,7 +128,7 @@ export function SortableHeaderButton({
   return (
     <button
       aria-label={ariaLabel}
-      className={cn("inline-flex cursor-pointer items-center gap-[5px] uppercase", active ? "text-primary" : "text-inherit")}
+      className={cn("inline-flex cursor-pointer items-center gap-[5px] uppercase", active ? "text-primary" : "text-inherit", className)}
       onClick={onClick}
       type="button"
     >

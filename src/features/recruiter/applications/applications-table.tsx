@@ -1,3 +1,4 @@
+import { ExternalLink, FileText } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 
@@ -53,43 +54,46 @@ export function ApplicationsTable({
   const navigate = useNavigate();
 
   return (
-    <Table className="min-w-[960px]">
+    <Table className="w-full table-fixed">
       <TableHead>
         <TableHeaderRow>
-          <TableHeaderCell className="w-[280px]">
+          <TableHeaderCell className="w-[26%] pl-5">
             <SortableHeaderButton
               active={sortBy === "id"}
+              className="text-foreground hover:text-foreground"
               direction={sortBy === "id" ? sortOrder : null}
               label={t("recruiterApplications.columns.candidate")}
               onClick={() => onSort("id")}
             />
           </TableHeaderCell>
-          <TableHeaderCell className="w-[220px]">
+          <TableHeaderCell className="w-[20%]">
             {t("recruiterApplications.columns.job")}
           </TableHeaderCell>
-          <TableHeaderCell className="w-[130px]">
+          <TableHeaderCell className="w-[11%]">
             <SortableHeaderButton
               active={sortBy === "submittedAt"}
+              className="font-bold text-foreground hover:text-foreground"
               direction={sortBy === "submittedAt" ? sortOrder : null}
               label={t("recruiterApplications.columns.submitted")}
               onClick={() => onSort("submittedAt")}
             />
           </TableHeaderCell>
-          <TableHeaderCell className="w-[140px]">
+          <TableHeaderCell className="w-[21%]">
             {t("recruiterApplications.columns.documents")}
           </TableHeaderCell>
-          <TableHeaderCell className="w-[180px]">
+          <TableHeaderCell className="w-[13%]">
             <SortableHeaderButton
               active={sortBy === "latestStatusAt"}
+              className="text-foreground hover:text-foreground"
               direction={sortBy === "latestStatusAt" ? sortOrder : null}
               label={t("recruiterApplications.columns.nextInterview")}
               onClick={() => onSort("latestStatusAt")}
             />
           </TableHeaderCell>
-          <TableHeaderCell className="w-[130px]">
+          <TableHeaderCell className="w-[9%]">
             {t("recruiterApplications.columns.status")}
           </TableHeaderCell>
-          <TableHeaderCell className="w-[50px] text-right">
+          <TableHeaderCell className="w-[5%] pr-5 text-right">
             <span className="sr-only">{t("recruiterApplications.columns.actions")}</span>
           </TableHeaderCell>
         </TableHeaderRow>
@@ -109,7 +113,7 @@ export function ApplicationsTable({
               key={item.id}
               onClick={() => navigate(detailPath)}
             >
-              <TableCell className="max-w-[280px]">
+              <TableCell className="w-[26%] pl-5">
                 <div className="flex min-w-0 items-center gap-3">
                   <PersonAvatar className="size-9 shrink-0 text-xs" name={candidateName} />
                   <div className="flex min-w-0 flex-1 flex-col">
@@ -138,7 +142,7 @@ export function ApplicationsTable({
                 </div>
               </TableCell>
 
-              <TableCell className="max-w-[220px]">
+              <TableCell className="w-[20%]">
                 <span
                   className="block truncate text-[13.5px] font-medium text-foreground"
                   title={item.job.title}
@@ -147,31 +151,36 @@ export function ApplicationsTable({
                 </span>
               </TableCell>
 
-              <TableCell className="whitespace-nowrap text-[13px] text-foreground">
+              <TableCell className="w-[11%] whitespace-nowrap text-[13px] text-foreground">
                 {formatDate(item.submittedAt, locale)}
               </TableCell>
 
-              <TableCell>
+              <TableCell className="w-[21%]">
                 <div
-                  className="flex flex-wrap items-center gap-2"
+                  className="flex flex-wrap items-center gap-1.5"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {hasCv ? (
                     <button
-                      className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline"
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-semibold text-foreground shadow-xs hover:bg-muted"
                       onClick={() => onOpenCv?.(item)}
                       type="button"
                     >
-                      {t("recruiterApplications.document.cv")}{" "}
-                      <span aria-hidden="true" className="text-[11px]">
-                        ↗
-                      </span>
+                      <FileText className="size-3.5 text-muted-foreground" />
+                      <span>{t("recruiterApplications.document.cv")}</span>
+                      <ExternalLink className="size-3 text-muted-foreground" />
                     </button>
                   ) : null}
                   {hasCoverLetter ? (
-                    <span className="inline-flex items-center text-xs font-semibold text-primary">
-                      {t("recruiterApplications.document.cover_letter")}
-                    </span>
+                    <button
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-semibold text-foreground shadow-xs hover:bg-muted"
+                      onClick={() => onOpenCv?.(item)}
+                      type="button"
+                    >
+                      <FileText className="size-3.5 text-muted-foreground" />
+                      <span>{t("recruiterApplications.document.cover_letter")}</span>
+                      <ExternalLink className="size-3 text-muted-foreground" />
+                    </button>
                   ) : null}
                   {!hasCv && !hasCoverLetter ? (
                     <span className="text-xs text-muted-foreground">—</span>
@@ -179,7 +188,7 @@ export function ApplicationsTable({
                 </div>
               </TableCell>
 
-              <TableCell>
+              <TableCell className="w-[13%]">
                 {item.nextInterview ? (
                   <div className="flex flex-col gap-0.5">
                     <span className="whitespace-nowrap text-[13px] font-medium text-foreground">
@@ -195,7 +204,7 @@ export function ApplicationsTable({
                 )}
               </TableCell>
 
-              <TableCell>
+              <TableCell className="w-[9%]">
                 <span
                   className={cn(
                     "inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold",
@@ -206,7 +215,7 @@ export function ApplicationsTable({
                 </span>
               </TableCell>
 
-              <TableCell className="w-[60px] text-right" onClick={(e) => e.stopPropagation()}>
+              <TableCell className="w-[5%] pr-5 text-right" onClick={(e) => e.stopPropagation()}>
                 <ApplicationRowActions
                   item={item}
                   onDownloadCv={() => onDownloadCv?.(item)}

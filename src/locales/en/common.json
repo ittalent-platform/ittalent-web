@@ -2529,7 +2529,7 @@
     "title": "Applications",
     "subtitle_one": "{{count}} application · your company",
     "subtitle_other": "{{count}} applications · your company",
-    "searchPlaceholder": "Search candidate, email, skill...",
+    "searchPlaceholder": "Search by name, email, job or application ID...",
     "filter": {
       "status": "Status:",
       "statusCaption": "Status",

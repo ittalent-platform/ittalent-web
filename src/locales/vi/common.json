@@ -2505,7 +2505,7 @@
     "title": "Hồ sơ ứng tuyển",
     "subtitle_one": "{{count}} hồ sơ ứng tuyển · công ty của bạn",
     "subtitle_other": "{{count}} hồ sơ ứng tuyển · công ty của bạn",
-    "searchPlaceholder": "Tìm ứng viên, email, kỹ năng...",
+    "searchPlaceholder": "Tìm theo tên, email, tin tuyển dụng hoặc mã hồ sơ...",
     "filter": {
       "status": "Trạng thái:",
       "statusCaption": "Trạng thái",

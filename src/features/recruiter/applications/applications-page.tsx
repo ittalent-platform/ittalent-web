@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Inbox, SearchX } from "lucide-react";
+import { Columns3, Inbox, SearchX, Table2 } from "lucide-react";
 
 import { AdminPageHeader } from "@/components/common/admin-page-header";
 import { Callout } from "@/components/common/callout";
@@ -8,12 +8,14 @@ import { EmptyState } from "@/components/common/empty-state";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { Table, TableBody, TableSkeletonRows } from "@/components/ui/table";
+import { ViewToggle } from "@/components/ui/view-toggle";
 import { ApplicationsTable } from "./applications-table";
 import { ApplicationsToolbar } from "./applications-toolbar";
 import {
   PAGE_SIZE_OPTIONS,
   PARAM,
   RECRUITER_APPLICATIONS_PATH,
+  VIEW_MODES,
   type ApplicationItem,
   type ApplicationStatus,
   type SortField,
@@ -21,6 +23,7 @@ import {
 import { useRecruiterApplications, useUpdateApplicationStatus } from "./applications.queries";
 import { useApplicationsParams } from "./use-applications-params";
 
+const VIEW_ICONS = { table: Table2, board: Columns3 } as const;
 const SKELETON_COLUMNS = 7;
 const CARD = "overflow-hidden surface-card";
 
@@ -176,7 +179,21 @@ export function ApplicationsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <AdminPageHeader description={subtitle} title={t("recruiterApplications.title")} />
+      <AdminPageHeader
+        actions={
+          <ViewToggle
+            onChange={(view) => state.setMany({ [PARAM.view]: view })}
+            options={VIEW_MODES.map((value) => ({
+              value,
+              icon: VIEW_ICONS[value],
+              label: t(`recruiterApplications.view.${value}`),
+            }))}
+            value={state.view}
+          />
+        }
+        description={subtitle}
+        title={t("recruiterApplications.title")}
+      />
       <ApplicationsToolbar
         showCounts={state.statuses.length === 0}
         state={state}

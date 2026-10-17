@@ -1,4 +1,3 @@
-import { Columns3, Table2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { ChecklistPopover } from "@/components/common/checklist-popover";
@@ -6,7 +5,6 @@ import { ListToolbar } from "@/components/common/list-toolbar";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { FilterSelect } from "@/components/ui/filter-select";
-import { ViewToggle } from "@/components/ui/view-toggle";
 import { useJobPostingList } from "@/features/job-postings/job-postings.queries";
 import {
   APPLICATION_STATUSES,
@@ -18,14 +16,11 @@ import {
   STATUS_LIST_SEPARATOR,
   STATUS_TONES,
   SUBMITTED_RANGES,
-  VIEW_MODES,
   type ApplicationStatus,
   type RecruiterDocumentType,
   type SubmittedRange,
 } from "./applications.constants";
 import type { RecruiterApplicationsListState } from "./use-applications-params";
-
-const VIEW_ICONS = { table: Table2, board: Columns3 } as const;
 const ALL_JOBS = "all";
 const ALL_DOCUMENTS = "all";
 type DocumentFilterOption = RecruiterDocumentType | typeof ALL_DOCUMENTS;
@@ -163,16 +158,6 @@ export function ApplicationsToolbar({ state, statusCounts, showCounts }: Applica
             {t("recruiterApplications.filter.clearFilters")}
           </Button>
         ) : null}
-
-        <ViewToggle
-          onChange={(view) => state.setMany({ [PARAM.view]: view })}
-          options={VIEW_MODES.map((value) => ({
-            value,
-            icon: VIEW_ICONS[value],
-            label: t(`recruiterApplications.view.${value}`),
-          }))}
-          value={state.view}
-        />
       </ListToolbar>
 
       {state.range === "custom" ? (
