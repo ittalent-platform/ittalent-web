@@ -2543,6 +2543,19 @@
       "table": "Bảng",
       "board": "Bảng Kanban"
     },
+    "board": {
+      "subtitleWithProgress_one": "{{count}} hồ sơ ứng tuyển · {{inProgress}} đang xử lý",
+      "subtitleWithProgress_other": "{{count}} hồ sơ ứng tuyển · {{inProgress}} đang xử lý",
+      "dropToMove": "Thả để chuyển sang {{stage}}",
+      "noStageCards": "Chưa có ứng viên ở giai đoạn này",
+      "stageLocked": "Không thể chuyển giai đoạn này"
+    },
+    "card": {
+      "remote": "Từ xa",
+      "fullTime": "Toàn thời gian",
+      "letter": "Thư",
+      "interviewPrefix": "Phỏng vấn"
+    },
     "columns": {
       "candidate": "ỨNG VIÊN",
       "job": "VỊ TRÍ TUYỂN DỤNG",

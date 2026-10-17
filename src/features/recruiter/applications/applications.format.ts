@@ -31,6 +31,19 @@ export function formatDate(iso: string, locale: string): string {
   return new Intl.DateTimeFormat(getLocaleTag(locale), DATE_FORMAT).format(date);
 }
 
+const SHORT_DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  day: "numeric",
+  month: "short",
+};
+
+/** Formats dates as "7 Oct" for compact card displays */
+export function formatShortDate(iso: string, locale: string): string {
+  if (!iso) return "—";
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat(getLocaleTag(locale), SHORT_DATE_FORMAT).format(date);
+}
+
 /** Formats times as "10:00" */
 export function formatTime(iso: string, locale: string): string {
   if (!iso) return "";

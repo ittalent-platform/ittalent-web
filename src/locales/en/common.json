@@ -2567,6 +2567,19 @@
       "table": "Table",
       "board": "Board"
     },
+    "board": {
+      "subtitleWithProgress_one": "{{count}} application · {{inProgress}} in progress",
+      "subtitleWithProgress_other": "{{count}} applications · {{inProgress}} in progress",
+      "dropToMove": "Drop to move to {{stage}}",
+      "noStageCards": "No applications in this stage",
+      "stageLocked": "Stage locked for this candidate"
+    },
+    "card": {
+      "remote": "Remote",
+      "fullTime": "Full-time",
+      "letter": "Letter",
+      "interviewPrefix": "Interview"
+    },
     "columns": {
       "candidate": "CANDIDATE",
       "job": "JOB",
