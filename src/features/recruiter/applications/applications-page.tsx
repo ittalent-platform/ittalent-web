@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Columns3, Inbox, SearchX, Table2 } from "lucide-react";
@@ -6,10 +6,15 @@ import { Columns3, Inbox, SearchX, Table2 } from "lucide-react";
 import { AdminPageHeader } from "@/components/common/admin-page-header";
 import { Callout } from "@/components/common/callout";
 import { EmptyState } from "@/components/common/empty-state";
+import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { Table, TableBody, TableSkeletonRows } from "@/components/ui/table";
 import { ViewToggle } from "@/components/ui/view-toggle";
+import {
+  ApplicationStatusDialog,
+  type StatusDialogSubmission,
+} from "./application-status-dialog";
 import { ApplicationsBoard } from "./applications-board";
 import { ApplicationsTable } from "./applications-table";
 import { ApplicationsToolbar } from "./applications-toolbar";
@@ -51,6 +56,17 @@ export function ApplicationsPage() {
   const data = query.data;
   const updateStatusMutation = useUpdateApplicationStatus();
 
+  const { showToast } = useToast();
+  const [statusDialogState, setStatusDialogState] = useState<{
+    open: boolean;
+    item: ApplicationItem | null;
+    targetStatus: UpdatableStatus | null;
+  }>({
+    open: false,
+    item: null,
+    targetStatus: null,
+  });
+
   const inProgressCount = useMemo(() => {
     if (!data?.statusCounts) return 0;
     return (
@@ -77,7 +93,40 @@ export function ApplicationsPage() {
 
   function handleStatusChange(item: ApplicationItem, status: ApplicationStatus) {
     if (isUpdatableStatus(status)) {
-      updateStatusMutation.mutate({ id: item.id, body: { status } });
+      updateStatusMutation.reset();
+      setStatusDialogState({
+        open: true,
+        item,
+        targetStatus: status,
+      });
+    }
+  }
+
+  async function handleConfirmStatusChange(submission: StatusDialogSubmission) {
+    if (!statusDialogState.item) return;
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: statusDialogState.item.id,
+        body: submission,
+      });
+      const candidateName =
+        statusDialogState.item.applicant.fullName ||
+        statusDialogState.item.applicant.email;
+      const targetStage = t(`applications.status.${submission.status}`);
+      showToast({
+        tone: "success",
+        title:
+          submission.status === "rejected"
+            ? t("recruiterApplications.statusDialog.titleReject")
+            : t("recruiterApplications.statusDialog.titleMove", { stage: targetStage }),
+        message: t("recruiterApplications.statusDialog.successToast", {
+          name: candidateName,
+          stage: targetStage,
+        }),
+      });
+      setStatusDialogState({ open: false, item: null, targetStatus: null });
+    } catch {
+      // Error is caught by mutation and rendered in the dialog error callout
     }
   }
 
@@ -223,6 +272,17 @@ export function ApplicationsPage() {
           totalPages={data.totalPages}
         />
       ) : null}
+      <ApplicationStatusDialog
+        error={updateStatusMutation.error}
+        isPending={updateStatusMutation.isPending}
+        item={statusDialogState.item}
+        onConfirm={handleConfirmStatusChange}
+        onOpenChange={(open) =>
+          setStatusDialogState((prev) => ({ ...prev, open }))
+        }
+        open={statusDialogState.open}
+        targetStatus={statusDialogState.targetStatus}
+      />
     </div>
   );
 }

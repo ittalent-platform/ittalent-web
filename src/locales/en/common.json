@@ -2621,6 +2621,29 @@
       "keywordBlank": "Search cannot be empty",
       "rangeContradictory": "From date must be earlier than or equal to to date",
       "filterUnsupported": "Some applied filters are unrecognized"
+    },
+    "statusDialog": {
+      "titleMove": "Move to {{stage}}",
+      "titleReject": "Reject application",
+      "candidateNotified": "The candidate is notified",
+      "reasonLabel": "Reason",
+      "reasonPlaceholder": "Why is this application rejected?",
+      "reasonHelper": "Kept with the application’s history for your team. Not shown to the candidate.",
+      "reasonRequired": "Write the reason (5–500 characters).",
+      "messageLabel": "Message to the candidate (optional)",
+      "messagePlaceholder": "e.g. Thank you for taking the time to speak with us...",
+      "messageHelper": "Shown with the new status in their applications page and email.",
+      "offerDefaultMessage": "We’re happy to offer you the {{jobTitle}} role. Our HR team will email the details.",
+      "internalNoteLabel": "Internal note (optional)",
+      "internalNotePlaceholder": "Only your company’s HR team sees this...",
+      "cancel": "Cancel",
+      "confirmMove": "Move to {{stage}}",
+      "confirmReject": "Reject application",
+      "updating": "Updating...",
+      "conflictError": "Another team member updated this application or the opening was already filled.",
+      "prerequisiteError": "An active interview schedule is required before moving to Interviewing.",
+      "genericError": "Could not update status. Please try again.",
+      "successToast": "{{name}} moved to {{stage}} and was notified."
     }
   }
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 
 import { PersonAvatar } from "@/components/common/person-avatar";
+import { Button } from "@/components/ui/button";
 import {
   SortableHeaderButton,
   Table,
@@ -161,26 +162,30 @@ export function ApplicationsTable({
                   onClick={(e) => e.stopPropagation()}
                 >
                   {hasCv ? (
-                    <button
-                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-semibold text-foreground shadow-xs hover:bg-muted"
+                    <Button
+                      className="h-6 gap-1.5 px-2 text-xs font-semibold"
                       onClick={() => onOpenCv?.(item)}
+                      size="xs"
                       type="button"
+                      variant="outline"
                     >
                       <FileText className="size-3.5 text-muted-foreground" />
                       <span>{t("recruiterApplications.document.cv")}</span>
                       <ExternalLink className="size-3 text-muted-foreground" />
-                    </button>
+                    </Button>
                   ) : null}
                   {hasCoverLetter ? (
-                    <button
-                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-semibold text-foreground shadow-xs hover:bg-muted"
+                    <Button
+                      className="h-6 gap-1.5 px-2 text-xs font-semibold"
                       onClick={() => onOpenCv?.(item)}
+                      size="xs"
                       type="button"
+                      variant="outline"
                     >
                       <FileText className="size-3.5 text-muted-foreground" />
                       <span>{t("recruiterApplications.document.cover_letter")}</span>
                       <ExternalLink className="size-3 text-muted-foreground" />
-                    </button>
+                    </Button>
                   ) : null}
                   {!hasCv && !hasCoverLetter ? (
                     <span className="text-xs text-muted-foreground">—</span>

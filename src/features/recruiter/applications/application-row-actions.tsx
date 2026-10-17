@@ -1,14 +1,25 @@
-import { ArrowRight, Calendar, Download, ExternalLink, Eye, MoreHorizontal } from "lucide-react";
+import {
+  ArrowRight,
+  Calendar,
+  Download,
+  ExternalLink,
+  Eye,
+  MoreHorizontal,
+  XCircle,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import {
   PERMITTED_TRANSITIONS,
+  STATUS_TONES,
   type ApplicationItem,
   type ApplicationStatus,
 } from "./applications.constants";
@@ -37,13 +48,14 @@ export function ApplicationRowActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
+        <Button
           aria-label={t("recruiterApplications.columns.actions")}
-          className="grid size-8 cursor-pointer place-items-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40"
-          type="button"
+          className="size-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+          size="icon"
+          variant="ghost"
         >
           <MoreHorizontal aria-hidden className="size-4" />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52 rounded-xl py-1">
         <DropdownMenuItem className="gap-2.5 px-3.5 py-2 text-[13.5px]" onSelect={onView}>
@@ -72,18 +84,26 @@ export function ApplicationRowActions({
 
         {nextStatuses.length > 0 && onStatusChange ? (
           <>
-            {nextStatuses.map((nextStatus) => (
-              <DropdownMenuItem
-                className="gap-2.5 px-3.5 py-2 text-[13.5px]"
-                key={nextStatus}
-                onSelect={() => onStatusChange(nextStatus)}
-              >
-                <ArrowRight className="size-4 text-muted-foreground" />
-                {t("recruiterApplications.actions.moveTo", {
-                  stage: t(`applications.status.${nextStatus}`),
-                })}
-              </DropdownMenuItem>
-            ))}
+            {nextStatuses.map((nextStatus) => {
+              const tone = STATUS_TONES[nextStatus];
+              const isReject = nextStatus === "rejected";
+              return (
+                <DropdownMenuItem
+                  className={cn("gap-2.5 px-3.5 py-2 text-[13.5px] font-medium", tone.text)}
+                  key={nextStatus}
+                  onSelect={() => onStatusChange(nextStatus)}
+                >
+                  {isReject ? (
+                    <XCircle className="size-4 shrink-0 text-(--status-error-fg)" />
+                  ) : (
+                    <ArrowRight className={cn("size-4 shrink-0", tone.text)} />
+                  )}
+                  {t("recruiterApplications.actions.moveTo", {
+                    stage: t(`applications.status.${nextStatus}`),
+                  })}
+                </DropdownMenuItem>
+              );
+            })}
           </>
         ) : null}
 

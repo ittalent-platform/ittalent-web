@@ -2597,6 +2597,29 @@
       "keywordBlank": "Từ khoá tìm kiếm không được để trống",
       "rangeContradictory": "Ngày bắt đầu phải trước hoặc cùng ngày với ngày kết thúc",
       "filterUnsupported": "Một số bộ lọc không hợp lệ"
+    },
+    "statusDialog": {
+      "titleMove": "Chuyển sang {{stage}}",
+      "titleReject": "Từ chối hồ sơ",
+      "candidateNotified": "Ứng viên sẽ được thông báo",
+      "reasonLabel": "Lý do",
+      "reasonPlaceholder": "Tại sao hồ sơ này bị từ chối?",
+      "reasonHelper": "Lưu trong lịch sử hồ sơ cho đội ngũ tuyển dụng. Ứng viên sẽ không nhìn thấy lý do này.",
+      "reasonRequired": "Vui lòng nhập lý do (5–500 ký tự).",
+      "messageLabel": "Tin nhắn gửi ứng viên (tuỳ chọn)",
+      "messagePlaceholder": "vd: Cảm ơn bạn đã dành thời gian trao đổi cùng công ty...",
+      "messageHelper": "Hiển thị cùng trạng thái mới trên trang ứng tuyển và email của ứng viên.",
+      "offerDefaultMessage": "Chúng tôi rất vui mừng đề xuất bạn vào vị trí {{jobTitle}}. Đội ngũ nhân sự sẽ gửi email chi tiết cho bạn.",
+      "internalNoteLabel": "Ghi chú nội bộ (tuỳ chọn)",
+      "internalNotePlaceholder": "Chỉ đội ngũ nhân sự công ty bạn nhìn thấy ghi chú này...",
+      "cancel": "Huỷ",
+      "confirmMove": "Chuyển sang {{stage}}",
+      "confirmReject": "Từ chối hồ sơ",
+      "updating": "Đang cập nhật...",
+      "conflictError": "Một thành viên khác đã cập nhật hồ sơ hoặc vị trí tuyển dụng đã đủ người.",
+      "prerequisiteError": "Cần có lịch phỏng vấn trước khi chuyển sang giai đoạn Phỏng vấn.",
+      "genericError": "Không thể cập nhật trạng thái. Vui lòng thử lại.",
+      "successToast": "Đã chuyển {{name}} sang {{stage}} và gửi thông báo."
     }
   }
 }
