@@ -112,9 +112,11 @@ export function useApplicationsParams(): RecruiterApplicationsListState {
     const submittedFrom = range === "custom" && from ? `${from}${DAY_START_SUFFIX}` : presetFrom;
     const submittedTo = range === "custom" && to ? `${to}${DAY_START_SUFFIX}` : undefined;
 
+    const effectiveLimit = view === "board" ? 100 : limit;
+
     return {
-      page: list.page,
-      limit,
+      page: view === "board" ? 1 : list.page,
+      limit: effectiveLimit,
       sortBy,
       sortOrder,
       ...(searchTerm ? { search: searchTerm } : {}),
@@ -124,7 +126,7 @@ export function useApplicationsParams(): RecruiterApplicationsListState {
       ...(submittedFrom ? { submittedFrom } : {}),
       ...(submittedTo ? { submittedTo } : {}),
     };
-  }, [list.page, limit, sortBy, sortOrder, searchTerm, statusFilter, jobId, documentType, range, from, to]);
+  }, [view, list.page, limit, sortBy, sortOrder, searchTerm, statusFilter, jobId, documentType, range, from, to]);
 
   function setMany(patch: Partial<Record<keyof typeof PARAM, string | null>>) {
     setParams((current) => {

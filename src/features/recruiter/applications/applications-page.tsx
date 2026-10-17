@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Columns3, Inbox, SearchX, Table2 } from "lucide-react";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { Table, TableBody, TableSkeletonRows } from "@/components/ui/table";
 import { ViewToggle } from "@/components/ui/view-toggle";
+import { ApplicationsBoard } from "./applications-board";
 import { ApplicationsTable } from "./applications-table";
 import { ApplicationsToolbar } from "./applications-toolbar";
 import {
@@ -49,8 +51,23 @@ export function ApplicationsPage() {
   const data = query.data;
   const updateStatusMutation = useUpdateApplicationStatus();
 
+  const inProgressCount = useMemo(() => {
+    if (!data?.statusCounts) return 0;
+    return (
+      (data.statusCounts.submitted || 0) +
+      (data.statusCounts.under_review || 0) +
+      (data.statusCounts.interviewing || 0) +
+      (data.statusCounts.offered || 0)
+    );
+  }, [data?.statusCounts]);
+
   const subtitle = data
-    ? t("recruiterApplications.subtitle", { count: data.total })
+    ? state.view === "board"
+      ? t("recruiterApplications.board.subtitleWithProgress", {
+          count: data.total,
+          inProgress: inProgressCount,
+        })
+      : t("recruiterApplications.subtitle", { count: data.total })
     : undefined;
 
   function sortBy(field: SortField) {
@@ -143,20 +160,14 @@ export function ApplicationsPage() {
 
     if (state.view === "board") {
       return (
-        <div className={`${CARD} flex flex-col items-center justify-center p-12 text-center`}>
-          <p className="text-base font-semibold text-foreground">Kanban Board View</p>
-          <p className="mt-1 max-w-md text-sm text-muted-foreground">
-            Recruiter drag-and-drop stage pipeline board will be enabled in the upcoming milestone.
-            Switch back to Table view to browse applications.
-          </p>
-          <Button
-            className="mt-4"
-            onClick={() => state.setMany({ [PARAM.view]: "table" })}
-            variant="outline"
-          >
-            Switch to Table view
-          </Button>
-        </div>
+        <ApplicationsBoard
+          items={data.items}
+          locale={i18n.language}
+          onOpenCoverLetter={handleOpenCv}
+          onOpenCv={handleOpenCv}
+          onStatusChange={handleStatusChange}
+          statusCounts={data.statusCounts}
+        />
       );
     }
 
@@ -201,7 +212,7 @@ export function ApplicationsPage() {
         statusCounts={data?.statusCounts}
       />
       {renderBody()}
-      {data && data.items.length && !invalidCriteria ? (
+      {data && data.items.length && !invalidCriteria && state.view === "table" ? (
         <Pagination
           limit={state.limit}
           onLimitChange={(limit) => state.set("limit", String(limit))}

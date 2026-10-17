@@ -81,6 +81,32 @@ export function isTransitionPermitted(from: ApplicationStatus, to: ApplicationSt
   return PERMITTED_TRANSITIONS[from]?.includes(to) ?? false;
 }
 
+/**
+ * 7 recruitment lifecycle stages displayed on the Kanban board matching design.
+ * Position filled is an automated vacancy state and not rendered as a primary column.
+ */
+export const KANBAN_COLUMNS = [
+  "submitted",
+  "under_review",
+  "interviewing",
+  "offered",
+  "hired",
+  "rejected",
+  "withdrawn",
+] as const satisfies readonly ApplicationStatus[];
+
+export type KanbanColumnStatus = (typeof KANBAN_COLUMNS)[number];
+
+/** Candidates in terminal stages cannot be dragged or transitioned. */
+export function isKanbanDraggable(status: ApplicationStatus): boolean {
+  return (
+    status !== "hired" &&
+    status !== "rejected" &&
+    status !== "withdrawn" &&
+    status !== "position_filled"
+  );
+}
+
 /** Default and limit configurations. */
 export const DEFAULT_PAGE_SIZE = 10;
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
