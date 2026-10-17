@@ -8,11 +8,13 @@ import {
   Download,
   ExternalLink,
   FileText,
+  History,
   Inbox,
   MoreVertical,
   XCircle,
 } from "lucide-react";
 
+import { useSession } from "@/auth/use-session";
 import { PersonAvatar } from "@/components/common/person-avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,7 +47,9 @@ import {
   useRecruiterApplication,
   useUpdateApplicationStatus,
 } from "@/features/recruiter/applications/applications.queries";
+import { ApplicationInternalNotes } from "./application-internal-notes";
 import { ApplicationProgressTimeline } from "./application-progress-timeline";
+import { CompanyHistoryDialog } from "./company-history-dialog";
 
 const CARD = "rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col gap-4";
 
@@ -54,11 +58,13 @@ export function RecruiterApplicationDetailPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { data: session } = useSession();
 
   const query = useRecruiterApplication(applicationId);
   const application = query.data;
   const updateStatusMutation = useUpdateApplicationStatus();
 
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [dialogState, setDialogState] = useState<{
     open: boolean;
     targetStatus: UpdatableStatus | null;
@@ -284,6 +290,13 @@ export function RecruiterApplicationDetailPage() {
                 <Calendar className="size-4 text-muted-foreground" />
                 {t("recruiterApplications.detail.scheduleInterview")}
               </DropdownMenuItem>
+              <DropdownMenuItem
+                className="gap-2.5 px-3.5 py-2 text-[13.5px]"
+                onSelect={() => setHistoryDialogOpen(true)}
+              >
+                <History className="size-4 text-muted-foreground" />
+                {t("recruiterApplications.historyDialog.title")}
+              </DropdownMenuItem>
               {application.attachments.length > 0 ? (
                 <DropdownMenuItem
                   className="gap-2.5 px-3.5 py-2 text-[13.5px]"
@@ -496,6 +509,12 @@ export function RecruiterApplicationDetailPage() {
             )}
           </section>
 
+          {/* Internal Notes Card */}
+          <ApplicationInternalNotes
+            applicationId={application.id}
+            initialNotes={application.notes}
+          />
+
           {/* Status History Summary Card */}
           <section aria-labelledby="history-heading" className={CARD}>
             <div className="flex items-center justify-between">
@@ -505,6 +524,14 @@ export function RecruiterApplicationDetailPage() {
               >
                 {t("recruiterApplications.detail.statusHistoryTitle")}
               </h2>
+              <button
+                className="inline-flex items-center gap-1 text-[13px] font-bold text-foreground hover:text-primary transition-colors cursor-pointer"
+                onClick={() => setHistoryDialogOpen(true)}
+                type="button"
+              >
+                <span>{t("recruiterApplications.detail.viewAllHistory")}</span>
+                <ArrowRight className="size-3.5" />
+              </button>
             </div>
             {application.statusHistory && application.statusHistory.length > 0 ? (
               <div className="flex flex-col gap-3">
@@ -556,6 +583,17 @@ export function RecruiterApplicationDetailPage() {
         onOpenChange={(open) => setDialogState((prev) => ({ ...prev, open }))}
         open={dialogState.open}
         targetStatus={dialogState.targetStatus}
+      />
+
+      {/* Company History Dialog Integration */}
+      <CompanyHistoryDialog
+        applicationId={application.id}
+        candidateName={candidateName}
+        companyName={enterpriseName}
+        jobTitle={application.job.title}
+        onOpenChange={setHistoryDialogOpen}
+        open={historyDialogOpen}
+        statusHistory={application.statusHistory}
       />
     </div>
   );
