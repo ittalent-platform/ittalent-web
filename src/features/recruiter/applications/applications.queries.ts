@@ -124,3 +124,32 @@ export function useUpdateRecruiterApplicationStatus(id: string) {
     },
   });
 }
+
+/** Update application recruitment status with parameterized id for list and board actions. */
+export function useUpdateApplicationStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      body,
+    }: {
+      id: string;
+      body: UpdateRecruiterApplicationStatusBody;
+    }) => {
+      return unwrap(
+        await patchApiV1RecruiterApplicationsByIdStatus({
+          path: { id },
+          body,
+        }),
+      );
+    },
+    onSuccess: async (_, { id }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: recruiterApplicationKeys.detail(id) }),
+        queryClient.invalidateQueries({ queryKey: recruiterApplicationKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: recruiterApplicationKeys.companyHistory(id) }),
+      ]);
+    },
+  });
+}
+

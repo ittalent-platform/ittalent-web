@@ -104,6 +104,16 @@ export const SORT_FIELDS = ["submittedAt", "latestStatusAt", "id"] as const;
 export const SORT_ORDERS = ["asc", "desc"] as const;
 export const DEFAULT_SORT = { sortBy: "submittedAt" as SortField, sortOrder: "desc" as SortOrder };
 
+export type SubmittedRange = "any" | "7d" | "30d" | "90d" | "custom";
+export const SUBMITTED_RANGE_DAYS: Record<Exclude<SubmittedRange, "any" | "custom">, number> = {
+  "7d": 7,
+  "30d": 30,
+  "90d": 90,
+};
+export const SUBMITTED_RANGES: readonly SubmittedRange[] = ["any", "7d", "30d", "90d", "custom"];
+export const MS_PER_DAY = 86_400_000;
+export const JOB_ID_PATTERN = /^[a-f\d]{24}$/i;
+
 /** URL query-param keys for list and board state single source of truth. */
 export const PARAM = {
   page: "page",
@@ -112,6 +122,9 @@ export const PARAM = {
   status: "status",
   jobId: "jobId",
   documentType: "documentType",
+  range: "range",
+  from: "from",
+  to: "to",
   submittedFrom: "submittedFrom",
   submittedTo: "submittedTo",
   sortBy: "sortBy",
