@@ -91,11 +91,13 @@ export function ApplicationKanbanCard({
       </div>
 
       {application.nextInterview ? (
-        <div className="inline-flex w-fit items-center gap-1.5 rounded-md bg-purple-500/10 px-2 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-300">
-          <Calendar aria-hidden className="size-3 text-purple-600 dark:text-purple-400" />
-          <span>
-            {t("recruiterApplications.card.interviewPrefix", "Interview")}{" "}
-            {formatInterviewSchedule(application.nextInterview.scheduledAt, locale)}
+        <div className="flex flex-col gap-0.5 rounded-lg bg-(--status-blocked-bg) p-2 text-[12.5px] font-semibold text-(--status-blocked-fg)">
+          <span className="flex items-center gap-1.5">
+            <Calendar aria-hidden className="size-3.5 shrink-0 text-(--status-blocked-fg)" />
+            <span>
+              {t("recruiterApplications.card.interviewPrefix", "Interview")}{" "}
+              {formatInterviewSchedule(application.nextInterview.scheduledAt, locale)}
+            </span>
           </span>
         </div>
       ) : null}
