@@ -1,5 +1,5 @@
 import { Search } from "lucide-react";
-import { useId, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { PersonAvatar } from "@/components/common/person-avatar";
@@ -29,9 +29,18 @@ type ApplicationPickerProps = {
 export function ApplicationPicker({ id, invalid, onChange, value }: ApplicationPickerProps) {
   const { t } = useTranslation();
   const listId = useId();
+  const blurTimerRef = useRef<number | null>(null);
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [highlight, setHighlight] = useState(0);
+
+  useEffect(() => {
+    return () => {
+      if (blurTimerRef.current !== null && typeof window !== "undefined") {
+        window.clearTimeout(blurTimerRef.current);
+      }
+    };
+  }, []);
   const keyword = useDebouncedValue(text, SEARCH_DELAY_MS);
   const unsafe = hasUnsafeSearchText(keyword);
   const results = useSchedulableApplications(unsafe ? "" : keyword, { enabled: open && !unsafe });
@@ -68,7 +77,20 @@ export function ApplicationPicker({ id, invalid, onChange, value }: ApplicationP
         className="pr-10"
         id={id}
         maxLength={INTERVIEW_SEARCH_MAX_LENGTH}
-        onBlur={() => window.setTimeout(() => setOpen(false), BLUR_CLOSE_DELAY_MS)}
+        onBlur={() => {
+          if (typeof window !== "undefined") {
+            if (blurTimerRef.current !== null) {
+              window.clearTimeout(blurTimerRef.current);
+            }
+            blurTimerRef.current = window.setTimeout(() => {
+              if (typeof window !== "undefined") {
+                setOpen(false);
+              }
+            }, BLUR_CLOSE_DELAY_MS);
+          } else {
+            setOpen(false);
+          }
+        }}
         onChange={(event) => {
           setText(event.target.value);
           setHighlight(0);

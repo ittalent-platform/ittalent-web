@@ -289,9 +289,9 @@ export const getApiV1JobPostingsByIdHistory = <ThrowOnError extends boolean = fa
 });
 
 /**
- * List user accounts
+ * List and search employee accounts
  *
- * System Administrator only (UC-USER-01). Newest first (createdAt desc, id desc). `search` matches username or email as literal, case-insensitive text. Only allow-listed fields are returned.
+ * Retrieves paginated user accounts. Scoped to caller enterprise if recruiter, or global for system admin (UC-13, UC-16).
  */
 export const getApiV1Users = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UsersData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1UsersResponses, GetApiV1UsersErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -313,9 +313,31 @@ export const postApiV1Users = <ThrowOnError extends boolean = false>(options: Op
 });
 
 /**
- * Get user by ID
+ * Read safe paginated user account history
+ */
+export const getApiV1UsersByIdHistory = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdHistoryData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdHistoryResponses, GetApiV1UsersByIdHistoryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/history',
+    ...options
+});
+
+/**
+ * Suspend or reopen a user account
+ */
+export const patchApiV1UsersByIdStatus = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdStatusData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdStatusResponses, PatchApiV1UsersByIdStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get employee by ID
  *
- * System Administrator only (UC-USER-02). Own-profile reads use GET /auth/me.
+ * Retrieves employee details with tenancy boundary verification (UC-14).
  */
 export const getApiV1UsersById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdResponses, GetApiV1UsersByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -324,7 +346,7 @@ export const getApiV1UsersById = <ThrowOnError extends boolean = false>(options:
 });
 
 /**
- * Edit a user account
+ * Update employee information
  *
  * System Administrator only. Updates only fullName and phone using expectedVersion; null or an empty phone clears the stored number. Role and email changes use separate flows.
  */
@@ -731,19 +753,6 @@ export const patchApiV1UsersByIdEmergencySuspension = <ThrowOnError extends bool
 });
 
 /**
- * Suspend or reopen a user account
- */
-export const patchApiV1UsersByIdStatus = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdStatusData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdStatusResponses, PatchApiV1UsersByIdStatusErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/status',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
  * Read the latest invitation status for an account
  */
 export const getApiV1UsersByIdInvitation = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdInvitationData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdInvitationResponses, GetApiV1UsersByIdInvitationErrors, ThrowOnError>({
@@ -789,15 +798,6 @@ export const postApiV1UserInvitationsAccept = <ThrowOnError extends boolean = fa
         'Content-Type': 'application/json',
         ...options.headers
     }
-});
-
-/**
- * Read safe paginated user account history
- */
-export const getApiV1UsersByIdHistory = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdHistoryData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdHistoryResponses, GetApiV1UsersByIdHistoryErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/history',
-    ...options
 });
 
 /**
