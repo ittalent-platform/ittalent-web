@@ -2678,7 +2678,29 @@
       "loading": "Loading application details...",
       "notFoundTitle": "Application not found",
       "notFoundDescription": "This application may have been removed or you do not have permission to view it.",
-      "backToApplications": "Back to applications"
+      "backToApplications": "Back to applications",
+      "internalNotesTitle": "INTERNAL NOTES",
+      "addNotePlaceholder": "Add a note for your team...",
+      "addNote": "Add",
+      "addingNote": "Adding...",
+      "noNotes": "No internal notes yet.",
+      "noteAddedSuccess": "Note added successfully.",
+      "noteValidationEmpty": "Note content cannot be empty."
+    },
+    "historyDialog": {
+      "title": "History",
+      "tabThisApplication": "This application",
+      "tabAtCompany": "At {{company}} · {{count}}",
+      "tabAtCompanyDefault": "Company history · {{count}}",
+      "messageToCandidate": "Message to candidate: “{{message}}”",
+      "reviewerNote": "Note: “{{note}}”",
+      "rejectionReason": "Reason: “{{reason}}”",
+      "byActor": "by {{actor}}",
+      "byCandidate": "by candidate",
+      "footnote": "Times in ICT (UTC+7). History is append-only. Internal notes and who opened files are never shown to the candidate.",
+      "noTimeline": "No history recorded yet.",
+      "noOtherApplications": "No previous applications recorded at this enterprise.",
+      "firstTimeApplicant": "First time applying to {{company}}."
     }
   }
 }
