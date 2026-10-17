@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,13 +48,14 @@ export function ApplicationRowActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
+        <Button
           aria-label={t("recruiterApplications.columns.actions")}
-          className="grid size-8 cursor-pointer place-items-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/40"
-          type="button"
+          className="size-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+          size="icon"
+          variant="ghost"
         >
           <MoreHorizontal aria-hidden className="size-4" />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52 rounded-xl py-1">
         <DropdownMenuItem className="gap-2.5 px-3.5 py-2 text-[13.5px]" onSelect={onView}>

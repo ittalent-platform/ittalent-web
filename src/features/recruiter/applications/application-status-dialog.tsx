@@ -251,18 +251,20 @@ function ApplicationStatusDialogContent({
 
           <DialogFooter className="mt-2 flex flex-row items-center justify-end gap-2.5">
             <Button
+              className="h-10 px-4 font-medium"
               disabled={isPending}
               onClick={() => onOpenChange(false)}
-              shape="pill"
+              shape="xl"
               type="button"
-              variant="outline"
+              variant="secondary"
             >
               {t("recruiterApplications.statusDialog.cancel")}
             </Button>
             {isReject ? (
               <Button
+                className="h-10 px-5 font-semibold"
                 disabled={isPending}
-                shape="pill"
+                shape="xl"
                 type="submit"
                 variant="destructive-solid"
               >
@@ -270,23 +272,11 @@ function ApplicationStatusDialogContent({
                   ? t("recruiterApplications.statusDialog.updating")
                   : t("recruiterApplications.statusDialog.confirmReject")}
               </Button>
-            ) : isOffer ? (
-              <Button
-                disabled={isPending}
-                shape="pill"
-                type="submit"
-                variant="warning-solid"
-              >
-                {isPending
-                  ? t("recruiterApplications.statusDialog.updating")
-                  : t("recruiterApplications.statusDialog.confirmMove", {
-                      stage: t(`applications.status.${targetStatus}`),
-                    })}
-              </Button>
             ) : (
               <Button
+                className="h-10 px-5 font-semibold"
                 disabled={isPending}
-                shape="pill"
+                shape="xl"
                 type="submit"
                 variant="default"
               >
