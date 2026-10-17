@@ -11,6 +11,19 @@ vi.mock("@/components/toast/toast-provider", () => ({
   useToast: () => ({ showToast: vi.fn(), dismissToast: vi.fn() }),
 }));
 
+vi.mock("@/auth/use-session", () => ({
+  useSession: () => ({
+    data: {
+      user: {
+        id: "recruiter-1",
+        email: "recruiter@novafintech.vn",
+        fullName: "Trần Bảo",
+        enterpriseName: "Nova Fintech",
+      },
+    },
+  }),
+}));
+
 const mockApplication: RecruiterApplicationDetailDto = {
   id: "607f1f77bcf86cd799439011",
   job: {
@@ -99,6 +112,39 @@ let mockQueryState = {
 
 vi.mock("@/features/recruiter/applications/applications.queries", () => ({
   useRecruiterApplication: () => mockQueryState,
+  useRecruiterApplicationNotes: () => ({
+    data: { items: mockApplication.notes, total: mockApplication.notes.length },
+    isPending: false,
+  }),
+  useCreateRecruiterNote: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
+  useRecruiterCompanyHistory: () => ({
+    data: {
+      applicant: mockApplication.applicant,
+      isFirstTimeApplicant: false,
+      totalSubmissionsToCompany: 1,
+      items: [
+        {
+          id: mockApplication.id,
+          job: mockApplication.job,
+          status: mockApplication.status,
+          reviewStage: mockApplication.reviewStage,
+          submittedDocuments: ["cv", "cover_letter"],
+          rejectionReason: null,
+          withdrawalReason: null,
+          notesCount: 1,
+          submittedAt: mockApplication.submittedAt,
+          latestStatusAt: mockApplication.latestStatusAt,
+          isCurrentApplication: true,
+        },
+      ],
+    },
+    isPending: false,
+    isLoading: false,
+    isError: false,
+  }),
   useUpdateApplicationStatus: () => ({
     mutateAsync: mockMutateAsync,
     isPending: false,

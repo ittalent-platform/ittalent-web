@@ -43,6 +43,7 @@ export function ApplicationInternalNotes({
     if (!trimmed) {
       showToast({
         tone: "error",
+        title: t("common.error"),
         message: t("recruiterApplications.detail.noteValidationEmpty"),
       });
       return;
@@ -53,11 +54,13 @@ export function ApplicationInternalNotes({
       setContent("");
       showToast({
         tone: "success",
+        title: t("recruiterApplications.detail.internalNotesTitle"),
         message: t("recruiterApplications.detail.noteAddedSuccess"),
       });
     } catch {
       showToast({
         tone: "error",
+        title: t("common.error"),
         message: t("recruiterApplications.statusDialog.genericError"),
       });
     }
@@ -117,7 +120,7 @@ export function ApplicationInternalNotes({
         <Button
           className="h-10 px-4 font-semibold shrink-0"
           disabled={createMutation.isPending || !content.trim()}
-          shape="rectangle"
+          shape="default"
           type="submit"
           variant="outline"
         >

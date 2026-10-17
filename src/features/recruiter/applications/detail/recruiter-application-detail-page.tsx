@@ -59,6 +59,7 @@ export function RecruiterApplicationDetailPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { data: session } = useSession();
+  const enterpriseName = session?.user?.enterpriseName || undefined;
 
   const query = useRecruiterApplication(applicationId);
   const application = query.data;
