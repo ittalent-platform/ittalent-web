@@ -527,6 +527,8 @@ export function RecruiterApplicationDetailPage() {
               </h2>
               <button
                 className="inline-flex items-center gap-1 text-[13px] font-bold text-foreground hover:text-primary transition-colors cursor-pointer"
+                data-testid="open-history-dialog"
+                id="open-history-dialog-btn"
                 onClick={() => setHistoryDialogOpen(true)}
                 type="button"
               >

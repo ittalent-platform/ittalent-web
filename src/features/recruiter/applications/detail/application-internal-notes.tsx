@@ -112,14 +112,18 @@ export function ApplicationInternalNotes({
       <form className="flex gap-2" onSubmit={handleSubmit}>
         <Input
           className="h-10 text-sm"
+          data-testid="internal-note-input"
           disabled={createMutation.isPending}
+          id="internal-note-input"
           onChange={(e) => setContent(e.target.value)}
           placeholder={t("recruiterApplications.detail.addNotePlaceholder")}
           value={content}
         />
         <Button
           className="h-10 px-4 font-semibold shrink-0"
+          data-testid="internal-note-submit-btn"
           disabled={createMutation.isPending || !content.trim()}
+          id="internal-note-submit-btn"
           shape="default"
           type="submit"
           variant="outline"

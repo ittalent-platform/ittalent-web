@@ -83,6 +83,8 @@ export function CompanyHistoryDialog({
             <Button
               aria-label="Close"
               className="size-8 rounded-xl text-muted-foreground hover:bg-muted"
+              data-testid="close-history-dialog"
+              id="close-history-dialog-btn"
               size="icon"
               variant="ghost"
             >
@@ -104,6 +106,8 @@ export function CompanyHistoryDialog({
                 ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",
             )}
+            data-testid="tab-this-application"
+            id="tab-this-application"
             onClick={() => setActiveTab("application")}
             role="tab"
             type="button"
@@ -118,6 +122,8 @@ export function CompanyHistoryDialog({
                 ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",
             )}
+            data-testid="tab-company-history"
+            id="tab-company-history"
             onClick={() => setActiveTab("company")}
             role="tab"
             type="button"
