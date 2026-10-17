@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 import {
   STATUS_TONES,
   type ApplicationStatus,
-} from "../applications.constants";
-import { formatDate } from "../applications.format";
+} from "@/features/recruiter/applications/applications.constants";
+import { formatDate } from "@/features/recruiter/applications/applications.format";
 
 export interface StatusHistoryItem {
   status: ApplicationStatus;

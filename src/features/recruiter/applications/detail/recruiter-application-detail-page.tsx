@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 import {
   ApplicationStatusDialog,
   type StatusDialogSubmission,
-} from "../application-status-dialog";
+} from "@/features/recruiter/applications/application-status-dialog";
 import {
   INTERVIEW_REPLY_TONES,
   PERMITTED_TRANSITIONS,
@@ -36,15 +36,15 @@ import {
   type ApplicationStatus,
   type UpdatableStatus,
   isUpdatableStatus,
-} from "../applications.constants";
+} from "@/features/recruiter/applications/applications.constants";
 import {
   formatDate,
   formatInterviewSchedule,
-} from "../applications.format";
+} from "@/features/recruiter/applications/applications.format";
 import {
   useRecruiterApplication,
   useUpdateApplicationStatus,
-} from "../applications.queries";
+} from "@/features/recruiter/applications/applications.queries";
 import { ApplicationProgressTimeline } from "./application-progress-timeline";
 
 const CARD = "rounded-2xl border border-border bg-card p-6 shadow-xs flex flex-col gap-4";
