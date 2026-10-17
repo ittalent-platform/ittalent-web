@@ -57,7 +57,7 @@ export function ApplicationsTable({
     <Table className="w-full table-fixed">
       <TableHead>
         <TableHeaderRow>
-          <TableHeaderCell className="w-[26%] pl-5">
+          <TableHeaderCell className="w-[23%] pl-5">
             <SortableHeaderButton
               active={sortBy === "id"}
               className="text-foreground hover:text-foreground"
@@ -66,10 +66,10 @@ export function ApplicationsTable({
               onClick={() => onSort("id")}
             />
           </TableHeaderCell>
-          <TableHeaderCell className="w-[20%]">
+          <TableHeaderCell className="w-[18%]">
             {t("recruiterApplications.columns.job")}
           </TableHeaderCell>
-          <TableHeaderCell className="w-[11%]">
+          <TableHeaderCell className="w-[10%]">
             <SortableHeaderButton
               active={sortBy === "submittedAt"}
               className="font-bold text-foreground hover:text-foreground"
@@ -78,7 +78,7 @@ export function ApplicationsTable({
               onClick={() => onSort("submittedAt")}
             />
           </TableHeaderCell>
-          <TableHeaderCell className="w-[21%]">
+          <TableHeaderCell className="w-[25%]">
             {t("recruiterApplications.columns.documents")}
           </TableHeaderCell>
           <TableHeaderCell className="w-[13%]">
@@ -90,10 +90,10 @@ export function ApplicationsTable({
               onClick={() => onSort("latestStatusAt")}
             />
           </TableHeaderCell>
-          <TableHeaderCell className="w-[9%]">
+          <TableHeaderCell className="w-[8%]">
             {t("recruiterApplications.columns.status")}
           </TableHeaderCell>
-          <TableHeaderCell className="w-[5%] pr-5 text-right">
+          <TableHeaderCell className="w-[3%] pr-5 text-right">
             <span className="sr-only">{t("recruiterApplications.columns.actions")}</span>
           </TableHeaderCell>
         </TableHeaderRow>
@@ -113,7 +113,7 @@ export function ApplicationsTable({
               key={item.id}
               onClick={() => navigate(detailPath)}
             >
-              <TableCell className="w-[26%] pl-5">
+              <TableCell className="w-[23%] pl-5">
                 <div className="flex min-w-0 items-center gap-3">
                   <PersonAvatar className="size-9 shrink-0 text-xs" name={candidateName} />
                   <div className="flex min-w-0 flex-1 flex-col">
@@ -142,7 +142,7 @@ export function ApplicationsTable({
                 </div>
               </TableCell>
 
-              <TableCell className="w-[20%]">
+              <TableCell className="w-[18%]">
                 <span
                   className="block truncate text-[13.5px] font-medium text-foreground"
                   title={item.job.title}
@@ -151,13 +151,13 @@ export function ApplicationsTable({
                 </span>
               </TableCell>
 
-              <TableCell className="w-[11%] whitespace-nowrap text-[13px] text-foreground">
+              <TableCell className="w-[10%] whitespace-nowrap text-[13px] text-foreground">
                 {formatDate(item.submittedAt, locale)}
               </TableCell>
 
-              <TableCell className="w-[21%]">
+              <TableCell className="w-[25%]">
                 <div
-                  className="flex flex-wrap items-center gap-1.5"
+                  className="flex items-center gap-1.5 whitespace-nowrap"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {hasCv ? (
@@ -204,7 +204,7 @@ export function ApplicationsTable({
                 )}
               </TableCell>
 
-              <TableCell className="w-[9%]">
+              <TableCell className="w-[8%]">
                 <span
                   className={cn(
                     "inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold",
@@ -215,7 +215,7 @@ export function ApplicationsTable({
                 </span>
               </TableCell>
 
-              <TableCell className="w-[5%] pr-5 text-right" onClick={(e) => e.stopPropagation()}>
+              <TableCell className="w-[3%] pr-5 text-right" onClick={(e) => e.stopPropagation()}>
                 <ApplicationRowActions
                   item={item}
                   onDownloadCv={() => onDownloadCv?.(item)}

@@ -188,6 +188,7 @@ export function ApplicationsPage() {
               icon: VIEW_ICONS[value],
               label: t(`recruiterApplications.view.${value}`),
             }))}
+            showLabels
             value={state.view}
           />
         }
