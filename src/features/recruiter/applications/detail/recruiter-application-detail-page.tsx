@@ -232,7 +232,7 @@ export function RecruiterApplicationDetailPage() {
           {nextStatuses.length > 0 ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="h-10 px-4 font-semibold" shape="xl" variant="default">
+                <Button className="h-10 px-4 font-semibold" shape="pill" variant="default">
                   <span>{t("recruiterApplications.detail.changeStatus")}</span>
                   <ChevronDown className="size-4 ml-1" />
                 </Button>

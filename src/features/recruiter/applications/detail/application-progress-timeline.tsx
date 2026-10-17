@@ -1,12 +1,13 @@
-import { Check, XCircle } from "lucide-react";
+import React from "react";
+import { Check, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
+import type { ApplicationStatus } from "@/features/recruiter/applications/applications.constants";
 import {
-  STATUS_TONES,
-  type ApplicationStatus,
-} from "@/features/recruiter/applications/applications.constants";
-import { formatDate } from "@/features/recruiter/applications/applications.format";
+  formatDate,
+  formatShortDate,
+} from "@/features/recruiter/applications/applications.format";
 
 export interface StatusHistoryItem {
   status: ApplicationStatus;
@@ -24,6 +25,14 @@ export interface ApplicationProgressTimelineProps {
   className?: string;
 }
 
+interface StageVisualConfig {
+  color: string;
+  activeRing: string;
+  upcomingBg: string;
+  upcomingBorder: string;
+  titleColor: string;
+}
+
 const LIFECYCLE_STAGES: readonly ApplicationStatus[] = [
   "submitted",
   "under_review",
@@ -31,6 +40,65 @@ const LIFECYCLE_STAGES: readonly ApplicationStatus[] = [
   "offered",
   "hired",
 ];
+
+const STAGE_CONFIGS: Record<ApplicationStatus, StageVisualConfig> = {
+  submitted: {
+    color: "#8a8a91",
+    activeRing: "#f1f1f3",
+    upcomingBg: "#f4f4f5",
+    upcomingBorder: "#8a8a91",
+    titleColor: "#3d3d42",
+  },
+  under_review: {
+    color: "#2a55a8",
+    activeRing: "#e0e9fa",
+    upcomingBg: "#eef4ff",
+    upcomingBorder: "#2a55a8",
+    titleColor: "#2a55a8",
+  },
+  interviewing: {
+    color: "#6941c6",
+    activeRing: "#efe9fb",
+    upcomingBg: "#fbf9ff",
+    upcomingBorder: "#6941c6",
+    titleColor: "#6941c6",
+  },
+  offered: {
+    color: "#b45309",
+    activeRing: "#fef3c7",
+    upcomingBg: "#fcf3e3",
+    upcomingBorder: "#b45309",
+    titleColor: "#9a4a06",
+  },
+  hired: {
+    color: "#12764a",
+    activeRing: "#d1fae5",
+    upcomingBg: "#e8f5ee",
+    upcomingBorder: "#12764a",
+    titleColor: "#12764a",
+  },
+  rejected: {
+    color: "#dc2626",
+    activeRing: "#fee2e2",
+    upcomingBg: "#fef2f2",
+    upcomingBorder: "#dc2626",
+    titleColor: "#dc2626",
+  },
+  withdrawn: {
+    color: "#64646b",
+    activeRing: "#ecebe7",
+    upcomingBg: "#f5f5f4",
+    upcomingBorder: "#64646b",
+    titleColor: "#64646b",
+  },
+  position_filled: {
+    color: "#64646b",
+    activeRing: "#ecebe7",
+    upcomingBg: "#f5f5f4",
+    upcomingBorder: "#64646b",
+    titleColor: "#64646b",
+  },
+};
 
 export function ApplicationProgressTimeline({
   currentStatus,
@@ -45,7 +113,31 @@ export function ApplicationProgressTimeline({
     currentStatus === "withdrawn" ||
     currentStatus === "position_filled";
 
-  // Map each status to the latest timestamp recorded in history
+  if (isTerminalNegative) {
+    const latestDate = statusHistory[0]?.occurredAt || statusHistory[0]?.timestamp;
+    const formattedDate = latestDate ? formatDate(latestDate, locale) : null;
+    return (
+      <section
+        aria-label="Progress"
+        className={cn(
+          "flex items-center gap-3 px-[22px] py-4 rounded-xl bg-card border border-border text-[13.5px] text-muted-foreground",
+          className,
+        )}
+      >
+        <span className="size-[22px] rounded-full bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+          <X className="size-3 stroke-[3]" />
+        </span>
+        <span>
+          <strong className="font-bold text-foreground">
+            {t(`applications.status.${currentStatus}`)}
+          </strong>
+          {formattedDate ? ` · ${formattedDate}` : ""}
+        </span>
+      </section>
+    );
+  }
+
+  // Map each status to its recorded timestamp
   const historyDates = statusHistory.reduce<Record<string, string>>((acc, item) => {
     const ts = item.occurredAt || item.timestamp;
     if (ts && !acc[item.status]) {
@@ -54,103 +146,76 @@ export function ApplicationProgressTimeline({
     return acc;
   }, {});
 
-  // Determine active index in the 5-stage pipeline
   const activeIndex = LIFECYCLE_STAGES.indexOf(currentStatus);
 
   return (
-    <div
+    <section
+      aria-label="Progress"
       className={cn(
-        "rounded-2xl border border-border bg-card p-6 shadow-xs",
+        "flex items-center px-[22px] py-4 rounded-xl bg-card border border-border overflow-x-auto",
         className,
       )}
     >
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          {t("recruiterApplications.detail.progressTitle")}
-        </h3>
-        {isTerminalNegative ? (
-          <span
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold",
-              STATUS_TONES[currentStatus]?.badge,
-            )}
-          >
-            <XCircle className="size-3.5" />
-            {t(`applications.status.${currentStatus}`)}
-          </span>
-        ) : null}
-      </div>
+      {LIFECYCLE_STAGES.map((stage, idx) => {
+        const isPassed = activeIndex !== -1 && idx < activeIndex;
+        const isCurrent = idx === activeIndex;
+        const isUpcoming = activeIndex === -1 || idx > activeIndex;
 
-      <div className="relative flex items-start justify-between">
-        {LIFECYCLE_STAGES.map((stage, idx) => {
-          const isPassed = activeIndex !== -1 && idx < activeIndex;
-          const isCurrent = idx === activeIndex;
-          const isUpcoming = activeIndex === -1 || idx > activeIndex;
+        const stageConfig = STAGE_CONFIGS[stage];
+        const rawDate = historyDates[stage];
+        const formattedDate = rawDate ? formatShortDate(rawDate, locale) : null;
 
-          const stageTone = STATUS_TONES[stage];
-          const rawDate = historyDates[stage];
-          const formattedDate = rawDate ? formatDate(rawDate, locale) : null;
+        const isLast = idx === LIFECYCLE_STAGES.length - 1;
+        const nextStage = !isLast ? LIFECYCLE_STAGES[idx + 1] : null;
+        const nextStageConfig = nextStage ? STAGE_CONFIGS[nextStage] : null;
 
-          return (
-            <div
-              className="relative z-10 flex flex-1 flex-col items-center text-center"
-              key={stage}
-            >
-              {/* Connecting line to next stage */}
-              {idx < LIFECYCLE_STAGES.length - 1 ? (
-                <div
-                  aria-hidden
-                  className={cn(
-                    "absolute top-3.5 left-[50%] -z-10 h-0.5 w-full -translate-y-1/2 transition-colors",
-                    isPassed
-                      ? "bg-primary"
-                      : isCurrent
-                        ? "bg-primary/40"
-                        : "bg-muted",
-                  )}
+        const isPassedLine = activeIndex !== -1 && idx < activeIndex;
+
+        return (
+          <React.Fragment key={stage}>
+            <div className="flex items-center gap-2.5 shrink-0">
+              {/* Stage indicator circle (24px / size-6) */}
+              {isPassed ? (
+                <span
+                  className="size-6 rounded-full flex items-center justify-center shrink-0 text-white"
+                  style={{ backgroundColor: stageConfig.color }}
+                >
+                  <Check className="size-3 stroke-[3]" />
+                </span>
+              ) : isCurrent ? (
+                <span
+                  className="size-6 rounded-full flex items-center justify-center shrink-0"
+                  style={{
+                    backgroundColor: stageConfig.color,
+                    boxShadow: `0 0 0 4px ${stageConfig.activeRing}`,
+                  }}
+                >
+                  <span className="size-2 rounded-full bg-white" />
+                </span>
+              ) : (
+                <span
+                  className="size-6 rounded-full shrink-0 border-2"
+                  style={{
+                    backgroundColor: stageConfig.upcomingBg,
+                    borderColor: stageConfig.upcomingBorder,
+                    opacity: 0.55,
+                  }}
                 />
-              ) : null}
+              )}
 
-              {/* Step indicator node */}
-              <div
-                className={cn(
-                  "grid size-7 place-items-center rounded-full text-xs font-bold transition-all",
-                  isPassed &&
-                    "bg-primary text-primary-foreground shadow-xs",
-                  isCurrent &&
-                    cn(
-                      "ring-4 bg-primary text-primary-foreground",
-                      stageTone.ring || "ring-primary/20",
-                    ),
-                  isUpcoming &&
-                    "border-2 border-border bg-card text-muted-foreground/60",
-                )}
-              >
-                {isPassed ? (
-                  <Check className="size-3.5 stroke-[3]" />
-                ) : isCurrent ? (
-                  <span className="size-2 rounded-full bg-primary-foreground" />
-                ) : (
-                  <span className="size-1.5 rounded-full bg-muted-foreground/40" />
-                )}
-              </div>
-
-              {/* Stage label and date */}
-              <div className="mt-2.5 flex flex-col items-center gap-0.5">
+              {/* Stage title and date text */}
+              <div className="flex flex-col gap-px">
                 <span
                   className={cn(
-                    "text-xs font-semibold tracking-tight",
-                    isCurrent
-                      ? cn("font-bold", stageTone.text)
-                      : isPassed
-                        ? "text-foreground"
-                        : "text-muted-foreground/70",
+                    "text-[13.5px] font-bold whitespace-nowrap",
+                    isUpcoming && "opacity-60",
                   )}
+                  style={{ color: stageConfig.titleColor }}
                 >
                   {t(`applications.status.${stage}`)}
                 </span>
                 {formattedDate ? (
-                  <span className="text-[11px] text-muted-foreground">
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
                     {isCurrent
                       ? t("recruiterApplications.detail.since", { date: formattedDate })
                       : formattedDate}
@@ -158,9 +223,26 @@ export function ApplicationProgressTimeline({
                 ) : null}
               </div>
             </div>
-          );
-        })}
-      </div>
-    </div>
+
+            {/* Connecting line to next stage */}
+            {!isLast && nextStageConfig ? (
+              <span
+                className={cn(
+                  "flex-grow h-0.5 mx-3 min-w-8",
+                  !isPassedLine && "bg-border",
+                )}
+                style={
+                  isPassedLine
+                    ? {
+                        background: `linear-gradient(90deg, ${stageConfig.color}, ${nextStageConfig.color})`,
+                      }
+                    : undefined
+                }
+              />
+            ) : null}
+          </React.Fragment>
+        );
+      })}
+    </section>
   );
 }

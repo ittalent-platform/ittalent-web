@@ -73,6 +73,6 @@ describe("ApplicationProgressTimeline", () => {
       />,
     );
 
-    expect(screen.getByText(/Oct 7, 2026/)).toBeInTheDocument();
+    expect(screen.getByText(/Oct 7/)).toBeInTheDocument();
   });
 });
