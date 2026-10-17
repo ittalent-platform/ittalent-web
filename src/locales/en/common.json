@@ -2524,6 +2524,91 @@
         }
       }
     }
+  },
+  "recruiterApplications": {
+    "title": "Applications",
+    "subtitle_one": "{{count}} application · your company",
+    "subtitle_other": "{{count}} applications · your company",
+    "searchPlaceholder": "Search candidate, email, skill...",
+    "filter": {
+      "status": "Status:",
+      "statusCaption": "Status",
+      "appliesRightAway": "Applies right away",
+      "selectAll": "Select all",
+      "inProgress": "In progress",
+      "closed": "Closed",
+      "all": "All",
+      "any": "Any",
+      "selected_one": "{{count}} selected",
+      "selected_other": "{{count}} selected",
+      "job": "Job:",
+      "allJobs": "All jobs",
+      "clearJob": "Clear job filter",
+      "clearFilters": "Clear filters",
+      "submitted": "Submitted:",
+      "document": "Documents:",
+      "anyDocument": "Any",
+      "from": "From",
+      "to": "To"
+    },
+    "document": {
+      "any": "Any",
+      "cv": "CV",
+      "cover_letter": "Cover letter"
+    },
+    "range": {
+      "any": "Any time",
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 90 days",
+      "custom": "Custom range"
+    },
+    "view": {
+      "table": "Table",
+      "board": "Board"
+    },
+    "columns": {
+      "candidate": "CANDIDATE",
+      "job": "JOB",
+      "submitted": "SUBMITTED",
+      "documents": "DOCUMENTS",
+      "nextInterview": "NEXT INTERVIEW",
+      "status": "STATUS",
+      "actions": "ACTIONS"
+    },
+    "candidate": {
+      "appliedAgain": "Applied again"
+    },
+    "interviewReply": {
+      "awaiting_reply": "Awaiting reply",
+      "accepted": "Accepted",
+      "new_time_requested": "New time requested",
+      "declined": "Declined"
+    },
+    "actions": {
+      "viewApplication": "View application",
+      "openCv": "Open CV",
+      "downloadCv": "Download CV",
+      "moveTo": "Move to {{stage}}",
+      "scheduleInterview": "Schedule interview"
+    },
+    "empty": {
+      "title": "No applications yet",
+      "description": "When candidates apply to your company's active job postings, their applications will appear here.",
+      "noMatchesTitle": "No matching applications",
+      "noMatchesDescription": "Try clearing search keywords or loosening the active filters."
+    },
+    "error": {
+      "title": "Could not load applications.",
+      "description": "Something went wrong while fetching applications. Please try again.",
+      "retry": "Retry"
+    },
+    "errors": {
+      "keywordTooLong": "Search must be {{max}} characters or less",
+      "keywordBlank": "Search cannot be empty",
+      "rangeContradictory": "From date must be earlier than or equal to to date",
+      "filterUnsupported": "Some applied filters are unrecognized"
+    }
   }
 }
 

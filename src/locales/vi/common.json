@@ -2500,6 +2500,91 @@
         }
       }
     }
+  },
+  "recruiterApplications": {
+    "title": "Hồ sơ ứng tuyển",
+    "subtitle_one": "{{count}} hồ sơ ứng tuyển · công ty của bạn",
+    "subtitle_other": "{{count}} hồ sơ ứng tuyển · công ty của bạn",
+    "searchPlaceholder": "Tìm ứng viên, email, kỹ năng...",
+    "filter": {
+      "status": "Trạng thái:",
+      "statusCaption": "Trạng thái",
+      "appliesRightAway": "Áp dụng ngay",
+      "selectAll": "Chọn tất cả",
+      "inProgress": "Đang xử lý",
+      "closed": "Đã đóng",
+      "all": "Tất cả",
+      "any": "Tất cả",
+      "selected_one": "Đã chọn {{count}}",
+      "selected_other": "Đã chọn {{count}}",
+      "job": "Tin tuyển dụng:",
+      "allJobs": "Tất cả tin",
+      "clearJob": "Xoá bộ lọc tin",
+      "clearFilters": "Xoá bộ lọc",
+      "submitted": "Ngày nộp:",
+      "document": "Tài liệu:",
+      "anyDocument": "Tất cả",
+      "from": "Từ ngày",
+      "to": "Đến ngày"
+    },
+    "document": {
+      "any": "Tất cả",
+      "cv": "CV",
+      "cover_letter": "Thư xin việc"
+    },
+    "range": {
+      "any": "Mọi lúc",
+      "7d": "7 ngày qua",
+      "30d": "30 ngày qua",
+      "90d": "90 ngày qua",
+      "custom": "Khoảng thời gian tuỳ chọn"
+    },
+    "view": {
+      "table": "Bảng",
+      "board": "Bảng Kanban"
+    },
+    "columns": {
+      "candidate": "ỨNG VIÊN",
+      "job": "VỊ TRÍ TUYỂN DỤNG",
+      "submitted": "NGÀY NỘP",
+      "documents": "TÀI LIỆU",
+      "nextInterview": "PHỎNG VẤN TIẾP THEO",
+      "status": "TRẠNG THÁI",
+      "actions": "THAO TÁC"
+    },
+    "candidate": {
+      "appliedAgain": "Ứng tuyển lại"
+    },
+    "interviewReply": {
+      "awaiting_reply": "Chờ phản hồi",
+      "accepted": "Đã đồng ý",
+      "new_time_requested": "Yêu cầu đổi giờ",
+      "declined": "Đã từ chối"
+    },
+    "actions": {
+      "viewApplication": "Xem hồ sơ ứng tuyển",
+      "openCv": "Mở CV",
+      "downloadCv": "Tải CV về",
+      "moveTo": "Chuyển sang {{stage}}",
+      "scheduleInterview": "Lên lịch phỏng vấn"
+    },
+    "empty": {
+      "title": "Chưa có hồ sơ ứng tuyển",
+      "description": "Khi ứng viên nộp hồ sơ vào các tin tuyển dụng đang mở của công ty, hồ sơ sẽ hiển thị ở đây.",
+      "noMatchesTitle": "Không tìm thấy hồ sơ phù hợp",
+      "noMatchesDescription": "Thử xoá từ khoá tìm kiếm hoặc mở rộng các bộ lọc đang chọn."
+    },
+    "error": {
+      "title": "Không thể tải danh sách hồ sơ ứng tuyển.",
+      "description": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại.",
+      "retry": "Thử lại"
+    },
+    "errors": {
+      "keywordTooLong": "Từ khoá tìm kiếm không được vượt quá {{max}} ký tự",
+      "keywordBlank": "Từ khoá tìm kiếm không được để trống",
+      "rangeContradictory": "Ngày bắt đầu phải trước hoặc cùng ngày với ngày kết thúc",
+      "filterUnsupported": "Một số bộ lọc không hợp lệ"
+    }
   }
 }
 
