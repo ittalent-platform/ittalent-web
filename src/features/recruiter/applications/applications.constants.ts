@@ -49,6 +49,20 @@ export const CLOSED_STATUSES = [
   "position_filled",
 ] as const satisfies readonly ApplicationStatus[];
 
+export const UPDATABLE_STATUSES = [
+  "under_review",
+  "interviewing",
+  "offered",
+  "hired",
+  "rejected",
+] as const satisfies readonly ApplicationStatus[];
+
+export type UpdatableStatus = (typeof UPDATABLE_STATUSES)[number];
+
+export function isUpdatableStatus(status: ApplicationStatus): status is UpdatableStatus {
+  return (UPDATABLE_STATUSES as readonly string[]).includes(status);
+}
+
 export const REVIEW_STAGES = [
   "screening",
   "interview",
