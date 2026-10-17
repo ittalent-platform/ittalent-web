@@ -2654,7 +2654,29 @@
       "loading": "Đang tải chi tiết hồ sơ...",
       "notFoundTitle": "Không tìm thấy hồ sơ ứng tuyển",
       "notFoundDescription": "Hồ sơ này có thể đã bị gỡ hoặc bạn không có quyền truy cập.",
-      "backToApplications": "Quay lại danh sách hồ sơ"
+      "backToApplications": "Quay lại danh sách hồ sơ",
+      "internalNotesTitle": "GHI CHÚ NỘI BỘ",
+      "addNotePlaceholder": "Thêm ghi chú cho đội ngũ...",
+      "addNote": "Thêm",
+      "addingNote": "Đang thêm...",
+      "noNotes": "Chưa có ghi chú nội bộ nào.",
+      "noteAddedSuccess": "Đã thêm ghi chú thành công.",
+      "noteValidationEmpty": "Nội dung ghi chú không được để trống."
+    },
+    "historyDialog": {
+      "title": "Lịch sử",
+      "tabThisApplication": "Hồ sơ này",
+      "tabAtCompany": "Tại {{company}} · {{count}}",
+      "tabAtCompanyDefault": "Lịch sử tại công ty · {{count}}",
+      "messageToCandidate": "Lời nhắn cho ứng viên: “{{message}}”",
+      "reviewerNote": "Ghi chú: “{{note}}”",
+      "rejectionReason": "Lý do: “{{reason}}”",
+      "byActor": "bởi {{actor}}",
+      "byCandidate": "bởi ứng viên",
+      "footnote": "Thời gian theo giờ ICT (UTC+7). Lịch sử chỉ ghi nối tiếp. Ghi chú nội bộ và nhật ký mở tài liệu không bao giờ hiển thị cho ứng viên.",
+      "noTimeline": "Chưa có lịch sử nào được ghi nhận.",
+      "noOtherApplications": "Chưa có hồ sơ ứng tuyển nào trước đây tại doanh nghiệp.",
+      "firstTimeApplicant": "Ứng tuyển lần đầu tại {{company}}."
     }
   }
 }
