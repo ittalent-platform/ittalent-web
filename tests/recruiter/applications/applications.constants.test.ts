@@ -5,9 +5,11 @@ import {
   CLOSED_STATUSES,
   IN_PROGRESS_STATUSES,
   INTERVIEW_REPLY_TONES,
+  KANBAN_COLUMNS,
   PERMITTED_TRANSITIONS,
   STATUS_TONES,
   TIMELINE_TONES,
+  isKanbanDraggable,
   isTransitionPermitted,
   type ApplicationStatus,
   type InterviewReplyState,
@@ -141,5 +143,27 @@ describe("recruiterApplicationKeys query key factory", () => {
       "app-101",
       "company-history",
     ]);
+  });
+
+  it("configures 7 kanban lifecycle columns and drag-eligibility", () => {
+    expect(KANBAN_COLUMNS).toEqual([
+      "submitted",
+      "under_review",
+      "interviewing",
+      "offered",
+      "hired",
+      "rejected",
+      "withdrawn",
+    ]);
+
+    expect(isKanbanDraggable("submitted")).toBe(true);
+    expect(isKanbanDraggable("under_review")).toBe(true);
+    expect(isKanbanDraggable("interviewing")).toBe(true);
+    expect(isKanbanDraggable("offered")).toBe(true);
+
+    expect(isKanbanDraggable("hired")).toBe(false);
+    expect(isKanbanDraggable("rejected")).toBe(false);
+    expect(isKanbanDraggable("withdrawn")).toBe(false);
+    expect(isKanbanDraggable("position_filled")).toBe(false);
   });
 });
