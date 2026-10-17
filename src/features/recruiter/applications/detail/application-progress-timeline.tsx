@@ -13,6 +13,7 @@ export interface StatusHistoryItem {
   reviewStage?: string | null;
   actorRole?: string | null;
   note?: string | null;
+  occurredAt?: string | null;
   timestamp?: string | null;
 }
 
@@ -46,8 +47,9 @@ export function ApplicationProgressTimeline({
 
   // Map each status to the latest timestamp recorded in history
   const historyDates = statusHistory.reduce<Record<string, string>>((acc, item) => {
-    if (item.timestamp && !acc[item.status]) {
-      acc[item.status] = item.timestamp;
+    const ts = item.occurredAt || item.timestamp;
+    if (ts && !acc[item.status]) {
+      acc[item.status] = ts;
     }
     return acc;
   }, {});
