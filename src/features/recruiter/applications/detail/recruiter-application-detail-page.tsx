@@ -9,7 +9,7 @@ import {
   ExternalLink,
   FileText,
   Inbox,
-  MoreHorizontal,
+  MoreVertical,
   XCircle,
 } from "lucide-react";
 
@@ -271,7 +271,7 @@ export function RecruiterApplicationDetailPage() {
                 size="icon"
                 variant="outline"
               >
-                <MoreHorizontal className="size-4" />
+                <MoreVertical className="size-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 rounded-xl py-1">
