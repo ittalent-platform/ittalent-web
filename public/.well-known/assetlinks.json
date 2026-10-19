@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.ittalent_mobile",
+      "sha256_cert_fingerprints": [
+        "32:29:1B:D9:E0:35:49:03:F9:4E:10:34:83:E0:BA:9A:EA:F0:02:38:8C:E2:15:F3:6C:89:09:1C:C0:AA:F9:3B"
+      ]
+    }
+  }
+]
