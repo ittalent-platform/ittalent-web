@@ -986,7 +986,36 @@
       "noResultsTitle": "Không có kết quả cho “{{query}}”",
       "noResultsDescription": "Không có tin tuyển dụng nào khớp với từ khóa này. Kiểm tra lại chính tả hoặc thử tiêu đề, nội dung hoặc địa điểm khác."
     },
-    "notSpecified": "Không chỉ định"
+    "notSpecified": "Không chỉ định",
+    "enterpriseAdmin": {
+      "subtitle_other": "{{count}} tin tuyển dụng tại {{company}} · mới tạo gần nhất trước",
+      "subtitleEmpty": "{{company}} chưa có tin tuyển dụng nào",
+      "subtitleFiltered_other": "{{count}} tin tuyển dụng phù hợp",
+      "emptyDescription": "Khi bộ phận HR tạo tin tuyển dụng, tin sẽ xuất hiện tại đây.",
+      "published": "Ngày đăng",
+      "notPublished": "Chưa đăng",
+      "metaUpdated": "Cập nhật {{date}}",
+      "metaClosed": "Đóng {{date}}",
+      "metaArchived": "Lưu trữ {{date}}",
+      "refresh": "Làm mới",
+      "refreshedTitle": "Đã làm mới tin tuyển dụng",
+      "refreshedMessage": "Bạn đang xem phiên bản mới nhất.",
+      "acceptingApplications": "Đang nhận hồ sơ",
+      "visibleToCandidates": "Ứng viên nhìn thấy",
+      "yes": "Có",
+      "no": "Không",
+      "activity": "Hoạt động",
+      "firstPublished": "Đăng lần đầu",
+      "lastChange": "Thay đổi gần nhất",
+      "notRecorded": "Chưa ghi nhận",
+      "viewHistory": "Xem lịch sử",
+      "notices": {
+        "draft": "Bản nháp. Chỉ thành viên của {{company}} mới xem được tin này.",
+        "closed": "Đã đóng. Ứng viên không thể xem hoặc ứng tuyển vào tin này. Việc xem tin không mở lại tin.",
+        "archived": "Đã lưu trữ. Tin được giữ lại để tra cứu và ẩn với ứng viên. Việc xem tin không bỏ lưu trữ.",
+        "deadlinePassed": "Hạn nộp hồ sơ đã qua vào {{date}}. Bộ phận HR có thể đóng hoặc cập nhật tin này."
+      }
+    }
   },
   "adminLayout": {
     "openMenu": "Mở menu",
@@ -2680,4 +2709,3 @@
     }
   }
 }
-

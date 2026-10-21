@@ -2,10 +2,12 @@ import { useSession } from "@/auth/use-session";
 import { JobPostingDetailPage } from "@/features/job-postings/job-posting-detail-page";
 import { JobPostingCreatePage, JobPostingEditPage } from "@/features/job-postings/job-posting-editor-pages";
 import { JobPostingListPage } from "@/features/job-postings/job-posting-list-page";
+import { JobPostingReadOnlyDetailPage } from "@/features/job-postings/job-posting-read-only-detail-page";
+import { JobPostingReadOnlyListPage } from "@/features/job-postings/job-posting-read-only-list-page";
 
-// Enterprise administrators share the recruiter screens but only read them (UC-JOB-04 / UC-S2-JOB-04, Ent Admin variant).
-function useIsEnterpriseAdmin() {
-  return useSession().data?.user.role === "enterprise_admin";
+// Enterprise administrators only read their company's job postings (UC-JOB-04 / UC-S2-JOB-04, Ent Admin variant).
+function useSessionUser() {
+  return useSession().data?.user;
 }
 
 export function RecruiterCreateJobPostingPage() {
@@ -17,9 +19,18 @@ export function RecruiterEditJobPostingPage() {
 }
 
 export function RecruiterJobPostingDetailPage() {
-  return <JobPostingDetailPage actor="recruiter" readOnly={useIsEnterpriseAdmin()} />;
+  return useSessionUser()?.role === "enterprise_admin" ? (
+    <JobPostingReadOnlyDetailPage />
+  ) : (
+    <JobPostingDetailPage actor="recruiter" />
+  );
 }
 
 export function RecruiterJobPostingsPage() {
-  return <JobPostingListPage actor="recruiter" readOnly={useIsEnterpriseAdmin()} />;
+  const user = useSessionUser();
+  return user?.role === "enterprise_admin" ? (
+    <JobPostingReadOnlyListPage companyName={user.enterpriseName} />
+  ) : (
+    <JobPostingListPage actor="recruiter" />
+  );
 }

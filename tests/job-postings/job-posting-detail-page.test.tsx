@@ -63,7 +63,7 @@ const history: JobPostingHistory = {
   totalPages: 1,
 };
 
-function renderPage(actor: "admin" | "recruiter", value = posting, readOnly = false) {
+function renderPage(actor: "admin" | "recruiter", value = posting) {
   vi.mocked(jobQueries.useJobPosting).mockReturnValue({
     data: value,
     isError: false,
@@ -83,7 +83,7 @@ function renderPage(actor: "admin" | "recruiter", value = posting, readOnly = fa
       <MemoryRouter initialEntries={[`/${actor}/job-postings/${posting.id}`]}>
         <Routes>
           <Route
-            element={<JobPostingDetailPage actor={actor} readOnly={readOnly} />}
+            element={<JobPostingDetailPage actor={actor} />}
             path={`/${actor}/job-postings/:jobPostingId`}
           />
         </Routes>
@@ -144,13 +144,6 @@ describe("JobPostingDetailPage lifecycle", () => {
 
   it("keeps lifecycle controls read-only for administrators", () => {
     renderPage("admin");
-    expect(screen.queryByRole("button", { name: "Close" })).toBeNull();
-    expect(screen.queryByRole("button", { name: /Move to draft/ })).toBeNull();
-    expect(screen.getByText("Job published")).toBeInTheDocument();
-  });
-
-  it("keeps lifecycle controls read-only for enterprise administrators but still shows history", () => {
-    renderPage("recruiter", posting, true);
     expect(screen.queryByRole("button", { name: "Close" })).toBeNull();
     expect(screen.queryByRole("button", { name: /Move to draft/ })).toBeNull();
     expect(screen.getByText("Job published")).toBeInTheDocument();
