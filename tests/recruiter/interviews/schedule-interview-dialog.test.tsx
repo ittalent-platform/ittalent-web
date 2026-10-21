@@ -3,7 +3,17 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ScheduleInterviewDialog } from "@/features/recruiter/interviews/schedule-interview-dialog";
+import { ictDayKey, MS_PER_DAY } from "@/lib/format";
 import * as interviewQueries from "@/features/recruiter/interviews/interviews.queries";
+
+/** The pinned "now" (10:00 in Vietnam); every date below is derived from it, so the suite never rots. */
+const NOW = new Date("2026-10-08T03:00:00.000Z");
+const daysFromNow = (days: number) => new Date(NOW.getTime() + days * MS_PER_DAY);
+const TODAY = ictDayKey(NOW);
+const DAY = ictDayKey(daysFromNow(12)); // the day the fixtures schedule on, "YYYY-MM-DD"
+const DAY_DISPLAY = DAY.split("-").reverse().join("/");
+const DAY_LABEL = `${new Intl.DateTimeFormat("en-US", { timeZone: "UTC", weekday: "short" }).format(new Date(`${DAY}T00:00:00Z`))}, ${Number(DAY.slice(8))} ${new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" }).format(new Date(`${DAY}T00:00:00Z`))}`;
+const ictIso = (day: string, time: string) => new Date(`${day}T${time}:00+07:00`).toISOString();
 
 const showToast = vi.hoisted(() => vi.fn());
 vi.mock("@/components/toast/toast-provider", () => ({ useToast: () => ({ dismissToast: vi.fn(), showToast }) }));
@@ -15,8 +25,8 @@ vi.mock("@/features/recruiter/interviews/interviews.queries", () => ({
 }));
 
 const applications = [
-  { appliedAt: "2026-10-01T02:00:00.000Z", applicant: { email: "bao.ha@gmail.com", fullName: "Hà Quốc Bảo", id: "a1" }, id: "app1", job: { id: "j1", title: "Backend Developer (Go)" }, status: "under_review" },
-  { appliedAt: "2026-10-02T02:00:00.000Z", applicant: { email: "long.t@gmail.com", fullName: "Trịnh Văn Long", id: "a2" }, id: "app2", job: { id: "j2", title: "DevOps Engineer" }, status: "submitted" },
+  { appliedAt: daysFromNow(-7).toISOString(), applicant: { email: "bao.ha@gmail.com", fullName: "Hà Quốc Bảo", id: "a1" }, id: "app1", job: { id: "j1", title: "Backend Developer (Go)" }, status: "under_review" },
+  { appliedAt: daysFromNow(-6).toISOString(), applicant: { email: "long.t@gmail.com", fullName: "Trịnh Văn Long", id: "a2" }, id: "app2", job: { id: "j2", title: "DevOps Engineer" }, status: "submitted" },
 ];
 const recruiters = [
   { email: "nam.bui@novafintech.vn", fullName: "Nam Bùi", id: "u-nam" },
@@ -64,6 +74,7 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
 
 describe("Schedule interview dialog", () => {
   beforeEach(() => {
+    vi.useFakeTimers({ now: NOW, toFake: ["Date"] });
     showToast.mockReset();
     onClose.mockReset();
     mutate = vi.fn<Mutate>();
@@ -86,8 +97,8 @@ describe("Schedule interview dialog", () => {
   });
 
   it("starts on the day chosen in the calendar", () => {
-    renderDialog("2026-10-20");
-    expect(within(dialog()).getByText("20/10/2026")).toBeInTheDocument();
+    renderDialog(DAY);
+    expect(within(dialog()).getByText(DAY_DISPLAY)).toBeInTheDocument();
   });
 
   it("sends nothing and says what is missing when submitted empty", async () => {
@@ -112,14 +123,14 @@ describe("Schedule interview dialog", () => {
   });
 
   it("says how long the interview runs once the date and the time are there", async () => {
-    renderDialog("2026-10-20");
+    renderDialog(DAY);
     fireEvent.change(screen.getByLabelText(/Start time/), { target: { value: "10:00" } });
-    expect(await screen.findByText("Runs Tue, 20 Oct · 10:00 – 11:00")).toBeInTheDocument();
+    expect(await screen.findByText(`Runs ${DAY_LABEL} · 10:00 – 11:00`)).toBeInTheDocument();
   });
 
   it("schedules an online interview in Vietnam time, then says so and closes", async () => {
     mutate.mockImplementation((_body, options) => options.onSuccess());
-    const user = renderDialog("2026-10-20");
+    const user = renderDialog(DAY);
     await fillValid(user);
     await user.click(screen.getByRole("button", { name: "Create schedule" }));
 
@@ -130,14 +141,14 @@ describe("Schedule interview dialog", () => {
       interviewerIds: ["u-nam"],
       meetingLink: "https://meet.google.com/kqr-pmzt-bvx",
       mode: "online",
-      scheduledAt: "2026-10-20T03:00:00.000Z",
+      scheduledAt: ictIso(DAY, "10:00"),
     });
     expect(showToast).toHaveBeenCalledWith({ message: "The interview has been added to the schedule.", title: "Interview scheduled", tone: "success" });
     expect(onClose).toHaveBeenCalled();
   });
 
   it("schedules an onsite interview when only a location is given", async () => {
-    const user = renderDialog("2026-10-20");
+    const user = renderDialog(DAY);
     await chooseApplication(user);
     fireEvent.change(screen.getByLabelText(/Start time/), { target: { value: "14:30" } });
     await addInterviewer(user);
@@ -145,12 +156,12 @@ describe("Schedule interview dialog", () => {
     await user.click(screen.getByRole("button", { name: "Create schedule" }));
 
     await waitFor(() => expect(mutate).toHaveBeenCalled());
-    expect(mutate.mock.calls[0]![0]).toMatchObject({ location: "12 Tôn Đản, Quận 4", mode: "onsite", scheduledAt: "2026-10-20T07:30:00.000Z" });
+    expect(mutate.mock.calls[0]![0]).toMatchObject({ location: "12 Tôn Đản, Quận 4", mode: "onsite", scheduledAt: ictIso(DAY, "14:30") });
     expect(mutate.mock.calls[0]![0]).not.toHaveProperty("meetingLink");
   });
 
   it("refuses a link that is not https", async () => {
-    const user = renderDialog("2026-10-20");
+    const user = renderDialog(DAY);
     await fillValid(user);
     await user.clear(screen.getByLabelText("Meeting link"));
     await user.type(screen.getByLabelText("Meeting link"), "http://meet.example.com/x");
@@ -160,8 +171,7 @@ describe("Schedule interview dialog", () => {
   });
 
   it("refuses a time that has already passed today, in Vietnam time", async () => {
-    vi.useFakeTimers({ now: new Date("2026-10-08T03:00:00.000Z"), toFake: ["Date"] }); // 10:00 in Vietnam
-    const user = renderDialog("2026-10-08");
+    const user = renderDialog(TODAY);
     await chooseApplication(user);
     fireEvent.change(screen.getByLabelText(/Start time/), { target: { value: "09:00" } });
     await addInterviewer(user);
@@ -209,7 +219,7 @@ describe("Schedule interview dialog", () => {
   describe("when the API refuses", () => {
     async function submitWith(error: unknown) {
       mutate.mockImplementation((_body, options) => options.onError(error));
-      const user = renderDialog("2026-10-20");
+      const user = renderDialog(DAY);
       await fillValid(user);
       await user.click(screen.getByRole("button", { name: "Create schedule" }));
     }
@@ -283,7 +293,7 @@ describe("Schedule interview dialog", () => {
     });
 
     it("counts a day chosen in the calendar as nothing entered", async () => {
-      const user = renderDialog("2026-10-20");
+      const user = renderDialog(DAY);
       await user.click(screen.getByRole("button", { name: "Cancel" }));
       expect(onClose).toHaveBeenCalled();
     });
