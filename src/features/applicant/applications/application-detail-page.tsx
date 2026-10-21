@@ -151,7 +151,7 @@ export function ApplicationDetailPage() {
             ) : null}
             {application.canWithdraw ? (
               <div className="flex flex-col gap-2 border-t border-line-muted pt-3">
-                <Button className="h-10 px-[18px] text-sm font-semibold" onClick={() => setWithdrawOpen(true)} shape="pill" variant="destructive-outline">{t("applications.withdraw")}</Button>
+                <Button className="h-10 border-destructive bg-destructive/5 px-[18px] text-sm font-semibold hover:bg-destructive/10" onClick={() => setWithdrawOpen(true)} shape="pill" variant="destructive-outline">{t("applications.withdraw")}</Button>
                 <span className="text-xs leading-normal text-slate-subtle">{t("applications.withdrawRule")}</span>
               </div>
             ) : null}
