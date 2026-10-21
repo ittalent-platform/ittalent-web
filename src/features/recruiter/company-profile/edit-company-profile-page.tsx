@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,6 +32,7 @@ import {
 } from "./company-profile.types";
 
 export function RecruiterEditCompanyProfilePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState(false);
@@ -65,7 +67,7 @@ export function RecruiterEditCompanyProfilePage() {
       social_facebook: "",
       social_github: "",
       social_twitter: "",
-      working_days: "Monday – Friday",
+      working_days: t("recruiterCompanyProfile.page.workingDaysDefault"),
     },
   });
 
@@ -93,10 +95,16 @@ export function RecruiterEditCompanyProfilePage() {
         social_facebook: "",
         social_github: "",
         social_twitter: "",
-        working_days: "Monday – Friday",
+        working_days: t("recruiterCompanyProfile.page.workingDaysDefault"),
       });
     }
-  }, [enterprise, reset]);
+  }, [enterprise, reset, t]);
+
+  const translateOptions = (options: { labelKey: string; value: string }[]) =>
+    options.map(({ labelKey, value }) => ({ label: t(labelKey), value }));
+  const industryOptions = translateOptions(INDUSTRY_OPTIONS);
+  const sizeOptions = translateOptions(COMPANY_SIZE_OPTIONS);
+  const typeOptions = translateOptions(COMPANY_TYPE_OPTIONS);
 
   if (isLoading) {
     return (
@@ -110,7 +118,7 @@ export function RecruiterEditCompanyProfilePage() {
   if (!enterprise) {
     return (
       <div className="p-8 text-center text-muted-foreground">
-        No enterprise profile found to edit.
+        {t("recruiterCompanyProfile.edit.notFound")}
       </div>
     );
   }
@@ -166,7 +174,7 @@ export function RecruiterEditCompanyProfilePage() {
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
       setErrorMessage(
-        errorObj.message ?? "Failed to save company profile changes.",
+        errorObj.message ?? t("recruiterCompanyProfile.edit.saveFailed"),
       );
     }
   };
@@ -179,21 +187,20 @@ export function RecruiterEditCompanyProfilePage() {
           to={RECRUITER_COMPANY_PROFILE_PATH}
           className="hover:text-foreground"
         >
-          Company profile
+          {t("sidebar.companyProfile")}
         </Link>
         <span>/</span>
-        <span className="text-foreground">Edit</span>
+        <span className="text-foreground">{t("actions.edit")}</span>
       </nav>
 
       {/* Header */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Edit company profile
+            {t("recruiterCompanyProfile.edit.title")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Changes go live on your public page as soon as you save. Fields
-            marked with * are required.
+            {t("recruiterCompanyProfile.edit.subtitle")}
           </p>
         </div>
 
@@ -205,7 +212,7 @@ export function RecruiterEditCompanyProfilePage() {
         >
           <Link to={RECRUITER_COMPANY_PROFILE_PATH}>
             <ArrowLeft className="size-4" />
-            Back to profile
+            {t("recruiterCompanyProfile.edit.back")}
           </Link>
         </Button>
       </div>
@@ -214,12 +221,9 @@ export function RecruiterEditCompanyProfilePage() {
       <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-800 dark:text-amber-300">
         <ShieldAlert className="size-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
         <div className="space-y-0.5">
-          <p className="font-semibold">Legal identity protection</p>
+          <p className="font-semibold">{t("recruiterCompanyProfile.edit.legalBannerTitle")}</p>
           <p className="leading-relaxed">
-            Legal name, tax code, registration number, founded year and status
-            are officially verified and locked. To modify these legal
-            credentials, please request verification correction with ITTalent
-            admin.
+            {t("recruiterCompanyProfile.edit.legalBannerBody")}
           </p>
         </div>
       </div>
@@ -233,7 +237,7 @@ export function RecruiterEditCompanyProfilePage() {
       {successToast ? (
         <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm font-medium text-emerald-700 dark:text-emerald-300">
           <CheckCircle2 className="size-5" />
-          <span>Profile changes saved successfully! Redirecting...</span>
+          <span>{t("recruiterCompanyProfile.edit.saved")}</span>
         </div>
       ) : null}
 
@@ -242,21 +246,20 @@ export function RecruiterEditCompanyProfilePage() {
         <Card className="shadow-xs">
           <CardHeader>
             <CardTitle className="text-base font-semibold">
-              1. Identity & Branding
+              {t("recruiterCompanyProfile.edit.identityTitle")}
             </CardTitle>
             <CardDescription className="text-xs">
-              Display name is what candidates and talent see across the
-              marketplace.
+              {t("recruiterCompanyProfile.edit.identityDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="space-y-1.5">
               <Label htmlFor="company-name" className="text-sm font-medium">
-                Display name <span className="text-rose-500">*</span>
+                {t("recruiterEmployees.form.displayName")} <span className="text-rose-500">*</span>
               </Label>
               <Input
                 id="company-name"
-                placeholder="e.g. Nova Fintech"
+                placeholder={t("recruiterCompanyProfile.edit.nameExample")}
                 {...register("name")}
                 aria-invalid={Boolean(errors.name)}
               />
@@ -264,7 +267,7 @@ export function RecruiterEditCompanyProfilePage() {
                 <p className="text-xs text-rose-500">{errors.name.message}</p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  Shown on your public page · 2–150 characters
+                  {t("recruiterCompanyProfile.edit.nameHint")}
                 </p>
               )}
             </div>
@@ -274,7 +277,7 @@ export function RecruiterEditCompanyProfilePage() {
               <div className="space-y-1">
                 <span className="flex items-center gap-1.5 text-muted-foreground">
                   <Lock className="size-3" />
-                  Legal company name
+                  {t("recruiterCompanyProfile.edit.legalCompanyName")}
                 </span>
                 <p className="font-medium text-foreground">
                   {(enterprise as unknown as { legal_name?: string })
@@ -285,7 +288,7 @@ export function RecruiterEditCompanyProfilePage() {
               <div className="space-y-1">
                 <span className="flex items-center gap-1.5 text-muted-foreground">
                   <Lock className="size-3" />
-                  Tax identification code
+                  {t("recruiterCompanyProfile.page.taxCode")}
                 </span>
                 <p className="font-mono font-medium text-foreground">
                   {enterprise.taxCode || "0312 345 678"}
@@ -295,20 +298,20 @@ export function RecruiterEditCompanyProfilePage() {
               <div className="space-y-1">
                 <span className="flex items-center gap-1.5 text-muted-foreground">
                   <Lock className="size-3" />
-                  Registration number
+                  {t("recruiterCompanyProfile.page.registrationNumber")}
                 </span>
                 <p className="font-medium text-foreground">
-                  Provided during verification
+                  {t("recruiterCompanyProfile.edit.registrationProvided")}
                 </p>
               </div>
 
               <div className="space-y-1">
                 <span className="flex items-center gap-1.5 text-muted-foreground">
                   <Lock className="size-3" />
-                  Verification status
+                  {t("recruiterCompanyProfile.edit.verificationStatus")}
                 </span>
                 <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
-                  <CheckCircle2 className="size-3" /> Verified Active
+                  <CheckCircle2 className="size-3" /> {t("recruiterCompanyProfile.edit.verifiedActive")}
                 </span>
               </div>
             </div>
@@ -319,18 +322,17 @@ export function RecruiterEditCompanyProfilePage() {
         <Card className="shadow-xs">
           <CardHeader>
             <CardTitle className="text-base font-semibold">
-              2. Contact Information
+              {t("recruiterCompanyProfile.edit.contactTitle")}
             </CardTitle>
             <CardDescription className="text-xs">
-              Primary official channels for candidate communication and
-              notification.
+              {t("recruiterCompanyProfile.edit.contactDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="company-email" className="text-sm font-medium">
-                  Corporate email <span className="text-rose-500">*</span>
+                  {t("adminEnterprises.detail.email")} <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   id="company-email"
@@ -348,7 +350,7 @@ export function RecruiterEditCompanyProfilePage() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="company-phone" className="text-sm font-medium">
-                  Phone number <span className="text-rose-500">*</span>
+                  {t("recruiterCompanyProfile.edit.phoneNumber")} <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   id="company-phone"
@@ -366,7 +368,7 @@ export function RecruiterEditCompanyProfilePage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="company-website" className="text-sm font-medium">
-                Official website
+                {t("recruiterCompanyProfile.edit.officialWebsite")}
               </Label>
               <Input
                 id="company-website"
@@ -387,58 +389,57 @@ export function RecruiterEditCompanyProfilePage() {
         <Card className="shadow-xs">
           <CardHeader>
             <CardTitle className="text-base font-semibold">
-              3. Business Details
+              {t("recruiterCompanyProfile.edit.businessTitle")}
             </CardTitle>
             <CardDescription className="text-xs">
-              Used for search filters and talent recommendations on ITTalent
-              marketplace.
+              {t("recruiterCompanyProfile.edit.businessDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium">
-                  Industry <span className="text-rose-500">*</span>
+                  {t("adminEnterprises.detail.industry")} <span className="text-rose-500">*</span>
                 </Label>
                 <FilterSelect
                   value={selectedIndustry || "Information Technology"}
                   onChange={(val: string) =>
                     setValue("industry", val, { shouldDirty: true })
                   }
-                  options={INDUSTRY_OPTIONS}
+                  options={industryOptions}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium">Company size</Label>
+                <Label className="text-sm font-medium">{t("adminEnterprises.detail.companySize")}</Label>
                 <FilterSelect
                   value={selectedSize || "201-500"}
                   onChange={(val: string) =>
                     setValue("company_size", val, { shouldDirty: true })
                   }
-                  options={COMPANY_SIZE_OPTIONS}
+                  options={sizeOptions}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-sm font-medium">Company model</Label>
+                <Label className="text-sm font-medium">{t("recruiterCompanyProfile.edit.companyModel")}</Label>
                 <FilterSelect
                   value={selectedType || "Product"}
                   onChange={(val: string) =>
                     setValue("company_type", val, { shouldDirty: true })
                   }
-                  options={COMPANY_TYPE_OPTIONS}
+                  options={typeOptions}
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="working-days" className="text-sm font-medium">
-                Working days
+                {t("recruiterCompanyProfile.edit.workingDays")}
               </Label>
               <Input
                 id="working-days"
-                placeholder="e.g. Monday – Friday (hybrid schedule)"
+                placeholder={t("recruiterCompanyProfile.edit.workingDaysExample")}
                 {...register("working_days")}
               />
             </div>
@@ -449,22 +450,21 @@ export function RecruiterEditCompanyProfilePage() {
         <Card className="shadow-xs">
           <CardHeader>
             <CardTitle className="text-base font-semibold">
-              4. Public Description & About
+              {t("recruiterCompanyProfile.edit.publicTitle")}
             </CardTitle>
             <CardDescription className="text-xs">
-              Introduce your company mission, team culture, and values to
-              attract top candidates.
+              {t("recruiterCompanyProfile.edit.publicDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="space-y-1.5">
               <Label htmlFor="company-desc" className="text-sm font-medium">
-                About description
+                {t("recruiterCompanyProfile.edit.aboutLabel")}
               </Label>
               <Textarea
                 id="company-desc"
                 rows={5}
-                placeholder="Tell candidates what makes your company a great place to work..."
+                placeholder={t("recruiterCompanyProfile.edit.aboutPlaceholder")}
                 {...register("description")}
                 aria-invalid={Boolean(errors.description)}
               />
@@ -481,21 +481,20 @@ export function RecruiterEditCompanyProfilePage() {
         <Card className="shadow-xs">
           <CardHeader>
             <CardTitle className="text-base font-semibold">
-              5. Headquarters Address
+              {t("recruiterCompanyProfile.edit.addressTitle")}
             </CardTitle>
             <CardDescription className="text-xs">
-              Physical office location displayed on your public profile and job
-              postings.
+              {t("recruiterCompanyProfile.edit.addressDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="space-y-1.5">
               <Label htmlFor="addr-street" className="text-sm font-medium">
-                Street address
+                {t("recruiterCompanyProfile.edit.street")}
               </Label>
               <Input
                 id="addr-street"
-                placeholder="e.g. 12 Tôn Đản, Phường 13, Quận 4"
+                placeholder={t("recruiterCompanyProfile.edit.streetExample")}
                 {...register("street")}
               />
             </div>
@@ -503,18 +502,18 @@ export function RecruiterEditCompanyProfilePage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="addr-city" className="text-sm font-medium">
-                  City / Province
+                  {t("recruiterCompanyProfile.edit.city")}
                 </Label>
                 <Input
                   id="addr-city"
-                  placeholder="e.g. Hồ Chí Minh"
+                  placeholder={t("recruiterCompanyProfile.edit.cityExample")}
                   {...register("city")}
                 />
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="addr-country" className="text-sm font-medium">
-                  Country
+                  {t("adminEnterprises.form.countryLabel")}
                 </Label>
                 <Input
                   id="addr-country"
@@ -533,7 +532,7 @@ export function RecruiterEditCompanyProfilePage() {
             variant="outline"
             onClick={() => navigate(RECRUITER_COMPANY_PROFILE_PATH)}
           >
-            Cancel
+            {t("actions.cancel")}
           </Button>
           <Button
             type="submit"
@@ -543,8 +542,8 @@ export function RecruiterEditCompanyProfilePage() {
             <Save className="size-4" />
             <span>
               {isSubmitting || updateMutation.isPending
-                ? "Saving..."
-                : "Save changes"}
+                ? t("state.saving")
+                : t("adminUsers.form.save")}
             </span>
           </Button>
         </div>

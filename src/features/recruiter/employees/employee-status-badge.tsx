@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +12,7 @@ export function EmployeeStatusBadge({
   status,
   className,
 }: EmployeeStatusBadgeProps) {
+  const { t } = useTranslation();
   const normalized = status.toLowerCase();
 
   switch (normalized) {
@@ -22,7 +25,7 @@ export function EmployeeStatusBadge({
           )}
         >
           <span className="size-1.5 rounded-full bg-emerald-500" />
-          Active
+          {t("adminUsers.status.active")}
         </Badge>
       );
     case "pending":
@@ -37,7 +40,7 @@ export function EmployeeStatusBadge({
           )}
         >
           <span className="size-1.5 rounded-full bg-amber-500" />
-          Invitation pending
+          {t("adminUsers.invitation.pending")}
         </Badge>
       );
     case "suspended":
@@ -50,7 +53,7 @@ export function EmployeeStatusBadge({
           )}
         >
           <span className="size-1.5 rounded-full bg-rose-500" />
-          Suspended
+          {t("adminUsers.status.suspended")}
         </Badge>
       );
     case "revoked":
@@ -62,7 +65,7 @@ export function EmployeeStatusBadge({
           )}
         >
           <span className="size-1.5 rounded-full bg-zinc-400" />
-          Revoked
+          {t("recruiterEmployees.status.revoked")}
         </Badge>
       );
     default:

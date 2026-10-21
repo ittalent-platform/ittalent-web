@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Image as ImageIcon, Trash2 } from "lucide-react";
 
 import {
@@ -26,6 +27,7 @@ export function ChangeCoverDialog({
   onOpenChange,
   enterprise,
 }: ChangeCoverDialogProps) {
+  const { t } = useTranslation();
   const [coverUrl, setCoverUrl] = useState(enterprise?.coverUrl ?? "");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -40,9 +42,7 @@ export function ChangeCoverDialog({
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      setErrorMessage(
-        "Cover image exceeds 10MB limit. Please choose a smaller file.",
-      );
+      setErrorMessage(t("recruiterCompanyProfile.cover.tooLarge"));
       return;
     }
 
@@ -64,7 +64,7 @@ export function ChangeCoverDialog({
       onOpenChange(false);
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
-      setErrorMessage(errorObj.message ?? "Failed to update cover image.");
+      setErrorMessage(errorObj.message ?? t("recruiterCompanyProfile.cover.saveFailed"));
     }
   };
 
@@ -78,7 +78,7 @@ export function ChangeCoverDialog({
       onOpenChange(false);
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
-      setErrorMessage(errorObj.message ?? "Failed to remove cover image.");
+      setErrorMessage(errorObj.message ?? t("recruiterCompanyProfile.cover.removeFailed"));
     }
   };
 
@@ -89,10 +89,9 @@ export function ChangeCoverDialog({
           <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
             <ImageIcon className="size-5" />
           </div>
-          <DialogTitle className="text-xl">Change cover banner</DialogTitle>
+          <DialogTitle className="text-xl">{t("recruiterCompanyProfile.cover.title")}</DialogTitle>
           <DialogDescription>
-            This banner displays prominently at the top of your company’s public
-            landing page.
+            {t("recruiterCompanyProfile.cover.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -109,20 +108,20 @@ export function ChangeCoverDialog({
               {coverUrl ? (
                 <img
                   src={coverUrl}
-                  alt="Cover Banner Preview"
+                  alt={t("recruiterCompanyProfile.cover.previewAlt")}
                   className="size-full object-cover"
                 />
               ) : (
                 <div className="flex size-full items-center justify-center text-muted-foreground">
                   <div className="text-center space-y-1">
                     <ImageIcon className="mx-auto size-8 text-muted-foreground/50" />
-                    <p className="text-xs">No cover image set</p>
+                    <p className="text-xs">{t("recruiterCompanyProfile.page.noCover")}</p>
                   </div>
                 </div>
               )}
             </div>
             <div className="p-2 text-center text-xs text-muted-foreground">
-              Preview banner
+              {t("recruiterCompanyProfile.cover.preview")}
             </div>
           </div>
 
@@ -132,7 +131,7 @@ export function ChangeCoverDialog({
               htmlFor="cover-file"
               className="text-xs font-medium text-foreground"
             >
-              Upload banner image
+              {t("recruiterCompanyProfile.cover.uploadFile")}
             </Label>
             <Input
               id="cover-file"
@@ -148,7 +147,7 @@ export function ChangeCoverDialog({
               htmlFor="cover-url"
               className="text-xs font-medium text-foreground"
             >
-              Or paste banner image URL
+              {t("recruiterCompanyProfile.cover.orUrl")}
             </Label>
             <Input
               id="cover-url"
@@ -160,9 +159,9 @@ export function ChangeCoverDialog({
           </div>
 
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            • Wide banner ratio (16:9 or 3:1), recommended 1920×640px.
-            <br />• Maximum file size: 10MB. High-resolution photos show best on
-            desktop displays.
+            {t("recruiterCompanyProfile.cover.hintRatio")}
+            <br />
+            {t("recruiterCompanyProfile.cover.hintSize")}
           </p>
         </div>
 
@@ -177,7 +176,7 @@ export function ChangeCoverDialog({
               disabled={updateMutation.isPending}
             >
               <Trash2 className="size-3.5 mr-1" />
-              Remove cover
+              {t("recruiterCompanyProfile.cover.remove")}
             </Button>
           ) : (
             <div />
@@ -189,7 +188,7 @@ export function ChangeCoverDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
             <Button
               type="button"
@@ -198,7 +197,7 @@ export function ChangeCoverDialog({
                 updateMutation.isPending || (!coverUrl && !enterprise.coverUrl)
               }
             >
-              {updateMutation.isPending ? "Saving..." : "Save cover"}
+              {updateMutation.isPending ? t("state.saving") : t("recruiterCompanyProfile.cover.save")}
             </Button>
           </div>
         </DialogFooter>

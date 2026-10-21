@@ -1,4 +1,5 @@
 import { Clock, History } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,7 @@ export function EmployeeHistoryDialog({
   onOpenChange,
   employee,
 }: EmployeeHistoryDialogProps) {
+  const { t } = useTranslation();
   const history = useEmployeeHistoryQuery(employee?.id ?? "", open);
 
   if (!employee) return null;
@@ -36,11 +38,10 @@ export function EmployeeHistoryDialog({
             <History className="size-5" />
           </div>
           <DialogTitle className="text-xl">
-            Employee account history
+            {t("recruiterEmployees.history.title")}
           </DialogTitle>
           <DialogDescription>
-            Audit log of all changes made to{" "}
-            {employee.fullName || employee.username}’s account.
+            {t("recruiterEmployees.history.description", { name: employee.fullName || employee.username })}
           </DialogDescription>
         </DialogHeader>
 
@@ -54,7 +55,7 @@ export function EmployeeHistoryDialog({
           ) : historyItems.length === 0 ? (
             <div className="py-8 text-center text-sm text-muted-foreground">
               <Clock className="mx-auto mb-2 size-6 text-muted-foreground/60" />
-              No recorded history events found for this account.
+              {t("recruiterEmployees.history.empty")}
             </div>
           ) : (
             <div className="relative pl-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border space-y-6">
@@ -64,7 +65,7 @@ export function EmployeeHistoryDialog({
                   <div className="rounded-lg border border-border/60 bg-muted/30 p-3 transition hover:border-border hover:bg-muted/50">
                     <div className="flex items-center justify-between gap-2 text-xs">
                       <span className="font-semibold text-foreground capitalize">
-                        {item.action.replace(/_/g, " ")}
+                        {t(`adminUsers.history.${item.action}`, { defaultValue: item.action.replace(/_/g, " ") })}
                       </span>
                       <time className="text-muted-foreground">
                         {item.occurredAt
@@ -87,7 +88,7 @@ export function EmployeeHistoryDialog({
 
                     {item.actorName ? (
                       <p className="mt-1 text-[11px] text-muted-foreground">
-                        Performed by: {item.actorName}
+                        {t("recruiterEmployees.history.performedBy", { name: item.actorName })}
                       </p>
                     ) : null}
                   </div>
@@ -95,7 +96,7 @@ export function EmployeeHistoryDialog({
               ))}
             </div>
           )}
-          {history.hasNextPage ? <Button className="mt-4" disabled={history.isFetchingNextPage} onClick={() => void history.fetchNextPage()} variant="outline">Show older events</Button> : null}
+          {history.hasNextPage ? <Button className="mt-4" disabled={history.isFetchingNextPage} onClick={() => void history.fetchNextPage()} variant="outline">{t("adminUsers.history.older")}</Button> : null}
         </div>
       </DialogContent>
     </Dialog>

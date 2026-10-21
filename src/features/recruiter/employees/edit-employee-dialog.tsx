@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Dialog,
@@ -32,6 +33,7 @@ export function EditEmployeeDialog({
   onOpenChange,
   employee,
 }: EditEmployeeDialogProps) {
+  const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const updateMutation = useUpdateEmployeeMutation(employee?.id ?? "");
 
@@ -74,7 +76,7 @@ export function EditEmployeeDialog({
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
       setErrorMessage(
-        errorObj.message ?? "Failed to update employee information.",
+        errorObj.message ?? t("recruiterEmployees.edit.failed"),
       );
     }
   };
@@ -84,10 +86,9 @@ export function EditEmployeeDialog({
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle className="text-xl">Edit employee</DialogTitle>
+            <DialogTitle className="text-xl">{t("recruiterEmployees.edit.title")}</DialogTitle>
             <DialogDescription>
-              Update internal staff record details for{" "}
-              {employee.fullName || employee.username}.
+              {t("recruiterEmployees.edit.description", { name: employee.fullName || employee.username })}
             </DialogDescription>
           </DialogHeader>
 
@@ -99,7 +100,7 @@ export function EditEmployeeDialog({
 
           <div className="space-y-4 py-4">
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium">Work email</Label>
+              <Label className="text-sm font-medium">{t("enterpriseRegistration.step2.workEmail")}</Label>
               <Input
                 value={employee.email}
                 disabled
@@ -109,11 +110,11 @@ export function EditEmployeeDialog({
 
             <div className="space-y-1.5">
               <Label htmlFor="edit-full-name" className="text-sm font-medium">
-                Display name <span className="text-rose-500">*</span>
+                {t("recruiterEmployees.form.displayName")} <span className="text-rose-500">*</span>
               </Label>
               <Input
                 id="edit-full-name"
-                placeholder="e.g. Trần Bảo"
+                placeholder={t("recruiterEmployees.form.fullNameExample")}
                 {...register("full_name")}
                 aria-invalid={Boolean(errors.full_name)}
               />
@@ -123,7 +124,7 @@ export function EditEmployeeDialog({
                 </p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  Shown to the team and on job posts · 2–100 characters
+                  {t("recruiterEmployees.form.displayNameHint")}
                 </p>
               )}
             </div>
@@ -131,11 +132,11 @@ export function EditEmployeeDialog({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="edit-job-title" className="text-sm font-medium">
-                  Job title
+                  {t("recruiterEmployees.form.jobTitle")}
                 </Label>
                 <Input
                   id="edit-job-title"
-                  placeholder="e.g. Senior recruiter"
+                  placeholder={t("recruiterEmployees.form.jobTitleExample")}
                   {...register("job_title")}
                 />
               </div>
@@ -145,11 +146,11 @@ export function EditEmployeeDialog({
                   htmlFor="edit-department"
                   className="text-sm font-medium"
                 >
-                  Department
+                  {t("recruiterEmployees.form.department")}
                 </Label>
                 <Input
                   id="edit-department"
-                  placeholder="e.g. Talent acquisition"
+                  placeholder={t("recruiterEmployees.form.departmentExample")}
                   {...register("department")}
                 />
               </div>
@@ -157,11 +158,11 @@ export function EditEmployeeDialog({
 
             <div className="space-y-1.5">
               <Label htmlFor="edit-phone" className="text-sm font-medium">
-                Work phone
+                {t("recruiterEmployees.form.workPhone")}
               </Label>
               <Input
                 id="edit-phone"
-                placeholder="e.g. 0912 345 678"
+                placeholder={t("recruiterEmployees.form.phoneExample")}
                 {...register("phone")}
                 aria-invalid={Boolean(errors.phone)}
               />
@@ -173,8 +174,7 @@ export function EditEmployeeDialog({
             <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
               <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
               <span>
-                Email, password and role belong to the person’s own ITTalent
-                account, so they can’t be changed here.
+                {t("recruiterEmployees.form.lockedNote")}
               </span>
             </div>
           </div>
@@ -185,15 +185,15 @@ export function EditEmployeeDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || updateMutation.isPending}
             >
               {isSubmitting || updateMutation.isPending
-                ? "Saving..."
-                : "Save changes"}
+                ? t("state.saving")
+                : t("adminUsers.form.save")}
             </Button>
           </DialogFooter>
         </form>

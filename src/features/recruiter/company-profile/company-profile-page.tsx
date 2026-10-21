@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
 import {
   Briefcase,
@@ -22,6 +23,7 @@ import { ChangeLogoDialog } from "./change-logo-dialog";
 import { ChangeCoverDialog } from "./change-cover-dialog";
 
 export function RecruiterCompanyProfilePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [isLogoOpen, setIsLogoOpen] = useState(false);
@@ -58,11 +60,10 @@ export function RecruiterCompanyProfilePage() {
       <div className="rounded-xl border border-border bg-card p-12 text-center">
         <Building2 className="mx-auto size-10 text-muted-foreground/60 mb-3" />
         <h2 className="text-lg font-semibold text-foreground">
-          No enterprise profile linked
+          {t("recruiterCompanyProfile.page.noProfileTitle")}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground max-w-md mx-auto">
-          Your account is not currently affiliated with an enterprise workspace.
-          Please contact your organization administrator.
+          {t("recruiterCompanyProfile.page.noProfileBody")}
         </p>
         <div className="mt-4 flex justify-center gap-3">
           <Button
@@ -71,20 +72,14 @@ export function RecruiterCompanyProfilePage() {
             onClick={() => void refetch()}
             className="text-xs"
           >
-            Retry
+            {t("actions.retry")}
           </Button>
         </div>
       </div>
     );
   }
 
-  const benefitsList = [
-    "13th-month salary",
-    "Premium health insurance",
-    "Hybrid work flexibility",
-    "Annual learning budget",
-    "Top-tier equipment",
-  ];
+  const benefitsList = t("recruiterCompanyProfile.page.defaultBenefits", { returnObjects: true }) as string[];
 
   const techStackList = [
     "React",
@@ -110,9 +105,9 @@ export function RecruiterCompanyProfilePage() {
     <div className="space-y-6">
       {/* Breadcrumb Navigation */}
       <nav className="text-xs font-medium text-muted-foreground">
-        <span>Workspace</span>
+        <span>{t("recruiterEmployees.page.workspace")}</span>
         <span className="mx-2">/</span>
-        <span className="text-foreground">Company profile</span>
+        <span className="text-foreground">{t("sidebar.companyProfile")}</span>
       </nav>
 
       {/* Cover Banner with Floating Action */}
@@ -121,13 +116,13 @@ export function RecruiterCompanyProfilePage() {
           {enterprise.coverUrl ? (
             <img
               src={enterprise.coverUrl}
-              alt={`${enterprise.name} Cover Banner`}
+              alt={t("recruiterCompanyProfile.page.coverAlt", { name: enterprise.name })}
               className="size-full object-cover"
             />
           ) : (
             <div className="flex size-full items-center justify-center bg-gradient-to-br from-primary/30 via-primary/10 to-transparent">
               <span className="text-xs font-medium text-white/60">
-                No cover image set
+                {t("recruiterCompanyProfile.page.noCover")}
               </span>
             </div>
           )}
@@ -141,7 +136,7 @@ export function RecruiterCompanyProfilePage() {
           className="absolute right-4 top-4 gap-1.5 backdrop-blur-md bg-white/90 text-zinc-900 hover:bg-white text-xs shadow-xs"
         >
           <Camera className="size-3.5" />
-          <span>Change cover</span>
+          <span>{t("recruiterCompanyProfile.page.changeCover")}</span>
         </Button>
       </div>
 
@@ -165,7 +160,8 @@ export function RecruiterCompanyProfilePage() {
               type="button"
               onClick={() => setIsLogoOpen(true)}
               className="absolute inset-0 flex items-center justify-center bg-black/60 text-white opacity-0 transition group-hover:opacity-100 cursor-pointer"
-              title="Change logo"
+              title={t("recruiterCompanyProfile.page.changeLogo")}
+              aria-label={t("recruiterCompanyProfile.page.changeLogo")}
             >
               <Camera className="size-6" />
             </button>
@@ -177,16 +173,16 @@ export function RecruiterCompanyProfilePage() {
                 {enterprise.name}
               </h1>
               <Badge className="rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium text-xs">
-                Active
+                {t("adminUsers.status.active")}
               </Badge>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
               <span>
                 {[
-                  enterprise.industry || "Technology",
+                  enterprise.industry || t("recruiterCompanyProfile.page.defaultIndustry"),
                   enterprise.companySize
-                    ? `${enterprise.companySize} employees`
-                    : "201–500 employees",
+                    ? t("recruiterCompanyProfile.page.sizeEmployees", { size: enterprise.companySize })
+                    : t("recruiterCompanyProfile.companySize.201-500"),
                   enterprise.address?.city || "Hồ Chí Minh",
                 ]
                   .filter(Boolean)
@@ -223,7 +219,7 @@ export function RecruiterCompanyProfilePage() {
           >
             <Link to={`/enterprises/${enterprise.id}`} target="_blank">
               <ExternalLink className="size-3.5" />
-              <span>View public page</span>
+              <span>{t("recruiterCompanyProfile.page.viewPublic")}</span>
             </Link>
           </Button>
           <Button
@@ -232,7 +228,7 @@ export function RecruiterCompanyProfilePage() {
             className="gap-1.5 text-xs"
           >
             <Edit className="size-3.5" />
-            <span>Edit profile</span>
+            <span>{t("recruiterCompanyProfile.page.editProfile")}</span>
           </Button>
         </div>
       </div>
@@ -244,7 +240,7 @@ export function RecruiterCompanyProfilePage() {
           {/* About Card */}
           <Card className="shadow-xs">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold">About</CardTitle>
+              <CardTitle className="text-base font-semibold">{t("recruiterCompanyProfile.page.aboutTitle")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {enterprise.shortDescription ? (
@@ -254,7 +250,7 @@ export function RecruiterCompanyProfilePage() {
               ) : null}
               <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                 {enterprise.description ||
-                  `${enterprise.name} provides cutting-edge digital technology solutions and enterprise software. Our team delivers high-impact systems with a customer-first focus.`}
+                  t("recruiterCompanyProfile.page.aboutDefault", { name: enterprise.name })}
               </p>
             </CardContent>
           </Card>
@@ -263,19 +259,19 @@ export function RecruiterCompanyProfilePage() {
           <Card className="shadow-xs">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                Culture and benefits
+                {t("recruiterCompanyProfile.page.cultureTitle")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-5 text-sm">
               <p className="text-sm text-muted-foreground">
                 {enterprise.cultureSummary ||
-                  "Small squads, weekly demos and a written-first culture."}
+                  t("recruiterCompanyProfile.page.cultureDefault")}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Benefits & Perks
+                    {t("adminEnterprises.form.benefitsLabel")}
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {(enterprise.benefits?.length ? enterprise.benefits : benefitsList).map((benefit, i) => (
@@ -292,7 +288,7 @@ export function RecruiterCompanyProfilePage() {
 
                 <div className="space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Tech stack
+                    {t("recruiterCompanyProfile.page.techStack")}
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {(enterprise.techStack?.length ? enterprise.techStack : techStackList).map((tech, i) => (
@@ -311,10 +307,15 @@ export function RecruiterCompanyProfilePage() {
               <div className="flex items-center gap-2 pt-2 border-t border-border/60 text-xs text-muted-foreground">
                 <Clock className="size-4 text-primary" />
                 <span>
-                  Working days:{" "}
-                  <strong className="text-foreground">
-                    {(enterprise as unknown as { working_days?: string }).working_days || "Monday – Friday"}
-                  </strong>
+                  <Trans
+                    components={{ strong: <strong className="text-foreground" /> }}
+                    i18nKey="recruiterCompanyProfile.page.workingDays"
+                    values={{
+                      days:
+                        (enterprise as unknown as { working_days?: string }).working_days ||
+                        t("recruiterCompanyProfile.page.workingDaysDefault"),
+                    }}
+                  />
                 </span>
               </div>
             </CardContent>
@@ -324,10 +325,10 @@ export function RecruiterCompanyProfilePage() {
           <Card className="shadow-xs">
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-base font-semibold">
-                Media gallery
+                {t("recruiterCompanyProfile.page.galleryTitle")}
               </CardTitle>
               <span className="text-xs text-muted-foreground">
-                {enterprise.mediaGallery?.length || 3} of 10
+                {t("recruiterCompanyProfile.page.galleryCount", { count: enterprise.mediaGallery?.length || 3, max: 10 })}
               </span>
             </CardHeader>
             <CardContent>
@@ -340,7 +341,7 @@ export function RecruiterCompanyProfilePage() {
                     >
                       <img
                         src={imgUrl}
-                        alt={`Gallery ${i + 1}`}
+                        alt={t("recruiterCompanyProfile.page.galleryAlt", { n: i + 1 })}
                         className="size-full object-cover"
                       />
                     </div>
@@ -349,17 +350,17 @@ export function RecruiterCompanyProfilePage() {
                   <>
                     <div className="flex h-28 flex-col justify-end rounded-xl border border-border bg-gradient-to-br from-amber-500/10 to-orange-500/20 p-2.5 text-xs font-medium text-foreground">
                       <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                        <ImageIcon className="size-3" /> Office space
+                        <ImageIcon className="size-3" /> {t("recruiterCompanyProfile.page.galleryOffice")}
                       </span>
                     </div>
                     <div className="flex h-28 flex-col justify-end rounded-xl border border-border bg-gradient-to-br from-blue-500/10 to-indigo-500/20 p-2.5 text-xs font-medium text-foreground">
                       <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                        <ImageIcon className="size-3" /> Team meeting
+                        <ImageIcon className="size-3" /> {t("recruiterCompanyProfile.page.galleryMeeting")}
                       </span>
                     </div>
                     <div className="flex h-28 flex-col justify-end rounded-xl border border-border bg-gradient-to-br from-emerald-500/10 to-teal-500/20 p-2.5 text-xs font-medium text-foreground">
                       <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                        <ImageIcon className="size-3" /> Community event
+                        <ImageIcon className="size-3" /> {t("recruiterCompanyProfile.page.galleryEvent")}
                       </span>
                     </div>
                   </>
@@ -372,7 +373,7 @@ export function RecruiterCompanyProfilePage() {
           <Card className="shadow-xs">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                Addresses
+                {t("recruiterCompanyProfile.page.addressesTitle")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
@@ -382,10 +383,10 @@ export function RecruiterCompanyProfilePage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-xs text-foreground">
-                        Headquarters
+                        {t("recruiterCompanyProfile.page.headquarters")}
                       </span>
                       <Badge variant="neutral" className="text-[10px] py-0">
-                        Main office
+                        {t("recruiterCompanyProfile.page.mainOffice")}
                       </Badge>
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
@@ -399,7 +400,7 @@ export function RecruiterCompanyProfilePage() {
                   <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                   <div>
                     <span className="font-semibold text-xs text-foreground">
-                      Branch office
+                      {t("recruiterCompanyProfile.page.branchOffice")}
                     </span>
                     <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
                       {branchAddressStr}
@@ -416,35 +417,35 @@ export function RecruiterCompanyProfilePage() {
           {/* Business Card */}
           <Card className="shadow-xs">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold">Business</CardTitle>
+              <CardTitle className="text-base font-semibold">{t("recruiterCompanyProfile.page.businessTitle")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2.5 text-xs">
               <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                <span className="text-muted-foreground">Industry</span>
+                <span className="text-muted-foreground">{t("adminEnterprises.detail.industry")}</span>
                 <span className="font-semibold text-foreground">
-                  {enterprise.industry || "Information Technology"}
+                  {enterprise.industry || t("recruiterCompanyProfile.page.industryDefault")}
                 </span>
               </div>
               <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                <span className="text-muted-foreground">Sub-industries</span>
+                <span className="text-muted-foreground">{t("adminEnterprises.detail.subIndustries")}</span>
                 <span className="font-semibold text-foreground text-right">
                   {enterprise.subIndustries?.length
                     ? enterprise.subIndustries.join(", ")
-                    : "Payments, Digital banking, Cloud"}
+                    : t("recruiterCompanyProfile.page.subIndustriesDefault")}
                 </span>
               </div>
               <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                <span className="text-muted-foreground">Company type</span>
+                <span className="text-muted-foreground">{t("adminEnterprises.detail.companyType")}</span>
                 <span className="font-semibold text-foreground">
                   {(enterprise as unknown as { company_type?: string }).company_type ||
                     enterprise.companyType ||
-                    "Product"}
+                    t("recruiterCompanyProfile.companyType.product")}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Founded year</span>
+                <span className="text-muted-foreground">{t("adminEnterprises.detail.foundedYear")}</span>
                 <span className="font-semibold text-foreground">
-                  {enterprise.foundedYear ? `${enterprise.foundedYear}` : "Established"}
+                  {enterprise.foundedYear ? `${enterprise.foundedYear}` : t("recruiterCompanyProfile.page.established")}
                 </span>
               </div>
             </CardContent>
@@ -453,23 +454,23 @@ export function RecruiterCompanyProfilePage() {
           {/* Contact Card */}
           <Card className="shadow-xs">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold">Contact</CardTitle>
+              <CardTitle className="text-base font-semibold">{t("adminEnterprises.detail.contact")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2.5 text-xs">
               <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                <span className="text-muted-foreground">Corporate email</span>
+                <span className="text-muted-foreground">{t("adminEnterprises.detail.email")}</span>
                 <span className="font-semibold text-foreground truncate max-w-[180px]">
                   {enterprise.email}
                 </span>
               </div>
               <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                <span className="text-muted-foreground">Phone</span>
+                <span className="text-muted-foreground">{t("adminEnterprises.detail.phone")}</span>
                 <span className="font-mono font-semibold text-foreground">
                   {enterprise.phone || "—"}
                 </span>
               </div>
               <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                <span className="text-muted-foreground">Website</span>
+                <span className="text-muted-foreground">{t("adminEnterprises.detail.website")}</span>
                 {enterprise.website ? (
                   <a
                     href={
@@ -488,7 +489,7 @@ export function RecruiterCompanyProfilePage() {
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Social</span>
+                <span className="text-muted-foreground">{t("recruiterCompanyProfile.page.social")}</span>
                 <span className="font-semibold text-primary">
                   LinkedIn · Facebook · GitHub
                 </span>
@@ -500,24 +501,24 @@ export function RecruiterCompanyProfilePage() {
           <Card className="shadow-xs">
             <CardHeader className="pb-2 flex flex-row items-center justify-between">
               <CardTitle className="text-base font-semibold">
-                Job postings
+                {t("sidebar.jobPostings")}
               </CardTitle>
               <Link
                 to="/recruiter/job-postings"
                 className="text-xs font-semibold text-primary hover:underline"
               >
-                Manage
+                {t("recruiterCompanyProfile.page.manage")}
               </Link>
             </CardHeader>
             <CardContent className="text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Active openings</span>
+                <span className="text-muted-foreground">{t("recruiterCompanyProfile.page.activeOpenings")}</span>
                 <Badge
                   variant="neutral"
                   className="rounded-full px-2.5 py-0.5 font-semibold text-xs"
                 >
                   <Briefcase className="mr-1 size-3" />
-                  {enterprise.activeJobsCount ?? 0} active
+                  {t("recruiterCompanyProfile.page.activeCount", { count: enterprise.activeJobsCount ?? 0 })}
                 </Badge>
               </div>
             </CardContent>
@@ -527,13 +528,13 @@ export function RecruiterCompanyProfilePage() {
           <Card className="shadow-xs">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold">
-                Legal & Corporate
+                {t("recruiterCompanyProfile.page.legalTitle")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
               <div className="space-y-1 border-b border-border/60 pb-2.5">
                 <span className="text-muted-foreground">
-                  Legal corporate name
+                  {t("recruiterCompanyProfile.page.legalName")}
                 </span>
                 <p className="font-semibold text-foreground">
                   {(enterprise as unknown as { legal_name?: string })
@@ -543,7 +544,7 @@ export function RecruiterCompanyProfilePage() {
 
               <div className="space-y-1 border-b border-border/60 pb-2.5">
                 <span className="text-muted-foreground">
-                  Tax identification code
+                  {t("recruiterCompanyProfile.page.taxCode")}
                 </span>
                 <p className="font-mono font-semibold text-foreground">
                   {enterprise.taxCode || "9999999999"}
@@ -552,7 +553,7 @@ export function RecruiterCompanyProfilePage() {
 
               <div className="space-y-1">
                 <span className="text-muted-foreground">
-                  Registration number
+                  {t("recruiterCompanyProfile.page.registrationNumber")}
                 </span>
                 <p className="font-mono font-medium text-foreground">
                   {(enterprise as unknown as { registration_number?: string })
@@ -566,11 +567,10 @@ export function RecruiterCompanyProfilePage() {
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-xs space-y-2.5">
             <div className="flex items-center gap-2 font-semibold text-primary">
               <Sparkles className="size-4" />
-              <span>Keep your company profile fresh</span>
+              <span>{t("recruiterCompanyProfile.page.ctaTitle")}</span>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Updated company information and brand imagery attract 40% more
-              candidate applications.
+              {t("recruiterCompanyProfile.page.ctaBody")}
             </p>
             <Button
               variant="outline"
@@ -578,7 +578,7 @@ export function RecruiterCompanyProfilePage() {
               onClick={() => navigate(recruiterCompanyProfileEditPath())}
               className="w-full text-xs"
             >
-              Update company profile
+              {t("recruiterCompanyProfile.page.ctaButton")}
             </Button>
           </div>
         </div>

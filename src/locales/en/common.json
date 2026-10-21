@@ -2704,6 +2704,279 @@
       "noOtherApplications": "No previous applications recorded at this enterprise.",
       "firstTimeApplicant": "First time applying to {{company}}."
     }
+  },
+  "recruiterEmployees": {
+    "page": {
+      "workspace": "Workspace",
+      "subtitle": "Your company’s HR team. Only people in your corporate workspace are shown."
+    },
+    "toolbar": {
+      "searchPlaceholder": "Search employee or email…",
+      "departmentAll": "Department: All",
+      "sortNameAsc": "Sort: Name A-Z",
+      "sortNameDesc": "Sort: Name Z-A"
+    },
+    "departments": {
+      "talentAcquisition": "Talent acquisition",
+      "engineering": "Engineering",
+      "peopleOperations": "People operations"
+    },
+    "table": {
+      "employee": "Employee",
+      "department": "Department",
+      "workPhone": "Work Phone",
+      "memberSince": "Member Since"
+    },
+    "list": {
+      "loadError": "Failed to load employees list. Please check your connection and try again.",
+      "emptyTitle": "No employees found",
+      "emptyFiltered": "Try adjusting your search query or filters.",
+      "emptyFirst": "Start building your HR team by inviting your first employee."
+    },
+    "menu": {
+      "suspend": "Suspend membership",
+      "activate": "Activate membership"
+    },
+    "status": {
+      "revoked": "Revoked"
+    },
+    "role": {
+      "hrRecruiter": "HR / Recruiter"
+    },
+    "form": {
+      "displayName": "Display name",
+      "jobTitle": "Job title",
+      "department": "Department",
+      "workPhone": "Work phone",
+      "fullNameExample": "e.g. Trần Bảo",
+      "emailExample": "e.g. tran.b@novafintech.vn",
+      "jobTitleExample": "e.g. Senior recruiter",
+      "departmentExample": "e.g. Talent acquisition",
+      "phoneExample": "e.g. 0912 345 678",
+      "displayNameHint": "Shown to the team and on job posts · 2–100 characters",
+      "emailHint": "The invitation only works for this address.",
+      "phoneHint": "Optional · 9–15 digits, may start with +",
+      "lockedNote": "Email, password and role belong to the person’s own ITTalent account, so they can’t be changed here."
+    },
+    "validation": {
+      "emailInvalid": "Please provide a valid corporate email address",
+      "fullNameMin": "Full name must be at least {{min}} characters",
+      "fullNameMax": "Full name cannot exceed {{max}} characters",
+      "displayNameMin": "Display name must be at least {{min}} characters",
+      "displayNameMax": "Display name cannot exceed {{max}} characters",
+      "jobTitleMax": "Job title cannot exceed {{max}} characters",
+      "departmentMax": "Department cannot exceed {{max}} characters",
+      "phoneInvalid": "Work phone must be 8–20 digits",
+      "reasonMax": "Reason cannot exceed {{max}} characters"
+    },
+    "invite": {
+      "title": "Invite HR employee",
+      "description": "They get an email with a link to join. Nobody gets access until they accept.",
+      "accessRole": "HR at {{company}}",
+      "accessRoleHint": "Can post jobs, review applications and schedule interviews.",
+      "accessNote": "You can only invite HR here. Admin roles can’t be given from this form.",
+      "send": "Send invitation",
+      "duplicate": "An account with this email already exists in the system.",
+      "failed": "Failed to send invitation. Please try again.",
+      "successBody": "We dispatched an invitation email to <strong>{{email}}</strong>.",
+      "nextSteps": "Next steps for the invitee",
+      "nextStepsBody": "They have 7 days to open the link in their email, verify their corporate identity and set their password.",
+      "copyLink": "Copy invitation link",
+      "copied": "Link copied!",
+      "done": "Done"
+    },
+    "edit": {
+      "title": "Edit employee",
+      "description": "Update internal staff record details for {{name}}.",
+      "failed": "Failed to update employee information."
+    },
+    "statusDialog": {
+      "suspendBody": "Suspend workspace access for {{name}}. They will not be able to view or manage candidate applications and job postings.",
+      "activateBody": "Restore workspace access for {{name}}.",
+      "reasonLabel": "Reason for status change",
+      "suspendPlaceholder": "e.g. Employee transferred to another department or left the recruitment team",
+      "activatePlaceholder": "e.g. Reactivated by administrator request",
+      "auditNote": "This note will be recorded in the audit trail for enterprise compliance.",
+      "failed": "Failed to change membership status."
+    },
+    "history": {
+      "title": "Employee account history",
+      "description": "Audit log of all changes made to {{name}}’s account.",
+      "empty": "No recorded history events found for this account.",
+      "performedBy": "Performed by: {{name}}"
+    },
+    "detail": {
+      "notFoundTitle": "Employee not found",
+      "notFoundBody": "The requested employee record does not exist or you do not have permission to access it.",
+      "back": "Back to employees",
+      "infoTitle": "Employee information",
+      "membershipTitle": "Membership",
+      "activityTitle": "Recent activity",
+      "employeeId": "Employee ID",
+      "memberSince": "Member since",
+      "activeSince": "Active since {{date}}",
+      "suspendedTitle": "Access currently suspended",
+      "activeBody": "Can access and manage your corporate workspace: publish job postings, review applicants, and coordinate interview schedules.",
+      "suspendedBody": "Workspace access is revoked. This employee cannot view candidates or post jobs until reactivated.",
+      "viewAll": "View all ({{count}})",
+      "noActivity": "No recent activity recorded for this employee account."
+    }
+  },
+  "recruiterCompanyProfile": {
+    "page": {
+      "noProfileTitle": "No enterprise profile linked",
+      "noProfileBody": "Your account is not currently affiliated with an enterprise workspace. Please contact your organization administrator.",
+      "coverAlt": "{{name}} Cover Banner",
+      "noCover": "No cover image set",
+      "changeCover": "Change cover",
+      "changeLogo": "Change logo",
+      "viewPublic": "View public page",
+      "editProfile": "Edit profile",
+      "defaultIndustry": "Technology",
+      "sizeEmployees": "{{size}} employees",
+      "aboutTitle": "About",
+      "aboutDefault": "{{name}} provides cutting-edge digital technology solutions and enterprise software. Our team delivers high-impact systems with a customer-first focus.",
+      "cultureTitle": "Culture and benefits",
+      "cultureDefault": "Small squads, weekly demos and a written-first culture.",
+      "defaultBenefits": [
+        "13th-month salary",
+        "Premium health insurance",
+        "Hybrid work flexibility",
+        "Annual learning budget",
+        "Top-tier equipment"
+      ],
+      "techStack": "Tech stack",
+      "workingDays": "Working days: <strong>{{days}}</strong>",
+      "workingDaysDefault": "Monday – Friday",
+      "galleryTitle": "Media gallery",
+      "galleryCount": "{{count}} of {{max}}",
+      "galleryAlt": "Gallery {{n}}",
+      "galleryOffice": "Office space",
+      "galleryMeeting": "Team meeting",
+      "galleryEvent": "Community event",
+      "addressesTitle": "Addresses",
+      "headquarters": "Headquarters",
+      "mainOffice": "Main office",
+      "branchOffice": "Branch office",
+      "businessTitle": "Business",
+      "industryDefault": "Information Technology",
+      "subIndustriesDefault": "Payments, Digital banking, Cloud",
+      "established": "Established",
+      "social": "Social",
+      "manage": "Manage",
+      "activeOpenings": "Active openings",
+      "activeCount": "{{count}} active",
+      "legalTitle": "Legal & Corporate",
+      "legalName": "Legal corporate name",
+      "taxCode": "Tax identification code",
+      "registrationNumber": "Registration number",
+      "ctaTitle": "Keep your company profile fresh",
+      "ctaBody": "Updated company information and brand imagery attract 40% more candidate applications.",
+      "ctaButton": "Update company profile"
+    },
+    "edit": {
+      "title": "Edit company profile",
+      "subtitle": "Changes go live on your public page as soon as you save. Fields marked with * are required.",
+      "back": "Back to profile",
+      "legalBannerTitle": "Legal identity protection",
+      "legalBannerBody": "Legal name, tax code, registration number, founded year and status are officially verified and locked. To modify these legal credentials, please request verification correction with ITTalent admin.",
+      "saved": "Profile changes saved successfully! Redirecting...",
+      "saveFailed": "Failed to save company profile changes.",
+      "notFound": "No enterprise profile found to edit.",
+      "identityTitle": "1. Identity & Branding",
+      "identityDescription": "Display name is what candidates and talent see across the marketplace.",
+      "nameExample": "e.g. Nova Fintech",
+      "nameHint": "Shown on your public page · 2–150 characters",
+      "legalCompanyName": "Legal company name",
+      "registrationProvided": "Provided during verification",
+      "verificationStatus": "Verification status",
+      "verifiedActive": "Verified Active",
+      "contactTitle": "2. Contact Information",
+      "contactDescription": "Primary official channels for candidate communication and notification.",
+      "phoneNumber": "Phone number",
+      "officialWebsite": "Official website",
+      "businessTitle": "3. Business Details",
+      "businessDescription": "Used for search filters and talent recommendations on ITTalent marketplace.",
+      "companyModel": "Company model",
+      "workingDays": "Working days",
+      "workingDaysExample": "e.g. Monday – Friday (hybrid schedule)",
+      "publicTitle": "4. Public Description & About",
+      "publicDescription": "Introduce your company mission, team culture, and values to attract top candidates.",
+      "aboutLabel": "About description",
+      "aboutPlaceholder": "Tell candidates what makes your company a great place to work...",
+      "addressTitle": "5. Headquarters Address",
+      "addressDescription": "Physical office location displayed on your public profile and job postings.",
+      "street": "Street address",
+      "streetExample": "e.g. 12 Tôn Đản, Phường 13, Quận 4",
+      "city": "City / Province",
+      "cityExample": "e.g. Hồ Chí Minh"
+    },
+    "industry": {
+      "fintech": "Fintech",
+      "it": "Information Technology",
+      "software": "Software Development",
+      "ecommerce": "E-Commerce",
+      "banking": "Banking & Financial Services",
+      "ai": "AI & Machine Learning",
+      "healthcare": "Healthcare & Biotech",
+      "education": "Education & EdTech"
+    },
+    "companySize": {
+      "1-10": "1–10 employees",
+      "11-50": "11–50 employees",
+      "51-200": "51–200 employees",
+      "201-500": "201–500 employees",
+      "501-1000": "501–1000 employees",
+      "1000+": "1000+ employees"
+    },
+    "companyType": {
+      "product": "Product",
+      "outsourcing": "Outsourcing",
+      "itService": "IT Service",
+      "consulting": "Consulting",
+      "agency": "Agency",
+      "hybrid": "Hybrid"
+    },
+    "validation": {
+      "phoneInvalid": "Phone number must be 8–20 digits",
+      "urlWebsite": "Website must be a valid URL",
+      "urlLinkedin": "LinkedIn link must be a valid URL",
+      "urlFacebook": "Facebook link must be a valid URL",
+      "urlGithub": "GitHub link must be a valid URL",
+      "urlTwitter": "X / Twitter link must be a valid URL",
+      "industryRequired": "Please select an industry",
+      "descriptionMax": "Description cannot exceed {{max}} characters"
+    },
+    "logo": {
+      "title": "Change company logo",
+      "description": "This logo appears on your public company profile, job postings, and emails to candidates.",
+      "previewAlt": "Company Logo Preview",
+      "preview": "Preview",
+      "uploadFile": "Upload image file",
+      "orUrl": "Or paste image URL",
+      "hintRatio": "• Square format (1:1 ratio), recommended minimum 400×400px.",
+      "hintSize": "• Maximum file size: 5MB. Formats: PNG, JPG, WebP, SVG.",
+      "tooLarge": "Image size exceeds 5MB limit. Please choose a smaller file.",
+      "saveFailed": "Failed to update company logo.",
+      "removeFailed": "Failed to remove logo.",
+      "remove": "Remove logo",
+      "save": "Save logo"
+    },
+    "cover": {
+      "title": "Change cover banner",
+      "description": "This banner displays prominently at the top of your company’s public landing page.",
+      "previewAlt": "Cover Banner Preview",
+      "preview": "Preview banner",
+      "uploadFile": "Upload banner image",
+      "orUrl": "Or paste banner image URL",
+      "hintRatio": "• Wide banner ratio (16:9 or 3:1), recommended 1920×640px.",
+      "hintSize": "• Maximum file size: 10MB. High-resolution photos show best on desktop displays.",
+      "tooLarge": "Cover image exceeds 10MB limit. Please choose a smaller file.",
+      "saveFailed": "Failed to update cover image.",
+      "removeFailed": "Failed to remove cover image.",
+      "remove": "Remove cover",
+      "save": "Save cover"
+    }
   }
 }
 

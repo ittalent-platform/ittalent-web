@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Copy, Lock, Mail, Send } from "lucide-react";
+import { Trans, useTranslation } from "react-i18next";
 
 import {
   Dialog,
@@ -30,13 +31,14 @@ export function InviteEmployeeDialog({
   open,
   onOpenChange,
 }: InviteEmployeeDialogProps) {
+  const { t } = useTranslation();
   const [step, setStep] = useState<"form" | "success">("form");
   const [invitedEmail, setInvitedEmail] = useState("");
   const [copied, setCopied] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { data: enterprise } = useMyEnterpriseProfileQuery();
-  const enterpriseName = enterprise?.name || "Workspace";
+  const enterpriseName = enterprise?.name || t("recruiterEmployees.page.workspace");
   const enterpriseInitials = enterpriseName
     .split(/\s+/)
     .map((w) => w[0])
@@ -89,12 +91,10 @@ export function InviteEmployeeDialog({
     } catch (err: unknown) {
       const errorObj = err as { message?: string; status?: number };
       if (errorObj.status === 409) {
-        setErrorMessage(
-          "An account with this email already exists in the system.",
-        );
+        setErrorMessage(t("recruiterEmployees.invite.duplicate"));
       } else {
         setErrorMessage(
-          errorObj.message ?? "Failed to send invitation. Please try again.",
+          errorObj.message ?? t("recruiterEmployees.invite.failed"),
         );
       }
     }
@@ -114,11 +114,10 @@ export function InviteEmployeeDialog({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <DialogHeader className="space-y-1 text-left">
               <DialogTitle className="text-xl font-bold tracking-tight text-foreground">
-                Invite HR employee
+                {t("recruiterEmployees.invite.title")}
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground">
-                They get an email with a link to join. Nobody gets access until
-                they accept.
+                {t("recruiterEmployees.invite.description")}
               </DialogDescription>
             </DialogHeader>
 
@@ -132,30 +131,30 @@ export function InviteEmployeeDialog({
               {/* Full Name */}
               <div className="space-y-1">
                 <Label htmlFor="full_name" className="text-xs font-semibold text-foreground">
-                  Full name <span className="text-rose-500">*</span>
+                  {t("adminUsers.form.fullName")} <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   id="full_name"
-                  aria-label="Display name"
-                  placeholder="e.g. Trần Bảo"
+                  aria-label={t("recruiterEmployees.form.displayName")}
+                  placeholder={t("recruiterEmployees.form.fullNameExample")}
                   className="h-10 rounded-xl text-sm"
                   {...register("full_name")}
                   aria-invalid={Boolean(errors.full_name)}
                 />
                 <div className="flex justify-between items-center text-[11px] text-muted-foreground">
-                  <span>{errors.full_name?.message || "2–100 characters"}</span>
+                  <span>{errors.full_name?.message || t("auth.register.fullNameHint")}</span>
                 </div>
               </div>
 
               {/* Work Email */}
               <div className="space-y-1">
                 <Label htmlFor="email" className="text-xs font-semibold text-foreground">
-                  Work email <span className="text-rose-500">*</span>
+                  {t("enterpriseRegistration.step2.workEmail")} <span className="text-rose-500">*</span>
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="e.g. tran.b@novafintech.vn"
+                  placeholder={t("recruiterEmployees.form.emailExample")}
                   className="h-10 rounded-xl text-sm"
                   {...register("email")}
                   aria-invalid={Boolean(errors.email)}
@@ -163,7 +162,7 @@ export function InviteEmployeeDialog({
                 <div className="flex justify-between items-center text-[11px] text-muted-foreground">
                   <span>
                     {errors.email?.message ||
-                      "The invitation only works for this address."}
+                      t("recruiterEmployees.form.emailHint")}
                   </span>
                 </div>
               </div>
@@ -172,46 +171,46 @@ export function InviteEmployeeDialog({
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label htmlFor="job_title" className="text-xs font-semibold text-foreground">
-                    Job title
+                    {t("recruiterEmployees.form.jobTitle")}
                   </Label>
                   <Input
                     id="job_title"
-                    placeholder="e.g. Senior recruiter"
+                    placeholder={t("recruiterEmployees.form.jobTitleExample")}
                     className="h-10 rounded-xl text-sm"
                     {...register("job_title")}
                   />
-                  <span className="text-[11px] text-muted-foreground">Optional</span>
+                  <span className="text-[11px] text-muted-foreground">{t("jobPostings.optional")}</span>
                 </div>
 
                 <div className="space-y-1">
                   <Label htmlFor="department" className="text-xs font-semibold text-foreground">
-                    Department
+                    {t("recruiterEmployees.form.department")}
                   </Label>
                   <Input
                     id="department"
-                    placeholder="e.g. Talent acquisition"
+                    placeholder={t("recruiterEmployees.form.departmentExample")}
                     className="h-10 rounded-xl text-sm"
                     {...register("department")}
                   />
-                  <span className="text-[11px] text-muted-foreground">Optional</span>
+                  <span className="text-[11px] text-muted-foreground">{t("jobPostings.optional")}</span>
                 </div>
               </div>
 
               {/* Work Phone */}
               <div className="space-y-1">
                 <Label htmlFor="phone" className="text-xs font-semibold text-foreground">
-                  Work phone
+                  {t("recruiterEmployees.form.workPhone")}
                 </Label>
                 <Input
                   id="phone"
-                  placeholder="e.g. 0912 345 678"
+                  placeholder={t("recruiterEmployees.form.phoneExample")}
                   className="h-10 rounded-xl text-sm"
                   {...register("phone")}
                   aria-invalid={Boolean(errors.phone)}
                 />
                 <span className="text-[11px] text-muted-foreground">
                   {errors.phone?.message ||
-                    "Optional · 9–15 digits, may start with +"}
+                    t("recruiterEmployees.form.phoneHint")}
                 </span>
               </div>
 
@@ -220,7 +219,7 @@ export function InviteEmployeeDialog({
               {/* Access Role Card */}
               <div className="space-y-1.5">
                 <span className="text-xs font-semibold text-foreground block">
-                  Access
+                  {t("adminUsers.form.access")}
                 </span>
                 <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/40 p-3">
                   <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-xs tracking-wider">
@@ -228,16 +227,16 @@ export function InviteEmployeeDialog({
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold text-foreground truncate">
-                      HR at {enterpriseName}
+                      {t("recruiterEmployees.invite.accessRole", { company: enterpriseName })}
                     </p>
                     <p className="text-[11px] text-muted-foreground leading-tight">
-                      Can post jobs, review applications and schedule interviews.
+                      {t("recruiterEmployees.invite.accessRoleHint")}
                     </p>
                   </div>
                   <Lock className="size-4 text-muted-foreground/60 shrink-0" />
                 </div>
                 <span className="text-[11px] text-muted-foreground block">
-                  You can only invite HR here. Admin roles can’t be given from this form.
+                  {t("recruiterEmployees.invite.accessNote")}
                 </span>
               </div>
             </div>
@@ -249,7 +248,7 @@ export function InviteEmployeeDialog({
                 onClick={handleClose}
                 className="rounded-xl"
               >
-                Cancel
+                {t("actions.cancel")}
               </Button>
               <Button
                 type="submit"
@@ -259,8 +258,8 @@ export function InviteEmployeeDialog({
                 <Send className="size-3.5" />
                 <span>
                   {isSubmitting || createMutation.isPending
-                    ? "Sending..."
-                    : "Send invitation"}
+                    ? t("auth.verify.sending")
+                    : t("recruiterEmployees.invite.send")}
                 </span>
               </Button>
             </DialogFooter>
@@ -271,21 +270,23 @@ export function InviteEmployeeDialog({
               <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
                 <CheckCircle2 className="size-6" />
               </div>
-              <DialogTitle className="text-xl">Invitation sent</DialogTitle>
+              <DialogTitle className="text-xl">{t("adminUsers.invitation.sent")}</DialogTitle>
               <DialogDescription>
-                We dispatched an invitation email to{" "}
-                <strong className="text-foreground">{invitedEmail}</strong>.
+                <Trans
+                  components={{ strong: <strong className="text-foreground" /> }}
+                  i18nKey="recruiterEmployees.invite.successBody"
+                  values={{ email: invitedEmail }}
+                />
               </DialogDescription>
             </DialogHeader>
 
             <div className="my-5 rounded-lg border border-border bg-muted/40 p-4 text-xs text-muted-foreground space-y-2">
               <div className="flex items-center gap-2 font-medium text-foreground">
                 <Mail className="size-4 text-primary" />
-                <span>Next steps for the invitee</span>
+                <span>{t("recruiterEmployees.invite.nextSteps")}</span>
               </div>
               <p>
-                They have 7 days to open the link in their email, verify their
-                corporate identity and set their password.
+                {t("recruiterEmployees.invite.nextStepsBody")}
               </p>
             </div>
 
@@ -297,10 +298,10 @@ export function InviteEmployeeDialog({
                 onClick={handleCopyLink}
               >
                 <Copy className="size-4" />
-                {copied ? "Link copied!" : "Copy invitation link"}
+                {copied ? t("recruiterEmployees.invite.copied") : t("recruiterEmployees.invite.copyLink")}
               </Button>
               <Button type="button" className="w-full" onClick={handleClose}>
-                Done
+                {t("recruiterEmployees.invite.done")}
               </Button>
             </DialogFooter>
           </div>

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { client } from "@/api/client";
+import i18n from "@/i18n";
 import {
   getApiV1EnterprisesMyProfile,
   patchApiV1EnterprisesByEnterpriseId,
@@ -54,7 +55,7 @@ export function useUpdateMyEnterpriseProfileMutation(enterpriseId: string) {
       if (result.error) {
         const errorData = result.error as { message?: string };
         throw Object.assign(
-          new Error(errorData.message ?? "Failed to update company profile"),
+          new Error(errorData.message ?? i18n.t("recruiterCompanyProfile.edit.saveFailed")),
           errorData,
           {
             status: result.response?.status,

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { UserAuditHistoryResponse, UserDto } from "@/api/generated/types.gen";
-import { REASON_MIN_LENGTH } from "@/components/common/reason-field";
+import { REASON_MAX_LENGTH, REASON_MIN_LENGTH } from "@/components/common/reason-field";
+import { validationMessage as msg } from "@/lib/validation-message";
 
 // The employee screens use the recruiter-side contract of /api/v1/users, which differs from the system-admin
 // operations in the generated client (username, expectedVersion, audit shape), so these are typed here.
@@ -36,32 +37,38 @@ export type EmployeesListParams = {
   enabled?: boolean;
 };
 
+export const FULL_NAME_MIN_LENGTH = 2;
+export const NAME_MAX_LENGTH = 100;
+export const JOB_TITLE_MAX_LENGTH = 100;
+export const DEPARTMENT_MAX_LENGTH = 100;
+const PHONE_PATTERN = /^[0-9+() -]{8,20}$/;
+
 export const inviteEmployeeSchema = z.object({
   email: z
     .string()
     .trim()
-    .email("Please provide a valid corporate email address"),
+    .email(msg("recruiterEmployees.validation.emailInvalid")),
   full_name: z
     .string()
     .trim()
-    .min(2, "Full name must be at least 2 characters")
-    .max(100, "Full name cannot exceed 100 characters"),
+    .min(FULL_NAME_MIN_LENGTH, msg("recruiterEmployees.validation.fullNameMin", { min: FULL_NAME_MIN_LENGTH }))
+    .max(NAME_MAX_LENGTH, msg("recruiterEmployees.validation.fullNameMax", { max: NAME_MAX_LENGTH })),
   job_title: z
     .string()
     .trim()
-    .max(100, "Job title cannot exceed 100 characters")
+    .max(JOB_TITLE_MAX_LENGTH, msg("recruiterEmployees.validation.jobTitleMax", { max: JOB_TITLE_MAX_LENGTH }))
     .optional()
     .or(z.literal("")),
   department: z
     .string()
     .trim()
-    .max(100, "Department cannot exceed 100 characters")
+    .max(DEPARTMENT_MAX_LENGTH, msg("recruiterEmployees.validation.departmentMax", { max: DEPARTMENT_MAX_LENGTH }))
     .optional()
     .or(z.literal("")),
   phone: z
     .string()
     .trim()
-    .regex(/^[0-9+() -]{8,20}$/, "Work phone must be 8–20 digits")
+    .regex(PHONE_PATTERN, msg("recruiterEmployees.validation.phoneInvalid"))
     .optional()
     .or(z.literal("")),
 });
@@ -72,24 +79,24 @@ export const editEmployeeSchema = z.object({
   full_name: z
     .string()
     .trim()
-    .min(2, "Display name must be at least 2 characters")
-    .max(100, "Display name cannot exceed 100 characters"),
+    .min(FULL_NAME_MIN_LENGTH, msg("recruiterEmployees.validation.displayNameMin", { min: FULL_NAME_MIN_LENGTH }))
+    .max(NAME_MAX_LENGTH, msg("recruiterEmployees.validation.displayNameMax", { max: NAME_MAX_LENGTH })),
   job_title: z
     .string()
     .trim()
-    .max(100, "Job title cannot exceed 100 characters")
+    .max(JOB_TITLE_MAX_LENGTH, msg("recruiterEmployees.validation.jobTitleMax", { max: JOB_TITLE_MAX_LENGTH }))
     .optional()
     .or(z.literal("")),
   department: z
     .string()
     .trim()
-    .max(100, "Department cannot exceed 100 characters")
+    .max(DEPARTMENT_MAX_LENGTH, msg("recruiterEmployees.validation.departmentMax", { max: DEPARTMENT_MAX_LENGTH }))
     .optional()
     .or(z.literal("")),
   phone: z
     .string()
     .trim()
-    .regex(/^[0-9+() -]{8,20}$/, "Work phone must be 8–20 digits")
+    .regex(PHONE_PATTERN, msg("recruiterEmployees.validation.phoneInvalid"))
     .optional()
     .or(z.literal("")),
 });
@@ -101,8 +108,8 @@ export const changeEmployeeStatusSchema = z.object({
   reason: z
     .string()
     .trim()
-    .min(REASON_MIN_LENGTH, `Reason must be at least ${REASON_MIN_LENGTH} characters`)
-    .max(500, "Reason cannot exceed 500 characters"),
+    .min(REASON_MIN_LENGTH, msg("reason.tooShort", { min: REASON_MIN_LENGTH }))
+    .max(REASON_MAX_LENGTH, msg("recruiterEmployees.validation.reasonMax", { max: REASON_MAX_LENGTH })),
 });
 
 export type ChangeEmployeeStatusFormValues = z.infer<

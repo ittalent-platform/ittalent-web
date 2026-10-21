@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
 import {
   MoreHorizontal,
@@ -30,6 +31,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { FilterSelect } from "@/components/ui/filter-select";
 import { recruiterEmployeeDetailPath } from "@/config/routes";
 import { useSession } from "@/auth/use-session";
+import { formatDate } from "@/lib/format";
 import { useEmployeesListQuery } from "./employees.queries";
 import { EmployeeStatusBadge } from "./employee-status-badge";
 import { InviteEmployeeDialog } from "./invite-employee-dialog";
@@ -65,6 +67,7 @@ function getAvatarColor(id: string): string {
 }
 
 export function RecruiterEmployeesPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: session } = useSession();
   const canManageEmployees = session?.user.role === "enterprise_admin";
@@ -110,18 +113,18 @@ export function RecruiterEmployeesPage() {
   // Collect available departments for filtering
   const departmentOptions = useMemo(() => {
     return [
-      { label: "Department: All", value: "all" },
-      { label: "Talent acquisition", value: "Talent acquisition" },
-      { label: "Engineering", value: "Engineering" },
-      { label: "People operations", value: "People operations" },
+      { label: t("recruiterEmployees.toolbar.departmentAll"), value: "all" },
+      { label: t("recruiterEmployees.departments.talentAcquisition"), value: "Talent acquisition" },
+      { label: t("recruiterEmployees.departments.engineering"), value: "Engineering" },
+      { label: t("recruiterEmployees.departments.peopleOperations"), value: "People operations" },
     ];
-  }, []);
+  }, [t]);
 
   const sortOptions = [
-    { label: "Sort: Newest first", value: "createdAt-desc" },
-    { label: "Sort: Oldest first", value: "createdAt-asc" },
-    { label: "Sort: Name A-Z", value: "fullName-asc" },
-    { label: "Sort: Name Z-A", value: "fullName-desc" },
+    { label: t("admin.registrations.sort.newestFirst"), value: "createdAt-desc" },
+    { label: t("admin.registrations.sort.oldestFirst"), value: "createdAt-asc" },
+    { label: t("recruiterEmployees.toolbar.sortNameAsc"), value: "fullName-asc" },
+    { label: t("recruiterEmployees.toolbar.sortNameDesc"), value: "fullName-desc" },
   ];
 
   const handleSortChange = (val: string) => {
@@ -136,10 +139,10 @@ export function RecruiterEmployeesPage() {
 
   // Status counters calculation
   const statusTabs = [
-    { key: "all", label: "All" },
-    { key: "active", label: "Active" },
-    { key: "inactive", label: "Invitation pending" },
-    { key: "suspended", label: "Suspended" },
+    { key: "all", label: t("filterSelect.all") },
+    { key: "active", label: t("adminUsers.status.active") },
+    { key: "inactive", label: t("adminUsers.invitation.pending") },
+    { key: "suspended", label: t("adminUsers.status.suspended") },
   ] as const;
 
   return (
@@ -148,20 +151,19 @@ export function RecruiterEmployeesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <nav className="mb-1 text-xs font-medium text-muted-foreground">
-            <span>Workspace</span>
+            <span>{t("recruiterEmployees.page.workspace")}</span>
             <span className="mx-2">/</span>
-            <span className="text-foreground">Employees</span>
+            <span className="text-foreground">{t("sidebar.employees")}</span>
           </nav>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Employees
+            {t("sidebar.employees")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Your company’s HR team. Only people in your corporate workspace are
-            shown.
+            {t("recruiterEmployees.page.subtitle")}
           </p>
         </div>
 
-        {canManageEmployees ? <Button onClick={() => setIsInviteOpen(true)} className="gap-2 shrink-0"><UserPlus className="size-4" /><span>Invite HR employee</span></Button> : null}
+        {canManageEmployees ? <Button onClick={() => setIsInviteOpen(true)} className="gap-2 shrink-0"><UserPlus className="size-4" /><span>{t("recruiterEmployees.invite.title")}</span></Button> : null}
       </div>
 
       {/* Status Tabs */}
@@ -200,13 +202,14 @@ export function RecruiterEmployeesPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              placeholder="Search employee or email…"
+              placeholder={t("recruiterEmployees.toolbar.searchPlaceholder")}
               className="pl-9 pr-8 text-sm"
             />
             {search ? (
               <button
                 type="button"
                 onClick={() => setSearch("")}
+                aria-label={t("search.clearSearch")}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X className="size-3.5" />
@@ -240,13 +243,13 @@ export function RecruiterEmployeesPage() {
         <Table>
           <TableHead>
             <TableHeaderRow className="hover:bg-transparent">
-              <TableHeaderCell className="w-[300px]">Employee</TableHeaderCell>
-              <TableHeaderCell>Department</TableHeaderCell>
-              <TableHeaderCell>Work Phone</TableHeaderCell>
-              <TableHeaderCell>Status</TableHeaderCell>
-              <TableHeaderCell>Member Since</TableHeaderCell>
+              <TableHeaderCell className="w-[300px]">{t("recruiterEmployees.table.employee")}</TableHeaderCell>
+              <TableHeaderCell>{t("recruiterEmployees.table.department")}</TableHeaderCell>
+              <TableHeaderCell>{t("recruiterEmployees.table.workPhone")}</TableHeaderCell>
+              <TableHeaderCell>{t("applications.columns.status")}</TableHeaderCell>
+              <TableHeaderCell>{t("recruiterEmployees.table.memberSince")}</TableHeaderCell>
               <TableHeaderCell className="w-[60px] text-right">
-                Actions
+                {t("adminUsers.table.actions")}
               </TableHeaderCell>
             </TableHeaderRow>
           </TableHead>
@@ -286,8 +289,7 @@ export function RecruiterEmployeesPage() {
                   colSpan={6}
                   className="h-40 text-center text-sm text-destructive"
                 >
-                  Failed to load employees list. Please check your connection
-                  and try again.
+                  {t("recruiterEmployees.list.loadError")}
                 </TableCell>
               </TableRow>
             ) : employees.length === 0 ? (
@@ -296,14 +298,14 @@ export function RecruiterEmployeesPage() {
                   <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                     <UsersIcon className="size-8 text-muted-foreground/50" />
                     <p className="text-sm font-medium text-foreground">
-                      No employees found
+                      {t("recruiterEmployees.list.emptyTitle")}
                     </p>
                     <p className="text-xs">
                       {search ||
                       statusFilter !== "all" ||
                       departmentFilter !== "all"
-                        ? "Try adjusting your search query or filters."
-                        : "Start building your HR team by inviting your first employee."}
+                        ? t("recruiterEmployees.list.emptyFiltered")
+                        : t("recruiterEmployees.list.emptyFirst")}
                     </p>
                     {search ||
                     statusFilter !== "all" ||
@@ -318,7 +320,7 @@ export function RecruiterEmployeesPage() {
                           setDepartmentFilter("all");
                         }}
                       >
-                        Reset filters
+                        {t("adminUsers.history.reset")}
                       </Button>
                       ) : (
                       canManageEmployees ? <Button
@@ -326,7 +328,7 @@ export function RecruiterEmployeesPage() {
                         className="mt-2 text-xs"
                         onClick={() => setIsInviteOpen(true)}
                       >
-                        Invite HR employee
+                        {t("recruiterEmployees.invite.title")}
                       </Button> : null
                       )}
                   </div>
@@ -339,18 +341,12 @@ export function RecruiterEmployeesPage() {
                 const colorClass = getAvatarColor(emp.id);
                 const jobTitle =
                   (emp as unknown as { job_title?: string }).job_title ||
-                  (emp.role === "admin" ? "Enterprise admin" : "Recruiter");
+                  (emp.role === "admin" ? t("roles.enterpriseAdmin") : t("roles.recruiter"));
                 const department =
                   (emp as unknown as { department?: string }).department ||
-                  "Talent acquisition";
+                  t("recruiterEmployees.departments.talentAcquisition");
                 const phone = emp.phone || "—";
-                const memberDate = emp.createdAt
-                  ? new Date(emp.createdAt).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })
-                  : "—";
+                const memberDate = formatDate(emp.createdAt);
 
                 return (
                   <TableRow
@@ -419,7 +415,7 @@ export function RecruiterEmployeesPage() {
                             className="size-8"
                           >
                             <MoreHorizontal className="size-4" />
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">{t("adminLayout.openMenu")}</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -428,12 +424,12 @@ export function RecruiterEmployeesPage() {
                               navigate(recruiterEmployeeDetailPath(emp.id))
                             }
                           >
-                            View details
+                            {t("adminUsers.table.view")}
                           </DropdownMenuItem>
                           {canManageEmployees ? <DropdownMenuItem
                             onClick={() => setEditingEmployee(emp)}
                           >
-                            Edit information
+                            {t("adminUsers.detail.editInformation")}
                           </DropdownMenuItem> : null}
                           {canManageEmployees ? <DropdownMenuItem
                             onClick={() => setStatusEmployee(emp)}
@@ -444,8 +440,8 @@ export function RecruiterEmployeesPage() {
                             }
                           >
                             {emp.status === "active"
-                              ? "Suspend membership"
-                              : "Activate membership"}
+                              ? t("recruiterEmployees.menu.suspend")
+                              : t("recruiterEmployees.menu.activate")}
                           </DropdownMenuItem> : null}
                         </DropdownMenuContent>
                       </DropdownMenu>

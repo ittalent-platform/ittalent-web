@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { client } from "@/api/client";
+import i18n from "@/i18n";
 import { getApiV1UsersById, getApiV1UsersByIdHistory } from "@/api/generated";
 import type { UserDto, UserListResponse } from "@/api/generated/types.gen";
 
@@ -142,7 +143,7 @@ export function useCreateEmployeeMutation() {
           errors?: Record<string, string[]>;
         };
         const message =
-          errorData.message ?? "Failed to create employee account";
+          errorData.message ?? i18n.t("recruiterEmployees.invite.failed");
         throw Object.assign(new Error(message), errorData, {
           status: result.response?.status,
         });
@@ -174,7 +175,7 @@ export function useUpdateEmployeeMutation(employeeId: string) {
       if (result.error) {
         const errorData = result.error as { message?: string };
         throw Object.assign(
-          new Error(errorData.message ?? "Failed to update employee"),
+          new Error(errorData.message ?? i18n.t("recruiterEmployees.edit.failed")),
           errorData,
           {
             status: result.response?.status,
@@ -214,7 +215,7 @@ export function useUpdateEmployeeStatusMutation(employeeId: string) {
       if (result.error) {
         const errorData = result.error as { message?: string };
         throw Object.assign(
-          new Error(errorData.message ?? "Failed to update employee status"),
+          new Error(errorData.message ?? i18n.t("recruiterEmployees.statusDialog.failed")),
           errorData,
           {
             status: result.response?.status,

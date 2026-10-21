@@ -205,7 +205,7 @@ describe("Recruiter Employee Detail Page Tests", () => {
     expect(
       screen.getByRole("heading", { name: "Employee account history" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("account invited").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Account invitation sent").length).toBeGreaterThan(0);
   });
 
   it("opens edit employee dialog, modifies display name and phone, and saves", async () => {

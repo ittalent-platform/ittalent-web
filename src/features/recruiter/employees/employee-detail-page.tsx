@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 import {
   ArrowLeft,
@@ -14,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RECRUITER_EMPLOYEES_PATH } from "@/config/routes";
 import { useSession } from "@/auth/use-session";
+import { formatDate } from "@/lib/format";
 import {
   useEmployeeDetailQuery,
   useEmployeeHistoryQuery,
@@ -31,6 +33,7 @@ function getInitials(name: string): string {
 }
 
 export function RecruiterEmployeeDetailPage() {
+  const { t } = useTranslation();
   const { employeeId = "" } = useParams();
   const { data: session } = useSession();
   const canManageEmployees = session?.user.role === "enterprise_admin";
@@ -74,16 +77,15 @@ export function RecruiterEmployeeDetailPage() {
     return (
       <div className="rounded-xl border border-border bg-card p-12 text-center">
         <h2 className="text-lg font-semibold text-foreground">
-          Employee not found
+          {t("recruiterEmployees.detail.notFoundTitle")}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          The requested employee record does not exist or you do not have
-          permission to access it.
+          {t("recruiterEmployees.detail.notFoundBody")}
         </p>
         <Button asChild variant="outline" className="mt-4 gap-2">
           <Link to={RECRUITER_EMPLOYEES_PATH}>
             <ArrowLeft className="size-4" />
-            Back to employees
+            {t("recruiterEmployees.detail.back")}
           </Link>
         </Button>
       </div>
@@ -94,18 +96,12 @@ export function RecruiterEmployeeDetailPage() {
   const initials = getInitials(name);
   const jobTitle =
     (employee as unknown as { job_title?: string }).job_title ||
-    (employee.role === "admin" ? "Enterprise Administrator" : "Recruiter");
+    (employee.role === "admin" ? t("roles.enterpriseAdmin") : t("roles.recruiter"));
   const department =
     (employee as unknown as { department?: string }).department ||
-    "Talent acquisition";
+    t("recruiterEmployees.departments.talentAcquisition");
   const empCode = `EMP-${employee.id.slice(-4).toUpperCase()}`;
-  const memberDate = employee.createdAt
-    ? new Date(employee.createdAt).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
-    : "—";
+  const memberDate = formatDate(employee.createdAt);
 
   const recentHistory = historyList.slice(0, 4);
 
@@ -114,7 +110,7 @@ export function RecruiterEmployeeDetailPage() {
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
         <Link to={RECRUITER_EMPLOYEES_PATH} className="hover:text-foreground">
-          Employees
+          {t("sidebar.employees")}
         </Link>
         <span>/</span>
         <span className="font-mono text-foreground">{empCode}</span>
@@ -147,15 +143,15 @@ export function RecruiterEmployeeDetailPage() {
             className="gap-2"
           >
             <Edit3 className="size-4" />
-            <span>Edit information</span>
+            <span>{t("adminUsers.detail.editInformation")}</span>
           </Button>
           <Button
             variant={employee.status === "active" ? "destructive" : "default"}
             onClick={() => setIsStatusOpen(true)}
           >
             {employee.status === "active"
-              ? "Change status"
-              : "Activate membership"}
+              ? t("recruiterApplications.detail.changeStatus")
+              : t("recruiterEmployees.menu.activate")}
           </Button>
         </div> : null}
       </div>
@@ -166,30 +162,30 @@ export function RecruiterEmployeeDetailPage() {
         <Card className="shadow-xs">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-semibold">
-              Employee information
+              {t("recruiterEmployees.detail.infoTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="grid grid-cols-3 gap-2 border-b border-border/60 pb-3">
-              <span className="text-muted-foreground">Display name</span>
+              <span className="text-muted-foreground">{t("recruiterEmployees.form.displayName")}</span>
               <span className="col-span-2 font-medium text-foreground">
                 {name}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2 border-b border-border/60 pb-3">
-              <span className="text-muted-foreground">Job title</span>
+              <span className="text-muted-foreground">{t("recruiterEmployees.form.jobTitle")}</span>
               <span className="col-span-2 font-medium text-foreground">
                 {jobTitle}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2 border-b border-border/60 pb-3">
-              <span className="text-muted-foreground">Department</span>
+              <span className="text-muted-foreground">{t("recruiterEmployees.form.department")}</span>
               <span className="col-span-2 font-medium text-foreground">
                 {department}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <span className="text-muted-foreground">Work phone</span>
+              <span className="text-muted-foreground">{t("recruiterEmployees.form.workPhone")}</span>
               <span className="col-span-2 font-mono text-foreground">
                 {employee.phone || "—"}
               </span>
@@ -200,11 +196,11 @@ export function RecruiterEmployeeDetailPage() {
         {/* Card 2: Account Details */}
         <Card className="shadow-xs">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold">Account</CardTitle>
+            <CardTitle className="text-base font-semibold">{t("adminUsers.table.accountStatus")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="grid grid-cols-3 gap-2 border-b border-border/60 pb-3">
-              <span className="text-muted-foreground">Work email</span>
+              <span className="text-muted-foreground">{t("enterpriseRegistration.step2.workEmail")}</span>
               <div className="col-span-2 flex items-center gap-2">
                 <span className="font-medium text-foreground">
                   {employee.email}
@@ -212,35 +208,34 @@ export function RecruiterEmployeeDetailPage() {
                 {employee.emailVerified ? (
                   <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
                     <CheckCircle2 className="size-3" />
-                    Verified
+                    {t("adminUsers.emailStatus.verified")}
                   </span>
                 ) : null}
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 border-b border-border/60 pb-3">
-              <span className="text-muted-foreground">Role</span>
+              <span className="text-muted-foreground">{t("adminUsers.table.role")}</span>
               <span className="col-span-2 font-medium text-foreground capitalize">
                 {employee.role === "admin"
-                  ? "Enterprise Admin"
-                  : "HR / Recruiter"}
+                  ? t("roles.enterpriseAdmin")
+                  : t("recruiterEmployees.role.hrRecruiter")}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2 border-b border-border/60 pb-3">
-              <span className="text-muted-foreground">Employee ID</span>
+              <span className="text-muted-foreground">{t("recruiterEmployees.detail.employeeId")}</span>
               <span className="col-span-2 font-mono font-medium text-foreground">
                 {empCode}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <span className="text-muted-foreground">Member since</span>
+              <span className="text-muted-foreground">{t("recruiterEmployees.detail.memberSince")}</span>
               <span className="col-span-2 text-foreground">{memberDate}</span>
             </div>
 
             <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
               <Info className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
               <span>
-                Email, password and role belong to the person’s own ITTalent
-                account, so they can’t be changed here.
+                {t("recruiterEmployees.form.lockedNote")}
               </span>
             </div>
           </CardContent>
@@ -250,7 +245,7 @@ export function RecruiterEmployeeDetailPage() {
         <Card className="shadow-xs">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-semibold">
-              Membership
+              {t("recruiterEmployees.detail.membershipTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
@@ -258,14 +253,14 @@ export function RecruiterEmployeeDetailPage() {
               <UserCheck className="size-4 text-emerald-600" />
               <span>
                 {employee.status === "active"
-                  ? `Active since ${memberDate}`
-                  : "Access currently suspended"}
+                  ? t("recruiterEmployees.detail.activeSince", { date: memberDate })
+                  : t("recruiterEmployees.detail.suspendedTitle")}
               </span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {employee.status === "active"
-                ? "Can access and manage your corporate workspace: publish job postings, review applicants, and coordinate interview schedules."
-                : "Workspace access is revoked. This employee cannot view candidates or post jobs until reactivated."}
+                ? t("recruiterEmployees.detail.activeBody")
+                : t("recruiterEmployees.detail.suspendedBody")}
             </p>
           </CardContent>
         </Card>
@@ -274,7 +269,7 @@ export function RecruiterEmployeeDetailPage() {
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-base font-semibold">
-              Recent activity
+              {t("recruiterEmployees.detail.activityTitle")}
             </CardTitle>
             {historyList.length > 0 ? (
               <Button
@@ -284,14 +279,14 @@ export function RecruiterEmployeeDetailPage() {
                 onClick={() => setIsHistoryOpen(true)}
               >
                 <History className="size-3.5" />
-                <span>View all ({historyList.length})</span>
+                <span>{t("recruiterEmployees.detail.viewAll", { count: historyList.length })}</span>
               </Button>
             ) : null}
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             {recentHistory.length === 0 ? (
               <p className="text-xs text-muted-foreground py-2">
-                No recent activity recorded for this employee account.
+                {t("recruiterEmployees.detail.noActivity")}
               </p>
             ) : (
               <div className="space-y-2.5">
@@ -300,7 +295,7 @@ export function RecruiterEmployeeDetailPage() {
                     <span className="mt-1 size-1.5 rounded-full bg-primary shrink-0" />
                     <div className="flex-1">
                       <span className="font-medium text-foreground capitalize">
-                      {item.action.replace(/_/g, " ")}
+                      {t(`adminUsers.history.${item.action}`, { defaultValue: item.action.replace(/_/g, " ") })}
                       </span>
                       {item.reason ? (
                         <span className="text-muted-foreground ml-1">

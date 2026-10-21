@@ -1,70 +1,70 @@
 import { z } from "zod";
 import type { EnterpriseDetailDto } from "@/api/generated/types.gen";
+import { validationMessage as msg } from "@/lib/validation-message";
 
 export type EnterpriseDetail = EnterpriseDetailDto;
 
+// `value` is what the API stores; `labelKey` is the i18n key of the text shown to the user.
 export const INDUSTRY_OPTIONS = [
-  { label: "Fintech", value: "Fintech" },
-  { label: "Information Technology", value: "Information Technology" },
-  { label: "Software Development", value: "Software Development" },
-  { label: "E-Commerce", value: "E-Commerce" },
-  {
-    label: "Banking & Financial Services",
-    value: "Banking & Financial Services",
-  },
-  { label: "Telecommunications", value: "Telecommunications" },
-  { label: "AI & Machine Learning", value: "AI & Machine Learning" },
-  { label: "Healthcare & Biotech", value: "Healthcare & Biotech" },
-  { label: "Education & EdTech", value: "Education & EdTech" },
-  { label: "Other", value: "Other" },
+  { labelKey: "recruiterCompanyProfile.industry.fintech", value: "Fintech" },
+  { labelKey: "recruiterCompanyProfile.industry.it", value: "Information Technology" },
+  { labelKey: "recruiterCompanyProfile.industry.software", value: "Software Development" },
+  { labelKey: "recruiterCompanyProfile.industry.ecommerce", value: "E-Commerce" },
+  { labelKey: "recruiterCompanyProfile.industry.banking", value: "Banking & Financial Services" },
+  { labelKey: "enterpriseRegistration.industries.telecom", value: "Telecommunications" },
+  { labelKey: "recruiterCompanyProfile.industry.ai", value: "AI & Machine Learning" },
+  { labelKey: "recruiterCompanyProfile.industry.healthcare", value: "Healthcare & Biotech" },
+  { labelKey: "recruiterCompanyProfile.industry.education", value: "Education & EdTech" },
+  { labelKey: "enterpriseRegistration.industries.other", value: "Other" },
 ];
 
-export const COMPANY_SIZE_OPTIONS = [
-  { label: "1–10 employees", value: "1-10" },
-  { label: "11–50 employees", value: "11-50" },
-  { label: "51–200 employees", value: "51-200" },
-  { label: "201–500 employees", value: "201-500" },
-  { label: "501–1000 employees", value: "501-1000" },
-  { label: "1000+ employees", value: "1000+" },
-];
+export const COMPANY_SIZE_OPTIONS = ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"].map((value) => ({
+  labelKey: `recruiterCompanyProfile.companySize.${value}`,
+  value,
+}));
 
 export const COMPANY_TYPE_OPTIONS = [
-  { label: "Product", value: "Product" },
-  { label: "Outsourcing", value: "Outsourcing" },
-  { label: "IT Service", value: "IT Service" },
-  { label: "Consulting", value: "Consulting" },
-  { label: "Agency", value: "Agency" },
-  { label: "Hybrid", value: "Hybrid" },
-  { label: "Other", value: "Other" },
+  { labelKey: "recruiterCompanyProfile.companyType.product", value: "Product" },
+  { labelKey: "recruiterCompanyProfile.companyType.outsourcing", value: "Outsourcing" },
+  { labelKey: "recruiterCompanyProfile.companyType.itService", value: "IT Service" },
+  { labelKey: "recruiterCompanyProfile.companyType.consulting", value: "Consulting" },
+  { labelKey: "recruiterCompanyProfile.companyType.agency", value: "Agency" },
+  { labelKey: "recruiterCompanyProfile.companyType.hybrid", value: "Hybrid" },
+  { labelKey: "enterpriseRegistration.industries.other", value: "Other" },
 ];
+
+export const COMPANY_NAME_MIN_LENGTH = 2;
+export const COMPANY_NAME_MAX_LENGTH = 150;
+export const COMPANY_DESCRIPTION_MAX_LENGTH = 5000;
+const PHONE_PATTERN = /^[0-9+() -]{8,20}$/;
 
 export const updateEnterpriseProfileSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(2, "Display name must be at least 2 characters")
-    .max(150, "Display name cannot exceed 150 characters"),
+    .min(COMPANY_NAME_MIN_LENGTH, msg("recruiterEmployees.validation.displayNameMin", { min: COMPANY_NAME_MIN_LENGTH }))
+    .max(COMPANY_NAME_MAX_LENGTH, msg("recruiterEmployees.validation.displayNameMax", { max: COMPANY_NAME_MAX_LENGTH })),
   email: z
     .string()
     .trim()
-    .email("Please provide a valid corporate email address"),
+    .email(msg("recruiterEmployees.validation.emailInvalid")),
   phone: z
     .string()
     .trim()
-    .regex(/^[0-9+() -]{8,20}$/, "Phone number must be 8–20 digits"),
+    .regex(PHONE_PATTERN, msg("recruiterCompanyProfile.validation.phoneInvalid")),
   website: z
     .string()
     .trim()
-    .url("Website must be a valid URL")
+    .url(msg("recruiterCompanyProfile.validation.urlWebsite"))
     .optional()
     .or(z.literal("")),
-  industry: z.string().trim().min(1, "Please select an industry"),
+  industry: z.string().trim().min(1, msg("recruiterCompanyProfile.validation.industryRequired")),
   company_size: z.string().trim().optional().or(z.literal("")),
   company_type: z.string().trim().optional().or(z.literal("")),
   description: z
     .string()
     .trim()
-    .max(5000, "Description cannot exceed 5000 characters")
+    .max(COMPANY_DESCRIPTION_MAX_LENGTH, msg("recruiterCompanyProfile.validation.descriptionMax", { max: COMPANY_DESCRIPTION_MAX_LENGTH }))
     .optional()
     .or(z.literal("")),
   street: z.string().trim().optional().or(z.literal("")),
@@ -73,25 +73,25 @@ export const updateEnterpriseProfileSchema = z.object({
   social_linkedin: z
     .string()
     .trim()
-    .url("LinkedIn link must be a valid URL")
+    .url(msg("recruiterCompanyProfile.validation.urlLinkedin"))
     .optional()
     .or(z.literal("")),
   social_facebook: z
     .string()
     .trim()
-    .url("Facebook link must be a valid URL")
+    .url(msg("recruiterCompanyProfile.validation.urlFacebook"))
     .optional()
     .or(z.literal("")),
   social_github: z
     .string()
     .trim()
-    .url("GitHub link must be a valid URL")
+    .url(msg("recruiterCompanyProfile.validation.urlGithub"))
     .optional()
     .or(z.literal("")),
   social_twitter: z
     .string()
     .trim()
-    .url("X / Twitter link must be a valid URL")
+    .url(msg("recruiterCompanyProfile.validation.urlTwitter"))
     .optional()
     .or(z.literal("")),
   benefits: z.array(z.string()).optional(),

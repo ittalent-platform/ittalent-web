@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Building2, Image as ImageIcon, Trash2 } from "lucide-react";
 
 import {
@@ -26,6 +27,7 @@ export function ChangeLogoDialog({
   onOpenChange,
   enterprise,
 }: ChangeLogoDialogProps) {
+  const { t } = useTranslation();
   const [logoUrl, setLogoUrl] = useState(enterprise?.logoUrl ?? "");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -40,9 +42,7 @@ export function ChangeLogoDialog({
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      setErrorMessage(
-        "Image size exceeds 5MB limit. Please choose a smaller file.",
-      );
+      setErrorMessage(t("recruiterCompanyProfile.logo.tooLarge"));
       return;
     }
 
@@ -64,7 +64,7 @@ export function ChangeLogoDialog({
       onOpenChange(false);
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
-      setErrorMessage(errorObj.message ?? "Failed to update company logo.");
+      setErrorMessage(errorObj.message ?? t("recruiterCompanyProfile.logo.saveFailed"));
     }
   };
 
@@ -78,7 +78,7 @@ export function ChangeLogoDialog({
       onOpenChange(false);
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
-      setErrorMessage(errorObj.message ?? "Failed to remove logo.");
+      setErrorMessage(errorObj.message ?? t("recruiterCompanyProfile.logo.removeFailed"));
     }
   };
 
@@ -89,10 +89,9 @@ export function ChangeLogoDialog({
           <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Building2 className="size-5" />
           </div>
-          <DialogTitle className="text-xl">Change company logo</DialogTitle>
+          <DialogTitle className="text-xl">{t("recruiterCompanyProfile.logo.title")}</DialogTitle>
           <DialogDescription>
-            This logo appears on your public company profile, job postings, and
-            emails to candidates.
+            {t("recruiterCompanyProfile.logo.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -109,7 +108,7 @@ export function ChangeLogoDialog({
               <div className="relative group size-28 overflow-hidden rounded-2xl border border-border shadow-xs bg-background">
                 <img
                   src={logoUrl}
-                  alt="Company Logo Preview"
+                  alt={t("recruiterCompanyProfile.logo.previewAlt")}
                   className="size-full object-contain p-2"
                 />
               </div>
@@ -118,7 +117,7 @@ export function ChangeLogoDialog({
                 <ImageIcon className="size-10 text-muted-foreground/50" />
               </div>
             )}
-            <p className="mt-2 text-xs text-muted-foreground">Preview</p>
+            <p className="mt-2 text-xs text-muted-foreground">{t("recruiterCompanyProfile.logo.preview")}</p>
           </div>
 
           {/* Upload / URL Controls */}
@@ -127,7 +126,7 @@ export function ChangeLogoDialog({
               htmlFor="logo-file"
               className="text-xs font-medium text-foreground"
             >
-              Upload image file
+              {t("recruiterCompanyProfile.logo.uploadFile")}
             </Label>
             <div className="flex items-center gap-2">
               <Input
@@ -145,7 +144,7 @@ export function ChangeLogoDialog({
               htmlFor="logo-url"
               className="text-xs font-medium text-foreground"
             >
-              Or paste image URL
+              {t("recruiterCompanyProfile.logo.orUrl")}
             </Label>
             <Input
               id="logo-url"
@@ -157,8 +156,9 @@ export function ChangeLogoDialog({
           </div>
 
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            • Square format (1:1 ratio), recommended minimum 400×400px.
-            <br />• Maximum file size: 5MB. Formats: PNG, JPG, WebP, SVG.
+            {t("recruiterCompanyProfile.logo.hintRatio")}
+            <br />
+            {t("recruiterCompanyProfile.logo.hintSize")}
           </p>
         </div>
 
@@ -173,7 +173,7 @@ export function ChangeLogoDialog({
               disabled={updateMutation.isPending}
             >
               <Trash2 className="size-3.5 mr-1" />
-              Remove logo
+              {t("recruiterCompanyProfile.logo.remove")}
             </Button>
           ) : (
             <div />
@@ -185,7 +185,7 @@ export function ChangeLogoDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
             <Button
               type="button"
@@ -194,7 +194,7 @@ export function ChangeLogoDialog({
                 updateMutation.isPending || (!logoUrl && !enterprise.logoUrl)
               }
             >
-              {updateMutation.isPending ? "Saving..." : "Save logo"}
+              {updateMutation.isPending ? t("state.saving") : t("recruiterCompanyProfile.logo.save")}
             </Button>
           </div>
         </DialogFooter>

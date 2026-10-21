@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Dialog,
@@ -32,6 +33,7 @@ export function ChangeEmployeeStatusDialog({
   onOpenChange,
   employee,
 }: ChangeEmployeeStatusDialogProps) {
+  const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const statusMutation = useUpdateEmployeeStatusMutation(employee?.id ?? "");
 
@@ -67,7 +69,7 @@ export function ChangeEmployeeStatusDialog({
     } catch (err: unknown) {
       const errorObj = err as { message?: string };
       setErrorMessage(
-        errorObj.message ?? "Failed to change membership status.",
+        errorObj.message ?? t("recruiterEmployees.statusDialog.failed"),
       );
     }
   };
@@ -91,12 +93,12 @@ export function ChangeEmployeeStatusDialog({
               )}
             </div>
             <DialogTitle className="text-xl">
-              {isCurrentlyActive ? "Suspend membership" : "Activate membership"}
+              {isCurrentlyActive ? t("recruiterEmployees.menu.suspend") : t("recruiterEmployees.menu.activate")}
             </DialogTitle>
             <DialogDescription>
               {isCurrentlyActive
-                ? `Suspend workspace access for ${employee.fullName || employee.username}. They will not be able to view or manage candidate applications and job postings.`
-                : `Restore workspace access for ${employee.fullName || employee.username}.`}
+                ? t("recruiterEmployees.statusDialog.suspendBody", { name: employee.fullName || employee.username })
+                : t("recruiterEmployees.statusDialog.activateBody", { name: employee.fullName || employee.username })}
             </DialogDescription>
           </DialogHeader>
 
@@ -111,7 +113,7 @@ export function ChangeEmployeeStatusDialog({
 
             <div className="space-y-1.5">
               <Label htmlFor="status-reason" className="text-sm font-medium">
-                Reason for status change{" "}
+                {t("recruiterEmployees.statusDialog.reasonLabel")}{" "}
                 <span className="text-rose-500">*</span>
               </Label>
               <Textarea
@@ -119,8 +121,8 @@ export function ChangeEmployeeStatusDialog({
                 rows={3}
                 placeholder={
                   isCurrentlyActive
-                    ? "e.g. Employee transferred to another department or left the recruitment team"
-                    : "e.g. Reactivated by administrator request"
+                    ? t("recruiterEmployees.statusDialog.suspendPlaceholder")
+                    : t("recruiterEmployees.statusDialog.activatePlaceholder")
                 }
                 {...register("reason")}
                 aria-invalid={Boolean(errors.reason)}
@@ -129,8 +131,7 @@ export function ChangeEmployeeStatusDialog({
                 <p className="text-xs text-rose-500">{errors.reason.message}</p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  This note will be recorded in the audit trail for enterprise
-                  compliance.
+                  {t("recruiterEmployees.statusDialog.auditNote")}
                 </p>
               )}
             </div>
@@ -142,7 +143,7 @@ export function ChangeEmployeeStatusDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
             <Button
               type="submit"
@@ -150,10 +151,10 @@ export function ChangeEmployeeStatusDialog({
               disabled={isSubmitting || statusMutation.isPending}
             >
               {isSubmitting || statusMutation.isPending
-                ? "Updating..."
+                ? t("recruiterApplications.statusDialog.updating")
                 : isCurrentlyActive
-                  ? "Suspend membership"
-                  : "Activate membership"}
+                  ? t("recruiterEmployees.menu.suspend")
+                  : t("recruiterEmployees.menu.activate")}
             </Button>
           </DialogFooter>
         </form>
