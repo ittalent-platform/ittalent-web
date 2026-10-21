@@ -1087,9 +1087,13 @@
         "title": "Công ty không khả dụng",
         "body": "Công ty không tồn tại hoặc không còn hoạt động. Hãy chọn công ty đang hoạt động khác."
       },
+      "onboardingPending": {
+        "title": "Doanh nghiệp chưa hoàn tất onboarding",
+        "body": "Hãy hoàn tất đăng ký doanh nghiệp trước khi mời tài khoản này."
+      },
       "accountConflict": {
-        "title": "Email này đã có tài khoản",
-        "body": "Đã tồn tại tài khoản dùng email này."
+        "title": "Email hoặc tên đăng nhập đã được sử dụng",
+        "body": "Đã có tài khoản dùng email hoặc tên đăng nhập này. Hãy kiểm tra cả hai trường rồi thử lại."
       },
       "server": {
         "title": "Không thể lưu thay đổi",
@@ -1223,9 +1227,6 @@
       "conflictSaved": "Đang lưu",
       "conflictYours": "Của bạn",
       "loadLatest": "Tải bản mới nhất và sửa lại",
-      "existsTitle": "Email này đã có tài khoản",
-      "existsBody": "{{email}} đã được đăng ký. Hãy mở tài khoản hiện có thay vì tạo thêm.",
-      "openExisting": "Mở tài khoản hiện có",
       "discardEditTitle": "Bỏ các thay đổi?",
       "discardEditDescription": "Các chỉnh sửa của bạn cho tài khoản này sẽ không được lưu.",
       "discard": "Bỏ thay đổi",
