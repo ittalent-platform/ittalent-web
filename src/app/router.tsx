@@ -119,6 +119,30 @@ const RecruiterApplicationDetailPage = lazy(() =>
     default: m.RecruiterApplicationDetailPage,
   })),
 );
+const RecruiterEmployeesPage = lazy(() =>
+  import("@/features/recruiter/employees/employees-page").then((m) => ({
+    default: m.RecruiterEmployeesPage,
+  })),
+);
+const RecruiterEmployeeDetailPage = lazy(() =>
+  import("@/features/recruiter/employees/employee-detail-page").then((m) => ({
+    default: m.RecruiterEmployeeDetailPage,
+  })),
+);
+const RecruiterCompanyProfilePage = lazy(() =>
+  import("@/features/recruiter/company-profile/company-profile-page").then(
+    (m) => ({
+      default: m.RecruiterCompanyProfilePage,
+    }),
+  ),
+);
+const RecruiterEditCompanyProfilePage = lazy(() =>
+  import("@/features/recruiter/company-profile/edit-company-profile-page").then(
+    (m) => ({
+      default: m.RecruiterEditCompanyProfilePage,
+    }),
+  ),
+);
 const DocumentsPage = lazy(() =>
   import("@/features/documents/documents-page").then((m) => ({
     default: m.DocumentsPage,
@@ -293,6 +317,16 @@ export const appRoutes = [
           {
             path: "interviews/:interviewId",
             element: <RecruiterInterviewDetailPage />,
+          },
+          { path: "employees", element: <RecruiterEmployeesPage /> },
+          {
+            path: "employees/:employeeId",
+            element: <RecruiterEmployeeDetailPage />,
+          },
+          { path: "profile", element: <RecruiterCompanyProfilePage /> },
+          {
+            path: "profile/edit",
+            element: <RecruiterEditCompanyProfilePage />,
           },
         ],
       },

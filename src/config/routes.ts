@@ -28,3 +28,17 @@ export function adminUserPath(userId: string): string {
 export function adminEnterprisePath(enterpriseId: string): string {
   return `/admin/enterprises/${enterpriseId}`;
 }
+
+/** Recruiter employee accounts management (UC 10 - UC 16). */
+export const RECRUITER_EMPLOYEES_PATH = "/recruiter/employees";
+
+export function recruiterEmployeeDetailPath(employeeId: string): string {
+  return `${RECRUITER_EMPLOYEES_PATH}/${employeeId}`;
+}
+
+/** Recruiter company profile management (UC 17 - UC 19). */
+export const RECRUITER_COMPANY_PROFILE_PATH = "/recruiter/profile";
+
+export function recruiterCompanyProfileEditPath(): string {
+  return `${RECRUITER_COMPANY_PROFILE_PATH}/edit`;
+}

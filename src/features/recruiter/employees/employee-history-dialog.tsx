@@ -1,0 +1,104 @@
+import { Clock, History } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useEmployeeHistoryQuery } from "./employees.queries";
+import type { Employee } from "./employees.types";
+
+type EmployeeHistoryDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  employee: Employee | null;
+};
+
+export function EmployeeHistoryDialog({
+  open,
+  onOpenChange,
+  employee,
+}: EmployeeHistoryDialogProps) {
+  const { t } = useTranslation();
+  const history = useEmployeeHistoryQuery(employee?.id ?? "", open);
+
+  if (!employee) return null;
+
+  const historyItems = history.data?.pages.flatMap((page) => page.items) ?? [];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <History className="size-5" />
+          </div>
+          <DialogTitle className="text-xl">
+            {t("recruiterEmployees.history.title")}
+          </DialogTitle>
+          <DialogDescription>
+            {t("recruiterEmployees.history.description", { name: employee.fullName || employee.username })}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="max-h-[60vh] overflow-y-auto pr-1 py-2">
+          {history.isPending ? (
+            <div className="space-y-4 py-2">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          ) : historyItems.length === 0 ? (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              <Clock className="mx-auto mb-2 size-6 text-muted-foreground/60" />
+              {t("recruiterEmployees.history.empty")}
+            </div>
+          ) : (
+            <div className="relative pl-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border space-y-6">
+              {historyItems.map((item, index) => (
+                <div key={item.id || index} className="relative group">
+                  <span className="absolute -left-6 top-1 flex size-4 items-center justify-center rounded-full border-2 border-background bg-primary ring-4 ring-background" />
+                  <div className="rounded-lg border border-border/60 bg-muted/30 p-3 transition hover:border-border hover:bg-muted/50">
+                    <div className="flex items-center justify-between gap-2 text-xs">
+                      <span className="font-semibold text-foreground capitalize">
+                        {t(`adminUsers.history.${item.action}`, { defaultValue: item.action.replace(/_/g, " ") })}
+                      </span>
+                      <time className="text-muted-foreground">
+                        {item.occurredAt
+                          ? new Date(item.occurredAt).toLocaleString("vi-VN", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : ""}
+                      </time>
+                    </div>
+
+                    {item.reason ? (
+                      <p className="mt-1.5 text-xs text-foreground/80">
+                        {item.reason}
+                      </p>
+                    ) : null}
+
+                    {item.actorName ? (
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        {t("recruiterEmployees.history.performedBy", { name: item.actorName })}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {history.hasNextPage ? <Button className="mt-4" disabled={history.isFetchingNextPage} onClick={() => void history.fetchNextPage()} variant="outline">{t("adminUsers.history.older")}</Button> : null}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
