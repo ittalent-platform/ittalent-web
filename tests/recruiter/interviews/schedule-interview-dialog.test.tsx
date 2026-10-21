@@ -64,6 +64,8 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
 
 describe("Schedule interview dialog", () => {
   beforeEach(() => {
+    // The fixtures schedule on 20/10/2026; pin "now" before it so the dialog never sees them as past dates.
+    vi.useFakeTimers({ now: new Date("2026-10-08T03:00:00.000Z"), toFake: ["Date"] });
     showToast.mockReset();
     onClose.mockReset();
     mutate = vi.fn<Mutate>();
