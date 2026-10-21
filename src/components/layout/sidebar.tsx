@@ -9,7 +9,7 @@ import {
   X,
 } from "lucide-react";
 
-import { RECRUITER_APPLICATIONS_PATH, RECRUITER_INTERVIEWS_PATH, RECRUITER_JOB_POSTINGS_PATH } from "@/config/routes";
+import { RECRUITER_APPLICATIONS_PATH, RECRUITER_COMPANY_PROFILE_PATH, RECRUITER_EMPLOYEES_PATH, RECRUITER_INTERVIEWS_PATH, RECRUITER_JOB_POSTINGS_PATH } from "@/config/routes";
 import { SidebarNavList } from "./sidebar-nav-list";
 import { BrandLogo } from "./brand-logo";
 import { UserMenu } from "./user-menu";
@@ -46,6 +46,8 @@ const recruiterNavItems = [
   { end: false, icon: BriefcaseBusiness, labelKey: "sidebar.jobPostings", to: RECRUITER_JOB_POSTINGS_PATH },
   { end: false, icon: Inbox, labelKey: "sidebar.applications", to: RECRUITER_APPLICATIONS_PATH },
   { end: false, icon: CalendarDays, labelKey: "sidebar.interviews", to: RECRUITER_INTERVIEWS_PATH },
+  { end: false, icon: Users, labelKey: "sidebar.employees", to: RECRUITER_EMPLOYEES_PATH },
+  { end: false, icon: Building2, labelKey: "sidebar.companyProfile", to: RECRUITER_COMPANY_PROFILE_PATH },
 ] as const;
 
 type SidebarProps = {
@@ -63,7 +65,13 @@ type SidebarProps = {
 //   onCloseMobile,
 //   onToggleCollapsed,
 // }: SidebarProps) {
-export function Sidebar({ actor, collapsed, mobileOpen, onCloseMobile, onToggleCollapsed }: SidebarProps) {
+export function Sidebar({
+  actor,
+  collapsed,
+  mobileOpen,
+  onCloseMobile,
+  onToggleCollapsed,
+}: SidebarProps) {
   const { t } = useTranslation();
   const pendingRegistrationsQuery = useEnterpriseRegistrationsListQuery({
     enabled: actor === "admin",
@@ -83,8 +91,16 @@ export function Sidebar({ actor, collapsed, mobileOpen, onCloseMobile, onToggleC
         collapsed && "lg:items-center",
       )}
     >
-      <div className={cn("flex items-center gap-2 px-2 pb-4 pt-1", collapsed && "lg:px-0")}>
-        <BrandLogo tone="inverse" wordmarkClassName={cn("text-[13px]", collapsed && "lg:hidden")} />
+      <div
+        className={cn(
+          "flex items-center gap-2 px-2 pb-4 pt-1",
+          collapsed && "lg:px-0",
+        )}
+      >
+        <BrandLogo
+          tone="inverse"
+          wordmarkClassName={cn("text-[13px]", collapsed && "lg:hidden")}
+        />
         {!collapsed ? (
           <button
             aria-label={t("sidebar.collapse")}
