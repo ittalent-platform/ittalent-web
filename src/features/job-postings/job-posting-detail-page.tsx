@@ -60,7 +60,7 @@ import {
 type Actor = "admin" | "recruiter";
 type LifecycleAction = JobPostingTransition | "draft" | "publish";
 
-export function JobPostingDetailPage({ actor }: { actor: Actor }) {
+export function JobPostingDetailPage({ actor, readOnly = false }: { actor: Actor; readOnly?: boolean }) {
   const { t } = useTranslation();
   const { jobPostingId } = useParams<{ jobPostingId: string }>();
   const navigate = useNavigate();
@@ -159,7 +159,7 @@ export function JobPostingDetailPage({ actor }: { actor: Actor }) {
     return <JobPostingErrorState backTo={basePath} error={query.error} />;
 
   const posting = query.data;
-  const canManage = actor === "recruiter";
+  const canManage = actor === "recruiter" && !readOnly;
   const applicationCount = posting.applicationCount ?? 0;
 
   function handlePublishClick() {

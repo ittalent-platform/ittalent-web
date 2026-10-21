@@ -53,7 +53,8 @@ type Actor = "admin" | "recruiter";
 const SORT_FIELDS: readonly JobSortBy[] = ["created_at", "title", "expires_at"];
 const SEARCH_REGEX = /^[a-zA-Z0-9\s.\-'\u00C0-\u024F\u1EA0-\u1EF9]*$/;
 
-export function JobPostingListPage({ actor }: { actor: Actor }) {
+export function JobPostingListPage({ actor, readOnly = false }: { actor: Actor; readOnly?: boolean }) {
+  const canManage = actor === "recruiter" && !readOnly;
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -279,7 +280,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
     <div className="space-y-5">
       <AdminPageHeader
         actions={
-          actor === "recruiter" ? (
+          canManage ? (
             <Button
               asChild
               className="h-11 px-5 text-sm font-semibold"
@@ -438,7 +439,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         <div className="overflow-hidden rounded-xl border border-border bg-card">
           <JobPostingTable
             basePath={basePath}
-            canManage={actor === "recruiter"}
+            canManage={canManage}
             hasFilters={hasFilters}
             isLoading={query.isPending}
             items={query.data?.items ?? []}
@@ -471,7 +472,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
       ) : null}
 
       {/* Confirmation & Checklist Dialogs */}
-      {actor === "recruiter" && pendingDelete ? (
+      {canManage && pendingDelete ? (
         <DeleteJobDialog
           disabled={deletion.isPending}
           onConfirm={() => deletion.mutate(pendingDelete.id)}
@@ -481,7 +482,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         />
       ) : null}
 
-      {actor === "recruiter" && pendingClose ? (
+      {canManage && pendingClose ? (
         <CloseJobDialog
           disabled={transition.isPending}
           onConfirm={() =>
@@ -493,7 +494,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         />
       ) : null}
 
-      {actor === "recruiter" && pendingArchive ? (
+      {canManage && pendingArchive ? (
         <ArchiveJobDialog
           disabled={transition.isPending}
           onConfirm={() =>
@@ -505,7 +506,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         />
       ) : null}
 
-      {actor === "recruiter" && pendingUnarchive ? (
+      {canManage && pendingUnarchive ? (
         <UnarchiveJobDialog
           disabled={transition.isPending}
           onConfirm={() =>
@@ -517,7 +518,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         />
       ) : null}
 
-      {actor === "recruiter" && pendingReopen ? (
+      {canManage && pendingReopen ? (
         <ReopenJobDialog
           disabled={transition.isPending}
           onConfirm={() =>
@@ -529,7 +530,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         />
       ) : null}
 
-      {actor === "recruiter" && pendingPublish ? (
+      {canManage && pendingPublish ? (
         <PublishJobDialog
           disabled={publishing.isPending}
           onConfirm={() => publishing.mutate(pendingPublish.id)}
@@ -539,7 +540,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         />
       ) : null}
 
-      {actor === "recruiter" && pendingPublishBlocked ? (
+      {canManage && pendingPublishBlocked ? (
         <PublishChecklistDialog
           editPath={`${basePath}/${pendingPublishBlocked.id}/edit`}
           onOpenChange={(open) => !open && setPendingPublishBlocked(null)}
@@ -548,7 +549,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
         />
       ) : null}
 
-      {actor === "recruiter" && pendingUnpublish ? (
+      {canManage && pendingUnpublish ? (
         <MoveToDraftDialog
           disabled={unpublishing.isPending}
           onConfirm={() => unpublishing.mutate(pendingUnpublish.id)}
