@@ -113,6 +113,18 @@ test.describe("Enterprise Admin Job Postings (read-only)", () => {
     ).toHaveCount(0);
   });
 
+  test("redirects an enterprise admin who types the create or edit URL", async ({
+    enterpriseAdmin: page,
+  }) => {
+    for (const path of [
+      `${JOB_POSTINGS_PATH}/create`,
+      `${detailPath(JOB_POSTING_E2E.jobs.closeReopen.id)}/edit`,
+    ]) {
+      await page.goto(path);
+      await expect(page).toHaveURL(new RegExp(`${JOB_POSTINGS_PATH}$`));
+    }
+  });
+
   test("denies browser and direct API access to another enterprise job", async ({
     enterpriseAdmin: page,
   }) => {
