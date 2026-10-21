@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getApiV1MeApplications, getApiV1MeApplicationsById, getApiV1MeApplicationsByIdHistory, patchApiV1MeApplicationsByIdWithdraw } from "@/api/generated";
 import type { GetApiV1MeApplicationsData } from "@/api/generated/types.gen";
 import { HISTORY_PAGE_SIZE } from "./applications.constants";
@@ -26,13 +26,7 @@ export function useApplication(id: string) {
 
 // History is an append-only list capped by the API page size; one request covers the timeline and its "View all" dialog.
 export function useApplicationHistory(id: string) {
-  return useInfiniteQuery({
-    queryKey: applicationKeys.history(id),
-    initialPageParam: 1,
-    queryFn: async ({ pageParam }) => unwrap(await getApiV1MeApplicationsByIdHistory({ path: { id }, query: { page: pageParam, limit: HISTORY_PAGE_SIZE } })),
-    getNextPageParam: (last) => last.page < last.totalPages ? last.page + 1 : undefined,
-    enabled: Boolean(id),
-  });
+  return useQuery({ queryKey: applicationKeys.history(id), queryFn: async () => unwrap(await getApiV1MeApplicationsByIdHistory({ path: { id }, query: { page: 1, limit: HISTORY_PAGE_SIZE } })), enabled: Boolean(id) });
 }
 
 export type WithdrawInput = { id: string; reason?: string; expectedVersion?: number };

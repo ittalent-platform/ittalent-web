@@ -287,7 +287,6 @@
     "reasonOptional": "Lý do (không bắt buộc)",
     "reasonPlaceholder": "Cho công ty biết lý do, nếu bạn muốn",
     "reasonHint": "Tối đa {{max}} ký tự. Công ty có thể xem lý do này.",
-    "reasonTooShort": "Nhập ít nhất {{min}} ký tự hoặc để trống lý do.",
     "keepApplication": "Giữ đơn",
     "keepApplications": "Giữ các đơn",
     "withdrawFailed": "Rút đơn thất bại. Dữ liệu không bị thay đổi. Vui lòng thử lại.",
@@ -323,7 +322,6 @@
     },
     "history": {
       "title": "Lịch sử trạng thái",
-      "olderEvents": "Xem sự kiện cũ hơn",
       "submitted": "Đã nộp",
       "under_review": "Chuyển sang Đang xem xét",
       "interviewing": "Chuyển sang Phỏng vấn",
@@ -1091,13 +1089,9 @@
         "title": "Công ty không khả dụng",
         "body": "Công ty không tồn tại hoặc không còn hoạt động. Hãy chọn công ty đang hoạt động khác."
       },
-      "onboardingPending": {
-        "title": "Doanh nghiệp chưa hoàn tất onboarding",
-        "body": "Hãy hoàn tất đăng ký doanh nghiệp trước khi mời tài khoản này."
-      },
       "accountConflict": {
-        "title": "Email hoặc tên đăng nhập đã được sử dụng",
-        "body": "Đã có tài khoản dùng email hoặc tên đăng nhập này. Hãy kiểm tra cả hai trường rồi thử lại."
+        "title": "Email này đã có tài khoản",
+        "body": "Đã tồn tại tài khoản dùng email này."
       },
       "server": {
         "title": "Không thể lưu thay đổi",
@@ -1231,6 +1225,9 @@
       "conflictSaved": "Đang lưu",
       "conflictYours": "Của bạn",
       "loadLatest": "Tải bản mới nhất và sửa lại",
+      "existsTitle": "Email này đã có tài khoản",
+      "existsBody": "{{email}} đã được đăng ký. Hãy mở tài khoản hiện có thay vì tạo thêm.",
+      "openExisting": "Mở tài khoản hiện có",
       "discardEditTitle": "Bỏ các thay đổi?",
       "discardEditDescription": "Các chỉnh sửa của bạn cho tài khoản này sẽ không được lưu.",
       "discard": "Bỏ thay đổi",
@@ -2685,3 +2682,4 @@
     }
   }
 }
+

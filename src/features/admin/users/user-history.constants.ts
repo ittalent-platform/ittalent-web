@@ -27,10 +27,9 @@ export const HISTORY_ACTION_TONE: Record<HistoryAction, "error" | "info" | "succ
 
 
 /** The API's `code` on a 409 says which conflict it is. */
-export const CONFLICT_CODES: Record<string, "accountConflict" | "companyUnavailable" | "lastAdmin" | "lastEnterpriseAdmin" | "onboardingPending" | "stale" | "transition"> = {
+export const CONFLICT_CODES: Record<string, "accountConflict" | "companyUnavailable" | "lastAdmin" | "lastEnterpriseAdmin" | "stale" | "transition"> = {
   ACCOUNT_CONFLICT: "accountConflict",
   COMPANY_UNAVAILABLE: "companyUnavailable",
-  ENTERPRISE_ONBOARDING_PENDING: "onboardingPending",
   INVALID_TRANSITION: "transition",
   LAST_ADMIN: "lastAdmin",
   LAST_ENTERPRISE_ADMIN: "lastEnterpriseAdmin",
@@ -39,7 +38,7 @@ export const CONFLICT_CODES: Record<string, "accountConflict" | "companyUnavaila
 
 /** Fallback for responses without a code: told apart by their message. */
 export const CONFLICT_MESSAGE_MARKERS = {
-  accountConflict: "email address or username is already in use",
+  accountConflict: "Account already exists",
   companyUnavailable: "enterprise is missing or inactive",
   lastAdmin: "final active System Administrator",
   lastEnterpriseAdmin: "another Enterprise Administrator",

@@ -65,13 +65,7 @@ type SidebarProps = {
 //   onCloseMobile,
 //   onToggleCollapsed,
 // }: SidebarProps) {
-export function Sidebar({
-  actor,
-  collapsed,
-  mobileOpen,
-  onCloseMobile,
-  onToggleCollapsed,
-}: SidebarProps) {
+export function Sidebar({ actor, collapsed, mobileOpen, onCloseMobile, onToggleCollapsed }: SidebarProps) {
   const { t } = useTranslation();
   const pendingRegistrationsQuery = useEnterpriseRegistrationsListQuery({
     enabled: actor === "admin",
@@ -91,16 +85,8 @@ export function Sidebar({
         collapsed && "lg:items-center",
       )}
     >
-      <div
-        className={cn(
-          "flex items-center gap-2 px-2 pb-4 pt-1",
-          collapsed && "lg:px-0",
-        )}
-      >
-        <BrandLogo
-          tone="inverse"
-          wordmarkClassName={cn("text-[13px]", collapsed && "lg:hidden")}
-        />
+      <div className={cn("flex items-center gap-2 px-2 pb-4 pt-1", collapsed && "lg:px-0")}>
+        <BrandLogo tone="inverse" wordmarkClassName={cn("text-[13px]", collapsed && "lg:hidden")} />
         {!collapsed ? (
           <button
             aria-label={t("sidebar.collapse")}

@@ -41,7 +41,7 @@ describe("Candidate My Applications", () => {
     showToast.mockClear();
     vi.mocked(applicationQueries.useApplications).mockReturnValue({ data: list, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplications>);
     vi.mocked(applicationQueries.useApplication).mockReturnValue({ data: detail, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplication>);
-    vi.mocked(applicationQueries.useApplicationHistory).mockReturnValue({ data: { pages: [history], pageParams: [1] }, hasNextPage: false, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplicationHistory>);
+    vi.mocked(applicationQueries.useApplicationHistory).mockReturnValue({ data: history, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplicationHistory>);
     mockWithdraw();
   });
 
@@ -167,7 +167,7 @@ describe("Candidate My Applications", () => {
   });
 
   it("shows an empty history state (UC-MYAPP-03.AC.1) and a history retry (EX.4)", () => {
-    vi.mocked(applicationQueries.useApplicationHistory).mockReturnValue({ data: { pages: [{ ...history, items: [], total: 0 }], pageParams: [1] }, hasNextPage: false, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplicationHistory>);
+    vi.mocked(applicationQueries.useApplicationHistory).mockReturnValue({ data: { ...history, items: [], total: 0 }, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplicationHistory>);
     const view = renderApp(`/my-applications/${id}`);
     expect(screen.getByText("No status events yet")).toBeInTheDocument();
     view.unmount();
@@ -196,18 +196,6 @@ describe("Candidate My Applications", () => {
     expect(screen.getByText("Your second application to this job")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Withdraw application" }));
     expect(screen.getByText(/already your second application/)).toBeInTheDocument();
-  });
-
-  it("does not submit an optional withdrawal reason shorter than five characters", async () => {
-    const mutateAsync = mockWithdraw();
-    renderApp(`/my-applications/${id}`);
-    const withdrawButton = screen.getByRole("button", { name: "Withdraw application" });
-    fireEvent.click(withdrawButton);
-    fireEvent.change(screen.getByPlaceholderText("Tell the company why, if you want to"), { target: { value: "why" } });
-    const confirm = screen.getByRole("alertdialog", { name: "Withdraw this application?" });
-    fireEvent.click(within(confirm).getByRole("button", { name: "Withdraw application" }));
-    expect(await screen.findByText("Enter at least 5 characters, or leave the reason blank.")).toBeInTheDocument();
-    expect(mutateAsync).not.toHaveBeenCalled();
   });
 
   it("reports a partial bulk withdrawal and leaves the failed application listed (UC-MYAPP-04.AC.3)", async () => {

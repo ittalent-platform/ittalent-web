@@ -44,7 +44,7 @@ export function ApplicationDetailPage() {
   const later = useApplication(application?.reappliedAs ?? "");
 
   const entries = useMemo<TimelineEntry[]>(
-    () => (history.data?.pages.flatMap((page) => page.items) ?? []).map((event, index) => ({
+    () => (history.data?.items ?? []).map((event, index) => ({
       atIso: event.occurredAt,
       by: t(`applications.actor.${event.actorRole}`),
       // A reapplication starts its own history with "Submitted · applied again".
@@ -159,7 +159,7 @@ export function ApplicationDetailPage() {
 
           {history.isPending ? <Skeleton className="h-40 w-full rounded-2xl" /> : history.isError
             ? <Callout role="alert" title={t("applications.historyError")} tone="error"><Button className="mt-1 h-auto p-0 text-[13px] font-semibold" onClick={() => void history.refetch()} variant="link">{t("actions.retry")}</Button></Callout>
-            : entries.length ? <><Timeline entries={entries} formatDate={(iso) => formatDateTime(iso, locale)} title={t("applications.history.title")} />{history.hasNextPage ? <Button disabled={history.isFetchingNextPage} onClick={() => void history.fetchNextPage()} variant="outline">{t("applications.history.olderEvents")}</Button> : null}</>
+            : entries.length ? <Timeline entries={entries} formatDate={(iso) => formatDateTime(iso, locale)} title={t("applications.history.title")} />
             : <RailCard title={t("applications.history.title")}><p className="m-0 text-[13px] text-muted-foreground">{t("applications.noHistory")}</p></RailCard>}
         </aside>
       </div>

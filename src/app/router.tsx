@@ -200,11 +200,9 @@ const EnterprisePage = lazy(() =>
   })),
 );
 const EnterpriseDetailPage = lazy(() =>
-  import("@/features/public-site/enterprise/enterprise-detail-page").then(
-    (m) => ({
-      default: m.EnterpriseDetailPage,
-    }),
-  ),
+  import("@/features/public-site/enterprise/enterprise-detail-page").then((m) => ({
+    default: m.EnterpriseDetailPage,
+  })),
 );
 
 export const appRoutes = [
