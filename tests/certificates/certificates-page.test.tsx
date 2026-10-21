@@ -63,7 +63,56 @@ describe("Certificates page (UC-S4-CERT-01..05)", () => {
     vi.mocked(api.patchApiV1MeCertificateLinksById).mockResolvedValue({ error: { message: "changed", code: "VERSION_CONFLICT" }, response: { ok: false, status: 409 } } as never);
     renderPage();
     fireEvent.click(await screen.findByRole("switch", { name: "Suggest AWS Architect when I apply" }));
-    expect(await screen.findByRole("alertdialog", { name: "This certificate changed somewhere else" })).toBeInTheDocument();
+    const dialog = await screen.findByRole("alertdialog", { name: "This certificate changed somewhere else" });
+    expect(within(dialog).getByText("Load the latest version, then turn Suggest on apply on or off again.")).toBeInTheDocument();
+  });
+
+  it("says the certificate was deleted elsewhere when the switch gets a 404, with only OK", async () => {
+    vi.mocked(api.patchApiV1MeCertificateLinksById).mockResolvedValue({ error: { message: "gone" }, response: { ok: false, status: 404 } } as never);
+    renderPage();
+    fireEvent.click(await screen.findByRole("switch", { name: "Suggest AWS Architect when I apply" }));
+    const dialog = await screen.findByRole("alertdialog", { name: "This certificate was deleted" });
+    expect(within(dialog).getByText(/It was removed in another tab/)).toBeInTheDocument();
+    expect(within(dialog).queryByRole("button", { name: "Cancel" })).not.toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("button", { name: "OK" }));
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+  });
+
+  async function openEdit() {
+    renderPage();
+    fireEvent.pointerDown(await screen.findByRole("button", { name: "Actions for AWS Architect" }), { button: 0, ctrlKey: false });
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Edit" }));
+    return screen.findByRole("dialog", { name: "Edit certificate" });
+  }
+
+  it("edit shows the version and that sent applications keep their copy, then sends the loaded version", async () => {
+    vi.mocked(api.patchApiV1MeCertificateLinksById).mockResolvedValue({ data: certificate({ version: 3 }), response: { ok: true, status: 200 } } as never);
+    const dialog = await openEdit();
+    expect(within(dialog).getByText("Version 2 · last changed 3 Oct 2026.")).toBeInTheDocument();
+    expect(within(dialog).getByText(/Sent with 2 applications\. They keep the version they were sent with/)).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(api.patchApiV1MeCertificateLinksById).toHaveBeenCalledWith(expect.objectContaining({ body: expect.objectContaining({ expectedVersion: 2 }), path: { id: "c1" } })));
+    expect(await screen.findByText("Certificate saved.")).toBeInTheDocument();
+  });
+
+  it("edit that hits a 409 asks to load the latest version with the edit copy", async () => {
+    vi.mocked(api.patchApiV1MeCertificateLinksById).mockResolvedValue({ error: { message: "changed", code: "VERSION_CONFLICT" }, response: { ok: false, status: 409 } } as never);
+    fireEvent.click(within(await openEdit()).getByRole("button", { name: "Save changes" }));
+    const dialog = await screen.findByRole("alertdialog", { name: "This certificate changed somewhere else" });
+    expect(within(dialog).getByText("It was edited in another tab. Load the latest version, then make your change again.")).toBeInTheDocument();
+  });
+
+  it("edit of a certificate deleted elsewhere says it isn't available", async () => {
+    vi.mocked(api.patchApiV1MeCertificateLinksById).mockResolvedValue({ error: { message: "gone" }, response: { ok: false, status: 404 } } as never);
+    fireEvent.click(within(await openEdit()).getByRole("button", { name: "Save changes" }));
+    expect(await screen.findByRole("alertdialog", { name: "This certificate isn't available" })).toBeInTheDocument();
+  });
+
+  it("edit refused because access changed keeps the form and says so", async () => {
+    vi.mocked(api.patchApiV1MeCertificateLinksById).mockResolvedValue({ error: { message: "no" }, response: { ok: false, status: 403 } } as never);
+    const dialog = await openEdit();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save changes" }));
+    expect(await within(dialog).findByText(/because your account access changed/)).toBeInTheDocument();
   });
 
   it("deletes with the version and says sent applications keep their copy", async () => {
@@ -75,6 +124,35 @@ describe("Certificates page (UC-S4-CERT-01..05)", () => {
     expect(within(dialog).getByText(/The 2 applications you already sent keep their copy/)).toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
     await waitFor(() => expect(api.deleteApiV1MeCertificateLinksById).toHaveBeenCalledWith({ path: { id: "c1" }, query: { expectedVersion: 2 } }));
+    expect(await screen.findByText("Certificate deleted. Sent applications keep their copy.")).toBeInTheDocument();
+  });
+
+  it("deleting one never sent or suggested has no extra note", async () => {
+    renderPage();
+    fireEvent.pointerDown(await screen.findByRole("button", { name: "Actions for IELTS 7.5" }), { button: 0, ctrlKey: false });
+    fireEvent.click(await screen.findByRole("menuitem", { name: /Delete/ }));
+    const dialog = await screen.findByRole("alertdialog", { name: "Delete this certificate?" });
+    expect(dialog.textContent).toContain("IELTS 7.5 is removed from your list.");
+    expect(within(dialog).queryByText(/already sent/)).not.toBeInTheDocument();
+  });
+
+  it("delete that hits a 409 asks to load the latest version first", async () => {
+    vi.mocked(api.deleteApiV1MeCertificateLinksById).mockResolvedValue({ error: { message: "changed", code: "VERSION_CONFLICT" }, response: { ok: false, status: 409 } } as never);
+    renderPage();
+    fireEvent.pointerDown(await screen.findByRole("button", { name: "Actions for AWS Architect" }), { button: 0, ctrlKey: false });
+    fireEvent.click(await screen.findByRole("menuitem", { name: /Delete/ }));
+    fireEvent.click(within(await screen.findByRole("alertdialog", { name: "Delete this certificate?" })).getByRole("button", { name: "Delete" }));
+    const dialog = await screen.findByRole("alertdialog", { name: "This certificate changed somewhere else" });
+    expect(within(dialog).getByText("Load the latest version before deleting it.")).toBeInTheDocument();
+  });
+
+  it("delete failure keeps the row and says nothing was deleted", async () => {
+    vi.mocked(api.deleteApiV1MeCertificateLinksById).mockResolvedValue({ error: { message: "boom" }, response: { ok: false, status: 500 } } as never);
+    renderPage();
+    fireEvent.pointerDown(await screen.findByRole("button", { name: "Actions for AWS Architect" }), { button: 0, ctrlKey: false });
+    fireEvent.click(await screen.findByRole("menuitem", { name: /Delete/ }));
+    fireEvent.click(within(await screen.findByRole("alertdialog", { name: "Delete this certificate?" })).getByRole("button", { name: "Delete" }));
+    expect(await screen.findByText("Couldn't delete the certificate. It's still in your list. Please try again.")).toBeInTheDocument();
   });
 
   it("shows the empty state", async () => {

@@ -23,7 +23,14 @@ import { useCertificatesQuery, useDeleteCertificate, useUpdateCertificate } from
 import { HTTP_UNAUTHORIZED, HTTP_FORBIDDEN, HTTP_NOT_FOUND } from "@/api/http-status";
 import type { RequestError } from "@/api/request-error";
 
-type Dialog = { kind: "add" } | { kind: "edit"; certificate: CertificateLink } | { kind: "delete"; certificate: CertificateLink } | { kind: "conflict" } | null;
+/** What the user was doing when the certificate turned out to be stale: the 409/404 copy differs per action. */
+type StaleAction = "delete" | "edit" | "suggest";
+type Dialog =
+  | { kind: "add" }
+  | { kind: "edit"; certificate: CertificateLink }
+  | { kind: "delete"; certificate: CertificateLink }
+  | { kind: "conflict" | "missing"; action: StaleAction }
+  | null;
 
 
 export function CertificatesPage() {
@@ -59,10 +66,13 @@ export function CertificatesPage() {
   const toast = (message: string) => showToast({ message, title: message, tone: "success" });
   const close = () => setDialog(null);
 
-  function handleMutationError(error: unknown, fallbackKey: string) {
+  function handleMutationError(error: unknown, action: StaleAction, fallbackKey: string) {
     const { code, status } = error as RequestError;
-    if (code === "VERSION_CONFLICT" || status === HTTP_NOT_FOUND) setDialog({ kind: "conflict" });
-    else setActionError(t(fallbackKey));
+    if (code === "VERSION_CONFLICT") setDialog({ action, kind: "conflict" });
+    else if (status === HTTP_NOT_FOUND) {
+      setDialog({ action, kind: "missing" });
+      void query.refetch();
+    } else setActionError(t(fallbackKey));
   }
 
   async function toggleSuggested(certificate: CertificateLink, suggested: boolean) {
@@ -72,7 +82,7 @@ export function CertificatesPage() {
       await update.mutateAsync({ body: { expectedVersion: certificate.version, suggested }, id: certificate.id });
       toast(t(suggested ? "certificates.toast.suggested" : "certificates.toast.unsuggested"));
     } catch (error) {
-      handleMutationError(error, "certificates.errors.switchFailed");
+      handleMutationError(error, "suggest", "certificates.errors.switchFailed");
     } finally {
       setSavingId(null);
     }
@@ -83,10 +93,10 @@ export function CertificatesPage() {
     try {
       await remove.mutateAsync({ expectedVersion: certificate.version, id: certificate.id });
       close();
-      toast(t("certificates.toast.deleted", { name: certificate.name }));
+      toast(t(certificate.sentCount > 0 ? "certificates.toast.deletedKeptCopies" : "certificates.toast.deleted"));
     } catch (error) {
       close();
-      handleMutationError(error, "certificates.errors.deleteFailed");
+      handleMutationError(error, "delete", "certificates.errors.deleteFailed");
     }
   }
 
@@ -178,7 +188,8 @@ export function CertificatesPage() {
       {dialog?.kind === "add" || dialog?.kind === "edit" ? (
         <CertificateFormDialog
           certificate={dialog.kind === "edit" ? dialog.certificate : undefined}
-          onConflict={() => setDialog({ kind: "conflict" })}
+          onConflict={() => setDialog({ action: "edit", kind: "conflict" })}
+          onMissing={() => { setDialog({ action: "edit", kind: "missing" }); void query.refetch(); }}
           onOpenChange={(open) => !open && close()}
           onSaved={(saved) => {
             const added = dialog.kind === "add";
@@ -187,7 +198,7 @@ export function CertificatesPage() {
               setHighlightId(saved.id);
               set("page", null);
             }
-            toast(t(added ? "certificates.toast.added" : "certificates.toast.saved", { name: saved.name }));
+            toast(t(added ? "certificates.toast.added" : "certificates.toast.saved"));
           }}
         />
       ) : null}
@@ -197,7 +208,7 @@ export function CertificatesPage() {
         cancelLabel={t("certificates.delete.keep")}
         description={dialog?.kind === "delete" ? (
           <span className="flex flex-col gap-3">
-            <span><Trans components={{ b: <b className="font-semibold text-foreground" /> }} i18nKey="certificates.delete.description" values={{ name: dialog.certificate.name }} /></span>
+            <span><Trans components={{ b: <b className="font-semibold text-foreground" /> }} i18nKey={dialog.certificate.suggested ? "certificates.delete.description" : "certificates.delete.descriptionNotSuggested"} values={{ name: dialog.certificate.name }} /></span>
             {dialog.certificate.sentCount > 0 ? (
               <span className="flex gap-2 rounded-xl bg-muted px-3.5 py-3 text-[13px] text-foreground">
                 <Send aria-hidden className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
@@ -219,12 +230,24 @@ export function CertificatesPage() {
       <ActionConfirmDialog
         action={t("certificates.conflict.loadLatest")}
         cancelLabel={t("actions.cancel")}
-        description={t("certificates.conflict.description")}
+        description={dialog?.kind === "conflict" ? t(`certificates.conflict.description.${dialog.action}`) : undefined}
         icon={RefreshCw}
         onConfirm={() => { close(); void query.refetch(); }}
         onOpenChange={(open) => { if (!open) { close(); void query.refetch(); } }}
         open={dialog?.kind === "conflict"}
         title={t("certificates.conflict.title")}
+        variant="warning-solid"
+      />
+
+      <ActionConfirmDialog
+        action={t("certificates.missing.ok")}
+        description={dialog?.kind === "missing" ? t(dialog.action === "suggest" ? "certificates.missing.suggestDescription" : "certificates.missing.description") : undefined}
+        icon={RefreshCw}
+        noCancel
+        onConfirm={close}
+        onOpenChange={(open) => !open && close()}
+        open={dialog?.kind === "missing"}
+        title={t(dialog?.kind === "missing" && dialog.action === "suggest" ? "certificates.missing.suggestTitle" : "certificates.missing.title")}
         variant="warning-solid"
       />
     </Shell>
