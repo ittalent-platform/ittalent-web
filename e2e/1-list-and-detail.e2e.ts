@@ -1,11 +1,13 @@
 import {
   ACCOUNTS,
   api,
+  appLink,
   applicationId,
   displayId,
   expect,
   FOREIGN_APPLICATION_ID,
   SEED,
+  rowFor,
   search,
   signInAs,
   test,
@@ -46,15 +48,9 @@ test.describe("UC-MYAPP-01 view my applications", () => {
         `Showing 1–${TOTAL_APPLICATIONS} of ${TOTAL_APPLICATIONS}`,
       ),
     ).toBeVisible();
-    await expect(
-      page.getByRole("row").filter({ hasText: displayId(SEED.underReview) }),
-    ).toContainText("DataWave");
-    await expect(
-      page.getByRole("row").filter({ hasText: displayId(SEED.underReview) }),
-    ).toContainText("Under Review");
-    await expect(
-      page.getByRole("row").filter({ hasText: displayId(SEED.interviewing) }),
-    ).toContainText("Cover letter");
+    await expect(rowFor(page, SEED.underReview)).toContainText("DataWave");
+    await expect(rowFor(page, SEED.underReview)).toContainText("Under Review");
+    await expect(rowFor(page, SEED.interviewing)).toContainText("Cover letter");
     // Private data of another candidate never appears.
     await expect(page.getByText("Hidden Corp")).toHaveCount(0);
     await expect(
@@ -155,12 +151,10 @@ test.describe("UC-MYAPP-01 view my applications", () => {
     await expect(page.getByRole("alert")).toContainText(
       "Could not load your applications.",
     );
-    await expect(
-      page.getByRole("row").filter({ hasText: displayId(SEED.submitted) }),
-    ).toHaveCount(0);
+    await expect(rowFor(page, SEED.submitted)).toHaveCount(0);
     fail = false;
     await page.getByRole("button", { name: "Retry" }).click();
-    await expect(page.getByText(displayId(SEED.submitted))).toBeVisible();
+    await expect(appLink(page, SEED.submitted)).toBeVisible();
   });
 
   test("BR-APP-008 tags the reapplication and the withdrawn record and links them", async ({
