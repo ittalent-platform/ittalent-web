@@ -1001,7 +1001,38 @@
       "noResultsTitle": "No results for “{{query}}”",
       "noResultsDescription": "No job postings match this keyword. Check the spelling or try a different title, content, or location."
     },
-    "notSpecified": "Not specified"
+    "notSpecified": "Not specified",
+    "enterpriseAdmin": {
+      "subtitle_one": "{{count}} job posting in {{company}} · newest created first",
+      "subtitle_other": "{{count}} job postings in {{company}} · newest created first",
+      "subtitleEmpty": "No job postings in {{company}} yet",
+      "subtitleFiltered_one": "{{count}} job posting matches",
+      "subtitleFiltered_other": "{{count}} job postings match",
+      "emptyDescription": "When your HR team creates a job posting, it will appear here.",
+      "published": "Published",
+      "notPublished": "Not published",
+      "metaUpdated": "Updated {{date}}",
+      "metaClosed": "Closed {{date}}",
+      "metaArchived": "Archived {{date}}",
+      "refresh": "Refresh",
+      "refreshedTitle": "Job posting refreshed",
+      "refreshedMessage": "You’re seeing the latest version.",
+      "acceptingApplications": "Accepting applications",
+      "visibleToCandidates": "Visible to candidates",
+      "yes": "Yes",
+      "no": "No",
+      "activity": "Activity",
+      "firstPublished": "First published",
+      "lastChange": "Last change",
+      "notRecorded": "Not recorded",
+      "viewHistory": "View history",
+      "notices": {
+        "draft": "Draft. Only people in {{company}} can see this job.",
+        "closed": "Closed. Candidates can’t see or apply to this job. Viewing it doesn’t reopen it.",
+        "archived": "Archived. Kept for your records and hidden from candidates. Viewing it doesn’t unarchive it.",
+        "deadlinePassed": "The deadline passed on {{date}}. Your HR team can close or update this job."
+      }
+    }
   },
   "adminLayout": {
     "openMenu": "Open menu",
@@ -2979,4 +3010,3 @@
     }
   }
 }
-
