@@ -6,6 +6,9 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { EmployeesPage } from "@/features/recruiter/employees/employees-page";
 import * as empQueries from "@/features/recruiter/employees/employees.queries";
 import { ToastProvider } from "@/components/toast/toast-provider";
+import { useSession } from "@/auth/use-session";
+
+vi.mock("@/auth/use-session", () => ({ useSession: vi.fn() }));
 
 function renderWithClient(ui: React.ReactElement) {
   const testQueryClient = new QueryClient({
@@ -67,6 +70,7 @@ const mockEmployees = [
 describe("Recruiter Employees Page Tests", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.mocked(useSession).mockReturnValue({ data: { user: { id: "enterprise-admin-1", role: "enterprise_admin" } }, isPending: false, refetch: vi.fn(), logout: vi.fn() } as never);
   });
 
   it("renders employee list, header, search input, and add employee button", () => {
@@ -101,6 +105,22 @@ describe("Recruiter Employees Page Tests", () => {
     expect(screen.getByText("Sarah Jenkins")).toBeInTheDocument();
     expect(screen.getByText("Alex Rivera")).toBeInTheDocument();
     expect(screen.getByText("Marcus Vance")).toBeInTheDocument();
+  });
+
+  it("keeps recruiters read-only on the company employee directory", async () => {
+    vi.mocked(useSession).mockReturnValue({ data: { user: { id: "recruiter-1", role: "recruiter" } }, isPending: false, refetch: vi.fn(), logout: vi.fn() } as never);
+    vi.spyOn(empQueries, "useEmployeesListQuery").mockReturnValue({
+      data: { items: mockEmployees, total: 3, page: 1, limit: 10, totalPages: 1 },
+      isLoading: false,
+      isError: false,
+    } as never);
+
+    renderWithClient(<MemoryRouter><EmployeesPage /></MemoryRouter>);
+
+    expect(screen.queryByRole("button", { name: /Invite HR employee/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sarah Jenkins" })).toHaveAttribute("href", "/recruiter/employees/emp-1");
+    expect(screen.queryByRole("button", { name: /Edit information/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Suspend membership/i })).not.toBeInTheDocument();
   });
 
   it("filters employees when searching in input", () => {

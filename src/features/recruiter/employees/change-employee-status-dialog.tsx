@@ -59,6 +59,7 @@ export function ChangeEmployeeStatusDialog({
       await statusMutation.mutateAsync({
         status: values.status,
         reason: values.reason,
+        expectedVersion: employee.version ?? 0,
       });
 
       onOpenChange(false);

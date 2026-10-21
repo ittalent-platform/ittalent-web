@@ -1,5 +1,20 @@
 import { z } from "zod";
-import type { UserDto, UserHistoryResponse } from "@/api/generated/types.gen";
+import type { UserAuditHistoryResponse, UserDto } from "@/api/generated/types.gen";
+import { REASON_MIN_LENGTH } from "@/components/common/reason-field";
+
+// The employee screens use the recruiter-side contract of /api/v1/users, which differs from the system-admin
+// operations in the generated client (username, expectedVersion, audit shape), so these are typed here.
+export type CreateEmployeeRequest = {
+  fullName: string;
+  email: string;
+  phone?: string | null;
+  role?: "recruiter";
+  enterpriseId?: string;
+  status?: "active" | "inactive";
+};
+export type UpdateEmployeeRequest = { fullName?: string; phone?: string | null; expectedVersion: number };
+export type UpdateEmployeeStatusRequest = { status: "active" | "suspended"; reason: string; expectedVersion: number };
+export type UserHistoryResponse = UserAuditHistoryResponse;
 
 export type Employee = UserDto;
 
@@ -86,7 +101,7 @@ export const changeEmployeeStatusSchema = z.object({
   reason: z
     .string()
     .trim()
-    .min(5, "Reason must be at least 5 characters")
+    .min(REASON_MIN_LENGTH, `Reason must be at least ${REASON_MIN_LENGTH} characters`)
     .max(500, "Reason cannot exceed 500 characters"),
 });
 

@@ -67,7 +67,7 @@ export function EditEmployeeDialog({
       }
 
       if (Object.keys(payload).length > 0) {
-        await updateMutation.mutateAsync(payload);
+        await updateMutation.mutateAsync({ ...payload, expectedVersion: employee.version ?? 0 });
       }
 
       onOpenChange(false);

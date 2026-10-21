@@ -59,7 +59,7 @@ export function ChangeLogoDialog({
     setErrorMessage(null);
     try {
       await updateMutation.mutateAsync({
-        logo_url: logoUrl.trim() ? logoUrl.trim() : null,
+        logo_url: logoUrl.trim(),
       });
       onOpenChange(false);
     } catch (err: unknown) {
@@ -72,7 +72,7 @@ export function ChangeLogoDialog({
     setErrorMessage(null);
     try {
       await updateMutation.mutateAsync({
-        logo_url: null,
+        logo_url: "",
       });
       setLogoUrl("");
       onOpenChange(false);

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RECRUITER_EMPLOYEES_PATH } from "@/config/routes";
+import { useSession } from "@/auth/use-session";
 import {
   useEmployeeDetailQuery,
   useEmployeeHistoryQuery,
@@ -31,6 +32,8 @@ function getInitials(name: string): string {
 
 export function RecruiterEmployeeDetailPage() {
   const { employeeId = "" } = useParams();
+  const { data: session } = useSession();
+  const canManageEmployees = session?.user.role === "enterprise_admin";
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
@@ -41,7 +44,8 @@ export function RecruiterEmployeeDetailPage() {
     isLoading,
     isError,
   } = useEmployeeDetailQuery(employeeId);
-  const { data: historyData } = useEmployeeHistoryQuery(employeeId);
+  const historyQuery = useEmployeeHistoryQuery(employeeId);
+  const historyList = historyQuery.data?.pages.flatMap((page) => page.items) ?? [];
 
   if (isLoading) {
     return (
@@ -103,7 +107,6 @@ export function RecruiterEmployeeDetailPage() {
       })
     : "—";
 
-  const historyList = historyData?.items ?? [];
   const recentHistory = historyList.slice(0, 4);
 
   return (
@@ -137,7 +140,7 @@ export function RecruiterEmployeeDetailPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 sm:self-center">
+        {canManageEmployees ? <div className="flex items-center gap-2.5 sm:self-center">
           <Button
             variant="outline"
             onClick={() => setIsEditOpen(true)}
@@ -154,7 +157,7 @@ export function RecruiterEmployeeDetailPage() {
               ? "Change status"
               : "Activate membership"}
           </Button>
-        </div>
+        </div> : null}
       </div>
 
       {/* Grid of Detail Cards */}
@@ -297,16 +300,16 @@ export function RecruiterEmployeeDetailPage() {
                     <span className="mt-1 size-1.5 rounded-full bg-primary shrink-0" />
                     <div className="flex-1">
                       <span className="font-medium text-foreground capitalize">
-                        {item.action.replace(/_/g, " ")}
+                      {item.action.replace(/_/g, " ")}
                       </span>
-                      {item.description ? (
+                      {item.reason ? (
                         <span className="text-muted-foreground ml-1">
-                          · {item.description}
+                          · {item.reason}
                         </span>
                       ) : null}
                       <time className="block text-[11px] text-muted-foreground">
-                        {item.timestamp
-                          ? new Date(item.timestamp).toLocaleDateString(
+                        {item.occurredAt
+                          ? new Date(item.occurredAt).toLocaleDateString(
                               "en-GB",
                               {
                                 day: "numeric",
@@ -325,16 +328,16 @@ export function RecruiterEmployeeDetailPage() {
       </div>
 
       {/* Dialog Modals */}
-      <EditEmployeeDialog
+      {canManageEmployees ? <EditEmployeeDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
         employee={employee}
-      />
-      <ChangeEmployeeStatusDialog
+      /> : null}
+      {canManageEmployees ? <ChangeEmployeeStatusDialog
         open={isStatusOpen}
         onOpenChange={setIsStatusOpen}
         employee={employee}
-      />
+      /> : null}
       <EmployeeHistoryDialog
         open={isHistoryOpen}
         onOpenChange={setIsHistoryOpen}

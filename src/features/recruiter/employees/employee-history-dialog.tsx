@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { useEmployeeHistoryQuery } from "./employees.queries";
 import type { Employee } from "./employees.types";
 
@@ -21,11 +22,11 @@ export function EmployeeHistoryDialog({
   onOpenChange,
   employee,
 }: EmployeeHistoryDialogProps) {
-  const { data, isLoading } = useEmployeeHistoryQuery(employee?.id ?? "", open);
+  const history = useEmployeeHistoryQuery(employee?.id ?? "", open);
 
   if (!employee) return null;
 
-  const historyItems = data?.items ?? [];
+  const historyItems = history.data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,7 +45,7 @@ export function EmployeeHistoryDialog({
         </DialogHeader>
 
         <div className="max-h-[60vh] overflow-y-auto pr-1 py-2">
-          {isLoading ? (
+          {history.isPending ? (
             <div className="space-y-4 py-2">
               <Skeleton className="h-16 w-full" />
               <Skeleton className="h-16 w-full" />
@@ -66,8 +67,8 @@ export function EmployeeHistoryDialog({
                         {item.action.replace(/_/g, " ")}
                       </span>
                       <time className="text-muted-foreground">
-                        {item.timestamp
-                          ? new Date(item.timestamp).toLocaleString("vi-VN", {
+                        {item.occurredAt
+                          ? new Date(item.occurredAt).toLocaleString("vi-VN", {
                               day: "2-digit",
                               month: "2-digit",
                               year: "numeric",
@@ -78,9 +79,9 @@ export function EmployeeHistoryDialog({
                       </time>
                     </div>
 
-                    {item.description ? (
+                    {item.reason ? (
                       <p className="mt-1.5 text-xs text-foreground/80">
-                        {item.description}
+                        {item.reason}
                       </p>
                     ) : null}
 
@@ -94,6 +95,7 @@ export function EmployeeHistoryDialog({
               ))}
             </div>
           )}
+          {history.hasNextPage ? <Button className="mt-4" disabled={history.isFetchingNextPage} onClick={() => void history.fetchNextPage()} variant="outline">Show older events</Button> : null}
         </div>
       </DialogContent>
     </Dialog>

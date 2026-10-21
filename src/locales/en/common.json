@@ -294,6 +294,7 @@
     "reasonOptional": "Reason (optional)",
     "reasonPlaceholder": "Tell the company why, if you want to",
     "reasonHint": "Up to {{max}} characters. The company can see it.",
+    "reasonTooShort": "Enter at least {{min}} characters, or leave the reason blank.",
     "keepApplication": "Keep application",
     "keepApplications": "Keep applications",
     "withdrawFailed": "Withdrawal failed. Nothing was changed. Please try again.",
@@ -329,6 +330,7 @@
     },
     "history": {
       "title": "Status history",
+      "olderEvents": "Show older events",
       "submitted": "Submitted",
       "under_review": "Moved to Under Review",
       "interviewing": "Moved to Interviewing",
@@ -1102,9 +1104,13 @@
         "title": "Company unavailable",
         "body": "The company is missing or no longer active. Choose another active company."
       },
+      "onboardingPending": {
+        "title": "Company onboarding is unfinished",
+        "body": "Complete enterprise registration before inviting this account."
+      },
       "accountConflict": {
-        "title": "This email already has an account",
-        "body": "An account with this email already exists."
+        "title": "Email or username already in use",
+        "body": "An account already uses this email address or username. Check both fields and try again."
       },
       "server": {
         "title": "Couldn't save the change",
@@ -1240,9 +1246,6 @@
       "conflictSaved": "Saved now",
       "conflictYours": "Yours",
       "loadLatest": "Load latest and edit again",
-      "existsTitle": "This email already has an account",
-      "existsBody": "{{email}} is already registered. Open the existing account instead of creating another.",
-      "openExisting": "Open existing account",
       "discardEditTitle": "Discard your changes?",
       "discardEditDescription": "The edits you made to this account won't be saved.",
       "discard": "Discard",
@@ -2706,4 +2709,3 @@
     }
   }
 }
-

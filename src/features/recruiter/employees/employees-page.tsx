@@ -29,6 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Pagination } from "@/components/ui/pagination";
 import { FilterSelect } from "@/components/ui/filter-select";
 import { recruiterEmployeeDetailPath } from "@/config/routes";
+import { useSession } from "@/auth/use-session";
 import { useEmployeesListQuery } from "./employees.queries";
 import { EmployeeStatusBadge } from "./employee-status-badge";
 import { InviteEmployeeDialog } from "./invite-employee-dialog";
@@ -65,6 +66,8 @@ function getAvatarColor(id: string): string {
 
 export function RecruiterEmployeesPage() {
   const navigate = useNavigate();
+  const { data: session } = useSession();
+  const canManageEmployees = session?.user.role === "enterprise_admin";
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -84,7 +87,7 @@ export function RecruiterEmployeesPage() {
   const { data, isLoading, isError } = useEmployeesListQuery({
     page,
     limit: pageSize,
-    search: search.trim() || undefined,
+    search: search.trim().length >= 2 ? search.trim() : undefined,
     status: statusFilter,
     department: departmentFilter !== "all" ? departmentFilter : undefined,
     sortBy,
@@ -158,13 +161,7 @@ export function RecruiterEmployeesPage() {
           </p>
         </div>
 
-        <Button
-          onClick={() => setIsInviteOpen(true)}
-          className="gap-2 shrink-0"
-        >
-          <UserPlus className="size-4" />
-          <span>Invite HR employee</span>
-        </Button>
+        {canManageEmployees ? <Button onClick={() => setIsInviteOpen(true)} className="gap-2 shrink-0"><UserPlus className="size-4" /><span>Invite HR employee</span></Button> : null}
       </div>
 
       {/* Status Tabs */}
@@ -323,15 +320,15 @@ export function RecruiterEmployeesPage() {
                       >
                         Reset filters
                       </Button>
-                    ) : (
-                      <Button
+                      ) : (
+                      canManageEmployees ? <Button
                         size="sm"
                         className="mt-2 text-xs"
                         onClick={() => setIsInviteOpen(true)}
                       >
                         Invite HR employee
-                      </Button>
-                    )}
+                      </Button> : null
+                      )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -433,12 +430,12 @@ export function RecruiterEmployeesPage() {
                           >
                             View details
                           </DropdownMenuItem>
-                          <DropdownMenuItem
+                          {canManageEmployees ? <DropdownMenuItem
                             onClick={() => setEditingEmployee(emp)}
                           >
                             Edit information
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
+                          </DropdownMenuItem> : null}
+                          {canManageEmployees ? <DropdownMenuItem
                             onClick={() => setStatusEmployee(emp)}
                             className={
                               emp.status === "active"
@@ -449,7 +446,7 @@ export function RecruiterEmployeesPage() {
                             {emp.status === "active"
                               ? "Suspend membership"
                               : "Activate membership"}
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> : null}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -479,20 +476,20 @@ export function RecruiterEmployeesPage() {
       </div>
 
       {/* Dialogs */}
-      <InviteEmployeeDialog
+      {canManageEmployees ? <InviteEmployeeDialog
         open={isInviteOpen}
         onOpenChange={setIsInviteOpen}
-      />
-      <EditEmployeeDialog
+      /> : null}
+      {canManageEmployees ? <EditEmployeeDialog
         open={Boolean(editingEmployee)}
         onOpenChange={(open) => !open && setEditingEmployee(null)}
         employee={editingEmployee}
-      />
-      <ChangeEmployeeStatusDialog
+      /> : null}
+      {canManageEmployees ? <ChangeEmployeeStatusDialog
         open={Boolean(statusEmployee)}
         onOpenChange={(open) => !open && setStatusEmployee(null)}
         employee={statusEmployee}
-      />
+      /> : null}
     </div>
   );
 }

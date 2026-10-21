@@ -6,6 +6,9 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { EmployeeDetailPage } from "@/features/recruiter/employees/employee-detail-page";
 import * as empQueries from "@/features/recruiter/employees/employees.queries";
 import { ToastProvider } from "@/components/toast/toast-provider";
+import { useSession } from "@/auth/use-session";
+
+vi.mock("@/auth/use-session", () => ({ useSession: vi.fn() }));
 
 function renderWithClient(ui: React.ReactElement) {
   const testQueryClient = new QueryClient({
@@ -39,28 +42,40 @@ const mockEmployee = {
 };
 
 const mockHistory = {
-  items: [
+  pages: [{ items: [
     {
       id: "hist-1",
-      action: "STATUS_CHANGE",
-      description: "Status changed to active",
+      action: "status_suspended",
+      reason: "Status changed to active",
       actorName: "Admin User",
-      timestamp: "2026-01-01T08:00:00.000Z",
+      occurredAt: "2026-01-01T08:00:00.000Z",
+      actorId: "admin-1",
+      result: "success" as const,
+      changes: null,
+      version: 1,
     },
     {
       id: "hist-2",
-      action: "ACCOUNT_CREATED",
-      description: "Employee account created via invitation",
+      action: "account_invited",
+      reason: "Employee account created via invitation",
       actorName: "Admin User",
-      timestamp: "2025-06-20T10:00:00.000Z",
+      occurredAt: "2025-06-20T10:00:00.000Z",
+      actorId: "admin-1",
+      result: "success" as const,
+      changes: null,
+      version: 1,
     },
-  ],
-  total: 2,
+  ], page: 1, limit: 20, total: 2, totalPages: 1 }],
+  pageParams: [1],
+  hasNextPage: false,
+  isPending: false,
+  isError: false,
 };
 
 describe("Recruiter Employee Detail Page Tests", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.mocked(useSession).mockReturnValue({ data: { user: { id: "enterprise-admin-1", role: "enterprise_admin" } }, isPending: false, refetch: vi.fn(), logout: vi.fn() } as never);
   });
 
   it("renders employee details cards and audit timeline", () => {
@@ -155,6 +170,7 @@ describe("Recruiter Employee Detail Page Tests", () => {
       expect(mutateAsync).toHaveBeenCalledWith({
         status: "suspended",
         reason: "Employee temporary sabbatical leave",
+        expectedVersion: 0,
       });
     });
   });
@@ -189,9 +205,7 @@ describe("Recruiter Employee Detail Page Tests", () => {
     expect(
       screen.getByRole("heading", { name: "Employee account history" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText("Employee account created via invitation"),
-    ).toBeInTheDocument();
+    expect(screen.getAllByText("account invited").length).toBeGreaterThan(0);
   });
 
   it("opens edit employee dialog, modifies display name and phone, and saves", async () => {
@@ -249,6 +263,7 @@ describe("Recruiter Employee Detail Page Tests", () => {
       expect(mutateAsync).toHaveBeenCalledWith({
         fullName: "Marcus Vance Jr",
         phone: "+1 (555) 999-0000",
+        expectedVersion: 0,
       });
     });
   });

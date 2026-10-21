@@ -1,22 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { client } from "@/api/client";
-import {
-  createEmployee,
-  getApiV1UsersById,
-  getUserHistory,
-  patchApiV1UsersById,
-  updateUserStatus,
-} from "@/api/generated";
+import { getApiV1UsersById, getApiV1UsersByIdHistory } from "@/api/generated";
+import type { UserDto, UserListResponse } from "@/api/generated/types.gen";
+
 import type {
   CreateEmployeeRequest,
-  UpdateUserRequest,
-  UpdateUserStatusRequest,
-  UserDto,
+  EmployeesListParams,
+  UpdateEmployeeRequest,
+  UpdateEmployeeStatusRequest,
   UserHistoryResponse,
-  UserListResponse,
-} from "@/api/generated/types.gen";
+} from "./employees.types";
+import { unwrap } from "@/api/request-error";
 
-import type { EmployeesListParams } from "./employees.types";
+const JSON_HEADERS = { "Content-Type": "application/json" };
 
 export const employeesKeys = {
   all: ["recruiter-employees"] as const,
@@ -31,6 +27,7 @@ export const employeesKeys = {
 
 export const DEFAULT_PAGE_SIZE = 10;
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
+export const EMPLOYEE_HISTORY_PAGE_SIZE = 20;
 
 export function useEmployeesListQuery(params: EmployeesListParams) {
   const { enabled = true, limit = DEFAULT_PAGE_SIZE, ...queryParams } = params;
@@ -119,27 +116,12 @@ export function useEmployeeDetailQuery(employeeId: string, enabled = true) {
 }
 
 export function useEmployeeHistoryQuery(employeeId: string, enabled = true) {
-  return useQuery({
+  return useInfiniteQuery({
     enabled: Boolean(employeeId) && enabled,
     queryKey: employeesKeys.history(employeeId),
-    queryFn: async (): Promise<UserHistoryResponse> => {
-      const result = await getUserHistory({
-        client,
-        path: { id: employeeId },
-      });
-
-      if (result.error) {
-        throw Object.assign(result.error as object, {
-          status: result.response?.status,
-        });
-      }
-
-      return (
-        result.data ?? {
-          items: [],
-        }
-      );
-    },
+    initialPageParam: 1,
+    queryFn: async ({ pageParam }): Promise<UserHistoryResponse> => unwrap(await getApiV1UsersByIdHistory({ client, path: { id: employeeId }, query: { page: pageParam, limit: EMPLOYEE_HISTORY_PAGE_SIZE } }), "Unable to load employee history"),
+    getNextPageParam: (last) => last.page < last.totalPages ? last.page + 1 : undefined,
   });
 }
 
@@ -148,9 +130,10 @@ export function useCreateEmployeeMutation() {
 
   return useMutation({
     mutationFn: async (data: CreateEmployeeRequest): Promise<UserDto> => {
-      const result = await createEmployee({
-        client,
+      const result = await client.post<{ 201: UserDto }>({
+        url: "/api/v1/users",
         body: data,
+        headers: JSON_HEADERS,
       });
 
       if (result.error) {
@@ -181,11 +164,11 @@ export function useUpdateEmployeeMutation(employeeId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateUserRequest): Promise<UserDto> => {
-      const result = await patchApiV1UsersById({
-        client,
-        path: { id: employeeId },
+    mutationFn: async (data: UpdateEmployeeRequest): Promise<UserDto> => {
+      const result = await client.patch<{ 200: UserDto }>({
+        url: `/api/v1/users/${employeeId}`,
         body: data,
+        headers: JSON_HEADERS,
       });
 
       if (result.error) {
@@ -221,11 +204,11 @@ export function useUpdateEmployeeStatusMutation(employeeId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateUserStatusRequest): Promise<UserDto> => {
-      const result = await updateUserStatus({
-        client,
-        path: { id: employeeId },
+    mutationFn: async (data: UpdateEmployeeStatusRequest): Promise<UserDto> => {
+      const result = await client.patch<{ 200: UserDto }>({
+        url: `/api/v1/users/${employeeId}/status`,
         body: data,
+        headers: JSON_HEADERS,
       });
 
       if (result.error) {

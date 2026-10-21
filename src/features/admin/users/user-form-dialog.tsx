@@ -3,7 +3,7 @@ import { Check, ChevronDown, Search, Send, TriangleAlert } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { z } from "zod";
 
 import type { CreateAdminUserRequest, CreateAdminUserResponse, PatchApiV1UsersByIdData, UserDto } from "@/api/generated/types.gen";
@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ADMIN_USERS_PATH, adminUserPath } from "@/config/routes";
+import { adminUserPath } from "@/config/routes";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 import { classifyAccountError } from "./account-error";
@@ -76,7 +76,6 @@ export function UserFormDialog({ onChangeEmail, onCreated, onOpenChange, onReloa
   const editing = Boolean(user);
   const [failure, setFailure] = useState<string | null>(null);
   const [conflict, setConflict] = useState(false);
-  const [existingEmail, setExistingEmail] = useState<string | null>(null);
   const [undelivered, setUndelivered] = useState<CreateAdminUserResponse["user"] | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [companySearch, setCompanySearch] = useState("");
@@ -126,7 +125,6 @@ export function UserFormDialog({ onChangeEmail, onCreated, onOpenChange, onReloa
 
   async function save(values: FormValues) {
     setFailure(null);
-    setExistingEmail(null);
     try {
       if (user) {
         const body = buildUserPatch(user, values);
@@ -161,9 +159,11 @@ export function UserFormDialog({ onChangeEmail, onCreated, onOpenChange, onReloa
         setConflict(true);
         onReload?.();
       } else if (kind === "accountConflict") {
-        setExistingEmail(values.email.trim().toLowerCase());
+        setFailure(t("adminUsers.errors.accountConflict.body"));
       } else if (kind === "companyUnavailable") {
         setFailure(t("adminUsers.errors.companyUnavailable.body"));
+      } else if (kind === "onboardingPending") {
+        setFailure(t("adminUsers.errors.onboardingPending.body"));
       } else {
         setFailure(kind === "other" && error instanceof Error ? error.message : t(user ? "adminUsers.form.saveFailed" : "adminUsers.form.createFailed"));
       }
@@ -184,7 +184,6 @@ export function UserFormDialog({ onChangeEmail, onCreated, onOpenChange, onReloa
     form.reset();
     setFailure(null);
     setConflict(false);
-    setExistingEmail(null);
     onOpenChange(false);
   }
 
@@ -223,14 +222,6 @@ export function UserFormDialog({ onChangeEmail, onCreated, onOpenChange, onReloa
                       </table>
                     ) : null}
                     <Button className={DIALOG_BUTTON_CLASS} onClick={loadLatest} shape="default" type="button" variant="outline">{t("adminUsers.form.loadLatest")}</Button>
-                  </div>
-                </Callout>
-              ) : null}
-              {existingEmail ? (
-                <Callout role="alert" title={t("adminUsers.form.existsTitle")} tone="error">
-                  <div className="flex flex-col items-start gap-2">
-                    <span>{t("adminUsers.form.existsBody", { email: existingEmail })}</span>
-                    <Button asChild className={DIALOG_BUTTON_CLASS} shape="default" variant="outline"><Link to={`${ADMIN_USERS_PATH}?search=${encodeURIComponent(existingEmail)}`}>{t("adminUsers.form.openExisting")}</Link></Button>
                   </div>
                 </Callout>
               ) : null}

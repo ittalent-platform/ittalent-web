@@ -10,6 +10,12 @@ describe("classifyAccountError", () => {
     expect(classifyAccountError({ code: "VERSION_CONFLICT", message: "x", status: 409 })).toBe("stale");
     expect(classifyAccountError({ code: "ACCOUNT_CONFLICT", message: "x", status: 409 })).toBe("accountConflict");
     expect(classifyAccountError({ code: "COMPANY_UNAVAILABLE", message: "x", status: 409 })).toBe("companyUnavailable");
+    expect(classifyAccountError({ code: "ENTERPRISE_ONBOARDING_PENDING", message: "x", status: 409 })).toBe("onboardingPending");
+    expect(classifyAccountError({ code: "COMPANY_UNAVAILABLE", message: "x", status: 404 })).toBe("companyUnavailable");
+  });
+
+  it("recognizes the stable company-unavailable code even on the legacy 404 status", () => {
+    expect(classifyAccountError({ code: "COMPANY_UNAVAILABLE", message: "x", status: 404 })).toBe("companyUnavailable");
   });
 
   it("falls back to the message when a 409 has no code, and to stale when nothing matches", () => {

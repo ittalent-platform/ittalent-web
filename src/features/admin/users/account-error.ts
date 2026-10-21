@@ -1,14 +1,15 @@
 import { CONFLICT_CODES, CONFLICT_MESSAGE_MARKERS } from "./user-history.constants";
 import { HTTP_CONFLICT, HTTP_SERVER_ERROR } from "@/api/http-status";
 
-export type AccountErrorKind = "accountConflict" | "companyUnavailable" | "lastAdmin" | "lastEnterpriseAdmin" | "other" | "server" | "stale" | "transition";
+export type AccountErrorKind = "accountConflict" | "companyUnavailable" | "lastAdmin" | "lastEnterpriseAdmin" | "onboardingPending" | "other" | "server" | "stale" | "transition";
 
 /** Tells the API's failure modes apart: 409 is a stale version or an illegal change, 5xx a persistence failure. */
 export function classifyAccountError(error: unknown): AccountErrorKind {
   const { code, message = "", status } = (error ?? {}) as { code?: string; message?: string; status?: number };
+  const byCode = code ? CONFLICT_CODES[code] : undefined;
+  if (byCode) return byCode;
+  if (code === "COMPANY_UNAVAILABLE" && status === 404) return "companyUnavailable";
   if (status === HTTP_CONFLICT) {
-    const byCode = code ? CONFLICT_CODES[code] : undefined;
-    if (byCode) return byCode;
     // Fallback for older API responses that carry no code.
     const found = (Object.keys(CONFLICT_MESSAGE_MARKERS) as (keyof typeof CONFLICT_MESSAGE_MARKERS)[]).find((key) => message.includes(CONFLICT_MESSAGE_MARKERS[key]));
     return found ?? "stale";
