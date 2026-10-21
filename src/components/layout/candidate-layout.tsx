@@ -21,7 +21,8 @@ export function CandidateLayout() {
           </div>
         </div>
       </header>
-      <main className="mx-auto flex w-full max-w-[1264px] flex-1 flex-col gap-5 px-4 pb-12 pt-8 sm:px-6">
+      {/* 1280px of content (+ 24px gutters), as in the account page designs. */}
+      <main className="mx-auto flex w-full max-w-[1328px] flex-1 flex-col gap-5 px-4 pb-12 pt-8 sm:px-6">
         <Outlet />
       </main>
       <MarketplaceFooter />
