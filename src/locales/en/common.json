@@ -294,6 +294,7 @@
     "reasonOptional": "Reason (optional)",
     "reasonPlaceholder": "Tell the company why, if you want to",
     "reasonHint": "Up to {{max}} characters. The company can see it.",
+    "reasonTooShort": "Enter at least {{min}} characters, or leave the reason blank.",
     "keepApplication": "Keep application",
     "keepApplications": "Keep applications",
     "withdrawFailed": "Withdrawal failed. Nothing was changed. Please try again.",
@@ -329,6 +330,7 @@
     },
     "history": {
       "title": "Status history",
+      "olderEvents": "Show older events",
       "submitted": "Submitted",
       "under_review": "Moved to Under Review",
       "interviewing": "Moved to Interviewing",

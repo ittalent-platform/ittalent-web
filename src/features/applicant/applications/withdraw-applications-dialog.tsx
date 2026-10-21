@@ -6,7 +6,7 @@ import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { useToast } from "@/components/toast/toast-provider";
 import { Textarea } from "@/components/ui/textarea";
 import { applicationDisplayId } from "./application-formatters";
-import { MAX_REASON_LENGTH } from "./applications.constants";
+import { MAX_REASON_LENGTH, MIN_REASON_LENGTH } from "./applications.constants";
 import { useWithdrawApplications, type WithdrawInput } from "./applications.queries";
 import { HTTP_CONFLICT } from "@/api/http-status";
 import { requestStatus } from "@/api/request-error";
@@ -36,6 +36,10 @@ function WithdrawForm({ targets, onOpenChange, onDone }: WithdrawDialogProps) {
 
   async function confirm() {
     const trimmed = reason.trim();
+    if (trimmed && trimmed.length < MIN_REASON_LENGTH) {
+      setFailure(t("applications.reasonTooShort", { min: MIN_REASON_LENGTH }));
+      return;
+    }
     const inputs: WithdrawInput[] = remaining.map(({ id, version }) => ({ id, ...(version !== undefined ? { expectedVersion: version } : {}), ...(trimmed ? { reason: trimmed } : {}) }));
     try {
       const { failed } = await mutation.mutateAsync(inputs);

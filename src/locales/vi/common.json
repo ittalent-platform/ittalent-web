@@ -287,6 +287,7 @@
     "reasonOptional": "Lý do (không bắt buộc)",
     "reasonPlaceholder": "Cho công ty biết lý do, nếu bạn muốn",
     "reasonHint": "Tối đa {{max}} ký tự. Công ty có thể xem lý do này.",
+    "reasonTooShort": "Nhập ít nhất {{min}} ký tự hoặc để trống lý do.",
     "keepApplication": "Giữ đơn",
     "keepApplications": "Giữ các đơn",
     "withdrawFailed": "Rút đơn thất bại. Dữ liệu không bị thay đổi. Vui lòng thử lại.",
@@ -322,6 +323,7 @@
     },
     "history": {
       "title": "Lịch sử trạng thái",
+      "olderEvents": "Xem sự kiện cũ hơn",
       "submitted": "Đã nộp",
       "under_review": "Chuyển sang Đang xem xét",
       "interviewing": "Chuyển sang Phỏng vấn",
