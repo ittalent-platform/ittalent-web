@@ -15,7 +15,10 @@ export const ACCOUNTS = {
   documentA: "document-applicant-a@example.test",
   documentB: "document-applicant-b@example.test",
 } as const;
-export const ACCOUNT_PASSWORDS: Record<(typeof ACCOUNTS)[keyof typeof ACCOUNTS], string> = {
+export const ACCOUNT_PASSWORDS: Record<
+  (typeof ACCOUNTS)[keyof typeof ACCOUNTS],
+  string
+> = {
   [ACCOUNTS.demo]: PASSWORD,
   [ACCOUNTS.empty]: PASSWORD,
   [ACCOUNTS.other]: PASSWORD,
@@ -122,5 +125,8 @@ export const search = (page: Page) =>
   page.getByPlaceholder("Search by job title or company…");
 export const statusFilter = (page: Page) =>
   page.getByRole("button", { name: /^Status:/ });
+// The table has no ID column: a row is identified by its link to the application.
+export const appLink = (page: Page, index: number) =>
+  page.locator(`a[href$="/my-applications/${applicationId(index)}"]`);
 export const rowFor = (page: Page, index: number) =>
-  page.getByRole("row").filter({ hasText: displayId(index) });
+  page.getByRole("row").filter({ has: appLink(page, index) });

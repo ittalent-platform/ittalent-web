@@ -241,7 +241,6 @@
       "board": "Board"
     },
     "columns": {
-      "reference": "ID",
       "job": "Job",
       "submitted": "Submitted",
       "updated": "Updated",

@@ -48,7 +48,10 @@ describe("Candidate My Applications", () => {
   it("shows server results in the table and switches to the board", async () => {
     renderApp("/my-applications");
     expect(screen.getByRole("link", { name: /Kỹ sư Backend/ })).toBeInTheDocument();
-    expect(screen.getByText("APP-9011")).toBeInTheDocument();
+    // The reference lives on the detail page and the board, not in a table column.
+    expect(screen.queryByText("APP-9011")).toBeNull();
+    expect(screen.queryByRole("columnheader", { name: /^ID/ })).toBeNull();
+    expect(screen.getByRole("columnheader", { name: /Job/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Board" }));
     await waitFor(() => expect(screen.getByRole("button", { name: "Board" })).toHaveAttribute("aria-pressed", "true"));
     expect(screen.getByRole("region", { name: "Submitted" })).toBeInTheDocument();
