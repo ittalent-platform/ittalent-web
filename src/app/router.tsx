@@ -4,7 +4,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, createBrowserRouter, RouterProvider, useLocation } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
-import { JOB_POSTING_MANAGER_ROLES } from "@/auth/roles";
+import { JOB_POSTING_MANAGER_ROLES, JOB_POSTING_WRITER_ROLES } from "@/auth/roles";
 import { AppLayout } from "@/components/layout/admin-layout";
 import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
@@ -273,16 +273,21 @@ export const appRoutes = [
           },
           { path: "job-postings", element: <RecruiterJobPostingsPage /> },
           {
-            path: "job-postings/create",
-            element: <RecruiterCreateJobPostingPage />,
+            element: <ProtectedRoute requiredRoles={JOB_POSTING_WRITER_ROLES} />,
+            children: [
+              {
+                path: "job-postings/create",
+                element: <RecruiterCreateJobPostingPage />,
+              },
+              {
+                path: "job-postings/:jobPostingId/edit",
+                element: <RecruiterEditJobPostingPage />,
+              },
+            ],
           },
           {
             path: "job-postings/:jobPostingId",
             element: <RecruiterJobPostingDetailPage />,
-          },
-          {
-            path: "job-postings/:jobPostingId/edit",
-            element: <RecruiterEditJobPostingPage />,
           },
           { path: "applications", element: <RecruiterApplicationsPage /> },
           {

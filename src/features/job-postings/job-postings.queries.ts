@@ -92,18 +92,35 @@ export function useJobPosting(id: string | undefined) {
   });
 }
 
-export function useJobPostingHistory(id: string | undefined) {
+/**
+ * History is newest first. With `withFirstPublish`, the result also carries the earliest publish
+ * event, found by walking pages from the oldest backwards until one holds a publish event.
+ */
+export function useJobPostingHistory(
+  id: string | undefined,
+  { withFirstPublish = false } = {},
+) {
   return useQuery({
     enabled: Boolean(id),
-    queryKey: jobPostingKeys.history(id ?? ""),
-    queryFn: async (): Promise<JobPostingHistory> =>
-      unwrap(
-        await getApiV1JobPostingsByIdHistory({
-          path: { id: id ?? "" },
-          query: { page: 1, limit: JOB_HISTORY_PAGE_SIZE },
-        }),
-        "Could not load job posting history.",
-      ),
+    queryKey: [...jobPostingKeys.history(id ?? ""), withFirstPublish],
+    queryFn: async (): Promise<JobPostingHistory & { firstPublishedAt?: string }> => {
+      const fetchPage = async (page: number) =>
+        unwrap(
+          await getApiV1JobPostingsByIdHistory({
+            path: { id: id ?? "" },
+            query: { page, limit: JOB_HISTORY_PAGE_SIZE },
+          }),
+          "Could not load job posting history.",
+        );
+      const first = await fetchPage(1);
+      if (!withFirstPublish) return first;
+      for (let page = first.totalPages; page >= 1; page--) {
+        const { items } = page === 1 ? first : await fetchPage(page);
+        const found = items.findLast((event) => event.action === "publish");
+        if (found) return { ...first, firstPublishedAt: found.occurredAt };
+      }
+      return first;
+    },
   });
 }
 

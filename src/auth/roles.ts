@@ -3,6 +3,9 @@ export const JOB_POSTING_MANAGER_ROLES = [
   "enterprise_admin",
 ] as const;
 
+/** Roles that may create/edit job postings in the web app; enterprise admins are read-only here (backend permissions are unchanged by decision). */
+export const JOB_POSTING_WRITER_ROLES = ["recruiter"] as const;
+
 export type JobPostingManagerRole =
   (typeof JOB_POSTING_MANAGER_ROLES)[number];
 export type ProtectedRole = "admin" | "user" | JobPostingManagerRole;

@@ -93,7 +93,7 @@ function renderList(items: JobPosting[]) {
   );
 }
 
-function renderDetail(posting: JobPosting) {
+function renderDetail(posting: JobPosting, historyData: object = history) {
   vi.mocked(jobQueries.useJobPosting).mockReturnValue({
     data: posting,
     isError: false,
@@ -101,7 +101,7 @@ function renderDetail(posting: JobPosting) {
     refetch: vi.fn(),
   } as unknown as ReturnType<typeof jobQueries.useJobPosting>);
   vi.mocked(jobQueries.useJobPostingHistory).mockReturnValue({
-    data: history,
+    data: historyData,
     isError: false,
     isPending: false,
     refetch: vi.fn(),
@@ -172,6 +172,20 @@ describe("JobPostingReadOnlyDetailPage", () => {
 
     fireEvent.click(within(activity).getByRole("button", { name: "View history" }));
     expect(screen.getByRole("dialog")).toHaveTextContent("Job published");
+  });
+
+  it("shows the first publish date from the history hook, not from the loaded page", () => {
+    renderDetail(base, { ...history, firstPublishedAt: "2026-01-03T05:00:00.000Z" });
+    const activity = screen.getByRole("region", { name: "Activity" });
+    expect(within(activity).getByText("First published").nextSibling).toHaveTextContent("03");
+    expect(within(activity).getByText("First published").nextSibling).toHaveTextContent("2026");
+  });
+
+  it("separates accepting applications from visible to candidates", () => {
+    renderDetail({ ...base, recruitmentStatus: "closed" });
+    const card = screen.getByText("Visible to candidates").closest("div")?.parentElement as HTMLElement;
+    expect(within(card).getByText("Accepting applications").nextSibling).toHaveTextContent("No");
+    expect(within(card).getByText("Visible to candidates").nextSibling).toHaveTextContent("Yes");
   });
 
   it("shows Not published and the draft notice for a draft", () => {

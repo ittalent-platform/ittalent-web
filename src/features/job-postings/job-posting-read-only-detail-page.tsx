@@ -58,7 +58,7 @@ export function JobPostingReadOnlyDetailPage() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [now] = useState(() => Date.now());
   const query = useJobPosting(jobPostingId);
-  const history = useJobPostingHistory(jobPostingId);
+  const history = useJobPostingHistory(jobPostingId, { withFirstPublish: true });
 
   if (query.isPending) {
     return (
@@ -85,10 +85,7 @@ export function JobPostingReadOnlyDetailPage() {
   const yesNo = (value: boolean) =>
     t(value ? "jobPostings.enterpriseAdmin.yes" : "jobPostings.enterpriseAdmin.no");
   const events = history.data?.items ?? [];
-  // History is newest first, so the last publish event in the page is the first publish.
-  const firstPublishedAt =
-    events.findLast((event) => event.action === "publish")?.occurredAt ??
-    posting.publishedAt;
+  const firstPublishedAt = history.data?.firstPublishedAt ?? posting.publishedAt;
   const lastChange = events[0];
   const salary = formatSalary(posting);
 
@@ -211,7 +208,7 @@ export function JobPostingReadOnlyDetailPage() {
               <DetailRow
                 bordered={false}
                 label={t("jobPostings.enterpriseAdmin.visibleToCandidates")}
-                value={yesNo(isOpen)}
+                value={yesNo(posting.status === "published")}
               />
             </div>
           </RailCard>

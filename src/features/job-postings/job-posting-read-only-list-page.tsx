@@ -265,7 +265,7 @@ export function JobPostingReadOnlyListPage({
                         </Link>
                       </TableCell>
                       <TableCell className={`${bodyCell} whitespace-nowrap`}>
-                        <JobPostingStatusBadge mode="publication" posting={row} />
+                        <JobPostingStatusBadge posting={row} />
                       </TableCell>
                       <TableCell className={`${bodyCell} whitespace-nowrap`}>
                         {!row.expiresAt ? (
