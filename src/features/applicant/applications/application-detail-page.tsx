@@ -125,9 +125,9 @@ export function ApplicationDetailPage() {
                 value={application.attachments.length ? (
                   <span className="flex flex-wrap gap-2">
                     {application.attachments.map((file) => (
-                      <span className="inline-flex h-8 items-center gap-2 rounded-xl border border-border px-2.5 text-[13px]" key={file.documentId}>
-                        <DocumentTypeBadge kind={ATTACHMENT_KIND[file.type] ?? "cv"} label={file.type === "cv" ? t("applications.attachmentShort.cv") : t("applications.attachmentShort.cover_letter")} />
-                        {file.fileName}
+                      <span className="inline-flex h-8 min-w-0 max-w-full items-center gap-2 rounded-xl border border-border px-2.5 text-[13px]" key={file.documentId} title={file.fileName}>
+                        <span className="shrink-0"><DocumentTypeBadge kind={ATTACHMENT_KIND[file.type] ?? "cv"} label={file.type === "cv" ? t("applications.attachmentShort.cv") : t("applications.attachmentShort.cover_letter")} /></span>
+                        <span className="truncate">{file.fileName}</span>
                       </span>
                     ))}
                   </span>

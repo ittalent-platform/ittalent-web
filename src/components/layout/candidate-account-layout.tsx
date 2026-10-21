@@ -23,7 +23,7 @@ export function CandidateAccountLayout() {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-8 lg:flex-row">
-      <nav aria-label={t("accountNav.label")} className="flex shrink-0 flex-col gap-5 lg:w-72">
+      <nav aria-label={t("accountNav.label")} className="flex shrink-0 flex-col gap-5 lg:w-56">
         {ACCOUNT_NAV.map((group) => (
           <div className="flex flex-col gap-1" key={group.labelKey}>
             <p className="px-3 pb-1 eyebrow">{t(group.labelKey)}</p>
