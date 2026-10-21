@@ -236,7 +236,6 @@
       "board": "Bảng Kanban"
     },
     "columns": {
-      "reference": "Mã",
       "job": "Vị trí",
       "submitted": "Ngày nộp",
       "updated": "Cập nhật",
