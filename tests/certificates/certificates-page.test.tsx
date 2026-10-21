@@ -146,6 +146,20 @@ describe("Certificates page (UC-S4-CERT-01..05)", () => {
     expect(within(dialog).getByText("Load the latest version before deleting it.")).toBeInTheDocument();
   });
 
+  it("keeps the 409 copy rendered while the dialog closes (no blank exit animation)", async () => {
+    vi.mocked(api.deleteApiV1MeCertificateLinksById).mockResolvedValue({ error: { message: "changed", code: "VERSION_CONFLICT" }, response: { ok: false, status: 409 } } as never);
+    renderPage();
+    fireEvent.pointerDown(await screen.findByRole("button", { name: "Actions for AWS Architect" }), { button: 0, ctrlKey: false });
+    fireEvent.click(await screen.findByRole("menuitem", { name: /Delete/ }));
+    fireEvent.click(within(await screen.findByRole("alertdialog", { name: "Delete this certificate?" })).getByRole("button", { name: "Delete" }));
+    const dialog = await screen.findByRole("alertdialog", { name: "This certificate changed somewhere else" });
+    const description = within(dialog).getByText("Load the latest version before deleting it.");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    // Whatever is still mounted during the exit must keep its text, never an emptied description.
+    expect(description.textContent).toBe("Load the latest version before deleting it.");
+    await waitFor(() => expect(screen.queryByRole("alertdialog", { name: "This certificate changed somewhere else" })).not.toBeInTheDocument());
+  });
+
   it("delete failure keeps the row and says nothing was deleted", async () => {
     vi.mocked(api.deleteApiV1MeCertificateLinksById).mockResolvedValue({ error: { message: "boom" }, response: { ok: false, status: 500 } } as never);
     renderPage();

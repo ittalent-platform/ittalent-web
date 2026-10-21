@@ -1,4 +1,4 @@
-import { Award, Lock, Plus, RefreshCw, Search, Send, Trash2 } from "lucide-react";
+import { Award, FileX, Lock, Plus, RefreshCw, Search, Send, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -65,6 +65,11 @@ export function CertificatesPage() {
 
   const toast = (message: string) => showToast({ message, title: message, tone: "success" });
   const close = () => setDialog(null);
+  // The 409/404 dialogs derive their copy from `dialog`, which close() clears: keep the last one so the exit animation doesn't blink empty.
+  const staleNow = dialog?.kind === "conflict" || dialog?.kind === "missing" ? dialog : null;
+  const [lastStale, setLastStale] = useState(staleNow);
+  if (staleNow && staleNow !== lastStale) setLastStale(staleNow);
+  const stale = staleNow ?? lastStale;
 
   function handleMutationError(error: unknown, action: StaleAction, fallbackKey: string) {
     const { code, status } = error as RequestError;
@@ -230,7 +235,7 @@ export function CertificatesPage() {
       <ActionConfirmDialog
         action={t("certificates.conflict.loadLatest")}
         cancelLabel={t("actions.cancel")}
-        description={dialog?.kind === "conflict" ? t(`certificates.conflict.description.${dialog.action}`) : undefined}
+        description={stale?.kind === "conflict" ? t(`certificates.conflict.description.${stale.action}`) : undefined}
         icon={RefreshCw}
         onConfirm={() => { close(); void query.refetch(); }}
         onOpenChange={(open) => { if (!open) { close(); void query.refetch(); } }}
@@ -241,13 +246,13 @@ export function CertificatesPage() {
 
       <ActionConfirmDialog
         action={t("certificates.missing.ok")}
-        description={dialog?.kind === "missing" ? t(dialog.action === "suggest" ? "certificates.missing.suggestDescription" : "certificates.missing.description") : undefined}
-        icon={RefreshCw}
+        description={stale?.kind === "missing" ? t(stale.action === "suggest" ? "certificates.missing.suggestDescription" : "certificates.missing.description") : undefined}
+        icon={FileX}
         noCancel
         onConfirm={close}
         onOpenChange={(open) => !open && close()}
         open={dialog?.kind === "missing"}
-        title={t(dialog?.kind === "missing" && dialog.action === "suggest" ? "certificates.missing.suggestTitle" : "certificates.missing.title")}
+        title={t(stale?.kind === "missing" && stale.action === "suggest" ? "certificates.missing.suggestTitle" : "certificates.missing.title")}
         variant="warning-solid"
       />
     </Shell>
