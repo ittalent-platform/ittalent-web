@@ -66,9 +66,10 @@
     "toast": {
       "suggested": "Will be suggested when you apply.",
       "unsuggested": "Won't be suggested when you apply.",
-      "added": "{{name}} added.",
-      "saved": "{{name}} saved.",
-      "deleted": "{{name}} deleted. Sent copies are kept."
+      "added": "Certificate added.",
+      "saved": "Certificate saved.",
+      "deleted": "Certificate deleted.",
+      "deletedKeptCopies": "Certificate deleted. Sent applications keep their copy."
     },
     "delete": {
       "title": "Delete this certificate?",
@@ -76,11 +77,16 @@
       "sentNote_one": "The application you already sent keeps its copy. Companies can still see it there.",
       "sentNote_other": "The {{count}} applications you already sent keep their copy. Companies can still see it there.",
       "keep": "Keep it",
-      "confirm": "Delete"
+      "confirm": "Delete",
+      "descriptionNotSuggested": "<b>{{name}}</b> is removed from your list."
     },
     "conflict": {
       "title": "This certificate changed somewhere else",
-      "description": "It was edited or deleted in another tab. Load the latest version, then make your change again.",
+      "description": {
+        "edit": "It was edited in another tab. Load the latest version, then make your change again.",
+        "suggest": "Load the latest version, then turn Suggest on apply on or off again.",
+        "delete": "Load the latest version before deleting it."
+      },
       "loadLatest": "Load latest"
     },
     "form": {
@@ -111,8 +117,16 @@
         "dates": "The expiry date must be after the issued date.",
         "duplicate": "You already added this link.",
         "saveFailed": "Couldn't save the certificate. Nothing was added. Please try again.",
-        "updateFailed": "Couldn't update this certificate. Nothing changed. Please try again."
+        "updateFailed": "Couldn't update this certificate. Nothing changed. Please try again.",
+        "accessChanged": "You can't save changes right now because your account access changed. Sign in again to continue."
       }
+    },
+    "missing": {
+      "title": "This certificate isn't available",
+      "description": "It may have been deleted. Your list has been refreshed.",
+      "suggestTitle": "This certificate was deleted",
+      "suggestDescription": "It was removed in another tab, so it can't be suggested. Your list has been refreshed.",
+      "ok": "OK"
     }
   },
   "actions": {

@@ -66,9 +66,10 @@
     "toast": {
       "suggested": "Sẽ được gợi ý khi bạn ứng tuyển.",
       "unsuggested": "Sẽ không được gợi ý khi bạn ứng tuyển.",
-      "added": "Đã thêm {{name}}.",
-      "saved": "Đã lưu {{name}}.",
-      "deleted": "Đã xoá {{name}}. Các bản đã gửi vẫn được giữ."
+      "added": "Đã thêm chứng chỉ.",
+      "saved": "Đã lưu chứng chỉ.",
+      "deleted": "Đã xoá chứng chỉ.",
+      "deletedKeptCopies": "Đã xoá chứng chỉ. Các đơn đã gửi vẫn giữ bản sao."
     },
     "delete": {
       "title": "Xoá chứng chỉ này?",
@@ -76,11 +77,16 @@
       "sentNote_one": "Đơn bạn đã gửi vẫn giữ bản sao. Doanh nghiệp vẫn xem được ở đó.",
       "sentNote_other": "{{count}} đơn bạn đã gửi vẫn giữ bản sao. Doanh nghiệp vẫn xem được ở đó.",
       "keep": "Giữ lại",
-      "confirm": "Xoá"
+      "confirm": "Xoá",
+      "descriptionNotSuggested": "<b>{{name}}</b> sẽ bị xoá khỏi danh sách."
     },
     "conflict": {
       "title": "Chứng chỉ đã thay đổi ở nơi khác",
-      "description": "Chứng chỉ đã được sửa hoặc xoá ở tab khác. Tải bản mới nhất rồi thao tác lại.",
+      "description": {
+        "edit": "Chứng chỉ đã được sửa ở tab khác. Tải bản mới nhất rồi sửa lại.",
+        "suggest": "Tải bản mới nhất rồi bật hoặc tắt Gợi ý khi ứng tuyển lại.",
+        "delete": "Tải bản mới nhất trước khi xoá."
+      },
       "loadLatest": "Tải bản mới nhất"
     },
     "form": {
@@ -111,8 +117,16 @@
         "dates": "Ngày hết hạn phải sau ngày cấp.",
         "duplicate": "Bạn đã thêm liên kết này rồi.",
         "saveFailed": "Không lưu được chứng chỉ. Chưa có gì được thêm. Vui lòng thử lại.",
-        "updateFailed": "Không cập nhật được chứng chỉ. Chưa có gì thay đổi. Vui lòng thử lại."
+        "updateFailed": "Không cập nhật được chứng chỉ. Chưa có gì thay đổi. Vui lòng thử lại.",
+        "accessChanged": "Bạn chưa thể lưu thay đổi vì quyền truy cập tài khoản đã thay đổi. Hãy đăng nhập lại để tiếp tục."
       }
+    },
+    "missing": {
+      "title": "Chứng chỉ này không còn",
+      "description": "Có thể chứng chỉ đã bị xoá. Danh sách của bạn đã được làm mới.",
+      "suggestTitle": "Chứng chỉ này đã bị xoá",
+      "suggestDescription": "Chứng chỉ đã bị xoá ở tab khác nên không thể gợi ý. Danh sách của bạn đã được làm mới.",
+      "ok": "OK"
     }
   },
   "actions": {

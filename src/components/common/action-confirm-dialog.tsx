@@ -44,6 +44,7 @@ export function ActionConfirmDialog({
   icon: Icon,
   iconVariant,
   keepOpenOnConfirm = false,
+  noCancel = false,
   onConfirm,
   onOpenChange,
   open,
@@ -74,6 +75,8 @@ export function ActionConfirmDialog({
   iconVariant?: ActionVariant;
   /** Radix closes the dialog on confirm by default; set this when the caller closes it after an async result. */
   keepOpenOnConfirm?: boolean;
+  /** Only the confirm button, for a notice the user just acknowledges. */
+  noCancel?: boolean;
   onConfirm: () => void;
   onOpenChange: (open: boolean) => void;
   open: boolean;
@@ -110,7 +113,7 @@ export function ActionConfirmDialog({
             {error ? <div className="mt-4"><InlineErrorAlert>{error}</InlineErrorAlert></div> : null}
           </div>
           <div className="flex flex-wrap items-center justify-end gap-3 border-t border-border px-[26px] py-5">
-            {cancel ? <AlertDialogCancel asChild className={DIALOG_BUTTON_CLASS} disabled={disabled} shape="default">{cancel}</AlertDialogCancel> : <AlertDialogCancel className={DIALOG_BUTTON_CLASS} disabled={disabled} shape="default">{cancelLabel}</AlertDialogCancel>}
+            {noCancel ? null : cancel ? <AlertDialogCancel asChild className={DIALOG_BUTTON_CLASS} disabled={disabled} shape="default">{cancel}</AlertDialogCancel> : <AlertDialogCancel className={DIALOG_BUTTON_CLASS} disabled={disabled} shape="default">{cancelLabel}</AlertDialogCancel>}
             {footerExtra}
             <AlertDialogAction className={DIALOG_BUTTON_CLASS} disabled={disabled || confirmDisabled} onClick={(event) => { if (keepOpenOnConfirm) event.preventDefault(); else confirming.current = true; onConfirm(); }} shape="default" variant={variant}>{action}</AlertDialogAction>
           </div>

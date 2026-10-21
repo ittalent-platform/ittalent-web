@@ -15,7 +15,7 @@ import { formatDate } from "@/lib/format";
 import { CERTIFICATE_LIMITS } from "./certificates.constants";
 import { useCreateCertificate, useUpdateCertificate } from "./certificates.queries";
 import type { RequestError } from "@/api/request-error";
-import { HTTP_NOT_FOUND } from "@/api/http-status";
+import { HTTP_FORBIDDEN, HTTP_NOT_FOUND, HTTP_UNAUTHORIZED } from "@/api/http-status";
 
 type Values = { expiryDate: string; issuedDate: string; issuer: string; name: string; suggested: boolean; url: string };
 type FieldErrors = Partial<Record<"expiryDate" | "name" | "url", string>>;
@@ -54,11 +54,12 @@ export function validateCertificate(values: Values): FieldErrors {
 type CertificateFormDialogProps = {
   certificate?: CertificateLink;
   onConflict: () => void;
+  onMissing: () => void;
   onOpenChange: (open: boolean) => void;
   onSaved: (certificate: CertificateLink) => void;
 };
 
-export function CertificateFormDialog({ certificate, onConflict, onOpenChange, onSaved }: CertificateFormDialogProps) {
+export function CertificateFormDialog({ certificate, onConflict, onMissing, onOpenChange, onSaved }: CertificateFormDialogProps) {
   const { t } = useTranslation();
   const editing = Boolean(certificate);
   const [values, setValues] = useState<Values>(() => initialValues(certificate));
@@ -112,7 +113,9 @@ export function CertificateFormDialog({ certificate, onConflict, onOpenChange, o
     } catch (error) {
       const { code, status } = error as RequestError;
       if (code === "DUPLICATE_CERTIFICATE_URL") setErrors({ url: "certificates.form.errors.duplicate" });
-      else if (code === "VERSION_CONFLICT" || status === HTTP_NOT_FOUND) onConflict();
+      else if (code === "VERSION_CONFLICT") onConflict();
+      else if (status === HTTP_NOT_FOUND) onMissing();
+      else if (editing && (status === HTTP_UNAUTHORIZED || status === HTTP_FORBIDDEN)) setFailure(t("certificates.form.errors.accessChanged"));
       else setFailure(t(editing ? "certificates.form.errors.updateFailed" : "certificates.form.errors.saveFailed"));
     }
   }
