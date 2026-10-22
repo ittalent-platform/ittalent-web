@@ -15,7 +15,9 @@
     "myApplications": "Đơn ứng tuyển của tôi",
     "myProfile": "Hồ sơ của tôi",
     "documents": "Tài liệu",
-    "certificates": "Chứng chỉ"
+    "certificates": "Chứng chỉ",
+    "account": "Tài khoản",
+    "notifications": "Thông báo"
   },
   "certificates": {
     "title": "Chứng chỉ",
@@ -2997,6 +2999,79 @@
       "removeFailed": "Không xoá được ảnh bìa.",
       "remove": "Xoá ảnh bìa",
       "save": "Lưu ảnh bìa"
+    }
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "unreadCount": "{{count}} chưa đọc",
+    "unreadCount_one": "{{count}} chưa đọc",
+    "unreadCount_other": "{{count}} chưa đọc",
+    "allCaughtUp": "Đã đọc tất cả",
+    "markAllAsRead": "Đánh dấu tất cả đã đọc",
+    "markAllAsReadConfirmTitle": "Đánh dấu {{count}} thông báo đã đọc?",
+    "markAllAsReadConfirmDesc": "Chỉ những thông báo bạn nhìn thấy hiện tại mới được đánh dấu. Bất kỳ thông báo nào đến sau sẽ vẫn chưa đọc.",
+    "moreActions": "Thao tác khác",
+    "deleteAll": "Xóa tất cả…",
+    "deleteAllConfirmTitle": "Xóa {{count}} thông báo?",
+    "deleteAllConfirmDesc": "Thao tác này sẽ xóa tất cả thông báo hiện có trong danh sách của bạn. Các thông báo đến sau khi xác nhận vẫn được giữ lại. Đơn ứng tuyển và lịch phỏng vấn của bạn không bị ảnh hưởng.",
+    "deleteAllConfirmBtn": "Xóa {{count}} thông báo",
+    "staleBatchTitle": "Thông báo của bạn đã thay đổi",
+    "staleBatchDesc": "Hiện tại bạn có {{count}} thông báo, không phải {{oldCount}}. Chưa có thông báo nào bị xóa.",
+    "staleBatchBtn": "Xóa {{count}} thông báo",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "showOlder": "Xem cũ hơn",
+    "showingCount": "Đang hiển thị {{shown}} trên tổng số {{total}}",
+    "tabs": {
+      "all": "Tất cả",
+      "unread": "Chưa đọc",
+      "announcements": "Thông báo chung"
+    },
+    "actions": {
+      "markAsRead": "Đánh dấu đã đọc",
+      "delete": "Xóa",
+      "undo": "Hoàn tác",
+      "close": "Đóng",
+      "tryAgain": "Thử lại",
+      "dismiss": "Bỏ qua",
+      "signIn": "Đăng nhập",
+      "browseJobs": "Tìm việc ngay",
+      "backToNotifications": "Quay lại thông báo"
+    },
+    "toast": {
+      "deleted": "Đã xóa thông báo",
+      "allMarkedRead": "Đã đánh dấu tất cả thông báo là đã đọc",
+      "allDeleted": "Đã xóa tất cả thông báo",
+      "markReadError": "Không thể đánh dấu đã đọc. Thử lại",
+      "deleteError": "Không thể xóa thông báo này. Thử lại",
+      "checkingStatus": "Đang kiểm tra trạng thái cập nhật..."
+    },
+    "empty": {
+      "noNotifications": "Chưa có thông báo nào",
+      "noNotificationsDesc": "Chúng tôi sẽ thông báo cho bạn khi có công ty xem xét đơn ứng tuyển hoặc lên lịch phỏng vấn.",
+      "allCaughtUp": "Bạn đã xem hết thông báo",
+      "allCaughtUpDesc": "Không có thông báo chưa đọc. Các thông báo cũ hơn nằm ở mục Tất cả.",
+      "noAnnouncements": "Chưa có thông báo chung",
+      "noAnnouncementsDesc": "Tin tức và cập nhật từ ITTalent sẽ hiển thị tại đây."
+    },
+    "errors": {
+      "unauthenticatedTitle": "Đăng nhập để xem thông báo của bạn",
+      "unauthenticatedDesc": "Phiên đăng nhập đã hết hạn. Sau khi đăng nhập lại bạn sẽ quay trở lại đây.",
+      "invalidPageTitle": "Trang thông báo này không tồn tại",
+      "invalidPageDesc": "Đang hiển thị các thông báo mới nhất của bạn.",
+      "storeFailureTitle": "Không thể tải thông báo",
+      "storeFailureDesc": "Đã xảy ra sự cố từ phía máy chủ. Thông báo của bạn vẫn an toàn; vui lòng thử lại sau giây lát.",
+      "projectionFailureTitle": "Thông báo bị ẩn để bảo đảm an toàn",
+      "projectionFailureDesc": "Không thể xác thực các thông báo này nên tạm thời không hiển thị. Vui lòng thử lại sau.",
+      "notFoundTitle": "Thông báo này không khả dụng",
+      "notFoundDesc": "Có thể thông báo đã bị xóa. Các thông báo khác vẫn không đổi."
+    },
+    "announcement": {
+      "badge": "THÔNG BÁO · ITTALENT",
+      "modalFooterNote": "Được gửi đến tất cả người dùng trong nhóm. Không thể phản hồi thông báo này."
+    },
+    "popover": {
+      "viewAll": "Xem tất cả thông báo"
     }
   }
 }
