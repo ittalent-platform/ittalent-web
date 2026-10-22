@@ -71,6 +71,8 @@ export function ApplicationDetailPage() {
 
   const displayId = applicationDisplayId(application.id);
   const stepIndex = PIPELINE_STEPS.indexOf(application.status);
+  // Hired ends the pipeline, so every step is complete rather than Hired being "current".
+  const stepperIndex = application.status === "hired" ? PIPELINE_STEPS.length : stepIndex;
   const isWithdrawn = application.status === "withdrawn";
 
   return (
@@ -91,7 +93,7 @@ export function ApplicationDetailPage() {
               </div>
               <ApplicationStatusBadge size="md" status={application.status} />
             </div>
-            {stepIndex >= 0 ? <Stepper ariaLabel={t("applications.progress")} currentIndex={stepIndex} steps={PIPELINE_STEPS.map((step) => t(`applications.status.${step}`))} /> : null}
+            {stepIndex >= 0 ? <Stepper ariaLabel={t("applications.progress")} currentIndex={stepperIndex} steps={PIPELINE_STEPS.map((step) => t(`applications.status.${step}`))} /> : null}
           </section>
 
           {application.reappliedFrom ? (
