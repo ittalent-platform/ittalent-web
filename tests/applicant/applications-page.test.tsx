@@ -187,6 +187,14 @@ describe("Candidate My Applications", () => {
     expect(screen.queryByRole("button", { name: "Withdraw application" })).not.toBeInTheDocument();
   });
 
+  it("completes every progress step once hired", () => {
+    vi.mocked(applicationQueries.useApplication).mockReturnValue({ data: { ...detail, status: "hired", canWithdraw: false }, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplication>);
+    renderApp(`/my-applications/${id}`);
+    const progress = screen.getByRole("list", { name: "Application progress" });
+    expect(progress.querySelector("[aria-current]")).toBeNull();
+    expect(progress.querySelectorAll("svg")).toHaveLength(5);
+  });
+
   it("offers Apply again only for a withdrawn first application (BR-APP-008)", () => {
     vi.mocked(applicationQueries.useApplication).mockReturnValue({ data: { ...detail, status: "withdrawn", canWithdraw: false, canApplyAgain: true, withdrawnAt: detail.submittedAt }, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplication>);
     renderApp(`/my-applications/${id}`);
