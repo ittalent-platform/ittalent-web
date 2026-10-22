@@ -9,6 +9,9 @@ export type NotificationTab = "all" | "unread" | "announcements";
 
 export type NotificationListParams = NonNullable<GetApiV1NotificationsData["query"]>;
 
+export type NotificationItem = NotificationItemDto;
+export type NotificationType = NotificationItemDto["type"];
+
 export type { NotificationItemDto, NotificationListResponse, UnreadCountResponse };
 
 /**
