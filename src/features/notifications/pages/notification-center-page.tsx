@@ -1,12 +1,324 @@
+import { CheckCheck, MoreVertical, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router";
 
+import {
+  useDeleteAllNotifications,
+  useDeleteNotification,
+  useMarkAllNotificationsRead,
+  useMarkNotificationRead,
+  useNotificationsQuery,
+  useUnreadCountQuery,
+} from "@/features/notifications/api/notifications.queries";
+import { NotificationItemRow } from "@/features/notifications/components/notification-item-row";
+import {
+  tabToNotificationQuery,
+  type NotificationItem,
+  type NotificationTab,
+} from "@/features/notifications/types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+
+const INITIAL_LIMIT = 10;
+const PAGE_INCREMENT = 10;
+
+/**
+ * Personal Notification Center Inbox page matching exact design specifications:
+ * - Header: Space Grotesk title, dynamic unread count / "All caught up" subtitle
+ * - Header Actions: "Mark all as read" button (disabled when 0 unread) and More Actions dropdown
+ * - Tabs: "All", "Unread", "Announcements" with respective live count badges
+ * - Card Container: 16px rounded border-box container
+ * - Notification rows: NotificationItemRow with unread dots, category chips, 2-line clamp, and hover action swap
+ * - Pagination: "Showing X of Y" and "Show older" button
+ * - Empty states: contextual feedback for each empty tab
+ */
 export function NotificationCenterPage() {
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const tabParam = searchParams.get("tab");
+  const activeTab: NotificationTab =
+    tabParam === "unread" || tabParam === "announcements" ? tabParam : "all";
+
+  const [limit, setLimit] = useState(INITIAL_LIMIT);
+
+  // Queries
+  const unreadCountQuery = useUnreadCountQuery();
+  const unreadCount = unreadCountQuery.data?.unreadCount ?? 0;
+
+  const notificationsQuery = useNotificationsQuery(
+    tabToNotificationQuery(activeTab, { page: 1, limit }),
+  );
+
+  // Counts for tabs
+  const allCountQuery = useNotificationsQuery(
+    tabToNotificationQuery("all", { page: 1, limit: 1 }),
+  );
+  const announcementsCountQuery = useNotificationsQuery(
+    tabToNotificationQuery("announcements", { page: 1, limit: 1 }),
+  );
+
+  const items = notificationsQuery.data?.items ?? [];
+  const totalCount = notificationsQuery.data?.total ?? 0;
+
+  const allTabCount = activeTab === "all" ? totalCount : (allCountQuery.data?.total ?? totalCount);
+  const announcementsTabCount =
+    activeTab === "announcements" ? totalCount : (announcementsCountQuery.data?.total ?? 0);
+
+  // Mutations
+  const markReadMutation = useMarkNotificationRead();
+  const markAllReadMutation = useMarkAllNotificationsRead();
+  const deleteMutation = useDeleteNotification();
+  const deleteAllMutation = useDeleteAllNotifications();
+
+  const handleTabChange = (nextTab: NotificationTab) => {
+    setSearchParams(
+      (prev) => {
+        if (nextTab === "all") {
+          prev.delete("tab");
+        } else {
+          prev.set("tab", nextTab);
+        }
+        return prev;
+      },
+      { replace: true },
+    );
+    setLimit(INITIAL_LIMIT);
+  };
+
+  const tabs: Array<{ key: NotificationTab; label: string; count: number }> = [
+    {
+      key: "all",
+      label: t("notifications.tabs.all", { defaultValue: "All" }),
+      count: allTabCount,
+    },
+    {
+      key: "unread",
+      label: t("notifications.tabs.unread", { defaultValue: "Unread" }),
+      count: unreadCount,
+    },
+    {
+      key: "announcements",
+      label: t("notifications.tabs.announcements", { defaultValue: "Announcements" }),
+      count: announcementsTabCount,
+    },
+  ];
+
+  const handleMarkAllAsRead = () => {
+    if (unreadCount > 0 && !markAllReadMutation.isPending) {
+      markAllReadMutation.mutate();
+    }
+  };
+
+  const handleDeleteAll = () => {
+    if (totalCount > 0 && !deleteAllMutation.isPending) {
+      deleteAllMutation.mutate();
+    }
+  };
+
   return (
-    <div data-testid="notification-center-page">
-      <h1 className="font-['Space_Grotesk'] text-[24px] sm:text-[26px] font-semibold text-foreground">
-        {t("notifications.title", { defaultValue: "Notifications" })}
-      </h1>
+    <div className="flex w-full flex-col gap-5" data-testid="notification-center-page">
+      {/* Zone 1: Page Header & Global Actions */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-1">
+          <h1 className="m-0 font-['Space_Grotesk'] text-[24px] font-semibold text-foreground sm:text-[26px]">
+            {t("notifications.title", { defaultValue: "Notifications" })}
+          </h1>
+          <p className="m-0 text-[13.5px] text-muted-foreground">
+            {unreadCount > 0
+              ? t("notifications.unreadCount", {
+                  count: unreadCount,
+                  defaultValue: `${unreadCount} unread`,
+                })
+              : t("notifications.allCaughtUp", { defaultValue: "All caught up" })}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {/* Mark all as read button */}
+          <button
+            className={cn(
+              "inline-flex h-[44px] items-center gap-2 rounded-[12px] px-[18px] text-[14px] font-semibold transition-colors",
+              unreadCount > 0
+                ? "border border-border bg-card text-foreground hover:bg-muted cursor-pointer"
+                : "border-0 bg-muted text-muted-foreground cursor-not-allowed",
+            )}
+            disabled={unreadCount === 0 || markAllReadMutation.isPending}
+            onClick={handleMarkAllAsRead}
+            type="button"
+          >
+            <CheckCheck className="size-4" />
+            {unreadCount > 0
+              ? t("notifications.markAllAsRead", { defaultValue: "Mark all as read" })
+              : t("notifications.allCaughtUp", { defaultValue: "All caught up" })}
+          </button>
+
+          {/* More actions menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label={t("notifications.moreActions", { defaultValue: "More actions" })}
+                className="flex size-11 items-center justify-center rounded-[12px] border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
+                type="button"
+              >
+                <MoreVertical className="size-[18px]" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 rounded-[14px] p-1.5 shadow-xl">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                disabled={unreadCount === 0 || markAllReadMutation.isPending}
+                onClick={handleMarkAllAsRead}
+              >
+                <CheckCheck className="size-4" />
+                <span>{t("notifications.markAllAsRead", { defaultValue: "Mark all as read" })}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer font-semibold"
+                disabled={totalCount === 0 || deleteAllMutation.isPending}
+                onClick={handleDeleteAll}
+                variant="destructive"
+              >
+                <Trash2 className="size-4" />
+                <span>{t("notifications.deleteAll", { defaultValue: "Delete all…" })}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Zone 2 & 3: Tabs & Card Container */}
+      <div className="w-full overflow-hidden rounded-[16px] border border-border bg-card">
+        {/* Tab Tray */}
+        <div
+          aria-label={t("notifications.title", { defaultValue: "Notifications" })}
+          className="flex gap-6 border-b border-border bg-card px-5 pt-1 sm:px-6"
+          role="tablist"
+        >
+          {tabs.map((tab) => {
+            const isSelected = activeTab === tab.key;
+            return (
+              <button
+                aria-selected={isSelected}
+                className={cn(
+                  "inline-flex h-10 items-center gap-2 border-b-2 px-0.5 text-[14px] transition-colors cursor-pointer",
+                  isSelected
+                    ? "border-brand font-bold text-foreground"
+                    : "border-transparent font-medium text-muted-foreground hover:text-foreground",
+                )}
+                key={tab.key}
+                onClick={() => handleTabChange(tab.key)}
+                role="tab"
+                type="button"
+              >
+                <span>{tab.label}</span>
+                <span
+                  className={cn(
+                    "inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 text-[12px] font-bold",
+                    isSelected
+                      ? "bg-ember-wash text-fg-link"
+                      : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* List items / Empty states */}
+        {notificationsQuery.isLoading && items.length === 0 ? (
+          <div className="flex items-center justify-center py-16 text-muted-foreground">
+            <span className="text-[13.5px]">{t("common.loading", { defaultValue: "Loading..." })}</span>
+          </div>
+        ) : items.length > 0 ? (
+          <div
+            aria-label={t("notifications.title", { defaultValue: "Notifications" })}
+            className="-mt-px"
+            role="list"
+          >
+            {items.map((item: NotificationItem) => (
+              <NotificationItemRow
+                item={item}
+                key={item.id}
+                onDelete={(id) => deleteMutation.mutate({ id })}
+                onMarkRead={(id) => markReadMutation.mutate({ id })}
+              />
+            ))}
+          </div>
+        ) : (
+          /* Contextual empty states matching design specs */
+          <div className="flex flex-col gap-2 p-8 text-left sm:p-10">
+            {activeTab === "unread" ? (
+              <>
+                <span className="font-['Space_Grotesk'] text-[19px] font-semibold text-foreground">
+                  {t("notifications.empty.allCaughtUp", { defaultValue: "You’re all caught up" })}
+                </span>
+                <span className="text-[13.5px] text-muted-foreground">
+                  {t("notifications.empty.allCaughtUpDesc", {
+                    defaultValue: "No unread notifications. Older ones are under All.",
+                  })}
+                </span>
+              </>
+            ) : activeTab === "announcements" ? (
+              <>
+                <span className="font-['Space_Grotesk'] text-[19px] font-semibold text-foreground">
+                  {t("notifications.empty.noAnnouncements", { defaultValue: "No announcements" })}
+                </span>
+                <span className="text-[13.5px] text-muted-foreground">
+                  {t("notifications.empty.noAnnouncementsDesc", {
+                    defaultValue: "News from ITTalent shows up here.",
+                  })}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="font-['Space_Grotesk'] text-[19px] font-semibold text-foreground">
+                  {t("notifications.empty.noNotifications", {
+                    defaultValue: "No notifications yet",
+                  })}
+                </span>
+                <span className="text-[13.5px] text-muted-foreground">
+                  {t("notifications.empty.noNotificationsDesc", {
+                    defaultValue:
+                      "We’ll let you know here when a company reviews your application or schedules an interview.",
+                  })}
+                </span>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Zone 5: Pagination Footer */}
+        {items.length > 0 && (
+          <div className="flex items-center justify-between border-t border-line-muted px-6 py-3.5">
+            <span className="text-[13px] text-muted-foreground">
+              {t("notifications.showingCount", {
+                defaultValue: `Showing ${items.length} of ${totalCount}`,
+                shown: items.length,
+                total: totalCount,
+              })}
+            </span>
+            {items.length < totalCount && (
+              <button
+                className="inline-flex h-10 items-center justify-center rounded-[12px] border border-border bg-card px-4 text-[14px] font-semibold text-foreground transition-colors hover:bg-muted cursor-pointer disabled:opacity-50"
+                disabled={notificationsQuery.isFetching}
+                onClick={() => setLimit((prev) => prev + PAGE_INCREMENT)}
+                type="button"
+              >
+                {t("notifications.showOlder", { defaultValue: "Show older" })}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
