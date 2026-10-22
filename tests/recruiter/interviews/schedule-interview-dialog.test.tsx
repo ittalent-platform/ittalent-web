@@ -64,6 +64,7 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
 
 describe("Schedule interview dialog", () => {
   beforeEach(() => {
+    vi.setSystemTime(new Date("2026-10-15T00:00:00Z"));
     showToast.mockReset();
     onClose.mockReset();
     mutate = vi.fn<Mutate>();
