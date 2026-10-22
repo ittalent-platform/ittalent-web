@@ -1597,6 +1597,134 @@ export type RegisterDeviceTokenRequest = {
     platform: 'ios' | 'android' | 'web';
 };
 
+export type CompanyDashboardResponse = {
+    asOf: string;
+    timeZone: string;
+    company: {
+        id: string;
+        name: string;
+    };
+    period: {
+        range: 'last_7_days' | 'last_30_days' | 'last_90_days' | 'this_month' | 'custom';
+        from: string;
+        to: string;
+        days: number;
+    };
+    summary: {
+        /**
+         * Jobs created in the period.
+         */
+        jobsPosted: number;
+        /**
+         * Of the jobs created in the period, how many are published now. It is not the company's total of open jobs: a job created before the period is not counted.
+         */
+        jobsOpen: number;
+        /**
+         * Applications received in the period, for the company's jobs.
+         */
+        applicationsReceived: number;
+        averageApplicationsPerDay: number;
+        /**
+         * Interviews scheduled to start in the period.
+         */
+        interviews: number;
+        /**
+         * Of those interviews, how many are completed now.
+         */
+        interviewsCompleted: number;
+        /**
+         * Of the applications received in the period, how many are hired now (a cohort count). It is not the number of hiring decisions made in the period: an application received earlier and hired in the period is not counted.
+         */
+        hired: number;
+        /**
+         * Share of the applications received in the period that are hired now; null when none were received.
+         */
+        hiredPercent: number | null;
+    };
+    weeks: Array<{
+        from: string;
+        to: string;
+        days: number;
+        applications: number;
+        jobsPosted: number;
+        interviews: number;
+        hired: number;
+    }>;
+    weeklyAverageApplications: number | null;
+    applicationStatuses: {
+        submitted: number;
+        underReview: number;
+        interviewing: number;
+        offered: number;
+        hired: number;
+        rejected: number;
+        withdrawn: number;
+        positionFilled: number;
+    };
+    interviewDays: Array<{
+        date: string;
+        count: number;
+    }>;
+    interviewStatuses: {
+        scheduled: number;
+        rescheduleRequested: number;
+        completed: number;
+        noShow: number;
+        cancelled: number;
+    };
+    jobStatuses: {
+        published: number;
+        closed: number;
+        draft: number;
+        archived: number;
+    };
+    topJobs: Array<{
+        id: string;
+        title: string;
+        applications: number;
+        interviews: number;
+        hired: number;
+    }>;
+};
+
+export type PlatformOverviewResponse = {
+    asOf: string;
+    timeZone: string;
+    accounts: {
+        total: number;
+        newInLast30Days: number;
+        byRole: {
+            candidates: number;
+            hr: number;
+            enterpriseAdmins: number;
+        };
+        byStatus: {
+            active: number;
+            invited: number;
+            inactive: number;
+            suspended: number;
+        };
+        newPerWeek: Array<{
+            from: string;
+            to: string;
+            count: number;
+        }>;
+    };
+    companies: {
+        active: number;
+        suspended: number;
+        approved: number;
+        waitingForReview: number;
+        oldestWaitingDays: number | null;
+    };
+    waitingForReview: Array<{
+        id: string;
+        companyName: string;
+        submittedAt: string;
+        waitingDays: number;
+    }>;
+};
+
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -4941,3 +5069,65 @@ export type DeleteApiV1NotificationsDevicesByTokenResponses = {
 };
 
 export type DeleteApiV1NotificationsDevicesByTokenResponse = DeleteApiV1NotificationsDevicesByTokenResponses[keyof DeleteApiV1NotificationsDevicesByTokenResponses];
+
+export type GetApiV1DashboardCompanyData = {
+    body?: never;
+    path?: never;
+    query?: {
+        range?: 'last_7_days' | 'last_30_days' | 'last_90_days' | 'this_month' | 'custom';
+        from?: string;
+        to?: string;
+    };
+    url: '/api/v1/dashboard/company';
+};
+
+export type GetApiV1DashboardCompanyErrors = {
+    /**
+     * Unknown date, "to" before "from", more than 366 days, or "from"/"to" without a custom range
+     */
+    400: unknown;
+    /**
+     * Authentication required, or the session was revoked
+     */
+    401: unknown;
+    /**
+     * Wrong role; or the account is not a member of a company (DASHBOARD_NOT_A_MEMBER); or the company is not active (DASHBOARD_COMPANY_NOT_ACTIVE)
+     */
+    403: unknown;
+};
+
+export type GetApiV1DashboardCompanyResponses = {
+    /**
+     * Statistics of the period
+     */
+    200: CompanyDashboardResponse;
+};
+
+export type GetApiV1DashboardCompanyResponse = GetApiV1DashboardCompanyResponses[keyof GetApiV1DashboardCompanyResponses];
+
+export type GetApiV1DashboardPlatformData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/dashboard/platform';
+};
+
+export type GetApiV1DashboardPlatformErrors = {
+    /**
+     * Authentication required, or the session was revoked
+     */
+    401: unknown;
+    /**
+     * Only system admins
+     */
+    403: unknown;
+};
+
+export type GetApiV1DashboardPlatformResponses = {
+    /**
+     * Platform overview
+     */
+    200: PlatformOverviewResponse;
+};
+
+export type GetApiV1DashboardPlatformResponse = GetApiV1DashboardPlatformResponses[keyof GetApiV1DashboardPlatformResponses];

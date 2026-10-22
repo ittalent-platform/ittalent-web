@@ -54,6 +54,16 @@ const AcceptInvitationPage = lazy(() =>
 const ConfirmEmailChangePage = lazy(() =>
   import("@/features/auth/confirm-email-change-page").then((m) => ({ default: m.ConfirmEmailChangePage })),
 );
+const AdminDashboardPage = lazy(() =>
+  import("@/features/admin/dashboard/admin-dashboard-page").then((m) => ({
+    default: m.AdminDashboardPage,
+  })),
+);
+const RecruiterDashboardPage = lazy(() =>
+  import("@/features/recruiter/dashboard/dashboard-page").then((m) => ({
+    default: m.DashboardPage,
+  })),
+);
 const UsersPage = lazy(() =>
   import("@/features/admin/users/users-page").then((m) => ({
     default: m.UsersPage,
@@ -257,6 +267,7 @@ export const appRoutes = [
         element: <AppLayout />,
         children: [
           { index: true, element: <Navigate replace to="/admin/users" /> },
+          { path: "dashboard", element: <AdminDashboardPage /> },
           { path: "users", element: <UsersPage /> },
           { path: "users/:userId", element: <AdminUserDetailPage /> },
           { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
@@ -295,6 +306,7 @@ export const appRoutes = [
             index: true,
             element: <Navigate replace to="/recruiter/job-postings" />,
           },
+          { path: "dashboard", element: <RecruiterDashboardPage /> },
           { path: "job-postings", element: <RecruiterJobPostingsPage /> },
           {
             element: <ProtectedRoute requiredRoles={JOB_POSTING_WRITER_ROLES} />,
