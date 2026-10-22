@@ -15,7 +15,9 @@
     "myApplications": "My applications",
     "myProfile": "My profile",
     "documents": "Documents",
-    "certificates": "Certificates"
+    "certificates": "Certificates",
+    "account": "Account",
+    "notifications": "Notifications"
   },
   "certificates": {
     "title": "Certificates",
@@ -3024,6 +3026,79 @@
       "removeFailed": "Failed to remove cover image.",
       "remove": "Remove cover",
       "save": "Save cover"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unreadCount": "{{count}} unread",
+    "unreadCount_one": "{{count}} unread",
+    "unreadCount_other": "{{count}} unread",
+    "allCaughtUp": "All caught up",
+    "markAllAsRead": "Mark all as read",
+    "markAllAsReadConfirmTitle": "Mark {{count}} notifications as read?",
+    "markAllAsReadConfirmDesc": "Only notifications you can see now are marked. Anything that arrives after you confirm stays unread.",
+    "moreActions": "More actions",
+    "deleteAll": "Delete all…",
+    "deleteAllConfirmTitle": "Delete {{count}} notifications?",
+    "deleteAllConfirmDesc": "This removes every notification in your list right now. Ones that arrive after you confirm are kept. Your applications and interviews aren't affected.",
+    "deleteAllConfirmBtn": "Delete {{count}} notifications",
+    "staleBatchTitle": "Your notifications changed",
+    "staleBatchDesc": "You now have {{count}} notifications, not {{oldCount}}. Nothing was deleted yet.",
+    "staleBatchBtn": "Delete {{count}} notifications",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "showOlder": "Show older",
+    "showingCount": "Showing {{shown}} of {{total}}",
+    "tabs": {
+      "all": "All",
+      "unread": "Unread",
+      "announcements": "Announcements"
+    },
+    "actions": {
+      "markAsRead": "Mark as read",
+      "delete": "Delete",
+      "undo": "Undo",
+      "close": "Close",
+      "tryAgain": "Try again",
+      "dismiss": "Dismiss",
+      "signIn": "Sign in",
+      "browseJobs": "Browse jobs",
+      "backToNotifications": "Back to notifications"
+    },
+    "toast": {
+      "deleted": "Notification deleted",
+      "allMarkedRead": "All notifications marked as read",
+      "allDeleted": "All notifications deleted",
+      "markReadError": "Couldn't mark as read. Try again",
+      "deleteError": "Couldn't delete this notification. Try again",
+      "checkingStatus": "Checking whether your notifications were marked..."
+    },
+    "empty": {
+      "noNotifications": "No notifications yet",
+      "noNotificationsDesc": "We'll let you know here when a company reviews your application or schedules an interview.",
+      "allCaughtUp": "You're all caught up",
+      "allCaughtUpDesc": "No unread notifications. Older ones are under All.",
+      "noAnnouncements": "No announcements",
+      "noAnnouncementsDesc": "News from ITTalent shows up here."
+    },
+    "errors": {
+      "unauthenticatedTitle": "Sign in to see your notifications",
+      "unauthenticatedDesc": "Your session ended, so nothing was loaded. After signing in you come straight back here.",
+      "invalidPageTitle": "That page of notifications doesn't exist",
+      "invalidPageDesc": "Showing your newest notifications instead.",
+      "storeFailureTitle": "Notifications couldn't be loaded",
+      "storeFailureDesc": "Something went wrong on our side. Your notifications are safe; try again in a moment.",
+      "projectionFailureTitle": "Notifications are hidden for safety",
+      "projectionFailureDesc": "We couldn't check these notifications, so none are shown. Try again later.",
+      "notFoundTitle": "This notification isn't available",
+      "notFoundDesc": "It may have been deleted. Your other notifications are unchanged."
+    },
+    "announcement": {
+      "badge": "ANNOUNCEMENT · ITTALENT",
+      "modalFooterNote": "Sent to everyone in a group. Replies aren't possible."
+    },
+    "popover": {
+      "viewAll": "View all notifications"
     }
   }
 }
