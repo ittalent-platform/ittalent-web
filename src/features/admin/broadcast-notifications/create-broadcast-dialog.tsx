@@ -128,22 +128,21 @@ export function CreateBroadcastDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Create Broadcast Notification</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="w-full max-w-[720px] gap-0 overflow-hidden rounded-2xl p-0 border border-border/80 shadow-2xl">
+        <DialogHeader className="bg-muted/15 border-b border-border/60 px-6 py-5">
+          <DialogTitle className="text-xl font-bold tracking-tight">Create Broadcast Notification</DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground mt-1">
             Compose an announcement message to broadcast across user accounts. You can dispatch immediately or save as draft.
           </DialogDescription>
         </DialogHeader>
 
-        {errorMsg && (
-          <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-            <AlertCircle className="size-4 shrink-0" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        <div className="space-y-4 py-2">
+        <div className="max-h-[calc(88vh-160px)] overflow-y-auto px-6 py-5 space-y-4">
+          {errorMsg && (
+            <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+              <AlertCircle className="size-4 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
           {/* Title */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -283,7 +282,7 @@ export function CreateBroadcastDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <DialogFooter className="border-t border-border/60 bg-muted/20 px-6 py-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button onClick={handleClose} type="button" variant="outline">
             Cancel
           </Button>

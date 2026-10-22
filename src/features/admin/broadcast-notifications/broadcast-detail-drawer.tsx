@@ -1,10 +1,13 @@
 import {
   Calendar,
-  CheckCircle,
+  CheckCircle2,
   Clock,
   ExternalLink,
+  Mail,
   Pencil,
+  Radio,
   Send,
+  Sparkles,
   Trash2,
   User,
   Users,
@@ -12,6 +15,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -69,42 +73,55 @@ export function BroadcastDetailDrawer({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="w-full max-w-[720px] gap-0 overflow-hidden rounded-2xl p-0 border border-border/80 shadow-2xl flex flex-col max-h-[92vh]">
+        <DialogHeader className="shrink-0 bg-muted/15 border-b border-border/60 px-6 py-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/80 px-2.5 py-0.5 text-xs font-medium text-muted-foreground shadow-xs">
+              <Sparkles className="size-3 text-primary/70" />
               {data.category}
             </span>
             <BroadcastStatusBadge status={data.status} />
             <BroadcastPriorityBadge priority={data.priority} />
           </div>
-          <DialogTitle className="mt-2 text-xl font-bold text-foreground">
+          <DialogTitle className="mt-2 text-xl font-bold tracking-tight text-foreground leading-snug">
             {data.title}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-2">
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           {/* Section 1: Message Preview */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Message Content & Preview
-            </h4>
-            <div className="rounded-xl border border-border bg-muted/20 p-4">
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+            <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+              <span className="font-semibold uppercase tracking-wider text-[11px] text-muted-foreground/90">
+                Message Content & Preview
+              </span>
+              {data.channels && data.channels.length > 0 && (
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <Radio className="size-3 text-primary" />
+                  <span>Channels: {data.channels.join(', ')}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-4 transition-colors">
+              <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed text-foreground/90 font-normal select-text">
                 {data.content}
               </p>
 
               {data.actionUrl && (
-                <div className="mt-4 pt-3 border-t border-border">
+                <div className="mt-3.5 pt-3 border-t border-border/50 flex flex-wrap items-center justify-between gap-3">
                   <a
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
                     href={data.actionUrl}
                     rel="noreferrer"
                     target="_blank"
                   >
                     <span>{data.actionLabel || 'Visit Action Link'}</span>
-                    <ExternalLink className="size-3" />
+                    <ExternalLink className="size-3.5" />
                   </a>
+                  <span className="text-[11px] text-muted-foreground font-mono truncate max-w-[280px]">
+                    {data.actionUrl}
+                  </span>
                 </div>
               )}
             </div>
@@ -112,51 +129,72 @@ export function BroadcastDetailDrawer({
 
           {/* Section 2: Distribution Metadata */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Distribution & Sender Metadata
-            </h4>
-            <div className="grid grid-cols-1 gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-2 text-xs">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Users className="size-4 shrink-0 text-primary" />
-                <span>
-                  Target Audience: <strong className="text-foreground">{data.targetAudience}</strong>
-                </span>
-              </div>
+            <span className="font-semibold uppercase tracking-wider text-[11px] text-muted-foreground/90">
+              Distribution & Sender
+            </span>
 
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <User className="size-4 shrink-0 text-primary" />
-                <span>
-                  Created By:{' '}
-                  <strong className="text-foreground">
-                    {data.sender?.fullName || data.sender?.email || 'System Administrator'}
-                  </strong>
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="size-4 shrink-0 text-muted-foreground" />
-                <span>
-                  Created At: <strong className="text-foreground">{formatDetailDate(data.createdAt)}</strong>
-                </span>
-              </div>
-
-              {isSent && (
-                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle className="size-4 shrink-0" />
-                  <span>
-                    Dispatched At:{' '}
-                    <strong className="text-foreground">{formatDetailDate(data.sentAt)}</strong>
-                  </span>
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/60 px-3.5 py-2.5 shadow-2xs">
+                <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <Users className="size-4" />
                 </div>
-              )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10.5px] font-medium text-muted-foreground">Target Audience</p>
+                  <p className="truncate text-xs font-semibold text-foreground">{data.targetAudience}</p>
+                </div>
+              </div>
 
-              {isScheduled && (
-                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-                  <Calendar className="size-4 shrink-0" />
-                  <span>
-                    Scheduled At:{' '}
-                    <strong className="text-foreground">{formatDetailDate(data.scheduledAt)}</strong>
-                  </span>
+              <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/60 px-3.5 py-2.5 shadow-2xs">
+                <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <User className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10.5px] font-medium text-muted-foreground">Created By</p>
+                  <p className="truncate text-xs font-semibold text-foreground">
+                    {data.sender?.fullName || data.sender?.email || 'System Administrator'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/60 px-3.5 py-2.5 shadow-2xs">
+                <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+                  <Clock className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10.5px] font-medium text-muted-foreground">Created At</p>
+                  <p className="truncate text-xs font-semibold text-foreground">{formatDetailDate(data.createdAt)}</p>
+                </div>
+              </div>
+
+              {isSent ? (
+                <div className="flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2.5 shadow-2xs">
+                  <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 className="size-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10.5px] font-medium text-emerald-700 dark:text-emerald-300">Dispatched At</p>
+                    <p className="truncate text-xs font-semibold text-foreground">{formatDetailDate(data.sentAt)}</p>
+                  </div>
+                </div>
+              ) : isScheduled ? (
+                <div className="flex items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-3.5 py-2.5 shadow-2xs">
+                  <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <Calendar className="size-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10.5px] font-medium text-amber-700 dark:text-amber-300">Scheduled At</p>
+                    <p className="truncate text-xs font-semibold text-foreground">{formatDetailDate(data.scheduledAt)}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/60 px-3.5 py-2.5 shadow-2xs">
+                  <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+                    <Mail className="size-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10.5px] font-medium text-muted-foreground">Status</p>
+                    <p className="truncate text-xs font-semibold text-foreground">Draft (Pending Dispatch)</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -164,64 +202,79 @@ export function BroadcastDetailDrawer({
 
           {/* Section 3: Delivery Analytics */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Delivery & Engagement Analytics
-            </h4>
+            <div className="flex items-center justify-between">
+              <span className="font-semibold uppercase tracking-wider text-[11px] text-muted-foreground/90">
+                Delivery & Engagement Analytics
+              </span>
+              {isSent && (
+                <span className="text-[11px] text-muted-foreground">
+                  Live telemetry synced
+                </span>
+              )}
+            </div>
 
             {isSent ? (
-              <div className="rounded-xl border border-border bg-card p-4">
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="p-2 rounded-lg bg-muted/40">
-                    <p className="text-xs text-muted-foreground">Targeted</p>
-                    <p className="text-lg font-bold text-foreground">
+              <div className="rounded-xl border border-border/70 bg-card px-4 py-3.5 shadow-xs space-y-3">
+                <div className="grid grid-cols-3 divide-x divide-border/60">
+                  <div className="px-2 sm:px-4 text-center first:pl-0">
+                    <p className="text-[10.5px] font-medium text-muted-foreground">Targeted</p>
+                    <p className="mt-0.5 text-xl font-bold tracking-tight text-foreground">
                       {data.deliveryMetrics.targetedCount}
                     </p>
+                    <p className="text-[10px] text-muted-foreground">Recipients</p>
                   </div>
-                  <div className="p-2 rounded-lg bg-muted/40">
-                    <p className="text-xs text-muted-foreground">Delivered</p>
-                    <p className="text-lg font-bold text-foreground">
+
+                  <div className="px-2 sm:px-4 text-center">
+                    <p className="text-[10.5px] font-medium text-muted-foreground">Delivered</p>
+                    <p className="mt-0.5 text-xl font-bold tracking-tight text-foreground">
                       {data.deliveryMetrics.deliveredCount}
                     </p>
+                    <p className="text-[10px] text-muted-foreground">Inboxes reached</p>
                   </div>
-                  <div className="p-2 rounded-lg bg-muted/40">
-                    <p className="text-xs text-muted-foreground">Read / Opened</p>
-                    <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                      {data.deliveryMetrics.readCount} ({data.deliveryMetrics.readPercentage}%)
+
+                  <div className="px-2 sm:px-4 text-center last:pr-0">
+                    <p className="text-[10.5px] font-medium text-muted-foreground">Read / Opened</p>
+                    <p className="mt-0.5 text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
+                      {data.deliveryMetrics.readCount}{' '}
+                      <span className="text-xs font-semibold text-emerald-600/80">
+                        ({data.deliveryMetrics.readPercentage}%)
+                      </span>
                     </p>
+                    <p className="text-[10px] text-muted-foreground">Receipts confirmed</p>
                   </div>
                 </div>
 
-                <div className="mt-4 space-y-1.5">
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Recipient Read Engagement</span>
-                    <span className="font-semibold text-foreground">
+                <div className="space-y-1 pt-2.5 border-t border-border/50">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-[11px] text-muted-foreground font-medium">Recipient Read Engagement</span>
+                    <span className="text-xs font-semibold text-foreground">
                       {data.deliveryMetrics.readPercentage}%
                     </span>
                   </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/80">
                     <div
-                      className="h-full rounded-full bg-primary transition-all duration-500"
+                      className="h-full rounded-full bg-emerald-500 transition-all duration-500"
                       style={{ width: `${Math.min(100, data.deliveryMetrics.readPercentage)}%` }}
                     />
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-border bg-muted/10 p-4 text-center text-xs text-muted-foreground">
-                <Clock className="mx-auto size-6 mb-1 text-muted-foreground/60" />
-                <p className="font-medium text-foreground">Pending Dispatch</p>
-                <p className="mt-0.5">
-                  Real-time delivery and read analytics will automatically generate once this announcement is dispatched.
+              <div className="rounded-xl border border-dashed border-border/80 bg-muted/20 p-4 text-center">
+                <Clock className="mx-auto size-5 text-muted-foreground/60 mb-1.5" />
+                <p className="text-xs font-semibold text-foreground">Pending Dispatch</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5 max-w-sm mx-auto">
+                  Real-time delivery counts and recipient open rates will automatically track once this broadcast is dispatched.
                 </p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Section 4: Actions */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-4">
+        {/* Section 4: Actions Footer */}
+        <DialogFooter className="shrink-0 border-t border-border/60 bg-muted/20 px-6 py-3.5 flex flex-row items-center justify-between sm:justify-between w-full">
           <Button
-            className="text-destructive hover:bg-destructive/10"
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive gap-1.5 px-3"
             onClick={() => {
               onOpenChange(false);
               onDelete(data);
@@ -282,7 +335,7 @@ export function BroadcastDetailDrawer({
               Close
             </Button>
           </div>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

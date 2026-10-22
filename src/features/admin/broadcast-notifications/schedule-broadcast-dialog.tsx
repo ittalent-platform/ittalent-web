@@ -117,18 +117,18 @@ function ScheduleBroadcastDialogContent({
   }
 
   return (
-    <DialogContent className="max-w-md">
-      <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+    <DialogContent className="max-w-md gap-0 overflow-hidden rounded-2xl p-0 border border-border/80 shadow-2xl">
+      <DialogHeader className="bg-muted/15 border-b border-border/60 px-6 py-5">
+        <DialogTitle className="flex items-center gap-2 text-xl font-bold tracking-tight">
           <Calendar className="size-5 text-primary" />
           Schedule Broadcast Dispatch
         </DialogTitle>
-        <DialogDescription>
+        <DialogDescription className="text-xs text-muted-foreground mt-1">
           Configure this announcement to be automatically published and distributed to target audiences at a future timestamp.
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4 py-2">
+      <div className="max-h-[calc(88vh-160px)] overflow-y-auto px-6 py-5 space-y-4">
         <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Announcement</p>
           <p className="font-semibold text-foreground line-clamp-1">{broadcast.title}</p>
@@ -192,7 +192,7 @@ function ScheduleBroadcastDialogContent({
         </div>
       </div>
 
-      <DialogFooter className="flex gap-2 sm:justify-end">
+      <DialogFooter className="border-t border-border/60 bg-muted/20 px-6 py-4 flex gap-2 sm:justify-end">
         <Button onClick={() => onOpenChange(false)} type="button" variant="outline">
           Cancel
         </Button>

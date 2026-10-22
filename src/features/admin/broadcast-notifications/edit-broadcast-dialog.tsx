@@ -117,18 +117,18 @@ function EditBroadcastDialogContent({
   }
 
   return (
-    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+    <DialogContent className="w-full max-w-[720px] gap-0 overflow-hidden rounded-2xl p-0 border border-border/80 shadow-2xl">
+      <DialogHeader className="bg-muted/15 border-b border-border/60 px-6 py-5">
+        <DialogTitle className="flex items-center gap-2 text-xl font-bold tracking-tight">
           <Edit3 className="size-5 text-primary" />
           Edit Broadcast Notification
         </DialogTitle>
-        <DialogDescription>
+        <DialogDescription className="text-xs text-muted-foreground mt-1">
           Update notification content and delivery parameters. Modifications will take effect at scheduled execution time.
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4 py-2">
+      <div className="max-h-[calc(88vh-160px)] overflow-y-auto px-6 py-5 space-y-4">
         {broadcast.status === 'Scheduled' && (
           <div className="rounded-lg bg-blue-50/70 p-3 text-xs text-blue-900 border border-blue-200 dark:bg-blue-950/40 dark:border-blue-900/40 dark:text-blue-300">
             ℹ️ Editing a scheduled announcement updates the message delivered when the scheduled trigger fires.
@@ -261,7 +261,7 @@ function EditBroadcastDialogContent({
         </div>
       </div>
 
-      <DialogFooter className="flex gap-2 sm:justify-end">
+      <DialogFooter className="border-t border-border/60 bg-muted/20 px-6 py-4 flex gap-2 sm:justify-end">
         <Button onClick={() => onOpenChange(false)} type="button" variant="outline">
           Cancel
         </Button>
