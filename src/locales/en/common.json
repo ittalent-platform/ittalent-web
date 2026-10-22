@@ -647,7 +647,8 @@
     "companyProfile": "Company profile",
     "collapse": "Collapse sidebar",
     "closeMenu": "Close menu",
-    "interviews": "Interviews"
+    "interviews": "Interviews",
+    "broadcasts": "Broadcast notifications"
   },
   "jobPostings": {
     "title": "Job postings",
