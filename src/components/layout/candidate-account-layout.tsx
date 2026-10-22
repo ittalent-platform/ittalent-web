@@ -1,7 +1,8 @@
-import { Award, Briefcase, FileText, type LucideIcon } from "lucide-react";
+import { Award, Bell, Briefcase, FileText, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router";
 
+import { NOTIFICATIONS_PATH } from "@/config/routes";
 import { cn } from "@/lib/utils";
 
 type AccountNavGroup = { labelKey: string; items: Array<{ icon: LucideIcon; labelKey: string; to: string }> };
@@ -15,6 +16,10 @@ const ACCOUNT_NAV: AccountNavGroup[] = [
       { icon: Award, labelKey: "accountNav.certificates", to: "/certificates" },
     ],
     labelKey: "accountNav.myProfile",
+  },
+  {
+    items: [{ icon: Bell, labelKey: "accountNav.notifications", to: NOTIFICATIONS_PATH }],
+    labelKey: "accountNav.account",
   },
 ];
 

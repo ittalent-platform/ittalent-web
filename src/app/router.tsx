@@ -158,6 +158,11 @@ const ApplicationDetailPage = lazy(() =>
     (m) => ({ default: m.ApplicationDetailPage }),
   ),
 );
+const NotificationCenterPage = lazy(() =>
+  import("@/features/notifications/pages/notification-center-page").then(
+    (m) => ({ default: m.NotificationCenterPage }),
+  ),
+);
 const EnterprisesPage = lazy(() =>
   import("@/features/admin/enterprises/enterprises-page").then((m) => ({
     default: m.EnterprisesPage,
@@ -243,6 +248,8 @@ export const appRoutes = [
                 element: <ApplicationDetailPage />,
               },
               { path: "certificates", element: <CertificatesPage /> },
+              { path: "notifications", element: <NotificationCenterPage /> },
+              { path: "account/notifications", element: <Navigate replace to="/notifications" /> },
             ],
           },
         ],
