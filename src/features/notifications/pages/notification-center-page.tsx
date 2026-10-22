@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 
+import { PageHeader } from "@/components/common/admin-page-header";
+import { Button } from "@/components/ui/button";
 import {
   useDeleteAllNotifications,
   useDeleteNotification,
@@ -30,8 +32,8 @@ const PAGE_INCREMENT = 10;
 
 /**
  * Personal Notification Center Inbox page matching exact design specifications:
- * - Header: Space Grotesk title, dynamic unread count / "All caught up" subtitle
- * - Header Actions: "Mark all as read" button (disabled when 0 unread) and More Actions dropdown
+ * - Header: PageHeader with Space Grotesk title, dynamic unread count / "All caught up" subtitle
+ * - Header Actions: "Mark all as read" Button and More Actions dropdown
  * - Tabs: "All", "Unread", "Announcements" with respective live count badges
  * - Card Container: 16px rounded border-box container
  * - Notification rows: NotificationItemRow with unread dots, category chips, 2-line clamp, and hover action swap
@@ -124,74 +126,73 @@ export function NotificationCenterPage() {
 
   return (
     <div className="flex w-full flex-col gap-5" data-testid="notification-center-page">
-      {/* Zone 1: Page Header & Global Actions */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <h1 className="m-0 font-['Space_Grotesk'] text-[24px] font-semibold text-foreground sm:text-[26px]">
-            {t("notifications.title", { defaultValue: "Notifications" })}
-          </h1>
-          <p className="m-0 text-[13.5px] text-muted-foreground">
-            {unreadCount > 0
-              ? t("notifications.unreadCount", {
-                  count: unreadCount,
-                  defaultValue: `${unreadCount} unread`,
-                })
-              : t("notifications.allCaughtUp", { defaultValue: "All caught up" })}
-          </p>
-        </div>
+      {/* Zone 1: Page Header & Global Actions (Reusing PageHeader & Button) */}
+      <PageHeader
+        actions={
+          <div className="flex items-center gap-3">
+            <Button
+              className={cn(
+                "font-semibold",
+                unreadCount === 0 &&
+                  "border-0 bg-muted text-muted-foreground cursor-not-allowed opacity-100",
+              )}
+              disabled={unreadCount === 0 || markAllReadMutation.isPending}
+              onClick={handleMarkAllAsRead}
+              shape="xl"
+              size="xl"
+              type="button"
+              variant="outline"
+            >
+              <CheckCheck className="size-4" />
+              {unreadCount > 0
+                ? t("notifications.markAllAsRead", { defaultValue: "Mark all as read" })
+                : t("notifications.allCaughtUp", { defaultValue: "All caught up" })}
+            </Button>
 
-        <div className="flex items-center gap-3">
-          {/* Mark all as read button */}
-          <button
-            className={cn(
-              "inline-flex h-[44px] items-center gap-2 rounded-[12px] px-[18px] text-[14px] font-semibold transition-colors",
-              unreadCount > 0
-                ? "border border-border bg-card text-foreground hover:bg-muted cursor-pointer"
-                : "border-0 bg-muted text-muted-foreground cursor-not-allowed",
-            )}
-            disabled={unreadCount === 0 || markAllReadMutation.isPending}
-            onClick={handleMarkAllAsRead}
-            type="button"
-          >
-            <CheckCheck className="size-4" />
-            {unreadCount > 0
-              ? t("notifications.markAllAsRead", { defaultValue: "Mark all as read" })
-              : t("notifications.allCaughtUp", { defaultValue: "All caught up" })}
-          </button>
-
-          {/* More actions menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                aria-label={t("notifications.moreActions", { defaultValue: "More actions" })}
-                className="flex size-11 items-center justify-center rounded-[12px] border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
-                type="button"
-              >
-                <MoreVertical className="size-[18px]" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-[14px] p-1.5 shadow-xl">
-              <DropdownMenuItem
-                className="cursor-pointer"
-                disabled={unreadCount === 0 || markAllReadMutation.isPending}
-                onClick={handleMarkAllAsRead}
-              >
-                <CheckCheck className="size-4" />
-                <span>{t("notifications.markAllAsRead", { defaultValue: "Mark all as read" })}</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer font-semibold"
-                disabled={totalCount === 0 || deleteAllMutation.isPending}
-                onClick={handleDeleteAll}
-                variant="destructive"
-              >
-                <Trash2 className="size-4" />
-                <span>{t("notifications.deleteAll", { defaultValue: "Delete all…" })}</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  aria-label={t("notifications.moreActions", { defaultValue: "More actions" })}
+                  className="size-11 text-muted-foreground hover:text-foreground"
+                  shape="xl"
+                  type="button"
+                  variant="outline"
+                >
+                  <MoreVertical className="size-[18px]" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 rounded-[14px] p-1.5 shadow-xl">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  disabled={unreadCount === 0 || markAllReadMutation.isPending}
+                  onClick={handleMarkAllAsRead}
+                >
+                  <CheckCheck className="size-4" />
+                  <span>{t("notifications.markAllAsRead", { defaultValue: "Mark all as read" })}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer font-semibold"
+                  disabled={totalCount === 0 || deleteAllMutation.isPending}
+                  onClick={handleDeleteAll}
+                  variant="destructive"
+                >
+                  <Trash2 className="size-4" />
+                  <span>{t("notifications.deleteAll", { defaultValue: "Delete all…" })}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        }
+        description={
+          unreadCount > 0
+            ? t("notifications.unreadCount", {
+                count: unreadCount,
+                defaultValue: `${unreadCount} unread`,
+              })
+            : t("notifications.allCaughtUp", { defaultValue: "All caught up" })
+        }
+        title={t("notifications.title", { defaultValue: "Notifications" })}
+      />
 
       {/* Zone 2 & 3: Tabs & Card Container */}
       <div className="w-full overflow-hidden rounded-[16px] border border-border bg-card">
