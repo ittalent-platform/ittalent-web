@@ -106,7 +106,6 @@ function ScheduleBroadcastDialogContent({
         id: broadcast.id,
         payload: {
           scheduled_at: targetTimestamp.toISOString(),
-          timezone: 'Asia/Ho_Chi_Minh',
         },
       });
 

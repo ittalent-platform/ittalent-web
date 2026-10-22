@@ -105,5 +105,5 @@ export interface UpdateBroadcastInput {
 
 export interface ScheduleBroadcastInput {
   scheduled_at: string;
-  timezone?: string;
 }
+

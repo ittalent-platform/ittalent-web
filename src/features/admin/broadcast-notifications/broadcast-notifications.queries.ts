@@ -123,7 +123,7 @@ export function useScheduleBroadcastMutation() {
       id: string;
       payload: ScheduleBroadcastInput;
     }): Promise<BroadcastNotificationDto> => {
-      const res = await client.post<{ 200: { success: boolean; data: BroadcastNotificationDto } }>({
+      const res = await client.patch<{ 200: { success: boolean; data: BroadcastNotificationDto } }>({
         url: `/api/v1/broadcast-notifications/${id}/schedule`,
         body: payload,
       });
@@ -142,7 +142,7 @@ export function useCancelScheduleMutation() {
 
   return useMutation({
     mutationFn: async (id: string): Promise<BroadcastNotificationDto> => {
-      const res = await client.post<{ 200: { success: boolean; data: BroadcastNotificationDto } }>({
+      const res = await client.patch<{ 200: { success: boolean; data: BroadcastNotificationDto } }>({
         url: `/api/v1/broadcast-notifications/${id}/cancel-schedule`,
       });
       const data = unwrap(res, 'Failed to cancel scheduled dispatch');
@@ -160,7 +160,7 @@ export function useDispatchBroadcastMutation() {
 
   return useMutation({
     mutationFn: async (id: string): Promise<BroadcastNotificationDto> => {
-      const res = await client.post<{ 200: { success: boolean; data: BroadcastNotificationDto } }>({
+      const res = await client.patch<{ 200: { success: boolean; data: BroadcastNotificationDto } }>({
         url: `/api/v1/broadcast-notifications/${id}/dispatch`,
       });
       const data = unwrap(res, 'Failed to dispatch broadcast notification');
