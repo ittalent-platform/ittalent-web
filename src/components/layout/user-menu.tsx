@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Award, BriefcaseBusiness, ChevronDown, FileText, LogOut, Users } from "lucide-react";
+import { Award, BriefcaseBusiness, ChevronDown, FileText, LogOut, UserRound, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/toast/toast-provider";
 import { getLogoutSuccessToast } from "@/features/auth/logout-toast";
-import { APPLICATIONS_PATH } from "@/config/routes";
+import { APPLICATIONS_PATH, profilePathForRole } from "@/config/routes";
 import { cn } from "@/lib/utils";
 import { PersonAvatar } from "@/components/common/person-avatar";
 
@@ -58,7 +58,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
             className="flex h-10 cursor-pointer items-center gap-1.5 rounded-full pl-1 pr-2 text-muted-foreground outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-primary/40"
             type="button"
           >
-            <PersonAvatar className="size-[34px] bg-(--status-info-bg) text-[12.5px] text-(--status-info-fg)" name={avatarName} />
+            <PersonAvatar className="size-[34px] bg-(--status-info-bg) text-[12.5px] text-(--status-info-fg)" name={avatarName} src={user?.avatarUrl} />
             <ChevronDown aria-hidden className="size-3.5" />
           </button>
         ) : (
@@ -71,7 +71,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           )}
           type="button"
         >
-          <PersonAvatar className="size-9 text-sm" name={avatarName} tone="peach" />
+          <PersonAvatar className="size-9 text-sm" name={avatarName} src={user?.avatarUrl} tone="peach" />
 
           <div className={cn("min-w-0 flex-1", collapsed && "lg:hidden", compactOnMobile && "max-sm:hidden")}>
             <p className="truncate text-[0.95rem] font-semibold">
@@ -97,6 +97,10 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
             </span>
           </p>
         </div>
+
+        <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate(profilePathForRole(user?.role))}>
+          <UserRound className="size-4" />{t('accountNav.myProfile')}
+        </DropdownMenuItem>
 
         {user?.role === "admin" ? (
           <DropdownMenuItem

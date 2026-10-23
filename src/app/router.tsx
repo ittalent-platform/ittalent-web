@@ -14,6 +14,7 @@ import { HomePage } from "@/features/public-site/home/home-page";
 const LoginPage = lazy(() =>
   import("@/features/auth/login-page").then((m) => ({ default: m.LoginPage })),
 );
+const ProfilePage = lazy(() => import('@/features/profile/profile-page').then((m) => ({ default: m.ProfilePage })));
 const RegisterPage = lazy(() =>
   import("@/features/auth/register-page").then((m) => ({
     default: m.RegisterPage,
@@ -213,6 +214,7 @@ export const appRoutes = [
             element: <CandidateAccountLayout />,
             children: [
               { path: "documents", element: <DocumentsPage /> },
+              { path: "profile", element: <ProfilePage /> },
               { path: "my-applications", element: <ApplicationsPage /> },
               {
                 path: "my-applications/:id",
@@ -234,6 +236,7 @@ export const appRoutes = [
         children: [
           { index: true, element: <Navigate replace to="/admin/users" /> },
           { path: "users", element: <UsersPage /> },
+          { path: "profile", element: <ProfilePage /> },
           { path: "users/:userId", element: <AdminUserDetailPage /> },
           { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
@@ -272,6 +275,7 @@ export const appRoutes = [
             element: <Navigate replace to="/recruiter/job-postings" />,
           },
           { path: "job-postings", element: <RecruiterJobPostingsPage /> },
+          { path: "profile", element: <ProfilePage /> },
           {
             path: "job-postings/create",
             element: <RecruiterCreateJobPostingPage />,

@@ -1,5 +1,11 @@
 /** Route paths shared by layout chrome and feature code, so neither hardcodes a URL. */
 export const APPLICATIONS_PATH = "/my-applications";
+export const PROFILE_PATH = "/profile";
+export function profilePathForRole(role?: string): string {
+  if (role === 'admin') return '/admin/profile';
+  if (role === 'recruiter' || role === 'enterprise_admin') return '/recruiter/profile';
+  return PROFILE_PATH;
+}
 export const CERTIFICATES_PATH = "/certificates";
 export const RECRUITER_JOB_POSTINGS_PATH = "/recruiter/job-postings";
 export const RECRUITER_APPLICATIONS_PATH = "/recruiter/applications";

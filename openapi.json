@@ -442,6 +442,11 @@
           "version": {
             "type": "integer",
             "minimum": 0
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
           }
         },
         "required": [
@@ -6961,6 +6966,154 @@
           "totalSubmissionsToCompany",
           "items"
         ]
+      },
+      "MyProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "username": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "enterpriseId": {
+            "type": "string",
+            "nullable": true
+          },
+          "statusReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "statusUpdatedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "statusUpdatedBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "enterpriseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "invitation": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "accepted",
+                  "revoked",
+                  "cancelled",
+                  "expired"
+                ]
+              },
+              "deliveryStatus": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "sent",
+                  "failed"
+                ]
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "sentAt": {
+                "type": "string",
+                "nullable": true,
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "status",
+              "deliveryStatus",
+              "expiresAt"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "hasPassword": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "username",
+          "fullName",
+          "phone",
+          "avatarUrl",
+          "role",
+          "status",
+          "emailVerified",
+          "enterpriseId",
+          "hasPassword"
+        ]
+      },
+      "UpdateMyProfile": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MyAvatarUpload": {
+        "type": "object",
+        "properties": {
+          "avatar": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "avatar"
+        ]
       }
     },
     "parameters": {}
@@ -11447,7 +11600,7 @@
         "tags": [
           "Certificate Links"
         ],
-        "summary": "List the current Candidate\u2019s private certificate links",
+        "summary": "List the current Candidate’s private certificate links",
         "security": [
           {
             "bearerAuth": []
@@ -12267,6 +12420,129 @@
           },
           "404": {
             "description": "Application not found or inaccessible (opaque 404)"
+          }
+        }
+      }
+    },
+    "/api/v1/me/profile": {
+      "get": {
+        "operationId": "getMyProfile",
+        "tags": [
+          "My Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Profile not found"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateMyProfile",
+        "tags": [
+          "My Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMyProfile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Profile not found"
+          }
+        }
+      }
+    },
+    "/api/v1/me/profile/avatar": {
+      "patch": {
+        "operationId": "uploadMyAvatar",
+        "tags": [
+          "My Profile"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/MyAvatarUpload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Profile not found"
+          },
+          "502": {
+            "description": "Storage unavailable"
+          },
+          "503": {
+            "description": "Storage not configured"
           }
         }
       }
