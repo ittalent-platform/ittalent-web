@@ -1,26 +1,46 @@
 import { useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import {
+  ArrowLeft,
+  Camera,
+  Check,
+  LockKeyhole,
+  Monitor,
+  Pencil,
+  RefreshCw,
+} from "lucide-react";
+import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import type { MyProfile } from "@/api/generated/types.gen";
 import { requestErrorMessage } from "@/api/request-error";
+import { DetailRow } from "@/components/common/detail-row";
 import { ErrorState } from "@/components/common/error-state";
 import { FormField } from "@/components/common/form-field";
+import { InlineBanner } from "@/components/common/inline-banner";
 import { InlineErrorAlert } from "@/components/common/inline-error-alert";
+import { PasswordField } from "@/components/common/password-field";
 import { PersonAvatar } from "@/components/common/person-avatar";
+import { SectionCard } from "@/components/common/section-card";
+import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PasswordField } from "@/components/common/password-field";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatDate } from "@/lib/format";
 import { strongPasswordSchema } from "@/lib/password-schema";
+import { cn } from "@/lib/utils";
 
 import {
   AVATAR_MAX_BYTES,
   AVATAR_TYPES,
+  PASSWORD_RULES,
   PROFILE_NAME_MAX,
   PROFILE_NAME_MIN,
   PROFILE_PHONE_PATTERN,
+  PROFILE_ROLE_KEYS,
+  PROFILE_STATUS_LABEL_KEYS,
+  PROFILE_STATUS_STYLES,
 } from "./profile.constants";
 import {
   useChangeMyPassword,
@@ -40,17 +60,10 @@ type PasswordForm = {
 export function ProfilePage() {
   const { t } = useTranslation();
   const [section, setSection] = useState<Section>("details");
+  const [editing, setEditing] = useState(false);
   const profile = useMyProfile();
 
-  if (profile.isPending)
-    return (
-      <div
-        className="rounded-2xl border border-border bg-card p-6 text-muted-foreground"
-        role="status"
-      >
-        {t("myProfile.loading")}
-      </div>
-    );
+  if (profile.isPending) return <ProfileSkeleton />;
   if (profile.isError)
     return (
       <ErrorState
@@ -70,56 +83,121 @@ export function ProfilePage() {
       />
     );
 
+  const title =
+    section === "password"
+      ? t("myProfile.password")
+      : editing
+        ? t("myProfile.editTitle")
+        : t("myProfile.title");
+  const subtitle =
+    section === "password"
+      ? t("myProfile.passwordSubtitle")
+      : editing
+        ? t("myProfile.editSubtitle")
+        : t("myProfile.subtitle");
+
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-6">
-      <div>
-        <h1 className="itt-display text-2xl font-semibold">
-          {t("myProfile.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("myProfile.subtitle")}
-        </p>
-      </div>
-      <div
-        aria-label={t("myProfile.sections")}
-        className="flex gap-2 border-b border-border"
-        role="tablist"
-      >
-        <button
-          aria-selected={section === "details"}
-          className={`px-3 py-2 text-sm font-medium ${section === "details" ? "border-b-2 border-primary text-foreground" : "text-muted-foreground"}`}
-          onClick={() => setSection("details")}
-          role="tab"
-          type="button"
-        >
-          {t("myProfile.details")}
-        </button>
-        <button
-          aria-selected={section === "password"}
-          className={`px-3 py-2 text-sm font-medium ${section === "password" ? "border-b-2 border-primary text-foreground" : "text-muted-foreground"}`}
-          onClick={() => setSection("password")}
-          role="tab"
-          type="button"
-        >
-          {t("myProfile.password")}
-        </button>
-      </div>
+    <div className="mx-auto flex w-full max-w-[1028px] flex-col gap-5">
+      <header className="flex flex-wrap items-end gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="itt-display text-[28px] font-semibold leading-tight">
+            {title}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+        </div>
+        {section === "details" && !editing ? (
+          <Button
+            className="text-muted-foreground"
+            disabled={profile.isFetching}
+            onClick={() => void profile.refetch()}
+            shape="pill"
+            size="lg"
+            type="button"
+            variant="ghost"
+          >
+            <RefreshCw
+              aria-hidden
+              className={cn("size-4", profile.isFetching && "animate-spin")}
+            />
+            {t("myProfile.refresh")}
+          </Button>
+        ) : (
+          <Button
+            onClick={() => {
+              setSection("details");
+              setEditing(false);
+            }}
+            size="lg"
+            type="button"
+            variant="ghost"
+          >
+            <ArrowLeft aria-hidden className="size-4" />
+            {t("myProfile.backToProfile")}
+          </Button>
+        )}
+      </header>
+
       {section === "details" ? (
-        <ProfileDetails profile={profile.data} />
+        <ProfileDetails
+          editing={editing}
+          onEditChange={setEditing}
+          onOpenPassword={() => {
+            setEditing(false);
+            setSection("password");
+          }}
+          profile={profile.data}
+        />
       ) : (
-        <ChangePassword hasPassword={profile.data.hasPassword} />
+        <ChangePassword
+          hasPassword={profile.data.hasPassword}
+          onCancel={() => setSection("details")}
+        />
       )}
     </div>
   );
 }
 
-function ProfileDetails({ profile }: { profile: MyProfile }) {
+function ProfileSkeleton() {
   const { t } = useTranslation();
+  return (
+    <div
+      className="mx-auto flex w-full max-w-[1028px] flex-col gap-5"
+      role="status"
+    >
+      <span className="sr-only">{t("myProfile.loading")}</span>
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-40" />
+        <Skeleton className="h-4 w-80 max-w-full" />
+      </div>
+      <div className="surface-card flex items-center gap-5 p-6">
+        <Skeleton className="size-[88px] rounded-full" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-64 max-w-full" />
+        </div>
+      </div>
+      <Skeleton className="h-64 rounded-2xl" />
+    </div>
+  );
+}
+
+function ProfileDetails({
+  editing,
+  onEditChange,
+  onOpenPassword,
+  profile,
+}: {
+  editing: boolean;
+  onEditChange: (editing: boolean) => void;
+  onOpenPassword: () => void;
+  profile: MyProfile;
+}) {
+  const { t } = useTranslation();
+  const { showToast } = useToast();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const update = useUpdateMyProfile();
   const upload = useUploadMyAvatar();
@@ -146,6 +224,7 @@ function ProfileDetails({ profile }: { profile: MyProfile }) {
       phone: profile.phone ?? "",
     },
   });
+
   useEffect(() => {
     if (!form.formState.isDirty)
       form.reset({
@@ -160,10 +239,28 @@ function ProfileDetails({ profile }: { profile: MyProfile }) {
     [avatarPreview],
   );
 
-  function selectAvatar(file?: File) {
-    setAvatarError(null);
+  const displayName = profile.fullName || profile.username;
+  const roleKey =
+    PROFILE_ROLE_KEYS[profile.role as keyof typeof PROFILE_ROLE_KEYS];
+  const statusKey =
+    PROFILE_STATUS_LABEL_KEYS[
+      profile.status as keyof typeof PROFILE_STATUS_LABEL_KEYS
+    ];
+  const statusStyle =
+    PROFILE_STATUS_STYLES[
+      profile.status as keyof typeof PROFILE_STATUS_STYLES
+    ] ?? "bg-muted text-muted-foreground";
+
+  function clearAvatarSelection() {
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
     setAvatarFile(null);
     setAvatarPreview(null);
+    if (fileInput.current) fileInput.current.value = "";
+  }
+
+  function selectAvatar(file?: File) {
+    setAvatarError(null);
+    clearAvatarSelection();
     if (!file) return;
     if (!AVATAR_TYPES.includes(file.type as (typeof AVATAR_TYPES)[number])) {
       setAvatarError(t("myProfile.avatarType"));
@@ -179,7 +276,6 @@ function ProfileDetails({ profile }: { profile: MyProfile }) {
 
   async function save(values: DetailsForm) {
     setSaveError(null);
-    setSaved(false);
     try {
       const updated = await update.mutateAsync({
         fullName: values.fullName.trim(),
@@ -189,7 +285,12 @@ function ProfileDetails({ profile }: { profile: MyProfile }) {
         fullName: updated.fullName ?? "",
         phone: updated.phone ?? "",
       });
-      setSaved(true);
+      onEditChange(false);
+      showToast({
+        message: t("myProfile.saved"),
+        title: t("myProfile.saved"),
+        tone: "success",
+      });
     } catch (error) {
       setSaveError(requestErrorMessage(error, t("myProfile.saveFailed")));
     }
@@ -200,30 +301,36 @@ function ProfileDetails({ profile }: { profile: MyProfile }) {
     setAvatarError(null);
     try {
       await upload.mutateAsync(avatarFile);
-      setAvatarFile(null);
-      setAvatarPreview(null);
-      if (fileInput.current) fileInput.current.value = "";
+      clearAvatarSelection();
+      showToast({
+        message: t("myProfile.avatarSaved"),
+        title: t("myProfile.avatarSaved"),
+        tone: "success",
+      });
     } catch (error) {
       setAvatarError(requestErrorMessage(error, t("myProfile.avatarFailed")));
     }
   }
 
+  function cancelEditing() {
+    form.reset({
+      fullName: profile.fullName ?? "",
+      phone: profile.phone ?? "",
+    });
+    setSaveError(null);
+    onEditChange(false);
+  }
+
   return (
-    <div className="space-y-5">
-      <section className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-        <div className="flex flex-wrap items-center gap-5">
-          <PersonAvatar
-            className="size-20 text-xl"
-            name={profile.fullName ?? profile.username}
-            src={avatarPreview ?? profile.avatarUrl}
-          />
-          <div className="space-y-2">
-            <p className="font-semibold">
-              {profile.fullName || profile.username}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {t("myProfile.avatarHint")}
-            </p>
+    <div className="flex flex-col gap-5">
+      <SectionCard className="gap-[18px] p-6">
+        <div className="flex flex-wrap items-center gap-[22px]">
+          <div className="relative shrink-0">
+            <PersonAvatar
+              className="size-[88px] itt-display text-[26px]"
+              name={displayName}
+              src={avatarPreview ?? profile.avatarUrl}
+            />
             <input
               ref={fileInput}
               accept="image/jpeg,image/png,image/webp"
@@ -232,94 +339,273 @@ function ProfileDetails({ profile }: { profile: MyProfile }) {
               onChange={(event) => selectAvatar(event.target.files?.[0])}
               type="file"
             />
+            <button
+              aria-label={t("myProfile.changeAvatar")}
+              className="absolute -bottom-0.5 -right-0.5 grid size-8 place-items-center rounded-full border-[3px] border-card bg-foreground text-card transition-colors hover:bg-foreground/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              onClick={() => fileInput.current?.click()}
+              type="button"
+            >
+              <Camera aria-hidden className="size-3.5" />
+            </button>
+          </div>
+          <div className="min-w-0 flex-1 space-y-1">
+            <p className="itt-display truncate text-2xl font-semibold">
+              {displayName}
+            </p>
+            <div className="flex flex-wrap items-center gap-2 text-[13.5px] text-muted-foreground">
+              <span className="wrap-anywhere">{profile.email}</span>
+              <VerificationBadge verified={profile.emailVerified} />
+            </div>
+            <p className="text-[12.5px] text-muted-foreground">
+              {t("myProfile.avatarHint")}
+            </p>
+          </div>
+          {!editing ? (
+            <Button
+              onClick={() => onEditChange(true)}
+              shape="pill"
+              size="xl"
+              type="button"
+              variant="outline"
+            >
+              <Pencil aria-hidden className="size-4" />
+              {t("myProfile.editProfile")}
+            </Button>
+          ) : null}
+        </div>
+        {avatarFile ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-[18px]">
+            <p className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">
+              {avatarFile.name}
+            </p>
             <div className="flex gap-2">
               <Button
-                onClick={() => fileInput.current?.click()}
+                disabled={upload.isPending}
+                onClick={clearAvatarSelection}
+                size="lg"
                 type="button"
                 variant="outline"
               >
-                {t("myProfile.chooseAvatar")}
+                {t("myProfile.cancel")}
               </Button>
-              {avatarFile ? (
-                <Button
-                  disabled={upload.isPending}
-                  onClick={() => void saveAvatar()}
-                  type="button"
-                >
-                  {upload.isPending
-                    ? t("myProfile.uploading")
-                    : t("myProfile.uploadAvatar")}
-                </Button>
-              ) : null}
+              <Button
+                disabled={upload.isPending}
+                onClick={() => void saveAvatar()}
+                size="lg"
+                type="button"
+              >
+                {upload.isPending
+                  ? t("myProfile.uploading")
+                  : t("myProfile.saveAvatar")}
+              </Button>
             </div>
           </div>
-        </div>
+        ) : null}
         {avatarError ? (
-          <div className="mt-3" role="alert">
+          <div role="alert">
             <InlineErrorAlert>{avatarError}</InlineErrorAlert>
           </div>
         ) : null}
-      </section>
-      <form
-        className="space-y-5 rounded-2xl border border-border bg-card p-5 sm:p-6"
-        onSubmit={form.handleSubmit(save)}
-      >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <FormField
-            error={form.formState.errors.fullName?.message}
-            htmlFor="profile-name"
-            label={t("myProfile.fullName")}
+      </SectionCard>
+
+      {editing ? (
+        <form
+          className="flex flex-col gap-5"
+          onSubmit={form.handleSubmit(save)}
+        >
+          <SectionCard
+            className="gap-[18px] p-6"
+            description={t("myProfile.personalDescription")}
+            title={t("myProfile.details")}
+            titleSize="lg"
           >
-            <Input id="profile-name" {...form.register("fullName")} />
-          </FormField>
-          <FormField
-            error={form.formState.errors.phone?.message}
-            htmlFor="profile-phone"
-            label={t("myProfile.phone")}
-          >
-            <Input
-              id="profile-phone"
-              inputMode="tel"
-              {...form.register("phone")}
+            <div className="grid gap-[18px] sm:grid-cols-2 sm:gap-4">
+              <FormField
+                error={form.formState.errors.fullName?.message}
+                hint={t("myProfile.nameHint")}
+                htmlFor="profile-name"
+                label={t("myProfile.fullName")}
+                required
+              >
+                <Input
+                  aria-invalid={Boolean(form.formState.errors.fullName)}
+                  id="profile-name"
+                  {...form.register("fullName")}
+                />
+              </FormField>
+              <FormField
+                error={form.formState.errors.phone?.message}
+                hint={t("myProfile.phoneHint")}
+                htmlFor="profile-phone"
+                label={t("myProfile.phone")}
+              >
+                <Input
+                  aria-invalid={Boolean(form.formState.errors.phone)}
+                  id="profile-phone"
+                  inputMode="tel"
+                  placeholder={t("myProfile.phonePlaceholder")}
+                  {...form.register("phone")}
+                />
+              </FormField>
+            </div>
+            {saveError ? (
+              <InlineErrorAlert>{saveError}</InlineErrorAlert>
+            ) : null}
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/60 pt-[18px]">
+              <Button
+                disabled={update.isPending}
+                onClick={cancelEditing}
+                shape="pill"
+                size="xl"
+                type="button"
+                variant="outline"
+              >
+                {t("myProfile.cancel")}
+              </Button>
+              <Button
+                disabled={update.isPending || !form.formState.isDirty}
+                shape="pill"
+                size="xl"
+                type="submit"
+              >
+                {update.isPending ? t("myProfile.saving") : t("myProfile.save")}
+              </Button>
+            </div>
+          </SectionCard>
+        </form>
+      ) : (
+        <SectionCard
+          className="gap-[18px] p-6"
+          description={t("myProfile.personalDescription")}
+          title={t("myProfile.details")}
+          titleSize="lg"
+        >
+          <dl className="m-0">
+            <DetailRow
+              className="sm:grid-cols-[180px_minmax(0,1fr)]"
+              label={t("myProfile.fullName")}
+              layout="grid"
+              value={displayName}
             />
-          </FormField>
-          <FormField htmlFor="profile-email" label={t("myProfile.email")}>
-            <Input id="profile-email" readOnly value={profile.email} />
-          </FormField>
-          <FormField htmlFor="profile-role" label={t("myProfile.role")}>
-            <Input id="profile-role" readOnly value={profile.role} />
-          </FormField>
-        </div>
-        {saveError ? <InlineErrorAlert>{saveError}</InlineErrorAlert> : null}
-        {saved ? (
-          <p className="text-sm text-(--status-success-fg)" role="status">
-            {t("myProfile.saved")}
-          </p>
-        ) : null}
-        <div className="flex justify-end">
+            <DetailRow
+              className="sm:grid-cols-[180px_minmax(0,1fr)]"
+              label={t("myProfile.phone")}
+              layout="grid"
+              value={profile.phone || t("myProfile.notProvided")}
+            />
+          </dl>
+        </SectionCard>
+      )}
+
+      <SectionCard
+        actions={
+          <LockKeyhole aria-hidden className="size-4 text-muted-foreground" />
+        }
+        className="gap-[18px] p-6"
+        description={t("myProfile.accountDescription")}
+        title={t("myProfile.account")}
+        titleSize="lg"
+      >
+        <dl className="m-0">
+          <DetailRow
+            className="sm:grid-cols-[180px_minmax(0,1fr)]"
+            label={t("myProfile.emailLabel")}
+            layout="grid"
+            value={
+              <span className="flex flex-wrap items-center gap-2">
+                <span>{profile.email}</span>
+                <VerificationBadge verified={profile.emailVerified} />
+              </span>
+            }
+          />
+          <DetailRow
+            className="sm:grid-cols-[180px_minmax(0,1fr)]"
+            label={t("myProfile.roleLabel")}
+            layout="grid"
+            value={roleKey ? t(roleKey) : profile.role}
+          />
+          <DetailRow
+            className="sm:grid-cols-[180px_minmax(0,1fr)]"
+            label={t("myProfile.accountStatus")}
+            layout="grid"
+            value={
+              <span
+                className={cn(
+                  "inline-flex h-[22px] items-center rounded-full px-2.5 text-xs font-semibold",
+                  statusStyle,
+                )}
+              >
+                {statusKey ? t(statusKey) : profile.status}
+              </span>
+            }
+          />
+          {profile.createdAt ? (
+            <DetailRow
+              className="sm:grid-cols-[180px_minmax(0,1fr)]"
+              label={t("myProfile.memberSince")}
+              layout="grid"
+              value={formatDate(profile.createdAt)}
+            />
+          ) : null}
+          <DetailRow
+            className="sm:grid-cols-[180px_minmax(0,1fr)]"
+            label={t("myProfile.accountId")}
+            layout="grid"
+            value={<span className="itt-mono text-[12.5px]">{profile.id}</span>}
+          />
+        </dl>
+        <div className="flex justify-end border-t border-border/60 pt-[18px]">
           <Button
-            disabled={update.isPending || !form.formState.isDirty}
+            onClick={onOpenPassword}
+            shape="pill"
             size="xl"
-            type="submit"
+            type="button"
+            variant="outline"
           >
-            {update.isPending ? t("myProfile.saving") : t("myProfile.save")}
+            <LockKeyhole aria-hidden className="size-4" />
+            {t("myProfile.changePassword")}
           </Button>
         </div>
-      </form>
+      </SectionCard>
     </div>
   );
 }
 
-function ChangePassword({ hasPassword }: { hasPassword: boolean }) {
+function VerificationBadge({ verified }: { verified: boolean }) {
   const { t } = useTranslation();
+  return (
+    <span
+      className={cn(
+        "inline-flex h-[22px] items-center gap-1 rounded-full px-2.5 text-xs font-semibold",
+        verified
+          ? "bg-(--status-success-bg) text-(--status-success-fg)"
+          : "bg-(--status-warning-bg) text-(--status-warning-fg)",
+      )}
+    >
+      {verified ? (
+        <Check aria-hidden className="size-3" strokeWidth={3} />
+      ) : null}
+      {t(verified ? "myProfile.verified" : "myProfile.notVerified")}
+    </span>
+  );
+}
+
+function ChangePassword({
+  hasPassword,
+  onCancel,
+}: {
+  hasPassword: boolean;
+  onCancel: () => void;
+}) {
+  const { t } = useTranslation();
+  const { showToast } = useToast();
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const change = useChangeMyPassword();
   const schema = z
     .object({
       currentPassword: z.string().min(1, t("myProfile.currentRequired")),
       newPassword: strongPasswordSchema.regex(
-        /[!@#$%^&*]/,
+        PASSWORD_RULES.symbol,
         t("myProfile.passwordHint"),
       ),
       confirmPassword: z.string().min(1, t("myProfile.confirmRequired")),
@@ -339,66 +625,165 @@ function ChangePassword({ hasPassword }: { hasPassword: boolean }) {
       newPassword: "",
       confirmPassword: "",
     },
+    mode: "onChange",
   });
+  const [currentPassword, newPassword] = useWatch({
+    control: form.control,
+    name: ["currentPassword", "newPassword"],
+  });
+  const passwordRules = [
+    {
+      key: "length",
+      met: PASSWORD_RULES.length.test(newPassword),
+      text: t("myProfile.passwordRules.length"),
+    },
+    {
+      key: "uppercase",
+      met: PASSWORD_RULES.uppercase.test(newPassword),
+      text: t("myProfile.passwordRules.uppercase"),
+    },
+    {
+      key: "lowercase",
+      met: PASSWORD_RULES.lowercase.test(newPassword),
+      text: t("myProfile.passwordRules.lowercase"),
+    },
+    {
+      key: "number",
+      met: PASSWORD_RULES.number.test(newPassword),
+      text: t("myProfile.passwordRules.number"),
+    },
+    {
+      key: "symbol",
+      met: PASSWORD_RULES.symbol.test(newPassword),
+      text: t("myProfile.passwordRules.symbol"),
+    },
+    {
+      key: "different",
+      met: Boolean(newPassword && currentPassword !== newPassword),
+      text: t("myProfile.passwordRules.different"),
+    },
+  ];
+
   if (!hasPassword)
     return (
-      <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
-        {t("myProfile.socialAccount")}
-      </div>
+      <SectionCard className="p-6">
+        <InlineBanner tone="info">{t("myProfile.socialAccount")}</InlineBanner>
+        <div className="flex justify-end">
+          <Button onClick={onCancel} size="xl" type="button" variant="outline">
+            {t("myProfile.backToProfile")}
+          </Button>
+        </div>
+      </SectionCard>
     );
 
   async function save(values: PasswordForm) {
     setError(null);
-    setSuccess(false);
     try {
       await change.mutateAsync({
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       });
       form.reset();
-      setSuccess(true);
+      showToast({
+        message: t("myProfile.passwordChanged"),
+        title: t("myProfile.passwordChanged"),
+        tone: "success",
+      });
     } catch (failure) {
       setError(requestErrorMessage(failure, t("myProfile.passwordFailed")));
     }
   }
 
   return (
-    <form
-      className="space-y-5 rounded-2xl border border-border bg-card p-5 sm:p-6"
-      onSubmit={form.handleSubmit(save)}
-    >
-      <PasswordField
-        error={form.formState.errors.currentPassword?.message}
-        id="current-password"
-        label={t("myProfile.currentPassword")}
-        registration={form.register("currentPassword")}
-      />
-      <PasswordField
-        error={form.formState.errors.newPassword?.message}
-        hint={t("myProfile.passwordHint")}
-        id="new-password"
-        label={t("myProfile.newPassword")}
-        registration={form.register("newPassword")}
-      />
-      <PasswordField
-        error={form.formState.errors.confirmPassword?.message}
-        id="confirm-password"
-        label={t("myProfile.confirmPassword")}
-        registration={form.register("confirmPassword")}
-      />
-      {error ? <InlineErrorAlert>{error}</InlineErrorAlert> : null}
-      {success ? (
-        <p className="text-sm text-(--status-success-fg)" role="status">
-          {t("myProfile.passwordChanged")}
-        </p>
-      ) : null}
-      <div className="flex justify-end">
-        <Button disabled={change.isPending} size="xl" type="submit">
-          {change.isPending
-            ? t("myProfile.changingPassword")
-            : t("myProfile.changePassword")}
-        </Button>
-      </div>
+    <form onSubmit={form.handleSubmit(save)}>
+      <SectionCard className="gap-[18px] p-6">
+        <div className="flex max-w-[560px] flex-col gap-[18px]">
+          <PasswordField
+            error={form.formState.errors.currentPassword?.message}
+            id="current-password"
+            label={t("myProfile.currentPassword")}
+            registration={form.register("currentPassword")}
+            required
+          />
+          <div className="space-y-2.5">
+            <PasswordField
+              error={form.formState.errors.newPassword?.message}
+              id="new-password"
+              label={t("myProfile.newPassword")}
+              registration={form.register("newPassword")}
+              required
+            />
+            <ul
+              aria-label={t("myProfile.passwordRules.label")}
+              className="grid list-none gap-2 p-0 sm:grid-cols-2 sm:gap-x-4"
+            >
+              {passwordRules.map((rule) => (
+                <li
+                  className={cn(
+                    "flex items-center gap-2 text-[13px]",
+                    rule.met
+                      ? "text-(--status-success-fg)"
+                      : "text-muted-foreground",
+                  )}
+                  key={rule.key}
+                >
+                  <span
+                    className={cn(
+                      "grid size-4 shrink-0 place-items-center rounded-full",
+                      rule.met
+                        ? "bg-(--status-success-fg) text-card"
+                        : "border border-border-dashed",
+                    )}
+                  >
+                    {rule.met ? (
+                      <Check
+                        aria-hidden
+                        className="size-2.5"
+                        strokeWidth={3.5}
+                      />
+                    ) : null}
+                  </span>
+                  {rule.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <PasswordField
+            error={form.formState.errors.confirmPassword?.message}
+            id="confirm-password"
+            label={t("myProfile.confirmPassword")}
+            registration={form.register("confirmPassword")}
+            required
+          />
+        </div>
+        {error ? <InlineErrorAlert>{error}</InlineErrorAlert> : null}
+        <div className="flex flex-wrap items-center gap-3 border-t border-border/60 pt-[18px]">
+          <p className="flex min-w-0 flex-1 items-start gap-2 text-[13px] text-muted-foreground">
+            <Monitor aria-hidden className="mt-0.5 size-4 shrink-0" />
+            <span>{t("myProfile.passwordSessionNote")}</span>
+          </p>
+          <Button
+            disabled={change.isPending}
+            onClick={onCancel}
+            shape="pill"
+            size="xl"
+            type="button"
+            variant="outline"
+          >
+            {t("myProfile.cancel")}
+          </Button>
+          <Button
+            disabled={change.isPending || !form.formState.isValid}
+            shape="pill"
+            size="xl"
+            type="submit"
+          >
+            {change.isPending
+              ? t("myProfile.changingPassword")
+              : t("myProfile.changePassword")}
+          </Button>
+        </div>
+      </SectionCard>
     </form>
   );
 }

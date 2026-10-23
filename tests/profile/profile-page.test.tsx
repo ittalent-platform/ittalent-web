@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ToastProvider } from "@/components/toast/toast-provider";
 import { ProfilePage } from "@/features/profile/profile-page";
 
 const fixture = {
@@ -32,6 +33,14 @@ vi.mock("@/features/profile/profile.queries", () => ({
   useChangeMyPassword: () => mocks.changePassword(),
 }));
 
+function renderProfile() {
+  return render(
+    <ToastProvider>
+      <ProfilePage />
+    </ToastProvider>,
+  );
+}
+
 describe("ProfilePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -48,12 +57,10 @@ describe("ProfilePage", () => {
     });
     mocks.upload.mockReturnValue({
       isPending: false,
-      mutateAsync: vi
-        .fn()
-        .mockResolvedValue({
-          ...fixture,
-          avatarUrl: "https://example.test/avatar.png",
-        }),
+      mutateAsync: vi.fn().mockResolvedValue({
+        ...fixture,
+        avatarUrl: "https://example.test/avatar.png",
+      }),
     });
     mocks.changePassword.mockReturnValue({
       isPending: false,
@@ -63,13 +70,13 @@ describe("ProfilePage", () => {
 
   it("renders the signed-in profile and saves only editable fields", async () => {
     const user = userEvent.setup();
-    render(<ProfilePage />);
-    expect(screen.getByDisplayValue("mine@example.test")).toHaveAttribute(
-      "readonly",
-    );
+    renderProfile();
+    expect(screen.getAllByText("mine@example.test")).not.toHaveLength(0);
+    expect(screen.getByText("Active")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Edit profile" }));
     expect(screen.getByDisplayValue("My Name")).toBeInTheDocument();
-    await user.clear(screen.getByLabelText("Full name"));
-    await user.type(screen.getByLabelText("Full name"), "New Name");
+    await user.clear(screen.getByLabelText(/Full name/));
+    await user.type(screen.getByLabelText(/Full name/), "New Name");
     await user.click(screen.getByRole("button", { name: "Save changes" }));
     await waitFor(() =>
       expect(mocks.update().mutateAsync).toHaveBeenCalledWith({
@@ -80,7 +87,7 @@ describe("ProfilePage", () => {
   });
 
   it("rejects an invalid image before upload", async () => {
-    render(<ProfilePage />);
+    renderProfile();
     const file = new File(["invalid"], "avatar.txt", { type: "text/plain" });
     fireEvent.change(screen.getByLabelText("Choose image"), {
       target: { files: [file] },
@@ -101,15 +108,15 @@ describe("ProfilePage", () => {
       configurable: true,
       value: vi.fn(),
     });
-    render(<ProfilePage />);
+    renderProfile();
     const file = new File(["png"], "avatar.png", { type: "image/png" });
     fireEvent.change(screen.getByLabelText("Choose image"), {
       target: { files: [file] },
     });
     expect(
-      screen.getByRole("button", { name: "Upload avatar" }),
+      screen.getByRole("button", { name: "Save photo" }),
     ).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Upload avatar" }));
+    await user.click(screen.getByRole("button", { name: "Save photo" }));
     await waitFor(() =>
       expect(mocks.upload().mutateAsync).toHaveBeenCalledWith(file),
     );
@@ -117,15 +124,15 @@ describe("ProfilePage", () => {
 
   it("shows the password form and clears it after a successful change", async () => {
     const user = userEvent.setup();
-    render(<ProfilePage />);
-    await user.click(screen.getByRole("tab", { name: "Password" }));
-    fireEvent.change(screen.getByLabelText("Current password"), {
+    renderProfile();
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+    fireEvent.change(screen.getByLabelText(/Current password/), {
       target: { value: "Old123!a" },
     });
-    fireEvent.change(screen.getByLabelText("New password"), {
+    fireEvent.change(screen.getByLabelText(/New password/), {
       target: { value: "New123!a" },
     });
-    fireEvent.change(screen.getByLabelText("Confirm new password"), {
+    fireEvent.change(screen.getByLabelText(/Confirm new password/), {
       target: { value: "New123!a" },
     });
     await user.click(screen.getByRole("button", { name: "Change password" }));
@@ -135,10 +142,10 @@ describe("ProfilePage", () => {
         newPassword: "New123!a",
       }),
     );
-    expect(screen.getByLabelText("Current password")).toHaveValue("");
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Password changed successfully.",
-    );
+    expect(screen.getByLabelText(/Current password/)).toHaveValue("");
+    expect(
+      await screen.findAllByText("Password changed successfully."),
+    ).not.toHaveLength(0);
   });
 
   it("explains passwordless accounts", async () => {
@@ -148,8 +155,8 @@ describe("ProfilePage", () => {
       isPending: false,
       isError: false,
     });
-    render(<ProfilePage />);
-    await user.click(screen.getByRole("tab", { name: "Password" }));
+    renderProfile();
+    await user.click(screen.getByRole("button", { name: "Change password" }));
     expect(screen.getByText(/no local password/)).toBeInTheDocument();
   });
 
@@ -161,21 +168,21 @@ describe("ProfilePage", () => {
         .fn()
         .mockRejectedValue(new Error("Incorrect current password.")),
     });
-    render(<ProfilePage />);
-    await user.click(screen.getByRole("tab", { name: "Password" }));
-    fireEvent.change(screen.getByLabelText("Current password"), {
+    renderProfile();
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+    fireEvent.change(screen.getByLabelText(/Current password/), {
       target: { value: "Wrong123!" },
     });
-    fireEvent.change(screen.getByLabelText("New password"), {
+    fireEvent.change(screen.getByLabelText(/New password/), {
       target: { value: "New123!a" },
     });
-    fireEvent.change(screen.getByLabelText("Confirm new password"), {
+    fireEvent.change(screen.getByLabelText(/Confirm new password/), {
       target: { value: "New123!a" },
     });
     await user.click(screen.getByRole("button", { name: "Change password" }));
     expect(
       await screen.findByText("Incorrect current password."),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("New password")).toHaveValue("New123!a");
+    expect(screen.getByLabelText(/New password/)).toHaveValue("New123!a");
   });
 });
