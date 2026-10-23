@@ -240,6 +240,7 @@ export const appRoutes = [
         children: [
           {
             element: <CandidateAccountLayout />,
+            handle: { hideFooter: true },
             children: [
               { path: "documents", element: <DocumentsPage /> },
               { path: "my-applications", element: <ApplicationsPage /> },
