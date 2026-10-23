@@ -1,10 +1,11 @@
 import { CheckCheck, MoreVertical, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 
 import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { PageHeader } from "@/components/common/admin-page-header";
+import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
 import {
   NOTIFICATIONS_PAGE_SIZE,
@@ -49,8 +50,11 @@ export function NotificationCenterPage() {
   const activeTab: NotificationTab =
     tabParam === "unread" || tabParam === "announcements" ? tabParam : "all";
 
+  const { showToast } = useToast();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<NotificationItem | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(new Set());
+  const pendingTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   // Queries
   const unreadCountQuery = useUnreadCountQuery();
@@ -80,11 +84,31 @@ export function NotificationCenterPage() {
   const announcementsTabCount =
     activeTab === "announcements" ? totalCount : (announcementsCountQuery.data?.total ?? 0);
 
+  // Filter out any items currently in the 5-second undo deletion window
+  const visibleItems = useMemo(
+    () => items.filter((item) => !pendingDeleteIds.has(item.id)),
+    [items, pendingDeleteIds],
+  );
+
   // Mutations
   const markReadMutation = useMarkNotificationRead();
   const markAllReadMutation = useMarkAllNotificationsRead();
   const deleteMutation = useDeleteNotification();
   const deleteAllMutation = useDeleteAllNotifications();
+
+  const deleteMutationRef = useRef(deleteMutation);
+  deleteMutationRef.current = deleteMutation;
+
+  // Commit any pending deletions upon unmount
+  useEffect(() => {
+    return () => {
+      pendingTimersRef.current.forEach((timer, id) => {
+        clearTimeout(timer);
+        deleteMutationRef.current.mutate({ id });
+      });
+      pendingTimersRef.current.clear();
+    };
+  }, []);
 
   const handleTabChange = (nextTab: NotificationTab) => {
     setSearchParams(
@@ -118,10 +142,81 @@ export function NotificationCenterPage() {
     },
   ];
 
+  const handleMarkRead = (id: string) => {
+    markReadMutation.mutate(
+      { id },
+      {
+        onError: () => {
+          showToast({
+            title: "",
+            message: t("notifications.markReadError", {
+              defaultValue: "Couldn’t mark as read. Try again",
+            }),
+            tone: "error",
+          });
+        },
+      },
+    );
+  };
+
   const handleMarkAllAsRead = () => {
     if (unreadCount > 0 && !markAllReadMutation.isPending) {
       markAllReadMutation.mutate();
     }
+  };
+
+  const handleDeleteItem = (id: string) => {
+    // Optimistically hide row from the list immediately
+    setPendingDeleteIds((prev) => new Set(prev).add(id));
+
+    // Schedule actual mutation execution after 5000ms
+    const timer = setTimeout(() => {
+      pendingTimersRef.current.delete(id);
+      setPendingDeleteIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      deleteMutation.mutate(
+        { id },
+        {
+          onError: () => {
+            showToast({
+              title: "",
+              message: t("notifications.deleteError", {
+                defaultValue: "Couldn’t delete this notification. Try again",
+              }),
+              tone: "error",
+            });
+          },
+        },
+      );
+    }, 5000);
+
+    pendingTimersRef.current.set(id, timer);
+
+    // Show 5-second undo toast
+    showToast({
+      title: "",
+      message: t("notifications.deleted", { defaultValue: "Notification deleted" }),
+      tone: "success",
+      durationMs: 5000,
+      action: {
+        label: t("common.undo", { defaultValue: "Undo" }),
+        onClick: () => {
+          const activeTimer = pendingTimersRef.current.get(id);
+          if (activeTimer) {
+            clearTimeout(activeTimer);
+            pendingTimersRef.current.delete(id);
+          }
+          setPendingDeleteIds((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        },
+      },
+    });
   };
 
   const handleDeleteAll = () => {
@@ -137,7 +232,7 @@ export function NotificationCenterPage() {
   const handleSelectItem = (item: NotificationItem) => {
     if (item.type === "system_announcement") {
       if (!item.isRead && item.id) {
-        markReadMutation.mutate({ id: item.id });
+        handleMarkRead(item.id);
       }
       setSelectedAnnouncement(item);
     }
@@ -262,22 +357,22 @@ export function NotificationCenterPage() {
           id={`tabpanel-${activeTab}`}
           role="tabpanel"
         >
-          {notificationsQuery.isLoading && items.length === 0 ? (
+          {notificationsQuery.isLoading && visibleItems.length === 0 ? (
             <div className="flex items-center justify-center py-16 text-muted-foreground">
               <span className="text-[13.5px]">{t("common.loading", { defaultValue: "Loading..." })}</span>
             </div>
-          ) : items.length > 0 ? (
+          ) : visibleItems.length > 0 ? (
             <div
               aria-label={t("notifications.title", { defaultValue: "Notifications" })}
               className="-mt-px"
               role="list"
             >
-            {items.map((item: NotificationItem) => (
+            {visibleItems.map((item: NotificationItem) => (
               <NotificationItemRow
                 item={item}
                 key={item.id}
-                onDelete={(id) => deleteMutation.mutate({ id })}
-                onMarkRead={(id) => markReadMutation.mutate({ id })}
+                onDelete={handleDeleteItem}
+                onMarkRead={handleMarkRead}
                 onSelect={handleSelectItem}
               />
             ))}
@@ -326,13 +421,13 @@ export function NotificationCenterPage() {
         )}
 
         {/* Zone 5: Pagination Footer */}
-        {items.length > 0 && (
+        {visibleItems.length > 0 && (
           <div className="flex items-center justify-between border-t border-line-muted px-6 py-3.5">
             <span className="text-[13px] text-muted-foreground">
               {t("notifications.showingCount", {
-                defaultValue: `Showing ${items.length} of ${totalCount}`,
-                shown: items.length,
-                total: totalCount,
+                defaultValue: `Showing ${visibleItems.length} of ${Math.max(0, totalCount - pendingDeleteIds.size)}`,
+                shown: visibleItems.length,
+                total: Math.max(0, totalCount - pendingDeleteIds.size),
               })}
             </span>
             {Boolean(notificationsQuery.hasNextPage) && (
@@ -376,7 +471,7 @@ export function NotificationCenterPage() {
 
       <AnnouncementDetailDialog
         item={selectedAnnouncement}
-        onDelete={(id) => deleteMutation.mutate({ id })}
+        onDelete={handleDeleteItem}
         onOpenChange={(open) => {
           if (!open) setSelectedAnnouncement(null);
         }}

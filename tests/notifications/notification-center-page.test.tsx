@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as api from "@/api/generated";
 import { NotificationCenterPage, NotificationItemRow } from "@/features/notifications";
@@ -18,13 +18,17 @@ vi.mock("@/api/generated", () => ({
   patchApiV1NotificationsReadAll: vi.fn(),
 }));
 
+import { ToastProvider } from "@/components/toast/toast-provider";
+
 describe("NotificationCenterPage & NotificationItemRow Suite", () => {
   let queryClient: QueryClient;
 
   function renderWithProviders(ui: ReactNode, initialEntries = ["/notifications"]) {
     return render(
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>
+        <ToastProvider>
+          <MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>
+        </ToastProvider>
       </QueryClientProvider>,
     );
   }
@@ -58,6 +62,10 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       type: "system_announcement",
     },
   ];
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -390,10 +398,66 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       const deleteDialogBtn = screen.getByRole("button", { name: /^delete$/i });
       await user.click(deleteDialogBtn);
 
-      // Verify deleteApiV1NotificationsById was called
-      expect(api.deleteApiV1NotificationsById).toHaveBeenCalledWith({
-        path: { id: "notif-3" },
+      // Announcement row is removed immediately from visible items
+      expect(screen.queryByRole("button", { name: /scheduled maintenance on 18 oct/i })).not.toBeInTheDocument();
+      // Toast appears with Undo
+      expect(screen.getByText("Notification deleted")).toBeInTheDocument();
+    });
+
+    it("restores row and aborts delete when Undo is clicked within 5 seconds", async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<NotificationCenterPage />);
+
+      expect(await screen.findByText("Interview scheduled")).toBeInTheDocument();
+      const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
+      await user.click(deleteButtons[0]);
+
+      // Row disappears immediately
+      expect(screen.queryByText("Interview scheduled")).not.toBeInTheDocument();
+
+      // Toast appears with Undo button
+      const undoBtn = screen.getByRole("button", { name: /undo/i });
+      expect(undoBtn).toBeInTheDocument();
+
+      // Click Undo
+      await user.click(undoBtn);
+
+      // Row is restored!
+      expect(screen.getByText("Interview scheduled")).toBeInTheDocument();
+
+      // Delete API was never called
+      expect(api.deleteApiV1NotificationsById).not.toHaveBeenCalled();
+    });
+
+    it("dispatches delete API call after 5-second undo window closes", async () => {
+      vi.mocked(api.deleteApiV1NotificationsById).mockResolvedValue({
+        data: { id: "notif-1", deletedAt: new Date().toISOString() },
+        response: new Response(null, { status: 200 }),
       });
+
+      renderWithProviders(<NotificationCenterPage />);
+      expect(await screen.findByText("Interview scheduled")).toBeInTheDocument();
+
+      vi.useFakeTimers();
+      try {
+        const deleteButtons = screen.getAllByRole("button", { name: /delete/i });
+        fireEvent.click(deleteButtons[0]);
+
+        // Row disappears immediately
+        expect(screen.queryByText("Interview scheduled")).not.toBeInTheDocument();
+        // Delete API not called yet
+        expect(api.deleteApiV1NotificationsById).not.toHaveBeenCalled();
+
+        // Advance 5 seconds
+        await vi.advanceTimersByTimeAsync(5000);
+
+        // Delete API called
+        expect(api.deleteApiV1NotificationsById).toHaveBeenCalledWith({
+          path: { id: "notif-1" },
+        });
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });
