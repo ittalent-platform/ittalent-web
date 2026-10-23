@@ -354,13 +354,16 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       expect(screen.getByRole("heading", { name: /delete 25 notifications\?/i })).toBeInTheDocument();
 
       // Total count changes in cache (e.g. new notification arrives, count becomes 26)
-      queryClient.setQueriesData({ queryKey: ["notifications", "infinite-list"] }, (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          pages: old.pages.map((p: any) => ({ ...p, total: 26 })),
-        };
-      });
+      queryClient.setQueriesData<{ pages: Array<{ total: number; [key: string]: unknown }> }>(
+        { queryKey: ["notifications", "infinite-list"] },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((p) => ({ ...p, total: 26 })),
+          };
+        },
+      );
 
       // Dialog updates to Stale Batch variant
       expect(await screen.findByRole("heading", { name: /your notifications changed/i })).toBeInTheDocument();

@@ -99,16 +99,19 @@ export function NotificationCenterPage() {
   const deleteAllMutation = useDeleteAllNotifications();
 
   const deleteMutationRef = useRef(deleteMutation);
-  deleteMutationRef.current = deleteMutation;
+  useEffect(() => {
+    deleteMutationRef.current = deleteMutation;
+  });
 
   // Commit any pending deletions upon unmount
   useEffect(() => {
+    const pendingTimers = pendingTimersRef.current;
     return () => {
-      pendingTimersRef.current.forEach((timer, id) => {
+      pendingTimers.forEach((timer, id) => {
         clearTimeout(timer);
         deleteMutationRef.current.mutate({ id });
       });
-      pendingTimersRef.current.clear();
+      pendingTimers.clear();
     };
   }, []);
 
