@@ -54,7 +54,7 @@ export function NotificationItemRow({
       )}
       <span
         className={cn(
-          "text-[14px] leading-tight text-foreground",
+          "truncate text-[14px] leading-tight text-foreground",
           isUnread ? "font-bold" : "font-semibold",
         )}
       >
@@ -62,7 +62,7 @@ export function NotificationItemRow({
       </span>
       <span
         className={cn(
-          "line-clamp-2 text-[13.5px] leading-relaxed",
+          "line-clamp-1 truncate text-[13.5px] leading-relaxed",
           isUnread ? "text-foreground/80" : "text-muted-foreground",
         )}
       >
@@ -99,8 +99,8 @@ export function NotificationItemRow({
       {/* Category icon */}
       <NotificationTypeIcon type={item.type} />
 
-      {/* Main content body */}
-      {item.actionUrl ? (
+      {/* Main content body: system_announcements ignore external actionUrl for security (BC-INBOX-09) */}
+      {item.actionUrl && !isAnnouncement ? (
         <Link
           className="flex min-w-0 flex-1 flex-col gap-0.5 text-foreground no-underline focus:outline-none"
           onClick={handleClick}

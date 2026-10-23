@@ -16,6 +16,7 @@ import {
   useNotificationsQuery,
   useUnreadCountQuery,
 } from "@/features/notifications/api/notifications.queries";
+import { AnnouncementDetailDialog } from "@/features/notifications/components/announcement-detail-dialog";
 import { NotificationItemRow } from "@/features/notifications/components/notification-item-row";
 import {
   tabToNotificationQuery,
@@ -49,6 +50,7 @@ export function NotificationCenterPage() {
     tabParam === "unread" || tabParam === "announcements" ? tabParam : "all";
 
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<NotificationItem | null>(null);
 
   // Queries
   const unreadCountQuery = useUnreadCountQuery();
@@ -129,6 +131,15 @@ export function NotificationCenterPage() {
           setShowDeleteAllDialog(false);
         },
       });
+    }
+  };
+
+  const handleSelectItem = (item: NotificationItem) => {
+    if (item.type === "system_announcement") {
+      if (!item.isRead && item.id) {
+        markReadMutation.mutate({ id: item.id });
+      }
+      setSelectedAnnouncement(item);
     }
   };
 
@@ -267,6 +278,7 @@ export function NotificationCenterPage() {
                 key={item.id}
                 onDelete={(id) => deleteMutation.mutate({ id })}
                 onMarkRead={(id) => markReadMutation.mutate({ id })}
+                onSelect={handleSelectItem}
               />
             ))}
           </div>
@@ -360,6 +372,15 @@ export function NotificationCenterPage() {
           defaultValue: "Delete all notifications?",
         })}
         variant="destructive-solid"
+      />
+
+      <AnnouncementDetailDialog
+        item={selectedAnnouncement}
+        onDelete={(id) => deleteMutation.mutate({ id })}
+        onOpenChange={(open) => {
+          if (!open) setSelectedAnnouncement(null);
+        }}
+        open={Boolean(selectedAnnouncement)}
       />
     </div>
   );

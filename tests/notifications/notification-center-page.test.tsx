@@ -179,6 +179,35 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
 
       expect(onDelete).toHaveBeenCalledWith("notif-1");
     });
+
+    it("sanitizes system_announcements by ignoring external actionUrl and triggers onSelect", async () => {
+      const user = userEvent.setup();
+      const onSelect = vi.fn();
+      const onMarkRead = vi.fn();
+      const maliciousAnnouncement: NotificationItem = {
+        ...sampleNotifications[2],
+        actionUrl: "https://malicious-phishing.com/steal-creds",
+      };
+
+      renderWithProviders(
+        <NotificationItemRow
+          item={maliciousAnnouncement}
+          onDelete={vi.fn()}
+          onMarkRead={onMarkRead}
+          onSelect={onSelect}
+        />,
+      );
+
+      // Verify no external link is rendered
+      expect(screen.queryByRole("link")).not.toBeInTheDocument();
+
+      // Clicking row triggers onSelect and marks read
+      const rowButton = screen.getByRole("button", { name: /scheduled maintenance/i });
+      await user.click(rowButton);
+
+      expect(onMarkRead).toHaveBeenCalledWith("notif-3");
+      expect(onSelect).toHaveBeenCalledWith(maliciousAnnouncement);
+    });
   });
 
   describe("NotificationCenterPage", () => {
@@ -330,6 +359,41 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
         ),
       ).toBeInTheDocument();
       expect(screen.getAllByText("All caught up")).toHaveLength(2);
+    });
+
+    it("opens AnnouncementDetailDialog when clicking an announcement and allows deleting it", async () => {
+      const user = userEvent.setup();
+      vi.mocked(api.deleteApiV1NotificationsById).mockResolvedValue({
+        data: { id: "notif-3", deletedAt: new Date().toISOString() },
+        response: new Response(null, { status: 200 }),
+      });
+
+      renderWithProviders(<NotificationCenterPage />);
+
+      // Find announcement row and click it
+      const announceRow = await screen.findByRole("button", {
+        name: /scheduled maintenance on 18 oct/i,
+      });
+      await user.click(announceRow);
+
+      // Verify patchApiV1NotificationsByIdRead was called to mark as read
+      expect(api.patchApiV1NotificationsByIdRead).toHaveBeenCalledWith({
+        path: { id: "notif-3" },
+      });
+
+      // Verify dialog is open and displays announcement details
+      const dialog = await screen.findByRole("dialog");
+      expect(dialog).toBeInTheDocument();
+      expect(screen.getByText("Sent to everyone in a group. Replies aren’t possible.")).toBeInTheDocument();
+
+      // Click Delete inside dialog
+      const deleteDialogBtn = screen.getByRole("button", { name: /^delete$/i });
+      await user.click(deleteDialogBtn);
+
+      // Verify deleteApiV1NotificationsById was called
+      expect(api.deleteApiV1NotificationsById).toHaveBeenCalledWith({
+        path: { id: "notif-3" },
+      });
     });
   });
 });
