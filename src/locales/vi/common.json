@@ -15,7 +15,9 @@
     "myApplications": "Đơn ứng tuyển của tôi",
     "myProfile": "Hồ sơ của tôi",
     "documents": "Tài liệu",
-    "certificates": "Chứng chỉ"
+    "certificates": "Chứng chỉ",
+    "account": "Tài khoản",
+    "notifications": "Thông báo"
   },
   "myProfile": {
     "title": "Hồ sơ của tôi",
@@ -146,9 +148,10 @@
     "toast": {
       "suggested": "Sẽ được gợi ý khi bạn ứng tuyển.",
       "unsuggested": "Sẽ không được gợi ý khi bạn ứng tuyển.",
-      "added": "Đã thêm {{name}}.",
-      "saved": "Đã lưu {{name}}.",
-      "deleted": "Đã xoá {{name}}. Các bản đã gửi vẫn được giữ."
+      "added": "Đã thêm chứng chỉ.",
+      "saved": "Đã lưu chứng chỉ.",
+      "deleted": "Đã xoá chứng chỉ.",
+      "deletedKeptCopies": "Đã xoá chứng chỉ. Các đơn đã gửi vẫn giữ bản sao."
     },
     "delete": {
       "title": "Xoá chứng chỉ này?",
@@ -156,11 +159,16 @@
       "sentNote_one": "Đơn bạn đã gửi vẫn giữ bản sao. Doanh nghiệp vẫn xem được ở đó.",
       "sentNote_other": "{{count}} đơn bạn đã gửi vẫn giữ bản sao. Doanh nghiệp vẫn xem được ở đó.",
       "keep": "Giữ lại",
-      "confirm": "Xoá"
+      "confirm": "Xoá",
+      "descriptionNotSuggested": "<b>{{name}}</b> sẽ bị xoá khỏi danh sách."
     },
     "conflict": {
       "title": "Chứng chỉ đã thay đổi ở nơi khác",
-      "description": "Chứng chỉ đã được sửa hoặc xoá ở tab khác. Tải bản mới nhất rồi thao tác lại.",
+      "description": {
+        "edit": "Chứng chỉ đã được sửa ở tab khác. Tải bản mới nhất rồi sửa lại.",
+        "suggest": "Tải bản mới nhất rồi bật hoặc tắt Gợi ý khi ứng tuyển lại.",
+        "delete": "Tải bản mới nhất trước khi xoá."
+      },
       "loadLatest": "Tải bản mới nhất"
     },
     "form": {
@@ -191,8 +199,16 @@
         "dates": "Ngày hết hạn phải sau ngày cấp.",
         "duplicate": "Bạn đã thêm liên kết này rồi.",
         "saveFailed": "Không lưu được chứng chỉ. Chưa có gì được thêm. Vui lòng thử lại.",
-        "updateFailed": "Không cập nhật được chứng chỉ. Chưa có gì thay đổi. Vui lòng thử lại."
+        "updateFailed": "Không cập nhật được chứng chỉ. Chưa có gì thay đổi. Vui lòng thử lại.",
+        "accessChanged": "Bạn chưa thể lưu thay đổi vì quyền truy cập tài khoản đã thay đổi. Hãy đăng nhập lại để tiếp tục."
       }
+    },
+    "missing": {
+      "title": "Chứng chỉ này không còn",
+      "description": "Có thể chứng chỉ đã bị xoá. Danh sách của bạn đã được làm mới.",
+      "suggestTitle": "Chứng chỉ này đã bị xoá",
+      "suggestDescription": "Chứng chỉ đã bị xoá ở tab khác nên không thể gợi ý. Danh sách của bạn đã được làm mới.",
+      "ok": "OK"
     }
   },
   "actions": {
@@ -302,7 +318,6 @@
       "board": "Bảng Kanban"
     },
     "columns": {
-      "reference": "Mã",
       "job": "Vị trí",
       "submitted": "Ngày nộp",
       "updated": "Cập nhật",
@@ -367,6 +382,7 @@
     "reasonOptional": "Lý do (không bắt buộc)",
     "reasonPlaceholder": "Cho công ty biết lý do, nếu bạn muốn",
     "reasonHint": "Tối đa {{max}} ký tự. Công ty có thể xem lý do này.",
+    "reasonTooShort": "Nhập ít nhất {{min}} ký tự hoặc để trống lý do.",
     "keepApplication": "Giữ đơn",
     "keepApplications": "Giữ các đơn",
     "withdrawFailed": "Rút đơn thất bại. Dữ liệu không bị thay đổi. Vui lòng thử lại.",
@@ -402,6 +418,7 @@
     },
     "history": {
       "title": "Lịch sử trạng thái",
+      "olderEvents": "Xem sự kiện cũ hơn",
       "submitted": "Đã nộp",
       "under_review": "Chuyển sang Đang xem xét",
       "interviewing": "Chuyển sang Phỏng vấn",
@@ -700,6 +717,8 @@
     "jobPostings": "Tin tuyển dụng",
     "applications": "Đơn ứng tuyển",
     "enterprises": "Hồ sơ doanh nghiệp",
+    "employees": "Nhân viên",
+    "companyProfile": "Hồ sơ công ty",
     "collapse": "Thu gọn thanh bên",
     "closeMenu": "Đóng menu",
     "interviews": "Phỏng vấn"
@@ -1066,7 +1085,36 @@
       "noResultsTitle": "Không có kết quả cho “{{query}}”",
       "noResultsDescription": "Không có tin tuyển dụng nào khớp với từ khóa này. Kiểm tra lại chính tả hoặc thử tiêu đề, nội dung hoặc địa điểm khác."
     },
-    "notSpecified": "Không chỉ định"
+    "notSpecified": "Không chỉ định",
+    "enterpriseAdmin": {
+      "subtitle_other": "{{count}} tin tuyển dụng tại {{company}} · mới tạo gần nhất trước",
+      "subtitleEmpty": "{{company}} chưa có tin tuyển dụng nào",
+      "subtitleFiltered_other": "{{count}} tin tuyển dụng phù hợp",
+      "emptyDescription": "Khi bộ phận HR tạo tin tuyển dụng, tin sẽ xuất hiện tại đây.",
+      "published": "Ngày đăng",
+      "notPublished": "Chưa đăng",
+      "metaUpdated": "Cập nhật {{date}}",
+      "metaClosed": "Đóng {{date}}",
+      "metaArchived": "Lưu trữ {{date}}",
+      "refresh": "Làm mới",
+      "refreshedTitle": "Đã làm mới tin tuyển dụng",
+      "refreshedMessage": "Bạn đang xem phiên bản mới nhất.",
+      "acceptingApplications": "Đang nhận hồ sơ",
+      "visibleToCandidates": "Ứng viên nhìn thấy",
+      "yes": "Có",
+      "no": "Không",
+      "activity": "Hoạt động",
+      "firstPublished": "Đăng lần đầu",
+      "lastChange": "Thay đổi gần nhất",
+      "notRecorded": "Chưa ghi nhận",
+      "viewHistory": "Xem lịch sử",
+      "notices": {
+        "draft": "Bản nháp. Chỉ thành viên của {{company}} mới xem được tin này.",
+        "closed": "Đã đóng. Ứng viên không thể xem hoặc ứng tuyển vào tin này. Việc xem tin không mở lại tin.",
+        "archived": "Đã lưu trữ. Tin được giữ lại để tra cứu và ẩn với ứng viên. Việc xem tin không bỏ lưu trữ.",
+        "deadlinePassed": "Hạn nộp hồ sơ đã qua vào {{date}}. Bộ phận HR có thể đóng hoặc cập nhật tin này."
+      }
+    }
   },
   "adminLayout": {
     "openMenu": "Mở menu",
@@ -1167,9 +1215,13 @@
         "title": "Công ty không khả dụng",
         "body": "Công ty không tồn tại hoặc không còn hoạt động. Hãy chọn công ty đang hoạt động khác."
       },
+      "onboardingPending": {
+        "title": "Doanh nghiệp chưa hoàn tất onboarding",
+        "body": "Hãy hoàn tất đăng ký doanh nghiệp trước khi mời tài khoản này."
+      },
       "accountConflict": {
-        "title": "Email này đã có tài khoản",
-        "body": "Đã tồn tại tài khoản dùng email này."
+        "title": "Email hoặc tên đăng nhập đã được sử dụng",
+        "body": "Đã có tài khoản dùng email hoặc tên đăng nhập này. Hãy kiểm tra cả hai trường rồi thử lại."
       },
       "server": {
         "title": "Không thể lưu thay đổi",
@@ -1303,9 +1355,6 @@
       "conflictSaved": "Đang lưu",
       "conflictYours": "Của bạn",
       "loadLatest": "Tải bản mới nhất và sửa lại",
-      "existsTitle": "Email này đã có tài khoản",
-      "existsBody": "{{email}} đã được đăng ký. Hãy mở tài khoản hiện có thay vì tạo thêm.",
-      "openExisting": "Mở tài khoản hiện có",
       "discardEditTitle": "Bỏ các thay đổi?",
       "discardEditDescription": "Các chỉnh sửa của bạn cho tài khoản này sẽ không được lưu.",
       "discard": "Bỏ thay đổi",
@@ -2757,6 +2806,352 @@
       "noTimeline": "Chưa có lịch sử nào được ghi nhận.",
       "noOtherApplications": "Chưa có hồ sơ ứng tuyển nào trước đây tại doanh nghiệp.",
       "firstTimeApplicant": "Ứng tuyển lần đầu tại {{company}}."
+    }
+  },
+  "recruiterEmployees": {
+    "page": {
+      "workspace": "Không gian làm việc",
+      "subtitle": "Đội ngũ nhân sự của công ty bạn. Chỉ hiển thị những người thuộc không gian làm việc doanh nghiệp của bạn."
+    },
+    "toolbar": {
+      "searchPlaceholder": "Tìm nhân viên hoặc email…",
+      "departmentAll": "Phòng ban: Tất cả",
+      "sortNameAsc": "Sắp xếp: Tên A-Z",
+      "sortNameDesc": "Sắp xếp: Tên Z-A"
+    },
+    "departments": {
+      "talentAcquisition": "Tuyển dụng nhân tài",
+      "engineering": "Kỹ thuật",
+      "peopleOperations": "Vận hành nhân sự"
+    },
+    "table": {
+      "employee": "Nhân viên",
+      "department": "Phòng ban",
+      "workPhone": "Điện thoại công việc",
+      "memberSince": "Thành viên từ"
+    },
+    "list": {
+      "loadError": "Không tải được danh sách nhân viên. Hãy kiểm tra kết nối và thử lại.",
+      "emptyTitle": "Không tìm thấy nhân viên",
+      "emptyFiltered": "Hãy thử đổi từ khóa tìm kiếm hoặc bộ lọc.",
+      "emptyFirst": "Hãy bắt đầu xây dựng đội ngũ HR bằng cách mời nhân viên đầu tiên."
+    },
+    "menu": {
+      "suspend": "Tạm khóa tư cách thành viên",
+      "activate": "Kích hoạt tư cách thành viên"
+    },
+    "status": {
+      "revoked": "Đã thu hồi"
+    },
+    "role": {
+      "hrRecruiter": "HR / Nhà tuyển dụng"
+    },
+    "form": {
+      "displayName": "Tên hiển thị",
+      "jobTitle": "Chức danh",
+      "department": "Phòng ban",
+      "workPhone": "Điện thoại công việc",
+      "fullNameExample": "VD: Trần Bảo",
+      "emailExample": "VD: tran.b@novafintech.vn",
+      "jobTitleExample": "VD: Chuyên viên tuyển dụng cấp cao",
+      "departmentExample": "VD: Tuyển dụng nhân tài",
+      "phoneExample": "VD: 0912 345 678",
+      "displayNameHint": "Hiển thị với cả nhóm và trên tin tuyển dụng · 2–100 ký tự",
+      "emailHint": "Lời mời chỉ dùng được với địa chỉ này.",
+      "phoneHint": "Không bắt buộc · 9–15 chữ số, có thể bắt đầu bằng +",
+      "lockedNote": "Email, mật khẩu và vai trò thuộc về tài khoản ITTalent của chính người đó nên không thể thay đổi tại đây."
+    },
+    "validation": {
+      "emailInvalid": "Vui lòng nhập địa chỉ email doanh nghiệp hợp lệ",
+      "fullNameMin": "Họ và tên phải có ít nhất {{min}} ký tự",
+      "fullNameMax": "Họ và tên không được vượt quá {{max}} ký tự",
+      "displayNameMin": "Tên hiển thị phải có ít nhất {{min}} ký tự",
+      "displayNameMax": "Tên hiển thị không được vượt quá {{max}} ký tự",
+      "jobTitleMax": "Chức danh không được vượt quá {{max}} ký tự",
+      "departmentMax": "Phòng ban không được vượt quá {{max}} ký tự",
+      "phoneInvalid": "Điện thoại công việc phải có 8–20 chữ số",
+      "reasonMax": "Lý do không được vượt quá {{max}} ký tự"
+    },
+    "invite": {
+      "title": "Mời nhân viên HR",
+      "description": "Họ sẽ nhận email có liên kết để tham gia. Chưa ai được truy cập cho đến khi chấp nhận lời mời.",
+      "accessRole": "HR tại {{company}}",
+      "accessRoleHint": "Có thể đăng tin tuyển dụng, xem đơn ứng tuyển và lên lịch phỏng vấn.",
+      "accessNote": "Tại đây bạn chỉ có thể mời HR. Không thể cấp vai trò quản trị từ biểu mẫu này.",
+      "send": "Gửi lời mời",
+      "duplicate": "Email này đã có tài khoản trong hệ thống.",
+      "failed": "Không gửi được lời mời. Vui lòng thử lại.",
+      "successBody": "Chúng tôi đã gửi email mời đến <strong>{{email}}</strong>.",
+      "nextSteps": "Các bước tiếp theo cho người được mời",
+      "nextStepsBody": "Họ có 7 ngày để mở liên kết trong email, xác minh danh tính doanh nghiệp và đặt mật khẩu.",
+      "copyLink": "Sao chép liên kết mời",
+      "copied": "Đã sao chép liên kết!",
+      "done": "Xong"
+    },
+    "edit": {
+      "title": "Sửa thông tin nhân viên",
+      "description": "Cập nhật thông tin hồ sơ nội bộ của {{name}}.",
+      "failed": "Không cập nhật được thông tin nhân viên."
+    },
+    "statusDialog": {
+      "suspendBody": "Tạm khóa quyền truy cập không gian làm việc của {{name}}. Họ sẽ không thể xem hoặc quản lý đơn ứng tuyển và tin tuyển dụng.",
+      "activateBody": "Khôi phục quyền truy cập không gian làm việc cho {{name}}.",
+      "reasonLabel": "Lý do đổi trạng thái",
+      "suspendPlaceholder": "VD: Nhân viên chuyển sang phòng ban khác hoặc rời đội tuyển dụng",
+      "activatePlaceholder": "VD: Kích hoạt lại theo yêu cầu của quản trị viên",
+      "auditNote": "Ghi chú này sẽ được lưu vào nhật ký kiểm toán để phục vụ tuân thủ của doanh nghiệp.",
+      "failed": "Không đổi được trạng thái thành viên."
+    },
+    "history": {
+      "title": "Lịch sử tài khoản nhân viên",
+      "description": "Nhật ký kiểm toán mọi thay đổi đối với tài khoản của {{name}}.",
+      "empty": "Chưa có sự kiện lịch sử nào được ghi nhận cho tài khoản này.",
+      "performedBy": "Thực hiện bởi: {{name}}"
+    },
+    "detail": {
+      "notFoundTitle": "Không tìm thấy nhân viên",
+      "notFoundBody": "Hồ sơ nhân viên này không tồn tại hoặc bạn không có quyền truy cập.",
+      "back": "Quay lại danh sách nhân viên",
+      "infoTitle": "Thông tin nhân viên",
+      "membershipTitle": "Tư cách thành viên",
+      "activityTitle": "Hoạt động gần đây",
+      "employeeId": "Mã nhân viên",
+      "memberSince": "Thành viên từ",
+      "activeSince": "Hoạt động từ {{date}}",
+      "suspendedTitle": "Quyền truy cập đang bị tạm khóa",
+      "activeBody": "Có thể truy cập và quản lý không gian làm việc doanh nghiệp: đăng tin tuyển dụng, xem ứng viên và điều phối lịch phỏng vấn.",
+      "suspendedBody": "Quyền truy cập không gian làm việc đã bị thu hồi. Nhân viên này không thể xem ứng viên hoặc đăng tin tuyển dụng cho đến khi được kích hoạt lại.",
+      "viewAll": "Xem tất cả ({{count}})",
+      "noActivity": "Chưa ghi nhận hoạt động gần đây nào cho tài khoản nhân viên này."
+    }
+  },
+  "recruiterCompanyProfile": {
+    "page": {
+      "noProfileTitle": "Chưa liên kết hồ sơ doanh nghiệp",
+      "noProfileBody": "Tài khoản của bạn hiện chưa thuộc không gian làm việc doanh nghiệp nào. Vui lòng liên hệ quản trị viên tổ chức của bạn.",
+      "coverAlt": "Ảnh bìa của {{name}}",
+      "noCover": "Chưa đặt ảnh bìa",
+      "changeCover": "Đổi ảnh bìa",
+      "changeLogo": "Đổi logo",
+      "viewPublic": "Xem trang công khai",
+      "editProfile": "Sửa hồ sơ",
+      "defaultIndustry": "Công nghệ",
+      "sizeEmployees": "{{size}} nhân viên",
+      "aboutTitle": "Giới thiệu",
+      "aboutDefault": "{{name}} cung cấp các giải pháp công nghệ số tiên tiến và phần mềm doanh nghiệp. Đội ngũ của chúng tôi xây dựng những hệ thống hiệu quả cao, lấy khách hàng làm trọng tâm.",
+      "cultureTitle": "Văn hóa và phúc lợi",
+      "cultureDefault": "Các nhóm nhỏ, demo hằng tuần và văn hóa ưu tiên trao đổi bằng văn bản.",
+      "defaultBenefits": [
+        "Lương tháng 13",
+        "Bảo hiểm sức khỏe cao cấp",
+        "Làm việc linh hoạt kết hợp",
+        "Ngân sách học tập hằng năm",
+        "Trang thiết bị hàng đầu"
+      ],
+      "techStack": "Công nghệ sử dụng",
+      "workingDays": "Ngày làm việc: <strong>{{days}}</strong>",
+      "workingDaysDefault": "Thứ Hai – Thứ Sáu",
+      "galleryTitle": "Thư viện ảnh",
+      "galleryCount": "{{count}} / {{max}}",
+      "galleryAlt": "Ảnh {{n}}",
+      "galleryOffice": "Không gian văn phòng",
+      "galleryMeeting": "Họp nhóm",
+      "galleryEvent": "Sự kiện cộng đồng",
+      "addressesTitle": "Địa chỉ",
+      "headquarters": "Trụ sở chính",
+      "mainOffice": "Văn phòng chính",
+      "branchOffice": "Văn phòng chi nhánh",
+      "businessTitle": "Hoạt động kinh doanh",
+      "industryDefault": "Công nghệ thông tin",
+      "subIndustriesDefault": "Thanh toán, Ngân hàng số, Điện toán đám mây",
+      "established": "Đã thành lập",
+      "social": "Mạng xã hội",
+      "manage": "Quản lý",
+      "activeOpenings": "Vị trí đang tuyển",
+      "activeCount": "{{count}} đang tuyển",
+      "legalTitle": "Pháp lý & doanh nghiệp",
+      "legalName": "Tên pháp lý của doanh nghiệp",
+      "taxCode": "Mã số thuế",
+      "registrationNumber": "Số đăng ký kinh doanh",
+      "ctaTitle": "Giữ hồ sơ công ty luôn mới",
+      "ctaBody": "Thông tin công ty và hình ảnh thương hiệu được cập nhật thu hút nhiều hơn 40% đơn ứng tuyển.",
+      "ctaButton": "Cập nhật hồ sơ công ty"
+    },
+    "edit": {
+      "title": "Sửa hồ sơ công ty",
+      "subtitle": "Thay đổi sẽ hiển thị trên trang công khai ngay khi bạn lưu. Các trường có dấu * là bắt buộc.",
+      "back": "Quay lại hồ sơ",
+      "legalBannerTitle": "Bảo vệ thông tin pháp lý",
+      "legalBannerBody": "Tên pháp lý, mã số thuế, số đăng ký kinh doanh, năm thành lập và trạng thái đã được xác minh chính thức và bị khóa. Để sửa các thông tin pháp lý này, vui lòng yêu cầu quản trị viên ITTalent điều chỉnh.",
+      "saved": "Đã lưu thay đổi hồ sơ! Đang chuyển hướng...",
+      "saveFailed": "Không lưu được thay đổi hồ sơ công ty.",
+      "notFound": "Không tìm thấy hồ sơ doanh nghiệp để chỉnh sửa.",
+      "identityTitle": "1. Nhận diện & thương hiệu",
+      "identityDescription": "Tên hiển thị là tên ứng viên và nhân tài nhìn thấy trên toàn sàn.",
+      "nameExample": "VD: Nova Fintech",
+      "nameHint": "Hiển thị trên trang công khai · 2–150 ký tự",
+      "legalCompanyName": "Tên pháp lý của công ty",
+      "registrationProvided": "Đã cung cấp khi xác minh",
+      "verificationStatus": "Trạng thái xác minh",
+      "verifiedActive": "Đã xác minh · Đang hoạt động",
+      "contactTitle": "2. Thông tin liên hệ",
+      "contactDescription": "Các kênh chính thức để liên lạc và gửi thông báo cho ứng viên.",
+      "phoneNumber": "Số điện thoại",
+      "officialWebsite": "Website chính thức",
+      "businessTitle": "3. Thông tin kinh doanh",
+      "businessDescription": "Dùng cho bộ lọc tìm kiếm và gợi ý nhân tài trên sàn ITTalent.",
+      "companyModel": "Mô hình công ty",
+      "workingDays": "Ngày làm việc",
+      "workingDaysExample": "VD: Thứ Hai – Thứ Sáu (làm việc kết hợp)",
+      "publicTitle": "4. Mô tả công khai & giới thiệu",
+      "publicDescription": "Giới thiệu sứ mệnh, văn hóa đội nhóm và giá trị của công ty để thu hút ứng viên giỏi.",
+      "aboutLabel": "Mô tả giới thiệu",
+      "aboutPlaceholder": "Hãy cho ứng viên biết điều gì khiến công ty bạn là nơi làm việc tuyệt vời...",
+      "addressTitle": "5. Địa chỉ trụ sở chính",
+      "addressDescription": "Địa chỉ văn phòng hiển thị trên hồ sơ công khai và các tin tuyển dụng.",
+      "street": "Địa chỉ",
+      "streetExample": "VD: 12 Tôn Đản, Phường 13, Quận 4",
+      "city": "Tỉnh / Thành phố",
+      "cityExample": "VD: Hồ Chí Minh"
+    },
+    "industry": {
+      "fintech": "Công nghệ tài chính (Fintech)",
+      "it": "Công nghệ thông tin",
+      "software": "Phát triển phần mềm",
+      "ecommerce": "Thương mại điện tử",
+      "banking": "Ngân hàng & dịch vụ tài chính",
+      "ai": "AI & học máy",
+      "healthcare": "Y tế & công nghệ sinh học",
+      "education": "Giáo dục & EdTech"
+    },
+    "companySize": {
+      "1-10": "1–10 nhân viên",
+      "11-50": "11–50 nhân viên",
+      "51-200": "51–200 nhân viên",
+      "201-500": "201–500 nhân viên",
+      "501-1000": "501–1000 nhân viên",
+      "1000+": "Trên 1000 nhân viên"
+    },
+    "companyType": {
+      "product": "Sản phẩm",
+      "outsourcing": "Gia công phần mềm",
+      "itService": "Dịch vụ CNTT",
+      "consulting": "Tư vấn",
+      "agency": "Agency",
+      "hybrid": "Kết hợp"
+    },
+    "validation": {
+      "phoneInvalid": "Số điện thoại phải có 8–20 chữ số",
+      "urlWebsite": "Website phải là URL hợp lệ",
+      "urlLinkedin": "Liên kết LinkedIn phải là URL hợp lệ",
+      "urlFacebook": "Liên kết Facebook phải là URL hợp lệ",
+      "urlGithub": "Liên kết GitHub phải là URL hợp lệ",
+      "urlTwitter": "Liên kết X / Twitter phải là URL hợp lệ",
+      "industryRequired": "Vui lòng chọn ngành nghề",
+      "descriptionMax": "Mô tả không được vượt quá {{max}} ký tự"
+    },
+    "logo": {
+      "title": "Đổi logo công ty",
+      "description": "Logo này hiển thị trên hồ sơ công ty công khai, tin tuyển dụng và email gửi đến ứng viên.",
+      "previewAlt": "Xem trước logo công ty",
+      "preview": "Xem trước",
+      "uploadFile": "Tải tệp ảnh lên",
+      "orUrl": "Hoặc dán URL ảnh",
+      "hintRatio": "• Định dạng vuông (tỉ lệ 1:1), khuyến nghị tối thiểu 400×400px.",
+      "hintSize": "• Dung lượng tối đa: 5MB. Định dạng: PNG, JPG, WebP, SVG.",
+      "tooLarge": "Ảnh vượt quá giới hạn 5MB. Vui lòng chọn tệp nhỏ hơn.",
+      "saveFailed": "Không cập nhật được logo công ty.",
+      "removeFailed": "Không xoá được logo.",
+      "remove": "Xoá logo",
+      "save": "Lưu logo"
+    },
+    "cover": {
+      "title": "Đổi ảnh bìa",
+      "description": "Ảnh bìa này hiển thị nổi bật ở đầu trang công khai của công ty bạn.",
+      "previewAlt": "Xem trước ảnh bìa",
+      "preview": "Xem trước ảnh bìa",
+      "uploadFile": "Tải ảnh bìa lên",
+      "orUrl": "Hoặc dán URL ảnh bìa",
+      "hintRatio": "• Ảnh bìa khổ rộng (tỉ lệ 16:9 hoặc 3:1), khuyến nghị 1920×640px.",
+      "hintSize": "• Dung lượng tối đa: 10MB. Ảnh độ phân giải cao hiển thị đẹp nhất trên màn hình máy tính.",
+      "tooLarge": "Ảnh bìa vượt quá giới hạn 10MB. Vui lòng chọn tệp nhỏ hơn.",
+      "saveFailed": "Không cập nhật được ảnh bìa.",
+      "removeFailed": "Không xoá được ảnh bìa.",
+      "remove": "Xoá ảnh bìa",
+      "save": "Lưu ảnh bìa"
+    }
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "unreadCount": "{{count}} chưa đọc",
+    "unreadCount_one": "{{count}} chưa đọc",
+    "unreadCount_other": "{{count}} chưa đọc",
+    "allCaughtUp": "Đã đọc tất cả",
+    "markAllAsRead": "Đánh dấu tất cả đã đọc",
+    "markAllAsReadConfirmTitle": "Đánh dấu {{count}} thông báo đã đọc?",
+    "markAllAsReadConfirmDesc": "Chỉ những thông báo bạn nhìn thấy hiện tại mới được đánh dấu. Bất kỳ thông báo nào đến sau sẽ vẫn chưa đọc.",
+    "moreActions": "Thao tác khác",
+    "deleteAll": "Xóa tất cả…",
+    "deleteAllConfirmTitle": "Xóa {{count}} thông báo?",
+    "deleteAllConfirmDesc": "Thao tác này sẽ xóa tất cả thông báo hiện có trong danh sách của bạn. Các thông báo đến sau khi xác nhận vẫn được giữ lại. Đơn ứng tuyển và lịch phỏng vấn của bạn không bị ảnh hưởng.",
+    "deleteAllConfirmBtn": "Xóa {{count}} thông báo",
+    "staleBatchTitle": "Thông báo của bạn đã thay đổi",
+    "staleBatchDesc": "Hiện tại bạn có {{count}} thông báo, không phải {{oldCount}}. Chưa có thông báo nào bị xóa.",
+    "staleBatchBtn": "Xóa {{count}} thông báo",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "showOlder": "Xem cũ hơn",
+    "showingCount": "Đang hiển thị {{shown}} trên tổng số {{total}}",
+    "tabs": {
+      "all": "Tất cả",
+      "unread": "Chưa đọc",
+      "announcements": "Thông báo chung"
+    },
+    "actions": {
+      "markAsRead": "Đánh dấu đã đọc",
+      "delete": "Xóa",
+      "undo": "Hoàn tác",
+      "close": "Đóng",
+      "tryAgain": "Thử lại",
+      "dismiss": "Bỏ qua",
+      "signIn": "Đăng nhập",
+      "browseJobs": "Tìm việc ngay",
+      "backToNotifications": "Quay lại thông báo"
+    },
+    "toast": {
+      "deleted": "Đã xóa thông báo",
+      "allMarkedRead": "Đã đánh dấu tất cả thông báo là đã đọc",
+      "allDeleted": "Đã xóa tất cả thông báo",
+      "markReadError": "Không thể đánh dấu đã đọc. Thử lại",
+      "deleteError": "Không thể xóa thông báo này. Thử lại",
+      "checkingStatus": "Đang kiểm tra trạng thái cập nhật..."
+    },
+    "empty": {
+      "noNotifications": "Chưa có thông báo nào",
+      "noNotificationsDesc": "Chúng tôi sẽ thông báo cho bạn khi có công ty xem xét đơn ứng tuyển hoặc lên lịch phỏng vấn.",
+      "allCaughtUp": "Bạn đã xem hết thông báo",
+      "allCaughtUpDesc": "Không có thông báo chưa đọc. Các thông báo cũ hơn nằm ở mục Tất cả.",
+      "noAnnouncements": "Chưa có thông báo chung",
+      "noAnnouncementsDesc": "Tin tức và cập nhật từ ITTalent sẽ hiển thị tại đây."
+    },
+    "errors": {
+      "unauthenticatedTitle": "Đăng nhập để xem thông báo của bạn",
+      "unauthenticatedDesc": "Phiên đăng nhập đã hết hạn. Sau khi đăng nhập lại bạn sẽ quay trở lại đây.",
+      "invalidPageTitle": "Trang thông báo này không tồn tại",
+      "invalidPageDesc": "Đang hiển thị các thông báo mới nhất của bạn.",
+      "storeFailureTitle": "Không thể tải thông báo",
+      "storeFailureDesc": "Đã xảy ra sự cố từ phía máy chủ. Thông báo của bạn vẫn an toàn; vui lòng thử lại sau giây lát.",
+      "projectionFailureTitle": "Thông báo bị ẩn để bảo đảm an toàn",
+      "projectionFailureDesc": "Không thể xác thực các thông báo này nên tạm thời không hiển thị. Vui lòng thử lại sau.",
+      "notFoundTitle": "Thông báo này không khả dụng",
+      "notFoundDesc": "Có thể thông báo đã bị xóa. Các thông báo khác vẫn không đổi."
+    },
+    "announcement": {
+      "badge": "THÔNG BÁO · ITTALENT",
+      "modalFooterNote": "Được gửi đến tất cả người dùng trong nhóm. Không thể phản hồi thông báo này."
+    },
+    "popover": {
+      "viewAll": "Xem tất cả thông báo"
     }
   }
 }

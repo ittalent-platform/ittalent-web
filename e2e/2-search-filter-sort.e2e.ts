@@ -1,7 +1,8 @@
 import {
   ACCOUNTS,
   api,
-  displayId,
+  appLink,
+  applicationId,
   expect,
   SEED,
   search,
@@ -16,17 +17,17 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
   }) => {
     await page.goto("/my-applications");
     await search(page).fill("pixel");
-    await expect(page.getByText(displayId(SEED.offered))).toBeVisible();
-    await expect(page.getByText(displayId(SEED.submitted))).toHaveCount(0);
+    await expect(appLink(page, SEED.offered)).toBeVisible();
+    await expect(appLink(page, SEED.submitted)).toHaveCount(0);
     await expect(page).toHaveURL(/search=pixel/);
 
     await search(page).fill("Frontend");
-    await expect(page.getByText(displayId(SEED.submitted))).toBeVisible();
-    await expect(page.getByText(displayId(SEED.hired))).toBeVisible();
-    await expect(page.getByText(displayId(SEED.offered))).toHaveCount(0);
+    await expect(appLink(page, SEED.submitted)).toBeVisible();
+    await expect(appLink(page, SEED.hired)).toBeVisible();
+    await expect(appLink(page, SEED.offered)).toHaveCount(0);
     await page.reload();
     await expect(search(page)).toHaveValue("Frontend");
-    await expect(page.getByText(displayId(SEED.hired))).toBeVisible();
+    await expect(appLink(page, SEED.hired)).toBeVisible();
   });
 
   test("AC.2 no match shows an empty state and AC.1 clearing returns the default list", async ({
@@ -48,7 +49,7 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     candidate: page,
   }) => {
     await page.goto("/my-applications");
-    await expect(page.getByText(displayId(SEED.submitted))).toBeVisible();
+    await expect(appLink(page, SEED.submitted)).toBeVisible();
     let listCalls = 0;
     await page.route("**/api/v1/me/applications?*", (route) => {
       listCalls += 1;
@@ -72,18 +73,18 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await expect(page).toHaveURL(
       /status=submitted%2Cunder_review%2Cinterviewing%2Coffered/,
     );
-    await expect(page.getByText(displayId(SEED.interviewing))).toBeVisible();
-    await expect(page.getByText(displayId(SEED.hired))).toHaveCount(0);
-    await expect(page.getByText(displayId(SEED.withdrawnOpen))).toHaveCount(0);
+    await expect(appLink(page, SEED.interviewing)).toBeVisible();
+    await expect(appLink(page, SEED.hired)).toHaveCount(0);
+    await expect(appLink(page, SEED.withdrawnOpen)).toHaveCount(0);
 
     await page.getByRole("button", { name: "Closed" }).click();
-    await expect(page.getByText(displayId(SEED.hired))).toBeVisible();
-    await expect(page.getByText(displayId(SEED.rejected))).toBeVisible();
-    await expect(page.getByText(displayId(SEED.submitted))).toHaveCount(0);
+    await expect(appLink(page, SEED.hired)).toBeVisible();
+    await expect(appLink(page, SEED.rejected)).toBeVisible();
+    await expect(appLink(page, SEED.submitted)).toHaveCount(0);
 
     await page.locator("label", { hasText: "Hired" }).click();
-    await expect(page.getByText(displayId(SEED.hired))).toHaveCount(0);
-    await expect(page.getByText(displayId(SEED.rejected))).toBeVisible();
+    await expect(appLink(page, SEED.hired)).toHaveCount(0);
+    await expect(appLink(page, SEED.rejected)).toBeVisible();
     await page.getByRole("button", { name: "Select all" }).click();
     await expect(
       page.getByText(
@@ -105,8 +106,8 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await page.goto("/my-applications");
     await page.getByRole("button", { name: /^Stage:/ }).click();
     await page.getByRole("menuitem", { name: "Interview" }).click();
-    await expect(page.getByText(displayId(SEED.interviewing))).toBeVisible();
-    await expect(page.getByText(displayId(SEED.underReview))).toHaveCount(0);
+    await expect(appLink(page, SEED.interviewing)).toBeVisible();
+    await expect(appLink(page, SEED.underReview)).toHaveCount(0);
   });
 
   test("submitted date presets and a custom range", async ({
@@ -115,8 +116,8 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await page.goto("/my-applications?limit=50");
     await page.getByRole("button", { name: /^Submitted:/ }).click();
     await page.getByRole("menuitem", { name: "Last 7 days" }).click();
-    await expect(page.getByText(displayId(SEED.rowMenu))).toBeVisible(); // 2 days ago
-    await expect(page.getByText(displayId(SEED.hired))).toHaveCount(0); // 60 days ago
+    await expect(appLink(page, SEED.rowMenu)).toBeVisible(); // 2 days ago
+    await expect(appLink(page, SEED.hired)).toHaveCount(0); // 60 days ago
 
     await page.getByRole("button", { name: /^Submitted:/ }).click();
     await page.getByRole("menuitem", { name: "Custom range" }).click();
@@ -127,7 +128,9 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     await page.getByRole("button", { name: "To", exact: true }).click();
     await page.getByRole("button", { name: "Today", exact: true }).click();
     // The From/To fields are the shared calendar DatePicker (not native inputs), so the custom range is set through the URL it reads.
-    await page.goto("/my-applications?range=custom&from=2000-01-01&to=2000-12-31");
+    await page.goto(
+      "/my-applications?range=custom&from=2000-01-01&to=2000-12-31",
+    );
     await expect(
       page.getByRole("heading", { name: "No matching applications" }),
     ).toBeVisible();
@@ -172,10 +175,10 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     const jobId = (detail.json as { items: { jobId: string }[] }).items[0]!
       .jobId;
     await page.goto(`/my-applications?jobId=${jobId}`);
-    await expect(page.getByText(displayId(SEED.offered))).toBeVisible();
-    await expect(page.getByText(displayId(SEED.submitted))).toHaveCount(0);
+    await expect(appLink(page, SEED.offered)).toBeVisible();
+    await expect(appLink(page, SEED.submitted)).toHaveCount(0);
     await page.getByRole("button", { name: "Clear job filter" }).click();
-    await expect(page.getByText(displayId(SEED.submitted))).toBeVisible();
+    await expect(appLink(page, SEED.submitted)).toBeVisible();
   });
 
   test("filters apply to the board too, with a count per status", async ({
@@ -195,13 +198,16 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
   }) => {
     await page.goto("/my-applications?limit=50");
     const firstId = async () =>
-      (await page.getByRole("row").nth(1).textContent()) ?? "";
-    await expect.poll(firstId).toContain(displayId(SEED.rowMenu)); // newest submitted first
+      (await page
+        .getByRole("row")
+        .nth(1)
+        .locator("a")
+        .first()
+        .getAttribute("href")) ?? "";
+    await expect.poll(firstId).toContain(applicationId(SEED.rowMenu)); // newest submitted first
     await page.getByRole("button", { name: "Submitted", exact: true }).click(); // toggles to ascending
     await expect(page).toHaveURL(/sortOrder=asc/);
-    await expect.poll(firstId).toContain(displayId(SEED.hired)); // oldest submitted first
-    await page.getByRole("button", { name: "ID", exact: true }).click();
-    await expect(page).toHaveURL(/sortBy=id/);
+    await expect.poll(firstId).toContain(applicationId(SEED.hired)); // oldest submitted first
   });
 
   test("API: status list, sort and scope are enforced by the server", async () => {
@@ -223,7 +229,8 @@ test.describe("UC-MYAPP-05 search and filter my applications", () => {
     ).json as { items: { submittedAt: string }[] };
     const dates = asc.items.map((item) => item.submittedAt);
     expect([...dates].sort()).toEqual(dates);
-    const other = (await api(ACCOUNTS.other, "/api/v1/me/applications")).json as {
+    const other = (await api(ACCOUNTS.other, "/api/v1/me/applications"))
+      .json as {
       total: number;
     };
     expect(other.total).toBe(1);

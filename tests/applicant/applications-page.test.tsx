@@ -41,14 +41,17 @@ describe("Candidate My Applications", () => {
     showToast.mockClear();
     vi.mocked(applicationQueries.useApplications).mockReturnValue({ data: list, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplications>);
     vi.mocked(applicationQueries.useApplication).mockReturnValue({ data: detail, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplication>);
-    vi.mocked(applicationQueries.useApplicationHistory).mockReturnValue({ data: history, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplicationHistory>);
+    vi.mocked(applicationQueries.useApplicationHistory).mockReturnValue({ data: { pages: [history], pageParams: [1] }, hasNextPage: false, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplicationHistory>);
     mockWithdraw();
   });
 
   it("shows server results in the table and switches to the board", async () => {
     renderApp("/my-applications");
     expect(screen.getByRole("link", { name: /Kỹ sư Backend/ })).toBeInTheDocument();
-    expect(screen.getByText("APP-9011")).toBeInTheDocument();
+    // The reference lives on the detail page and the board, not in a table column.
+    expect(screen.queryByText("APP-9011")).toBeNull();
+    expect(screen.queryByRole("columnheader", { name: /^ID/ })).toBeNull();
+    expect(screen.getByRole("columnheader", { name: /Job/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Board" }));
     await waitFor(() => expect(screen.getByRole("button", { name: "Board" })).toHaveAttribute("aria-pressed", "true"));
     expect(screen.getByRole("region", { name: "Submitted" })).toBeInTheDocument();
@@ -167,7 +170,7 @@ describe("Candidate My Applications", () => {
   });
 
   it("shows an empty history state (UC-MYAPP-03.AC.1) and a history retry (EX.4)", () => {
-    vi.mocked(applicationQueries.useApplicationHistory).mockReturnValue({ data: { ...history, items: [], total: 0 }, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplicationHistory>);
+    vi.mocked(applicationQueries.useApplicationHistory).mockReturnValue({ data: { pages: [{ ...history, items: [], total: 0 }], pageParams: [1] }, hasNextPage: false, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplicationHistory>);
     const view = renderApp(`/my-applications/${id}`);
     expect(screen.getByText("No status events yet")).toBeInTheDocument();
     view.unmount();
@@ -184,6 +187,14 @@ describe("Candidate My Applications", () => {
     expect(screen.queryByRole("button", { name: "Withdraw application" })).not.toBeInTheDocument();
   });
 
+  it("completes every progress step once hired", () => {
+    vi.mocked(applicationQueries.useApplication).mockReturnValue({ data: { ...detail, status: "hired", canWithdraw: false }, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplication>);
+    renderApp(`/my-applications/${id}`);
+    const progress = screen.getByRole("list", { name: "Application progress" });
+    expect(progress.querySelector("[aria-current]")).toBeNull();
+    expect(progress.querySelectorAll("svg")).toHaveLength(5);
+  });
+
   it("offers Apply again only for a withdrawn first application (BR-APP-008)", () => {
     vi.mocked(applicationQueries.useApplication).mockReturnValue({ data: { ...detail, status: "withdrawn", canWithdraw: false, canApplyAgain: true, withdrawnAt: detail.submittedAt }, isPending: false, isError: false } as ReturnType<typeof applicationQueries.useApplication>);
     renderApp(`/my-applications/${id}`);
@@ -196,6 +207,18 @@ describe("Candidate My Applications", () => {
     expect(screen.getByText("Your second application to this job")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Withdraw application" }));
     expect(screen.getByText(/already your second application/)).toBeInTheDocument();
+  });
+
+  it("does not submit an optional withdrawal reason shorter than five characters", async () => {
+    const mutateAsync = mockWithdraw();
+    renderApp(`/my-applications/${id}`);
+    const withdrawButton = screen.getByRole("button", { name: "Withdraw application" });
+    fireEvent.click(withdrawButton);
+    fireEvent.change(screen.getByPlaceholderText("Tell the company why, if you want to"), { target: { value: "why" } });
+    const confirm = screen.getByRole("alertdialog", { name: "Withdraw this application?" });
+    fireEvent.click(within(confirm).getByRole("button", { name: "Withdraw application" }));
+    expect(await screen.findByText("Enter at least 5 characters, or leave the reason blank.")).toBeInTheDocument();
+    expect(mutateAsync).not.toHaveBeenCalled();
   });
 
   it("reports a partial bulk withdrawal and leaves the failed application listed (UC-MYAPP-04.AC.3)", async () => {

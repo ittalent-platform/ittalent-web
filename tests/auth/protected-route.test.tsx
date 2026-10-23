@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ProtectedRoute } from "@/auth/protected-route";
-import { JOB_POSTING_MANAGER_ROLES } from "@/auth/roles";
+import { JOB_POSTING_MANAGER_ROLES, JOB_POSTING_WRITER_ROLES } from "@/auth/roles";
 import * as useSessionModule from "@/auth/use-session";
 
 describe("ProtectedRoute", () => {
@@ -192,5 +192,33 @@ describe("ProtectedRoute", () => {
 
     expect(screen.getByText("Job Posting Management")).toBeInTheDocument();
     expect(screen.queryByText("Admin Content")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["recruiter", "Job Posting Form", "Job Posting Management"],
+    ["enterprise_admin", "Job Posting Management", "Job Posting Form"],
+  ])("lets %s see %s on a write-only job posting route", (role, shown, hidden) => {
+    vi.spyOn(useSessionModule, "useSession").mockReturnValue({
+      data: {
+        user: { id: "m1", email: "m@example.com", username: role, role, status: "active" },
+      },
+      isPending: false,
+      logout: vi.fn(),
+      refetch: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/recruiter/job-postings/create"]}>
+        <Routes>
+          <Route element={<ProtectedRoute requiredRoles={JOB_POSTING_WRITER_ROLES} />}>
+            <Route path="/recruiter/job-postings/create" element={<div>Job Posting Form</div>} />
+          </Route>
+          <Route path="/recruiter/job-postings" element={<div>Job Posting Management</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText(shown)).toBeInTheDocument();
+    expect(screen.queryByText(hidden)).not.toBeInTheDocument();
   });
 });

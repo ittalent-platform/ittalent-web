@@ -17,8 +17,12 @@ const dialog = (page: Page, name: string | RegExp) =>
   page.getByRole("alertdialog", { name });
 const statusOf = async (index: number) =>
   (
-    (await api(ACCOUNTS.demo, `/api/v1/me/applications/${applicationId(index)}`))
-      .json as { status: string; version: number }
+    (
+      await api(
+        ACCOUNTS.demo,
+        `/api/v1/me/applications/${applicationId(index)}`,
+      )
+    ).json as { status: string; version: number }
   ).status;
 const historyOf = async (index: number) =>
   (
@@ -207,7 +211,10 @@ test.describe("UC-MYAPP-04 withdraw my application", () => {
       SEED.withdrawnLinked,
     ]) {
       const before = (
-        await api(ACCOUNTS.demo, `/api/v1/me/applications/${applicationId(index)}`)
+        await api(
+          ACCOUNTS.demo,
+          `/api/v1/me/applications/${applicationId(index)}`,
+        )
       ).json as { version: number; status: string };
       const attempt = await api(
         ACCOUNTS.demo,

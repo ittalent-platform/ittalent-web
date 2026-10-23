@@ -48,6 +48,8 @@ export const LIST_PARAMS = {
   sortOrder: "sort_order",
 } as const;
 export const ALL_OPTION = "all";
+/** Characters the list search accepts (letters incl. Vietnamese, digits, spaces and - . '). */
+export const JOB_SEARCH_PATTERN = /^[a-zA-Z0-9\s.\-'\u00C0-\u024F\u1EA0-\u1EF9]*$/;
 
 export const JOB_PUBLICATION_STATUSES = [
   "draft",

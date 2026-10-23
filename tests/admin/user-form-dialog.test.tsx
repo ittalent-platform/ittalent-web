@@ -110,6 +110,21 @@ describe("create dialog", () => {
     await waitFor(() => expect(resend).toHaveBeenCalledWith("u9"));
     await waitFor(() => expect(screen.queryByRole("alertdialog", { name: "Invitation not delivered" })).not.toBeInTheDocument());
   });
+
+  it("uses a shared conflict message rather than claiming the email is duplicated", async () => {
+    const create = vi.fn().mockRejectedValue(Object.assign(new Error("The email address or username is already in use"), { code: "ACCOUNT_CONFLICT", status: 409 }));
+    const { events } = setup({}, create);
+    await events.type(screen.getByLabelText(/full name/i), "Ann Lee");
+    await events.type(screen.getByLabelText(/^email/i), "ann@x.vn");
+    await events.type(screen.getByLabelText(/username/i), "ann_lee");
+    await events.tab();
+    const submit = screen.getByRole("button", { name: "Create and send invitation" });
+    await waitFor(() => expect(submit).toBeEnabled());
+    await events.click(submit);
+
+    expect(await screen.findByText("An account already uses this email address or username. Check both fields and try again.")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Open existing account" })).not.toBeInTheDocument();
+  });
 });
 
 describe("edit dialog", () => {

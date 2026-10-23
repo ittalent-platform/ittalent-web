@@ -4,7 +4,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, createBrowserRouter, RouterProvider, useLocation } from "react-router";
 
 import { ProtectedRoute } from "@/auth/protected-route";
-import { JOB_POSTING_MANAGER_ROLES } from "@/auth/roles";
+import { JOB_POSTING_MANAGER_ROLES, JOB_POSTING_WRITER_ROLES } from "@/auth/roles";
 import { AppLayout } from "@/components/layout/admin-layout";
 import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
@@ -119,6 +119,30 @@ const RecruiterApplicationDetailPage = lazy(() =>
   ).then((m) => ({
     default: m.RecruiterApplicationDetailPage,
   })),
+);
+const RecruiterEmployeesPage = lazy(() =>
+  import("@/features/recruiter/employees/employees-page").then((m) => ({
+    default: m.RecruiterEmployeesPage,
+  })),
+);
+const RecruiterEmployeeDetailPage = lazy(() =>
+  import("@/features/recruiter/employees/employee-detail-page").then((m) => ({
+    default: m.RecruiterEmployeeDetailPage,
+  })),
+);
+const RecruiterCompanyProfilePage = lazy(() =>
+  import("@/features/recruiter/company-profile/company-profile-page").then(
+    (m) => ({
+      default: m.RecruiterCompanyProfilePage,
+    }),
+  ),
+);
+const RecruiterEditCompanyProfilePage = lazy(() =>
+  import("@/features/recruiter/company-profile/edit-company-profile-page").then(
+    (m) => ({
+      default: m.RecruiterEditCompanyProfilePage,
+    }),
+  ),
 );
 const DocumentsPage = lazy(() =>
   import("@/features/documents/documents-page").then((m) => ({
@@ -277,16 +301,21 @@ export const appRoutes = [
           { path: "job-postings", element: <RecruiterJobPostingsPage /> },
           { path: "profile", element: <ProfilePage /> },
           {
-            path: "job-postings/create",
-            element: <RecruiterCreateJobPostingPage />,
+            element: <ProtectedRoute requiredRoles={JOB_POSTING_WRITER_ROLES} />,
+            children: [
+              {
+                path: "job-postings/create",
+                element: <RecruiterCreateJobPostingPage />,
+              },
+              {
+                path: "job-postings/:jobPostingId/edit",
+                element: <RecruiterEditJobPostingPage />,
+              },
+            ],
           },
           {
             path: "job-postings/:jobPostingId",
             element: <RecruiterJobPostingDetailPage />,
-          },
-          {
-            path: "job-postings/:jobPostingId/edit",
-            element: <RecruiterEditJobPostingPage />,
           },
           { path: "applications", element: <RecruiterApplicationsPage /> },
           {
@@ -297,6 +326,16 @@ export const appRoutes = [
           {
             path: "interviews/:interviewId",
             element: <RecruiterInterviewDetailPage />,
+          },
+          { path: "employees", element: <RecruiterEmployeesPage /> },
+          {
+            path: "employees/:employeeId",
+            element: <RecruiterEmployeeDetailPage />,
+          },
+          { path: "profile", element: <RecruiterCompanyProfilePage /> },
+          {
+            path: "profile/edit",
+            element: <RecruiterEditCompanyProfilePage />,
           },
         ],
       },

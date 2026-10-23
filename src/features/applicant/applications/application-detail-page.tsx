@@ -44,7 +44,7 @@ export function ApplicationDetailPage() {
   const later = useApplication(application?.reappliedAs ?? "");
 
   const entries = useMemo<TimelineEntry[]>(
-    () => (history.data?.items ?? []).map((event, index) => ({
+    () => (history.data?.pages.flatMap((page) => page.items) ?? []).map((event, index) => ({
       atIso: event.occurredAt,
       by: t(`applications.actor.${event.actorRole}`),
       // A reapplication starts its own history with "Submitted · applied again".
@@ -71,6 +71,8 @@ export function ApplicationDetailPage() {
 
   const displayId = applicationDisplayId(application.id);
   const stepIndex = PIPELINE_STEPS.indexOf(application.status);
+  // Hired ends the pipeline, so every step is complete rather than Hired being "current".
+  const stepperIndex = application.status === "hired" ? PIPELINE_STEPS.length : stepIndex;
   const isWithdrawn = application.status === "withdrawn";
 
   return (
@@ -91,7 +93,7 @@ export function ApplicationDetailPage() {
               </div>
               <ApplicationStatusBadge size="md" status={application.status} />
             </div>
-            {stepIndex >= 0 ? <Stepper ariaLabel={t("applications.progress")} currentIndex={stepIndex} steps={PIPELINE_STEPS.map((step) => t(`applications.status.${step}`))} /> : null}
+            {stepIndex >= 0 ? <Stepper ariaLabel={t("applications.progress")} currentIndex={stepperIndex} steps={PIPELINE_STEPS.map((step) => t(`applications.status.${step}`))} /> : null}
           </section>
 
           {application.reappliedFrom ? (
@@ -125,9 +127,9 @@ export function ApplicationDetailPage() {
                 value={application.attachments.length ? (
                   <span className="flex flex-wrap gap-2">
                     {application.attachments.map((file) => (
-                      <span className="inline-flex h-8 items-center gap-2 rounded-xl border border-border px-2.5 text-[13px]" key={file.documentId}>
-                        <DocumentTypeBadge kind={ATTACHMENT_KIND[file.type] ?? "cv"} label={file.type === "cv" ? t("applications.attachmentShort.cv") : t("applications.attachmentShort.cover_letter")} />
-                        {file.fileName}
+                      <span className="inline-flex h-8 min-w-0 max-w-full items-center gap-2 rounded-xl border border-border px-2.5 text-[13px]" key={file.documentId} title={file.fileName}>
+                        <span className="shrink-0"><DocumentTypeBadge kind={ATTACHMENT_KIND[file.type] ?? "cv"} label={file.type === "cv" ? t("applications.attachmentShort.cv") : t("applications.attachmentShort.cover_letter")} /></span>
+                        <span className="truncate">{file.fileName}</span>
                       </span>
                     ))}
                   </span>
@@ -151,7 +153,7 @@ export function ApplicationDetailPage() {
             ) : null}
             {application.canWithdraw ? (
               <div className="flex flex-col gap-2 border-t border-line-muted pt-3">
-                <Button className="h-10 px-[18px] text-sm font-semibold" onClick={() => setWithdrawOpen(true)} shape="pill" variant="destructive-outline">{t("applications.withdraw")}</Button>
+                <Button className="h-10 border-destructive bg-destructive/5 px-[18px] text-sm font-semibold hover:bg-destructive/10" onClick={() => setWithdrawOpen(true)} shape="pill" variant="destructive-outline">{t("applications.withdraw")}</Button>
                 <span className="text-xs leading-normal text-slate-subtle">{t("applications.withdrawRule")}</span>
               </div>
             ) : null}
@@ -159,7 +161,7 @@ export function ApplicationDetailPage() {
 
           {history.isPending ? <Skeleton className="h-40 w-full rounded-2xl" /> : history.isError
             ? <Callout role="alert" title={t("applications.historyError")} tone="error"><Button className="mt-1 h-auto p-0 text-[13px] font-semibold" onClick={() => void history.refetch()} variant="link">{t("actions.retry")}</Button></Callout>
-            : entries.length ? <Timeline entries={entries} formatDate={(iso) => formatDateTime(iso, locale)} title={t("applications.history.title")} />
+            : entries.length ? <><Timeline entries={entries} formatDate={(iso) => formatDateTime(iso, locale)} title={t("applications.history.title")} />{history.hasNextPage ? <Button disabled={history.isFetchingNextPage} onClick={() => void history.fetchNextPage()} variant="outline">{t("applications.history.olderEvents")}</Button> : null}</>
             : <RailCard title={t("applications.history.title")}><p className="m-0 text-[13px] text-muted-foreground">{t("applications.noHistory")}</p></RailCard>}
         </aside>
       </div>

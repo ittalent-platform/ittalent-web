@@ -11,15 +11,15 @@ import { APPLICATIONS_PATH, type ApplicationItem, type SortField, type SortOrder
 import { ReapplyTag } from "./reapply-tag";
 
 // Columns backed by a server-side sort key; the others are not sortable.
-const SORT_KEY_BY_COLUMN: Partial<Record<string, SortField>> = { reference: "id", submitted: "submittedAt", updated: "latestStatusAt" };
-const COLUMN_KEYS = ["reference", "job", "submitted", "updated", "documents", "status"] as const;
+const SORT_KEY_BY_COLUMN: Partial<Record<string, SortField>> = { submitted: "submittedAt", updated: "latestStatusAt" };
+const COLUMN_KEYS = ["job", "submitted", "updated", "documents", "status"] as const;
 
 export function ApplicationsTable({ items, locale, onWithdraw, onSort, sortBy, sortOrder }: { items: ApplicationItem[]; locale: string; onWithdraw: (item: ApplicationItem) => void; onSort: (field: SortField) => void; sortBy: SortField; sortOrder: SortOrder }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
-    <Table className="min-w-[860px]">
+    <Table className="min-w-[740px]">
       <TableHead>
         <TableHeaderRow>
           {COLUMN_KEYS.map((key) => {
@@ -35,7 +35,6 @@ export function ApplicationsTable({ items, locale, onWithdraw, onSort, sortBy, s
           const detailPath = `${APPLICATIONS_PATH}/${item.id}`;
           return (
             <TableRow className="hover:bg-surface-subtle" key={item.id}>
-              <TableCell className="whitespace-nowrap"><span className="itt-mono text-xs text-muted-foreground">{displayId}</span></TableCell>
               <TableCell className="max-w-[280px]">
                 <Link className="flex min-w-0 items-center gap-3 text-foreground" to={detailPath}>
                   <LogoTile tone="tint" name={item.job.companyName} />

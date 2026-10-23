@@ -1,4 +1,4 @@
-import type { MouseEventHandler, ReactNode } from "react";
+import type { MouseEventHandler, ReactNode, TdHTMLAttributes } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -62,14 +62,10 @@ export function TableRow({
 export function TableCell({
   children,
   className,
-  onClick,
-}: {
-  children?: ReactNode;
-  className?: string;
-  onClick?: MouseEventHandler<HTMLTableCellElement>;
-}) {
+  ...props
+}: TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td className={cn("px-4 py-3.5 first:px-5", className)} onClick={onClick}>
+    <td className={cn("px-4 py-3.5 first:px-5", className)} {...props}>
       {children}
     </td>
   );

@@ -17,7 +17,7 @@ import { useApplications } from "./applications.queries";
 import { useApplicationsParams } from "./use-applications-params";
 import { WithdrawApplicationsDialog, type WithdrawTarget } from "./withdraw-applications-dialog";
 
-const SKELETON_COLUMNS = 7;
+const SKELETON_COLUMNS = 6;
 const CARD = "overflow-hidden surface-card";
 
 function toTarget(item: ApplicationItem): WithdrawTarget {

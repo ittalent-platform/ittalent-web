@@ -69,7 +69,8 @@ export function CandidateAccountLayout() {
           </div>
         ))}
       </nav>
-      <div className="min-w-0 flex-1">
+      {/* A column with the same gap as the marketplace <main>, so a page made of sibling blocks (header, toolbar, table) is spaced as designed. */}
+      <div className="flex min-w-0 flex-1 flex-col gap-5">
         <Outlet />
       </div>
     </div>

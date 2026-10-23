@@ -34,6 +34,7 @@ import {
   JOB_LIST_DEFAULT_LIMIT,
   JOB_PUBLICATION_STATUSES,
   JOB_RECRUITMENT_STATUSES,
+  JOB_SEARCH_PATTERN,
   LIST_PARAMS,
   type JobSortBy,
   type JobSortOrder,
@@ -51,7 +52,6 @@ import {
 
 type Actor = "admin" | "recruiter";
 const SORT_FIELDS: readonly JobSortBy[] = ["created_at", "title", "expires_at"];
-const SEARCH_REGEX = /^[a-zA-Z0-9\s.\-'\u00C0-\u024F\u1EA0-\u1EF9]*$/;
 
 export function JobPostingListPage({ actor }: { actor: Actor }) {
   const { t } = useTranslation();
@@ -112,7 +112,7 @@ export function JobPostingListPage({ actor }: { actor: Actor }) {
     Boolean(publicationStatus) ||
     Boolean(recruitmentStatus);
 
-  const isSearchValid = SEARCH_REGEX.test(search);
+  const isSearchValid = JOB_SEARCH_PATTERN.test(search);
   const searchError =
     !isSearchValid && search ? t("jobPostings.search.validation") : undefined;
 

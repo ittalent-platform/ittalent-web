@@ -1572,6 +1572,68 @@ export type MyAvatarUpload = {
     avatar: Blob | File;
 };
 
+export type NotificationItemDto = {
+    id: string;
+    title: string;
+    message: string;
+    type: 'application_submitted' | 'application_status_changed' | 'interview_scheduled' | 'interview_rescheduled' | 'interview_cancelled' | 'enterprise_status_changed' | 'account_alert' | 'system_announcement';
+    category: 'info' | 'success' | 'warning' | 'action_required';
+    actionUrl?: string | null;
+    data?: {
+        [key: string]: unknown;
+    } | null;
+    isRead: boolean;
+    readAt?: string | null;
+    createdAt: string;
+};
+
+export type NotificationListResponse = {
+    items: Array<{
+        id: string;
+        title: string;
+        message: string;
+        type: 'application_submitted' | 'application_status_changed' | 'interview_scheduled' | 'interview_rescheduled' | 'interview_cancelled' | 'enterprise_status_changed' | 'account_alert' | 'system_announcement';
+        category: 'info' | 'success' | 'warning' | 'action_required';
+        actionUrl?: string | null;
+        data?: {
+            [key: string]: unknown;
+        } | null;
+        isRead: boolean;
+        readAt?: string | null;
+        createdAt: string;
+    }>;
+    unreadCount: number;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type UnreadCountResponse = {
+    unreadCount: number;
+};
+
+export type MarkAllReadResponse = {
+    updatedCount: number;
+    unreadCount: 0;
+    message: string;
+};
+
+export type DeleteNotificationResponse = {
+    success: true;
+    message: string;
+};
+
+export type DeleteAllNotificationsResponse = {
+    deletedCount: number;
+    message: string;
+};
+
+export type RegisterDeviceTokenRequest = {
+    token: string;
+    platform: 'ios' | 'android' | 'web';
+};
+
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -4764,3 +4826,252 @@ export type UploadMyAvatarResponses = {
 };
 
 export type UploadMyAvatarResponse = UploadMyAvatarResponses[keyof UploadMyAvatarResponses];
+
+export type DeleteApiV1NotificationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/notifications';
+};
+
+export type DeleteApiV1NotificationsErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+};
+
+export type DeleteApiV1NotificationsResponses = {
+    /**
+     * All notifications soft-deleted successfully
+     */
+    200: DeleteAllNotificationsResponse;
+};
+
+export type DeleteApiV1NotificationsResponse = DeleteApiV1NotificationsResponses[keyof DeleteApiV1NotificationsResponses];
+
+export type GetApiV1NotificationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        isRead?: boolean | null;
+        type?: 'application_submitted' | 'application_status_changed' | 'interview_scheduled' | 'interview_rescheduled' | 'interview_cancelled' | 'enterprise_status_changed' | 'account_alert' | 'system_announcement';
+        category?: 'info' | 'success' | 'warning' | 'action_required';
+    };
+    url: '/api/v1/notifications';
+};
+
+export type GetApiV1NotificationsErrors = {
+    /**
+     * Invalid query filters or pagination parameters
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+};
+
+export type GetApiV1NotificationsResponses = {
+    /**
+     * Inbox notifications list retrieved successfully
+     */
+    200: NotificationListResponse;
+};
+
+export type GetApiV1NotificationsResponse = GetApiV1NotificationsResponses[keyof GetApiV1NotificationsResponses];
+
+export type GetApiV1NotificationsStreamData = {
+    body?: never;
+    path?: never;
+    query?: {
+        token?: string;
+    };
+    url: '/api/v1/notifications/stream';
+};
+
+export type GetApiV1NotificationsStreamErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+};
+
+export type GetApiV1NotificationsStreamResponses = {
+    /**
+     * Stream of SSE events including "connected", "notification", and heartbeat ping comments
+     */
+    200: string;
+};
+
+export type GetApiV1NotificationsStreamResponse = GetApiV1NotificationsStreamResponses[keyof GetApiV1NotificationsStreamResponses];
+
+export type GetApiV1NotificationsUnreadCountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/notifications/unread-count';
+};
+
+export type GetApiV1NotificationsUnreadCountErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+};
+
+export type GetApiV1NotificationsUnreadCountResponses = {
+    /**
+     * Unread notification count
+     */
+    200: UnreadCountResponse;
+};
+
+export type GetApiV1NotificationsUnreadCountResponse = GetApiV1NotificationsUnreadCountResponses[keyof GetApiV1NotificationsUnreadCountResponses];
+
+export type PatchApiV1NotificationsReadAllData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/notifications/read-all';
+};
+
+export type PatchApiV1NotificationsReadAllErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+};
+
+export type PatchApiV1NotificationsReadAllResponses = {
+    /**
+     * All notifications marked as read
+     */
+    200: MarkAllReadResponse;
+};
+
+export type PatchApiV1NotificationsReadAllResponse = PatchApiV1NotificationsReadAllResponses[keyof PatchApiV1NotificationsReadAllResponses];
+
+export type PatchApiV1NotificationsByIdReadData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/notifications/{id}/read';
+};
+
+export type PatchApiV1NotificationsByIdReadErrors = {
+    /**
+     * Invalid notification ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Notification not found or access denied
+     */
+    404: unknown;
+};
+
+export type PatchApiV1NotificationsByIdReadResponses = {
+    /**
+     * Notification marked as read
+     */
+    200: NotificationItemDto;
+};
+
+export type PatchApiV1NotificationsByIdReadResponse = PatchApiV1NotificationsByIdReadResponses[keyof PatchApiV1NotificationsByIdReadResponses];
+
+export type DeleteApiV1NotificationsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/notifications/{id}';
+};
+
+export type DeleteApiV1NotificationsByIdErrors = {
+    /**
+     * Invalid notification ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Notification not found or access denied
+     */
+    404: unknown;
+};
+
+export type DeleteApiV1NotificationsByIdResponses = {
+    /**
+     * Notification soft-deleted successfully
+     */
+    200: DeleteNotificationResponse;
+};
+
+export type DeleteApiV1NotificationsByIdResponse = DeleteApiV1NotificationsByIdResponses[keyof DeleteApiV1NotificationsByIdResponses];
+
+export type PostApiV1NotificationsDevicesData = {
+    body: RegisterDeviceTokenRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/notifications/devices';
+};
+
+export type PostApiV1NotificationsDevicesErrors = {
+    /**
+     * Invalid payload
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+};
+
+export type PostApiV1NotificationsDevicesResponses = {
+    /**
+     * Device token registered successfully
+     */
+    204: void;
+};
+
+export type PostApiV1NotificationsDevicesResponse = PostApiV1NotificationsDevicesResponses[keyof PostApiV1NotificationsDevicesResponses];
+
+export type DeleteApiV1NotificationsDevicesByTokenData = {
+    body?: never;
+    path: {
+        token: string;
+    };
+    query?: never;
+    url: '/api/v1/notifications/devices/{token}';
+};
+
+export type DeleteApiV1NotificationsDevicesByTokenErrors = {
+    /**
+     * Invalid token parameter
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+};
+
+export type DeleteApiV1NotificationsDevicesByTokenResponses = {
+    /**
+     * Device token unregistered successfully
+     */
+    204: void;
+};
+
+export type DeleteApiV1NotificationsDevicesByTokenResponse = DeleteApiV1NotificationsDevicesByTokenResponses[keyof DeleteApiV1NotificationsDevicesByTokenResponses];
