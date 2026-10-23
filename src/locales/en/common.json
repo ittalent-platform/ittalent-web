@@ -86,7 +86,7 @@
       "symbol": "A symbol: ! @ # $ % ^ & *",
       "different": "Different from your current password"
     },
-    "passwordSessionNote": "You stay signed in here. Other devices are signed out.",
+    "passwordSessionNote": "You will be signed out after changing your password.",
     "changePassword": "Change password",
     "changingPassword": "Changing password…",
     "passwordChanged": "Password changed successfully.",

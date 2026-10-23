@@ -1,5 +1,7 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ToastProvider } from "@/components/toast/toast-provider";
@@ -24,6 +26,11 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(),
   upload: vi.fn(),
   changePassword: vi.fn(),
+  logout: vi.fn(),
+}));
+
+vi.mock("@/auth/use-session", () => ({
+  useSession: () => ({ logout: mocks.logout }),
 }));
 
 vi.mock("@/features/profile/profile.queries", () => ({
@@ -34,10 +41,20 @@ vi.mock("@/features/profile/profile.queries", () => ({
 }));
 
 function renderProfile() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   return render(
-    <ToastProvider>
-      <ProfilePage />
-    </ToastProvider>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={["/profile"]}>
+        <ToastProvider>
+          <Routes>
+            <Route element={<ProfilePage />} path="/profile" />
+            <Route element={<p>Sign in page</p>} path="/login" />
+          </Routes>
+        </ToastProvider>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
@@ -122,7 +139,7 @@ describe("ProfilePage", () => {
     );
   });
 
-  it("shows the password form and clears it after a successful change", async () => {
+  it("logs out after a successful password change", async () => {
     const user = userEvent.setup();
     renderProfile();
     await user.click(screen.getByRole("button", { name: "Change password" }));
@@ -142,10 +159,30 @@ describe("ProfilePage", () => {
         newPassword: "New123!a",
       }),
     );
-    expect(screen.getByLabelText(/Current password/)).toHaveValue("");
+    expect(mocks.logout).toHaveBeenCalledOnce();
+    expect(screen.getByText("Sign in page")).toBeInTheDocument();
     expect(
       await screen.findAllByText("Password changed successfully."),
     ).not.toHaveLength(0);
+  });
+
+  it("shows a confirmation mismatch only after submitting the password form", async () => {
+    const user = userEvent.setup();
+    renderProfile();
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+    await user.type(screen.getByLabelText(/Current password/), "Old123!a");
+    await user.type(screen.getByLabelText(/New password/), "New123!a");
+    await user.type(
+      screen.getByLabelText(/Confirm new password/),
+      "Different123!",
+    );
+
+    expect(screen.queryByText("Passwords do not match.")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+
+    expect(await screen.findByText("Passwords do not match.")).toBeInTheDocument();
+    expect(mocks.changePassword().mutateAsync).not.toHaveBeenCalled();
   });
 
   it("explains passwordless accounts", async () => {

@@ -86,7 +86,7 @@
       "symbol": "Có ký hiệu: ! @ # $ % ^ & *",
       "different": "Khác mật khẩu hiện tại"
     },
-    "passwordSessionNote": "Bạn vẫn đăng nhập trên thiết bị này. Các thiết bị khác sẽ bị đăng xuất.",
+    "passwordSessionNote": "Bạn sẽ được đăng xuất sau khi đổi mật khẩu.",
     "changePassword": "Đổi mật khẩu",
     "changingPassword": "Đang đổi mật khẩu…",
     "passwordChanged": "Đã đổi mật khẩu.",

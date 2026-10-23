@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Camera,
@@ -11,10 +12,12 @@ import {
 } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { z } from "zod";
 
 import type { MyProfile } from "@/api/generated/types.gen";
 import { requestErrorMessage } from "@/api/request-error";
+import { useSession } from "@/auth/use-session";
 import { DetailRow } from "@/components/common/detail-row";
 import { ErrorState } from "@/components/common/error-state";
 import { FormField } from "@/components/common/form-field";
@@ -599,6 +602,9 @@ function ChangePassword({
 }) {
   const { t } = useTranslation();
   const { showToast } = useToast();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { logout } = useSession();
   const [error, setError] = useState<string | null>(null);
   const change = useChangeMyPassword();
   const schema = z
@@ -625,7 +631,7 @@ function ChangePassword({
       newPassword: "",
       confirmPassword: "",
     },
-    mode: "onChange",
+    mode: "onSubmit",
   });
   const [currentPassword, newPassword] = useWatch({
     control: form.control,
@@ -683,12 +689,14 @@ function ChangePassword({
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       });
-      form.reset();
       showToast({
         message: t("myProfile.passwordChanged"),
         title: t("myProfile.passwordChanged"),
         tone: "success",
       });
+      logout();
+      queryClient.clear();
+      navigate("/login", { replace: true });
     } catch (failure) {
       setError(requestErrorMessage(failure, t("myProfile.passwordFailed")));
     }
@@ -773,7 +781,7 @@ function ChangePassword({
             {t("myProfile.cancel")}
           </Button>
           <Button
-            disabled={change.isPending || !form.formState.isValid}
+            disabled={change.isPending}
             shape="pill"
             size="xl"
             type="submit"
