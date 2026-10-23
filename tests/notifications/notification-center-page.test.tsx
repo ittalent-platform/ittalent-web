@@ -308,6 +308,35 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       expect(api.deleteApiV1Notifications).not.toHaveBeenCalled();
     });
 
+    it("renders stale batch dialog variant when inbox count changes before confirming delete all", async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<NotificationCenterPage />);
+
+      const moreBtn = await screen.findByRole("button", { name: /more actions/i });
+      await user.click(moreBtn);
+
+      const deleteAllMenuItem = await screen.findByRole("menuitem", { name: /delete all/i });
+      await user.click(deleteAllMenuItem);
+
+      // Dialog is open with initial count 25
+      expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /delete 25 notifications\?/i })).toBeInTheDocument();
+
+      // Total count changes in cache (e.g. new notification arrives, count becomes 26)
+      queryClient.setQueriesData({ queryKey: ["notifications", "infinite-list"] }, (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((p: any) => ({ ...p, total: 26 })),
+        };
+      });
+
+      // Dialog updates to Stale Batch variant
+      expect(await screen.findByRole("heading", { name: /your notifications changed/i })).toBeInTheDocument();
+      expect(screen.getByText(/you now have 26 notifications, not 25/i)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /delete 26 notifications/i })).toBeInTheDocument();
+    });
+
     it("requests more items when clicking Show older button", async () => {
       const user = userEvent.setup();
       vi.mocked(api.getApiV1Notifications).mockImplementation(async ({ query }) => {

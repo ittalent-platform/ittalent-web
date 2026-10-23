@@ -1,4 +1,4 @@
-import { CheckCheck, MoreVertical, Trash2 } from "lucide-react";
+import { CheckCheck, MoreVertical, RotateCw, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
@@ -52,6 +52,7 @@ export function NotificationCenterPage() {
 
   const { showToast } = useToast();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+  const [capturedDeleteCount, setCapturedDeleteCount] = useState<number | null>(null);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<NotificationItem | null>(null);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(new Set());
   const pendingTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -219,11 +220,24 @@ export function NotificationCenterPage() {
     });
   };
 
+  const handleOpenDeleteAllDialog = () => {
+    setCapturedDeleteCount(allTabCount);
+    setShowDeleteAllDialog(true);
+  };
+
+  const isStaleBatch =
+    showDeleteAllDialog &&
+    capturedDeleteCount !== null &&
+    allTabCount !== capturedDeleteCount;
+
+  const activeDeleteCount = isStaleBatch ? allTabCount : (capturedDeleteCount ?? allTabCount);
+
   const handleDeleteAll = () => {
-    if (totalCount > 0 && !deleteAllMutation.isPending) {
+    if (allTabCount > 0 && !deleteAllMutation.isPending) {
       deleteAllMutation.mutate(undefined, {
         onSuccess: () => {
           setShowDeleteAllDialog(false);
+          setCapturedDeleteCount(null);
         },
       });
     }
@@ -286,8 +300,8 @@ export function NotificationCenterPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer font-semibold"
-                  disabled={totalCount === 0 || deleteAllMutation.isPending}
-                  onClick={() => setShowDeleteAllDialog(true)}
+                  disabled={allTabCount === 0 || deleteAllMutation.isPending}
+                  onClick={handleOpenDeleteAllDialog}
                   variant="destructive"
                 >
                   <Trash2 className="size-4" />
@@ -448,24 +462,51 @@ export function NotificationCenterPage() {
       </div>
 
       <ActionConfirmDialog
-        action={t("notifications.deleteAllConfirmBtn", {
-          count: totalCount,
-          defaultValue: "Delete all",
-        })}
+        action={
+          isStaleBatch
+            ? t("notifications.staleBatchBtn", {
+                count: activeDeleteCount,
+                defaultValue: `Delete ${activeDeleteCount} notifications`,
+              })
+            : t("notifications.deleteAllBtnCount", {
+                count: activeDeleteCount,
+                defaultValue: `Delete ${activeDeleteCount} notifications`,
+              })
+        }
         cancelLabel={t("common.cancel", { defaultValue: "Cancel" })}
-        description={t("notifications.deleteAllConfirmDesc", {
-          defaultValue:
-            "This removes every notification in your list right now. Ones that arrive after you confirm are kept. Your applications and interviews aren't affected.",
-        })}
+        description={
+          isStaleBatch
+            ? t("notifications.staleBatchDesc", {
+                count: allTabCount,
+                oldCount: capturedDeleteCount,
+                defaultValue: `You now have ${allTabCount} notifications, not ${capturedDeleteCount}. Nothing was deleted yet.`,
+              })
+            : t("notifications.deleteAllConfirmDesc", {
+                defaultValue:
+                  "This removes every notification in your list right now. Ones that arrive after you confirm are kept. Your applications and interviews aren't affected.",
+              })
+        }
         disabled={deleteAllMutation.isPending}
-        icon={Trash2}
+        icon={isStaleBatch ? RotateCw : Trash2}
+        iconVariant={isStaleBatch ? "warning-solid" : undefined}
         onConfirm={handleDeleteAll}
-        onOpenChange={setShowDeleteAllDialog}
+        onOpenChange={(open) => {
+          setShowDeleteAllDialog(open);
+          if (!open) {
+            setCapturedDeleteCount(null);
+          }
+        }}
         open={showDeleteAllDialog}
-        title={t("notifications.deleteAllConfirmTitle", {
-          count: totalCount,
-          defaultValue: "Delete all notifications?",
-        })}
+        title={
+          isStaleBatch
+            ? t("notifications.staleBatchTitle", {
+                defaultValue: "Your notifications changed",
+              })
+            : t("notifications.deleteAllConfirmTitle", {
+                count: activeDeleteCount,
+                defaultValue: `Delete ${activeDeleteCount} notifications?`,
+              })
+        }
         variant="destructive-solid"
       />
 
