@@ -3081,6 +3081,10 @@
       "noAnnouncements": "No announcements",
       "noAnnouncementsDesc": "News from ITTalent shows up here."
     },
+    "error": {
+      "loadTitle": "Notifications couldn't be loaded",
+      "loadDesc": "Something went wrong on our side. Your notifications are safe; try again in a moment."
+    },
     "errors": {
       "unauthenticatedTitle": "Sign in to see your notifications",
       "unauthenticatedDesc": "Your session ended, so nothing was loaded. After signing in you come straight back here.",

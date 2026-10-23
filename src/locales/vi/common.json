@@ -3055,6 +3055,10 @@
       "noAnnouncements": "Chưa có thông báo chung",
       "noAnnouncementsDesc": "Tin tức và cập nhật từ ITTalent sẽ hiển thị tại đây."
     },
+    "error": {
+      "loadTitle": "Không thể tải thông báo",
+      "loadDesc": "Đã xảy ra sự cố từ phía máy chủ. Thông báo của bạn vẫn an toàn; vui lòng thử lại sau giây lát."
+    },
     "errors": {
       "unauthenticatedTitle": "Đăng nhập để xem thông báo của bạn",
       "unauthenticatedDesc": "Phiên đăng nhập đã hết hạn. Sau khi đăng nhập lại bạn sẽ quay trở lại đây.",

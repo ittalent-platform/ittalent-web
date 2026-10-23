@@ -1,7 +1,7 @@
-import { CheckCheck, MoreVertical, RotateCw, Trash2 } from "lucide-react";
+import { CheckCheck, MoreVertical, RotateCw, Trash2, TriangleAlert } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { PageHeader } from "@/components/common/admin-page-header";
@@ -397,6 +397,29 @@ export function NotificationCenterPage() {
             <div className="flex items-center justify-center py-16 text-muted-foreground">
               <span className="text-[13.5px]">{t("common.loading", { defaultValue: "Loading..." })}</span>
             </div>
+          ) : notificationsQuery.isError ? (
+            <div className="flex flex-col items-start gap-4 p-8 text-left sm:p-10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-destructive/10 text-destructive">
+                <TriangleAlert className="h-5 w-5" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="font-['Space_Grotesk'] text-[19px] font-semibold text-foreground">
+                  {t("notifications.error.loadTitle", { defaultValue: "Notifications couldn’t be loaded" })}
+                </span>
+                <span className="text-[13.5px] text-muted-foreground">
+                  {t("notifications.error.loadDesc", {
+                    defaultValue: "Something went wrong on our side. Your notifications are safe; try again in a moment.",
+                  })}
+                </span>
+              </div>
+              <Button
+                className="font-semibold"
+                onClick={() => notificationsQuery.refetch()}
+                variant="outline"
+              >
+                {t("notifications.actions.tryAgain", { defaultValue: "Try again" })}
+              </Button>
+            </div>
           ) : visibleItems.length > 0 ? (
             <div
               aria-label={t("notifications.title", { defaultValue: "Notifications" })}
@@ -451,6 +474,9 @@ export function NotificationCenterPage() {
                       "We’ll let you know here when a company reviews your application or schedules an interview.",
                   })}
                 </span>
+                <Button asChild className="mt-3 w-fit font-semibold" variant="outline">
+                  <Link to="/jobs">{t("notifications.actions.browseJobs", { defaultValue: "Browse jobs" })}</Link>
+                </Button>
               </>
             )}
           </div>

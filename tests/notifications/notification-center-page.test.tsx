@@ -519,5 +519,60 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
         vi.useRealTimers();
       }
     });
+
+    it("renders error state with retry button when query fails and retries on click", async () => {
+      const user = userEvent.setup();
+      vi.mocked(api.getApiV1Notifications).mockRejectedValue(new Error("Network failed"));
+
+      renderWithProviders(<NotificationCenterPage />);
+
+      expect(await screen.findByText(/notifications couldn['’]t be loaded/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/something went wrong on our side/i),
+      ).toBeInTheDocument();
+
+      const retryBtn = screen.getByRole("button", { name: /try again/i });
+      expect(retryBtn).toBeInTheDocument();
+
+      // Reset mock to succeed on retry
+      vi.mocked(api.getApiV1Notifications).mockResolvedValueOnce({
+        data: {
+          hasNext: false,
+          items: sampleNotifications,
+          limit: 10,
+          page: 1,
+          total: 3,
+          totalPages: 1,
+          unreadCount: 2,
+        },
+        response: new Response(null, { status: 200 }),
+      });
+
+      await user.click(retryBtn);
+
+      expect(await screen.findByText("Interview scheduled")).toBeInTheDocument();
+    });
+
+    it("renders 'Browse jobs' CTA button in 'All' tab empty state linking to /jobs", async () => {
+      vi.mocked(api.getApiV1Notifications).mockResolvedValue({
+        data: {
+          hasNext: false,
+          items: [],
+          limit: 10,
+          page: 1,
+          total: 0,
+          totalPages: 1,
+          unreadCount: 0,
+        },
+        response: new Response(null, { status: 200 }),
+      });
+
+      renderWithProviders(<NotificationCenterPage />);
+
+      expect(await screen.findByText("No notifications yet")).toBeInTheDocument();
+      const browseBtn = screen.getByRole("link", { name: /browse jobs/i });
+      expect(browseBtn).toBeInTheDocument();
+      expect(browseBtn).toHaveAttribute("href", "/jobs");
+    });
   });
 });
