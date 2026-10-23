@@ -1,13 +1,15 @@
 import { CheckCheck, MoreVertical, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 
 import { PageHeader } from "@/components/common/admin-page-header";
 import { Button } from "@/components/ui/button";
 import {
+  NOTIFICATIONS_PAGE_SIZE,
   useDeleteAllNotifications,
   useDeleteNotification,
+  useInfiniteNotificationsQuery,
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   useNotificationsQuery,
@@ -27,9 +29,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const INITIAL_LIMIT = 10;
-const PAGE_INCREMENT = 10;
-
 /**
  * Personal Notification Center Inbox page matching exact design specifications:
  * - Header: PageHeader with Space Grotesk title, dynamic unread count / "All caught up" subtitle
@@ -48,28 +47,31 @@ export function NotificationCenterPage() {
   const activeTab: NotificationTab =
     tabParam === "unread" || tabParam === "announcements" ? tabParam : "all";
 
-  const [limit, setLimit] = useState(INITIAL_LIMIT);
-
   // Queries
   const unreadCountQuery = useUnreadCountQuery();
   const unreadCount = unreadCountQuery.data?.unreadCount ?? 0;
 
-  const notificationsQuery = useNotificationsQuery(
-    tabToNotificationQuery(activeTab, { page: 1, limit }),
+  const notificationsQuery = useInfiniteNotificationsQuery(
+    tabToNotificationQuery(activeTab, { limit: NOTIFICATIONS_PAGE_SIZE }),
   );
 
-  // Counts for tabs
+  // Counts for tabs (gated: only run when tab is not active to prevent redundant queries & count race conditions)
   const allCountQuery = useNotificationsQuery(
     tabToNotificationQuery("all", { page: 1, limit: 1 }),
+    activeTab !== "all",
   );
   const announcementsCountQuery = useNotificationsQuery(
     tabToNotificationQuery("announcements", { page: 1, limit: 1 }),
+    activeTab !== "announcements",
   );
 
-  const items = notificationsQuery.data?.items ?? [];
-  const totalCount = notificationsQuery.data?.total ?? 0;
+  const items = useMemo(
+    () => notificationsQuery.data?.pages.flatMap((page) => page.items) ?? [],
+    [notificationsQuery.data?.pages],
+  );
+  const totalCount = notificationsQuery.data?.pages[0]?.total ?? 0;
 
-  const allTabCount = activeTab === "all" ? totalCount : (allCountQuery.data?.total ?? totalCount);
+  const allTabCount = activeTab === "all" ? totalCount : (allCountQuery.data?.total ?? 0);
   const announcementsTabCount =
     activeTab === "announcements" ? totalCount : (announcementsCountQuery.data?.total ?? 0);
 
@@ -91,7 +93,6 @@ export function NotificationCenterPage() {
       },
       { replace: true },
     );
-    setLimit(INITIAL_LIMIT);
   };
 
   const tabs: Array<{ key: NotificationTab; label: string; count: number }> = [
@@ -315,14 +316,16 @@ export function NotificationCenterPage() {
                 total: totalCount,
               })}
             </span>
-            {items.length < totalCount && (
+            {Boolean(notificationsQuery.hasNextPage) && (
               <button
                 className="inline-flex h-10 items-center justify-center rounded-[12px] border border-border bg-card px-4 text-[14px] font-semibold text-foreground transition-colors hover:bg-muted cursor-pointer disabled:opacity-50"
-                disabled={notificationsQuery.isFetching}
-                onClick={() => setLimit((prev) => prev + PAGE_INCREMENT)}
+                disabled={!notificationsQuery.hasNextPage || notificationsQuery.isFetchingNextPage}
+                onClick={() => notificationsQuery.fetchNextPage()}
                 type="button"
               >
-                {t("notifications.showOlder", { defaultValue: "Show older" })}
+                {notificationsQuery.isFetchingNextPage
+                  ? t("common.loading", { defaultValue: "Loading..." })
+                  : t("notifications.showOlder", { defaultValue: "Show older" })}
               </button>
             )}
           </div>

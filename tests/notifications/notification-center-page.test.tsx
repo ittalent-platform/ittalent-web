@@ -80,6 +80,7 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
         limit: 10,
         page: 1,
         total: 25,
+        totalPages: 3,
         unreadCount: 2,
       },
       response: new Response(null, { status: 200 }),
@@ -245,16 +246,32 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
 
     it("requests more items when clicking Show older button", async () => {
       const user = userEvent.setup();
+      vi.mocked(api.getApiV1Notifications).mockImplementation(async ({ query }) => {
+        const page = (query?.page as number) ?? 1;
+        return {
+          data: {
+            hasNext: page < 3,
+            items: sampleNotifications.map((n) => ({ ...n, id: `${n.id}-p${page}` })),
+            limit: 10,
+            page,
+            total: 25,
+            totalPages: 3,
+            unreadCount: 2,
+          },
+          response: new Response(null, { status: 200 }),
+        };
+      });
+
       renderWithProviders(<NotificationCenterPage />);
 
       const showOlderBtn = await screen.findByRole("button", { name: /show older/i });
       await user.click(showOlderBtn);
 
-      // Verify getApiV1Notifications was called with increased limit (20)
+      // Verify getApiV1Notifications was called for the next page (page: 2)
       await waitFor(() => {
         expect(api.getApiV1Notifications).toHaveBeenCalledWith(
           expect.objectContaining({
-            query: expect.objectContaining({ limit: 20 }),
+            query: expect.objectContaining({ page: 2, limit: 10 }),
           }),
         );
       });

@@ -9,6 +9,7 @@ import {
   tabToNotificationQuery,
   useDeleteAllNotifications,
   useDeleteNotification,
+  useInfiniteNotificationsQuery,
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   useNotificationsQuery,
@@ -94,6 +95,77 @@ describe("Notifications API & React Query Layer", () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(result.current.data).toEqual(mockResponse);
       expect(api.getApiV1Notifications).toHaveBeenCalledWith({ query: { limit: 20, page: 1 } });
+    });
+  });
+
+  describe("useInfiniteNotificationsQuery", () => {
+    it("fetches first page and advances with fetchNextPage", async () => {
+      const page1Response = {
+        items: [
+          {
+            category: "info" as const,
+            createdAt: "2026-10-22T10:00:00Z",
+            id: "notif-1",
+            isRead: false,
+            message: "Notification 1",
+            title: "Title 1",
+            type: "account_alert" as const,
+          },
+        ],
+        limit: 10,
+        page: 1,
+        total: 20,
+        totalPages: 2,
+        unreadCount: 1,
+      };
+
+      const page2Response = {
+        items: [
+          {
+            category: "info" as const,
+            createdAt: "2026-10-22T09:00:00Z",
+            id: "notif-2",
+            isRead: true,
+            message: "Notification 2",
+            title: "Title 2",
+            type: "account_alert" as const,
+          },
+        ],
+        limit: 10,
+        page: 2,
+        total: 20,
+        totalPages: 2,
+        unreadCount: 1,
+      };
+
+      vi.mocked(api.getApiV1Notifications)
+        .mockResolvedValueOnce({
+          data: page1Response,
+          response: new Response(null, { status: 200 }),
+        })
+        .mockResolvedValueOnce({
+          data: page2Response,
+          response: new Response(null, { status: 200 }),
+        });
+
+      const { result } = renderHook(() => useInfiniteNotificationsQuery({ limit: 10 }), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+      expect(result.current.data?.pages).toHaveLength(1);
+      expect(result.current.hasNextPage).toBe(true);
+
+      await result.current.fetchNextPage();
+
+      await waitFor(() => expect(result.current.data?.pages).toHaveLength(2));
+      expect(result.current.hasNextPage).toBe(false);
+      expect(api.getApiV1Notifications).toHaveBeenNthCalledWith(1, {
+        query: { limit: 10, page: 1 },
+      });
+      expect(api.getApiV1Notifications).toHaveBeenNthCalledWith(2, {
+        query: { limit: 10, page: 2 },
+      });
     });
   });
 
