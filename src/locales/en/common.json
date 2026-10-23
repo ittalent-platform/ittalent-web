@@ -3036,6 +3036,7 @@
     "markAllAsRead": "Mark all as read",
     "markAllAsReadConfirmTitle": "Mark {{count}} notifications as read?",
     "markAllAsReadConfirmDesc": "Only notifications you can see now are marked. Anything that arrives after you confirm stays unread.",
+    "markAllError": "Nothing was marked as read. Something went wrong on our side. You still have {{count}} unread notifications.",
     "moreActions": "More actions",
     "deleteAll": "Delete all…",
     "deleteAllConfirmTitle": "Delete {{count}} notifications?",

@@ -51,6 +51,7 @@ export function NotificationCenterPage() {
     tabParam === "unread" || tabParam === "announcements" ? tabParam : "all";
 
   const { showToast } = useToast();
+  const [showMarkAllDialog, setShowMarkAllDialog] = useState(false);
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [capturedDeleteCount, setCapturedDeleteCount] = useState<number | null>(null);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<NotificationItem | null>(null);
@@ -160,9 +161,30 @@ export function NotificationCenterPage() {
     );
   };
 
-  const handleMarkAllAsRead = () => {
+  const handleOpenMarkAllDialog = () => {
     if (unreadCount > 0 && !markAllReadMutation.isPending) {
-      markAllReadMutation.mutate();
+      setShowMarkAllDialog(true);
+    }
+  };
+
+  const handleConfirmMarkAllAsRead = () => {
+    if (unreadCount > 0 && !markAllReadMutation.isPending) {
+      markAllReadMutation.mutate(undefined, {
+        onSuccess: () => {
+          setShowMarkAllDialog(false);
+        },
+        onError: () => {
+          setShowMarkAllDialog(false);
+          showToast({
+            title: "",
+            message: t("notifications.markAllError", {
+              count: unreadCount,
+              defaultValue: `Nothing was marked as read. Something went wrong on our side. You still have ${unreadCount} unread notifications.`,
+            }),
+            tone: "error",
+          });
+        },
+      });
     }
   };
 
@@ -265,7 +287,7 @@ export function NotificationCenterPage() {
                   "border-0 bg-muted text-muted-foreground cursor-not-allowed opacity-100",
               )}
               disabled={unreadCount === 0 || markAllReadMutation.isPending}
-              onClick={handleMarkAllAsRead}
+              onClick={handleOpenMarkAllDialog}
               shape="xl"
               size="xl"
               type="button"
@@ -293,7 +315,7 @@ export function NotificationCenterPage() {
                 <DropdownMenuItem
                   className="cursor-pointer"
                   disabled={unreadCount === 0 || markAllReadMutation.isPending}
-                  onClick={handleMarkAllAsRead}
+                  onClick={handleOpenMarkAllDialog}
                 >
                   <CheckCheck className="size-4" />
                   <span>{t("notifications.markAllAsRead", { defaultValue: "Mark all as read" })}</span>
@@ -508,6 +530,25 @@ export function NotificationCenterPage() {
               })
         }
         variant="destructive-solid"
+      />
+
+      <ActionConfirmDialog
+        action={t("notifications.markAllAsRead", { defaultValue: "Mark as read" })}
+        cancelLabel={t("common.cancel", { defaultValue: "Cancel" })}
+        description={t("notifications.markAllAsReadConfirmDesc", {
+          defaultValue:
+            "Only notifications you can see now are marked. Anything that arrives after you confirm stays unread.",
+        })}
+        disabled={markAllReadMutation.isPending}
+        icon={CheckCheck}
+        onConfirm={handleConfirmMarkAllAsRead}
+        onOpenChange={setShowMarkAllDialog}
+        open={showMarkAllDialog}
+        title={t("notifications.markAllAsReadConfirmTitle", {
+          count: unreadCount,
+          defaultValue: `Mark ${unreadCount} notifications as read?`,
+        })}
+        variant="default"
       />
 
       <AnnouncementDetailDialog

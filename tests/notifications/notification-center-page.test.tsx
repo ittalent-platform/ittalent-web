@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
@@ -258,14 +258,45 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       expect(announcementsTab).toHaveAttribute("aria-selected", "true");
     });
 
-    it("triggers mark all as read mutation when clicking header button", async () => {
+    it("opens confirmation dialog and confirms before mutating mark all as read", async () => {
       const user = userEvent.setup();
       renderWithProviders(<NotificationCenterPage />);
 
       const markAllBtn = await screen.findByRole("button", { name: /mark all as read/i });
       await user.click(markAllBtn);
 
-      expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalled();
+      // Verify confirmation dialog is displayed
+      const dialog = await screen.findByRole("alertdialog");
+      expect(
+        within(dialog).getByRole("heading", { name: /mark 2 notifications as read\?/i }),
+      ).toBeInTheDocument();
+      expect(api.patchApiV1NotificationsReadAll).not.toHaveBeenCalled();
+
+      // Click confirm inside dialog
+      const confirmBtn = within(dialog).getByRole("button", { name: /mark all as read/i });
+      await user.click(confirmBtn);
+
+      expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledTimes(1);
+    });
+
+    it("displays error toast when mark all as read mutation fails", async () => {
+      const user = userEvent.setup();
+      vi.mocked(api.patchApiV1NotificationsReadAll).mockRejectedValue(new Error("Network error"));
+
+      renderWithProviders(<NotificationCenterPage />);
+
+      const markAllBtn = await screen.findByRole("button", { name: /mark all as read/i });
+      await user.click(markAllBtn);
+
+      const dialog = await screen.findByRole("alertdialog");
+      const confirmBtn = within(dialog).getByRole("button", { name: /mark all as read/i });
+      await user.click(confirmBtn);
+
+      expect(
+        await screen.findByText(
+          /nothing was marked as read.*you still have 2 unread notifications/i,
+        ),
+      ).toBeInTheDocument();
     });
 
     it("opens more actions dropdown menu and confirms delete all dialog before mutating", async () => {
