@@ -5,6 +5,7 @@ import {
   useQuery,
   useQueryClient,
   type InfiniteData,
+  type QueryClient,
 } from "@tanstack/react-query";
 
 import {
@@ -79,6 +80,54 @@ export function useUnreadCountQuery(enabled = true) {
   });
 }
 
+/**
+ * Synchronously updates cached items and metadata in both standard list queries and infinite list queries.
+ */
+export function updateAllLists(
+  queryClient: QueryClient,
+  updater: (items: NotificationItemDto[]) => NotificationItemDto[],
+  metaUpdater?: (prev: { total: number; unreadCount: number }) => { total: number; unreadCount: number },
+) {
+  queryClient.setQueriesData<NotificationListResponse>(
+    { queryKey: notificationKeys.lists() },
+    (old: NotificationListResponse | undefined) => {
+      if (!old) return old;
+      const newItems = updater(old.items);
+      const meta = metaUpdater
+        ? metaUpdater({ total: old.total, unreadCount: old.unreadCount })
+        : { total: old.total, unreadCount: old.unreadCount };
+      return {
+        ...old,
+        items: newItems,
+        total: meta.total,
+        unreadCount: meta.unreadCount,
+      };
+    },
+  );
+
+  queryClient.setQueriesData<InfiniteData<NotificationListResponse>>(
+    { queryKey: notificationKeys.infiniteLists() },
+    (old: InfiniteData<NotificationListResponse> | undefined) => {
+      if (!old) return old;
+      return {
+        ...old,
+        pages: old.pages.map((page: NotificationListResponse) => {
+          const newItems = updater(page.items);
+          const meta = metaUpdater
+            ? metaUpdater({ total: page.total, unreadCount: page.unreadCount })
+            : { total: page.total, unreadCount: page.unreadCount };
+          return {
+            ...page,
+            items: newItems,
+            total: meta.total,
+            unreadCount: meta.unreadCount,
+          };
+        }),
+      };
+    },
+  );
+}
+
 export function useMarkNotificationRead() {
   const queryClient = useQueryClient();
   return useMutation<NotificationItemDto, Error, { id: string }, { previousLists: Array<[readonly unknown[], NotificationListResponse | undefined]>; previousCount: UnreadCountResponse | undefined }>({
@@ -104,42 +153,27 @@ export function useMarkNotificationRead() {
 
       // Optimistically update matching notification in all cached lists
       let wasUnread = false;
-      queryClient.setQueriesData<NotificationListResponse>(
-        { queryKey: notificationKeys.lists() },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            items: old.items.map((item) => {
-              if (item.id === id) {
-                if (!item.isRead) wasUnread = true;
-                return { ...item, isRead: true, readAt: new Date().toISOString() };
-              }
-              return item;
-            }),
-            unreadCount: wasUnread ? Math.max(0, old.unreadCount - 1) : old.unreadCount,
-          };
-        },
-      );
+      const targetInCache = previousLists
+        .flatMap(([, data]) => data?.items ?? [])
+        .find((item) => item.id === id);
+      if (targetInCache && !targetInCache.isRead) {
+        wasUnread = true;
+      }
 
-      queryClient.setQueriesData<InfiniteData<NotificationListResponse>>(
-        { queryKey: notificationKeys.infiniteLists() },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            pages: old.pages.map((page) => ({
-              ...page,
-              items: page.items.map((item) => {
-                if (item.id === id) {
-                  return { ...item, isRead: true, readAt: new Date().toISOString() };
-                }
-                return item;
-              }),
-              unreadCount: wasUnread ? Math.max(0, page.unreadCount - 1) : page.unreadCount,
-            })),
-          };
-        },
+      updateAllLists(
+        queryClient,
+        (items) =>
+          items.map((item) => {
+            if (item.id === id) {
+              if (!item.isRead) wasUnread = true;
+              return { ...item, isRead: true, readAt: new Date().toISOString() };
+            }
+            return item;
+          }),
+        (meta) => ({
+          ...meta,
+          unreadCount: wasUnread ? Math.max(0, meta.unreadCount - 1) : meta.unreadCount,
+        }),
       );
 
       if (wasUnread && previousCount) {
@@ -178,31 +212,11 @@ export function useMarkAllNotificationsRead() {
       });
       const previousCount = queryClient.getQueryData<UnreadCountResponse>(notificationKeys.unreadCount());
 
-      queryClient.setQueriesData<NotificationListResponse>(
-        { queryKey: notificationKeys.lists() },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            items: old.items.map((item) => ({ ...item, isRead: true, readAt: new Date().toISOString() })),
-            unreadCount: 0,
-          };
-        },
-      );
-
-      queryClient.setQueriesData<InfiniteData<NotificationListResponse>>(
-        { queryKey: notificationKeys.infiniteLists() },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            pages: old.pages.map((page) => ({
-              ...page,
-              items: page.items.map((item) => ({ ...item, isRead: true, readAt: new Date().toISOString() })),
-              unreadCount: 0,
-            })),
-          };
-        },
+      updateAllLists(
+        queryClient,
+        (items) =>
+          items.map((item) => (item.isRead ? item : { ...item, isRead: true, readAt: new Date().toISOString() })),
+        (meta) => ({ ...meta, unreadCount: 0 }),
       );
 
       queryClient.setQueryData<UnreadCountResponse>(notificationKeys.unreadCount(), { unreadCount: 0 });
@@ -239,35 +253,20 @@ export function useDeleteNotification() {
       const previousCount = queryClient.getQueryData<UnreadCountResponse>(notificationKeys.unreadCount());
 
       let wasUnread = false;
-      queryClient.setQueriesData<NotificationListResponse>(
-        { queryKey: notificationKeys.lists() },
-        (old) => {
-          if (!old) return old;
-          const target = old.items.find((item) => item.id === id);
-          if (target && !target.isRead) wasUnread = true;
-          return {
-            ...old,
-            items: old.items.filter((item) => item.id !== id),
-            total: Math.max(0, old.total - 1),
-            unreadCount: wasUnread ? Math.max(0, old.unreadCount - 1) : old.unreadCount,
-          };
-        },
-      );
+      const targetInCache = previousLists
+        .flatMap(([, data]) => data?.items ?? [])
+        .find((item) => item.id === id);
+      if (targetInCache && !targetInCache.isRead) {
+        wasUnread = true;
+      }
 
-      queryClient.setQueriesData<InfiniteData<NotificationListResponse>>(
-        { queryKey: notificationKeys.infiniteLists() },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            pages: old.pages.map((page) => ({
-              ...page,
-              items: page.items.filter((item) => item.id !== id),
-              total: Math.max(0, page.total - 1),
-              unreadCount: wasUnread ? Math.max(0, page.unreadCount - 1) : page.unreadCount,
-            })),
-          };
-        },
+      updateAllLists(
+        queryClient,
+        (items) => items.filter((item) => item.id !== id),
+        (meta) => ({
+          total: Math.max(0, meta.total - 1),
+          unreadCount: wasUnread ? Math.max(0, meta.unreadCount - 1) : meta.unreadCount,
+        }),
       );
 
       if (wasUnread && previousCount) {
@@ -306,33 +305,10 @@ export function useDeleteAllNotifications() {
       });
       const previousCount = queryClient.getQueryData<UnreadCountResponse>(notificationKeys.unreadCount());
 
-      queryClient.setQueriesData<NotificationListResponse>(
-        { queryKey: notificationKeys.lists() },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            items: [],
-            total: 0,
-            unreadCount: 0,
-          };
-        },
-      );
-
-      queryClient.setQueriesData<InfiniteData<NotificationListResponse>>(
-        { queryKey: notificationKeys.infiniteLists() },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            pages: old.pages.map((page) => ({
-              ...page,
-              items: [],
-              total: 0,
-              unreadCount: 0,
-            })),
-          };
-        },
+      updateAllLists(
+        queryClient,
+        () => [],
+        () => ({ total: 0, unreadCount: 0 }),
       );
 
       queryClient.setQueryData<UnreadCountResponse>(notificationKeys.unreadCount(), { unreadCount: 0 });
