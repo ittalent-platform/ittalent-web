@@ -1,8 +1,9 @@
 import { CheckCheck, MoreVertical, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 
+import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { PageHeader } from "@/components/common/admin-page-header";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +47,8 @@ export function NotificationCenterPage() {
   const tabParam = searchParams.get("tab");
   const activeTab: NotificationTab =
     tabParam === "unread" || tabParam === "announcements" ? tabParam : "all";
+
+  const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
 
   // Queries
   const unreadCountQuery = useUnreadCountQuery();
@@ -121,7 +124,11 @@ export function NotificationCenterPage() {
 
   const handleDeleteAll = () => {
     if (totalCount > 0 && !deleteAllMutation.isPending) {
-      deleteAllMutation.mutate();
+      deleteAllMutation.mutate(undefined, {
+        onSuccess: () => {
+          setShowDeleteAllDialog(false);
+        },
+      });
     }
   };
 
@@ -174,7 +181,7 @@ export function NotificationCenterPage() {
                 <DropdownMenuItem
                   className="cursor-pointer font-semibold"
                   disabled={totalCount === 0 || deleteAllMutation.isPending}
-                  onClick={handleDeleteAll}
+                  onClick={() => setShowDeleteAllDialog(true)}
                   variant="destructive"
                 >
                   <Trash2 className="size-4" />
@@ -332,6 +339,28 @@ export function NotificationCenterPage() {
         )}
         </div>
       </div>
+
+      <ActionConfirmDialog
+        action={t("notifications.deleteAllConfirmBtn", {
+          count: totalCount,
+          defaultValue: "Delete all",
+        })}
+        cancelLabel={t("common.cancel", { defaultValue: "Cancel" })}
+        description={t("notifications.deleteAllConfirmDesc", {
+          defaultValue:
+            "This removes every notification in your list right now. Ones that arrive after you confirm are kept. Your applications and interviews aren't affected.",
+        })}
+        disabled={deleteAllMutation.isPending}
+        icon={Trash2}
+        onConfirm={handleDeleteAll}
+        onOpenChange={setShowDeleteAllDialog}
+        open={showDeleteAllDialog}
+        title={t("notifications.deleteAllConfirmTitle", {
+          count: totalCount,
+          defaultValue: "Delete all notifications?",
+        })}
+        variant="destructive-solid"
+      />
     </div>
   );
 }

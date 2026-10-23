@@ -231,7 +231,7 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalled();
     });
 
-    it("opens more actions dropdown menu and triggers delete all mutation", async () => {
+    it("opens more actions dropdown menu and confirms delete all dialog before mutating", async () => {
       const user = userEvent.setup();
       renderWithProviders(<NotificationCenterPage />);
 
@@ -241,7 +241,34 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       const deleteAllMenuItem = await screen.findByRole("menuitem", { name: /delete all/i });
       await user.click(deleteAllMenuItem);
 
-      expect(api.deleteApiV1Notifications).toHaveBeenCalled();
+      // Verify destructive action confirmation dialog is shown and mutation has not run yet
+      expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /delete.*notifications\?/i })).toBeInTheDocument();
+      expect(api.deleteApiV1Notifications).not.toHaveBeenCalled();
+
+      // Click confirm button inside the dialog
+      const confirmBtn = screen.getByRole("button", { name: /delete.*notifications/i });
+      await user.click(confirmBtn);
+
+      expect(api.deleteApiV1Notifications).toHaveBeenCalledTimes(1);
+    });
+
+    it("cancels delete all confirmation without calling delete API", async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<NotificationCenterPage />);
+
+      const moreBtn = await screen.findByRole("button", { name: /more actions/i });
+      await user.click(moreBtn);
+
+      const deleteAllMenuItem = await screen.findByRole("menuitem", { name: /delete all/i });
+      await user.click(deleteAllMenuItem);
+
+      expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
+
+      const cancelBtn = screen.getByRole("button", { name: /cancel/i });
+      await user.click(cancelBtn);
+
+      expect(api.deleteApiV1Notifications).not.toHaveBeenCalled();
     });
 
     it("requests more items when clicking Show older button", async () => {
