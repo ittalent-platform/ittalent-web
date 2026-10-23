@@ -206,6 +206,7 @@ export function NotificationCenterPage() {
             const isSelected = activeTab === tab.key;
             return (
               <button
+                aria-controls={`tabpanel-${tab.key}`}
                 aria-selected={isSelected}
                 className={cn(
                   "inline-flex h-10 items-center gap-2 border-b-2 px-0.5 text-[14px] transition-colors cursor-pointer",
@@ -213,6 +214,7 @@ export function NotificationCenterPage() {
                     ? "border-brand font-bold text-foreground"
                     : "border-transparent font-medium text-muted-foreground hover:text-foreground",
                 )}
+                id={`tab-${tab.key}`}
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
                 role="tab"
@@ -234,17 +236,23 @@ export function NotificationCenterPage() {
           })}
         </div>
 
-        {/* List items / Empty states */}
-        {notificationsQuery.isLoading && items.length === 0 ? (
-          <div className="flex items-center justify-center py-16 text-muted-foreground">
-            <span className="text-[13.5px]">{t("common.loading", { defaultValue: "Loading..." })}</span>
-          </div>
-        ) : items.length > 0 ? (
-          <div
-            aria-label={t("notifications.title", { defaultValue: "Notifications" })}
-            className="-mt-px"
-            role="list"
-          >
+        {/* Tab Panel Body */}
+        <div
+          aria-labelledby={`tab-${activeTab}`}
+          className="min-w-0"
+          id={`tabpanel-${activeTab}`}
+          role="tabpanel"
+        >
+          {notificationsQuery.isLoading && items.length === 0 ? (
+            <div className="flex items-center justify-center py-16 text-muted-foreground">
+              <span className="text-[13.5px]">{t("common.loading", { defaultValue: "Loading..." })}</span>
+            </div>
+          ) : items.length > 0 ? (
+            <div
+              aria-label={t("notifications.title", { defaultValue: "Notifications" })}
+              className="-mt-px"
+              role="list"
+            >
             {items.map((item: NotificationItem) => (
               <NotificationItemRow
                 item={item}
@@ -319,6 +327,7 @@ export function NotificationCenterPage() {
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

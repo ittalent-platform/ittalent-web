@@ -85,10 +85,15 @@ export function NotificationItemRow({
     >
       {/* Unread dot */}
       {isUnread && (
-        <span
-          aria-label={t("notifications.tabs.unread", { defaultValue: "Unread" })}
-          className="absolute left-2.5 top-1/2 -mt-1 size-2 rounded-full bg-brand"
-        />
+        <>
+          <span
+            aria-hidden="true"
+            className="absolute left-2.5 top-1/2 -mt-1 size-2 rounded-full bg-brand"
+          />
+          <span className="sr-only">
+            {t("notifications.tabs.unread", { defaultValue: "Unread" })}
+          </span>
+        </>
       )}
 
       {/* Category icon */}
