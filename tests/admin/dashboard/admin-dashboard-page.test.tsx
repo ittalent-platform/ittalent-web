@@ -62,6 +62,18 @@ describe("AdminDashboardPage", () => {
     expect(within(roles).getByText(/Invited/)).toHaveTextContent("48");
   });
 
+  it("lists the inactive accounts only when there are some", () => {
+    mockResult({ data: platformOverview() });
+    const { unmount } = renderPage();
+    expect(within(screen.getByRole("region", { name: "Accounts by role" })).queryByText(/Inactive/)).not.toBeInTheDocument();
+    unmount();
+
+    const base = platformOverview();
+    mockResult({ data: { ...base, accounts: { ...base.accounts, byStatus: { ...base.accounts.byStatus, inactive: 5 } } } });
+    renderPage();
+    expect(within(screen.getByRole("region", { name: "Accounts by role" })).getByText(/Inactive/)).toHaveTextContent("5");
+  });
+
   it("charts new accounts per week and links to the users list", () => {
     mockResult({ data: platformOverview() });
     renderPage();

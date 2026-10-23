@@ -203,6 +203,15 @@ describe("DashboardPage", () => {
     expect(screen.getByRole("region", { name: "Key numbers" })).toBeInTheDocument();
   });
 
+  it("names the chosen period on the button at once, while the old numbers stay", () => {
+    mockResult({ data: companyDashboard(), isFetching: true, isPlaceholderData: true });
+    renderPage("/recruiter/dashboard?range=last_7_days");
+
+    expect(screen.getByRole("button", { name: "Time period" })).toHaveTextContent("Last 7 days");
+    expect(screen.getByRole("button", { name: "Time period" })).not.toHaveTextContent("Last 30 days");
+    expect(screen.getByText(/Updating… numbers shown are from 10:42/)).toBeInTheDocument();
+  });
+
   it("refreshes on request", async () => {
     const user = userEvent.setup();
     mockResult({ data: companyDashboard() });

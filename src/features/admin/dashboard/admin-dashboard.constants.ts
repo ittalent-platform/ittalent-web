@@ -9,11 +9,11 @@ export const ROLE_ROWS: readonly { key: "candidates" | "hr" | "enterpriseAdmins"
   { key: "enterpriseAdmins", tone: "green" },
 ];
 
-/** Account statuses under the ring, each with the dot that marks it. */
-export const ACCOUNT_STATUS_ROWS: readonly { dot: string; key: "active" | "invited" | "inactive" | "suspended" }[] = [
+/** Account statuses under the ring, each with the dot that marks it. The design lists active, invited and suspended; inactive appears only when some account is, so the numbers still add up. */
+export const ACCOUNT_STATUS_ROWS: readonly { dot: string; hideWhenEmpty?: boolean; key: "active" | "invited" | "inactive" | "suspended" }[] = [
   { dot: "bg-(--dash-green)", key: "active" },
   { dot: "bg-(--dash-amber)", key: "invited" },
-  { dot: "bg-(--dash-axis)", key: "inactive" },
+  { dot: "bg-(--dash-axis)", hideWhenEmpty: true, key: "inactive" },
   { dot: "bg-(--dash-red)", key: "suspended" },
 ];
 

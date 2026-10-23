@@ -30,17 +30,27 @@ describe("dashboard-format", () => {
   });
 
   it("prints a calendar day the same wherever the browser is", () => {
-    expect(formatShortDay("2026-09-11", "en")).toMatch(/^11 Sept?$/);
-    expect(formatFullDay("2026-09-11", "en")).toMatch(/^11 Sept? 2026$/);
-    expect(formatShortDay("2026-01-01", "en")).toMatch(/^1 Jan$/);
+    expect(formatShortDay("2026-09-11", "en")).toBe("11 Sep");
+    expect(formatFullDay("2026-09-11", "en")).toBe("11 Sep 2026");
+    expect(formatShortDay("2026-01-01", "en")).toBe("1 Jan");
+  });
+
+  it("writes every English month with three letters, September too", () => {
+    const months = Array.from({ length: 12 }, (_, index) => formatShortDay(`2026-${String(index + 1).padStart(2, "0")}-05`, "en"));
+    expect(months).toEqual(["5 Jan", "5 Feb", "5 Mar", "5 Apr", "5 May", "5 Jun", "5 Jul", "5 Aug", "5 Sep", "5 Oct", "5 Nov", "5 Dec"]);
+    expect(formatAsOf("2026-09-11T03:42:00.000Z", "en").date).toBe("11 Sep 2026");
+  });
+
+  it("leaves the Vietnamese months as the locale writes them", () => {
+    expect(formatShortDay("2026-09-11", "vi")).toBe(new Intl.DateTimeFormat("vi-VN", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date("2026-09-11T00:00:00Z")));
   });
 
   it("writes ranges compactly and adds years only when needed", () => {
-    expect(formatDayRange("2026-10-04", "2026-10-10", "en")).toMatch(/^4 – 10 Oct$/);
-    expect(formatDayRange("2026-10-04", "2026-10-10", "en", { spaced: false })).toMatch(/^4–10 Oct$/);
-    expect(formatDayRange("2026-09-11", "2026-10-10", "en", { spaced: false })).toMatch(/^11 Sept?–10 Oct$/);
-    expect(formatDayRange("2026-09-11", "2026-10-10", "en", { withYear: true })).toMatch(/^11 Sept? – 10 Oct 2026$/);
-    expect(formatDayRange("2026-12-20", "2027-01-10", "en")).toMatch(/^20 Dec 2026 – 10 Jan 2027$/);
+    expect(formatDayRange("2026-10-04", "2026-10-10", "en")).toBe("4 – 10 Oct");
+    expect(formatDayRange("2026-10-04", "2026-10-10", "en", { spaced: false })).toBe("4–10 Oct");
+    expect(formatDayRange("2026-09-11", "2026-10-10", "en", { spaced: false })).toBe("11 Sep–10 Oct");
+    expect(formatDayRange("2026-09-11", "2026-10-10", "en", { withYear: true })).toBe("11 Sep – 10 Oct 2026");
+    expect(formatDayRange("2026-12-20", "2027-01-10", "en")).toBe("20 Dec 2026 – 10 Jan 2027");
     expect(formatDayRange("2026-10-10", "2026-10-10", "en")).toBe("10 Oct");
     expect(formatDayRange("2026-10-10", "2026-10-10", "en", { withYear: true })).toBe("10 Oct 2026");
   });
@@ -49,9 +59,9 @@ describe("dashboard-format", () => {
     // 03:42 UTC is 10:42 in UTC+7, the same calendar day.
     const asOf = formatAsOf("2026-10-11T03:42:00.000Z", "en");
     expect(asOf.time).toBe("10:42");
-    expect(asOf.date).toMatch(/^11 Oct 2026$/);
+    expect(asOf.date).toBe("11 Oct 2026");
     // 18:00 UTC is already the next day in Vietnam.
-    expect(formatAsOf("2026-10-10T18:00:00.000Z", "en").date).toMatch(/^11 Oct 2026$/);
+    expect(formatAsOf("2026-10-10T18:00:00.000Z", "en").date).toBe("11 Oct 2026");
   });
 
   it("does not throw on an unreadable instant", () => {

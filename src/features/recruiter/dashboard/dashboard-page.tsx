@@ -31,8 +31,9 @@ export function DashboardPage() {
 
   // The server's clock decides what "today" is; the browser's only stands in until the first answer arrives.
   const today = data ? ictDayKey(new Date(data.asOf)) : todayInVietnam();
+  // Numbers kept from the previous period (see useCompanyDashboard) must not name the period: the button follows the address at once.
   const shown =
-    data?.period ??
+    (dashboard.isPlaceholderData ? undefined : data?.period) ??
     (selection.range === "custom" && selection.from && selection.to
       ? { from: selection.from, range: selection.range, to: selection.to }
       : { ...presetWindow(selection.range === "custom" ? "last_30_days" : selection.range, today), range: selection.range });

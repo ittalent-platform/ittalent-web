@@ -39,7 +39,7 @@ export function AccountsByRoleCard({ data }: { data: PlatformOverviewResponse })
         </div>
       </div>
       <ul className="m-0 flex list-none flex-wrap gap-x-3.5 gap-y-2 border-t border-(--dash-track) p-0 pt-3 text-[12.5px] text-(--status-neutral-fg)">
-        {ACCOUNT_STATUS_ROWS.map((row) => (
+        {ACCOUNT_STATUS_ROWS.filter((row) => !row.hideWhenEmpty || byStatus[row.key] > 0).map((row) => (
           <li className="inline-flex items-center gap-1.5" key={row.key}>
             <span aria-hidden className={cn("size-2.5 rounded-[3px]", row.dot)} />
             {t(`adminDashboard.accountStatus.${row.key}`)} <b className="tabular-nums text-foreground">{formatCount(byStatus[row.key], language)}</b>

@@ -5,6 +5,8 @@ const VIETNAMESE_LOCALE = "vi-VN";
 const ENGLISH_LOCALE = "en-GB";
 const TIME_ZONE_ICT = "Asia/Ho_Chi_Minh";
 const PERCENT = 100;
+/** English short months are three letters ("Sep"); the en-GB data of Intl spells September "Sept". */
+const ENGLISH_MONTH_LENGTH = 3;
 // `YYYY-MM-DD`: the year is the first four characters and the month the first seven.
 const YEAR_LENGTH = 4;
 const MONTH_LENGTH = 7;
@@ -34,8 +36,17 @@ function dayDate(day: string): Date {
   return new Date(`${day}T00:00:00Z`);
 }
 
+/** Intl's text for a date, with the short English month cut to three letters. */
+function formatDate(date: Date, language: string, options: Intl.DateTimeFormatOptions): string {
+  const threeLetterMonth = options.month === "short" && !language.startsWith(VIETNAMESE);
+  return new Intl.DateTimeFormat(intlLocale(language), options)
+    .formatToParts(date)
+    .map((part) => (threeLetterMonth && part.type === "month" ? part.value.slice(0, ENGLISH_MONTH_LENGTH) : part.value))
+    .join("");
+}
+
 function dayParts(day: string, language: string, options: Intl.DateTimeFormatOptions): string {
-  return new Intl.DateTimeFormat(intlLocale(language), { ...options, timeZone: "UTC" }).format(dayDate(day));
+  return formatDate(dayDate(day), language, { ...options, timeZone: "UTC" });
 }
 
 /** "11 Sep" */
@@ -87,9 +98,8 @@ export function formatDayRange(from: string, to: string, language: string, optio
 export function formatAsOf(instant: string, language: string): { date: string; time: string } {
   const moment = new Date(instant);
   if (Number.isNaN(moment.getTime())) return { date: "—", time: "—" };
-  const locale = intlLocale(language);
   return {
-    date: new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: TIME_ZONE_ICT, year: "numeric" }).format(moment),
-    time: new Intl.DateTimeFormat(locale, { hour: "2-digit", hour12: false, minute: "2-digit", timeZone: TIME_ZONE_ICT }).format(moment),
+    date: formatDate(moment, language, { day: "numeric", month: "short", timeZone: TIME_ZONE_ICT, year: "numeric" }),
+    time: formatDate(moment, language, { hour: "2-digit", hour12: false, minute: "2-digit", timeZone: TIME_ZONE_ICT }),
   };
 }
