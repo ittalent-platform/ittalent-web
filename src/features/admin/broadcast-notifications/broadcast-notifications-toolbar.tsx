@@ -1,38 +1,83 @@
-import { Plus, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { FilterSelect } from '@/components/ui/filter-select';
-import { ListToolbar } from '@/components/common/list-toolbar';
+import { Plus, RotateCcw } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { ListToolbar } from "@/components/common/list-toolbar";
+import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
+import { FilterSelect } from "@/components/ui/filter-select";
+
+import {
+  BROADCAST_AUDIENCES,
+  BROADCAST_PRIORITIES,
+  BROADCAST_STATUSES,
+} from "./broadcast-notifications.constants";
 
 type BroadcastNotificationsToolbarProps = {
-  search: string;
-  onSearchChange: (value: string) => void;
-  status: string;
-  onStatusChange: (status: string) => void;
   audience: string;
+  fromDate?: string;
   onAudienceChange: (audience: string) => void;
-  priority: string;
+  onCreateClick: () => void;
+  onFromDateChange: (date: string) => void;
   onPriorityChange: (priority: string) => void;
   onResetFilters: () => void;
-  onCreateClick: () => void;
+  onSearchChange: (value: string) => void;
+  onStatusChange: (status: string) => void;
+  onToDateChange: (date: string) => void;
+  priority: string;
+  search: string;
+  status: string;
+  toDate?: string;
 };
 
 export function BroadcastNotificationsToolbar({
-  search,
-  onSearchChange,
-  status,
-  onStatusChange,
   audience,
+  fromDate = "",
   onAudienceChange,
-  priority,
+  onCreateClick,
+  onFromDateChange,
   onPriorityChange,
   onResetFilters,
-  onCreateClick,
+  onSearchChange,
+  onStatusChange,
+  onToDateChange,
+  priority,
+  search,
+  status,
+  toDate = "",
 }: BroadcastNotificationsToolbarProps) {
+  const { t } = useTranslation();
+
   const hasActiveFilters =
-    search.trim() !== '' ||
-    status !== 'all' ||
-    audience !== 'all' ||
-    priority !== 'all';
+    search.trim() !== "" ||
+    status !== "all" ||
+    audience !== "all" ||
+    priority !== "all" ||
+    Boolean(fromDate) ||
+    Boolean(toDate);
+
+  const statusOptions = [
+    { label: t("adminBroadcasts.toolbar.statusAll"), value: "all" },
+    ...BROADCAST_STATUSES.map((s) => ({
+      label: t(`adminBroadcasts.status.${s}`, { defaultValue: s }),
+      value: s,
+    })),
+  ];
+
+  const audienceOptions = [
+    { label: t("adminBroadcasts.toolbar.audienceAll"), value: "all" },
+    ...BROADCAST_AUDIENCES.map((a) => ({
+      label: t(`adminBroadcasts.audience.${a}`, { defaultValue: a }),
+      value: a,
+    })),
+  ];
+
+  const priorityOptions = [
+    { label: t("adminBroadcasts.toolbar.priorityAll"), value: "all" },
+    ...BROADCAST_PRIORITIES.map((p) => ({
+      label: t(`adminBroadcasts.priority.${p}`, { defaultValue: p }),
+      value: p,
+    })),
+  ];
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -40,46 +85,45 @@ export function BroadcastNotificationsToolbar({
         <ListToolbar
           onSearchChange={onSearchChange}
           search={search}
-          searchPlaceholder="Search broadcasts by title or content..."
+          searchPlaceholder={t("adminBroadcasts.toolbar.searchPlaceholder")}
         >
           <div className="flex flex-wrap items-center gap-2.5">
             <FilterSelect
               onChange={onStatusChange}
-              options={[
-                { label: 'Status: All', value: 'all' },
-                { label: 'Draft', value: 'Draft' },
-                { label: 'Scheduled', value: 'Scheduled' },
-                { label: 'Sent', value: 'Sent' },
-                { label: 'Cancelled', value: 'Cancelled' },
-              ]}
+              options={statusOptions}
               value={status}
             />
 
             <FilterSelect
               onChange={onAudienceChange}
-              options={[
-                { label: 'Audience: All', value: 'all' },
-                { label: 'All Users', value: 'All Users' },
-                { label: 'Applicants only', value: 'Applicants only' },
-                { label: 'Recruiters only', value: 'Recruiters only' },
-                { label: 'Enterprise Admins', value: 'Enterprise Admins' },
-              ]}
+              options={audienceOptions}
               value={audience}
             />
 
             <FilterSelect
               onChange={onPriorityChange}
-              options={[
-                { label: 'Priority: All', value: 'all' },
-                { label: 'Low', value: 'Low' },
-                { label: 'Normal', value: 'Normal' },
-                { label: 'High', value: 'High' },
-                { label: 'Urgent', value: 'Urgent' },
-              ]}
+              options={priorityOptions}
               value={priority}
             />
 
-            {hasActiveFilters && (
+            <div className="flex items-center gap-1.5">
+              <DatePicker
+                clearable
+                onChange={onFromDateChange}
+                placeholder={t("adminBroadcasts.toolbar.fromDatePlaceholder")}
+                value={fromDate}
+              />
+              <span className="text-xs text-muted-foreground">—</span>
+              <DatePicker
+                clearable
+                min={fromDate || undefined}
+                onChange={onToDateChange}
+                placeholder={t("adminBroadcasts.toolbar.toDatePlaceholder")}
+                value={toDate}
+              />
+            </div>
+
+            {hasActiveFilters ? (
               <Button
                 className="h-9 gap-1.5 px-3 text-xs text-muted-foreground hover:text-foreground"
                 onClick={onResetFilters}
@@ -87,20 +131,21 @@ export function BroadcastNotificationsToolbar({
                 variant="ghost"
               >
                 <RotateCcw className="size-3.5" />
-                Reset filters
+                {t("adminBroadcasts.toolbar.resetFilters")}
               </Button>
-            )}
+            ) : null}
           </div>
         </ListToolbar>
       </div>
 
       <div className="shrink-0">
         <Button
-          className="gap-1.5 font-medium shadow-sm"
+          className="gap-1.5 font-medium shadow-xs"
           onClick={onCreateClick}
+          type="button"
         >
           <Plus className="size-4" />
-          Create Broadcast
+          {t("adminBroadcasts.actions.create")}
         </Button>
       </div>
     </div>

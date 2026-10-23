@@ -1,5 +1,13 @@
-import { useMemo, useState, useEffect } from 'react';
-import { Calendar, Clock, AlertCircle } from 'lucide-react';
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Calendar, Clock } from "lucide-react";
+
+import { DIALOG_BUTTON_CLASS } from "@/components/common/action-confirm-dialog";
+import { FormField } from "@/components/common/form-field";
+import { InlineErrorAlert } from "@/components/common/inline-error-alert";
+import { useToast } from "@/components/toast/toast-provider";
+import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Dialog,
   DialogContent,
@@ -7,223 +15,228 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import type { BroadcastNotificationDto } from './broadcast-notifications.types';
-import { useScheduleBroadcastMutation } from './broadcast-notifications.queries';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { formatTimeIct, ictDayKey } from "@/lib/format";
+
+import { MIN_SCHEDULE_ADVANCE_MS } from "./broadcast-notifications.constants";
+import { useScheduleBroadcastMutation } from "./broadcast-notifications.queries";
+import type { BroadcastNotificationDto } from "./broadcast-notifications.types";
 
 type ScheduleBroadcastDialogProps = {
   broadcast: BroadcastNotificationDto | null;
-  open: boolean;
   onOpenChange: (open: boolean) => void;
+  open: boolean;
 };
+
+function computeDefaultDate(scheduledAt?: string | null): string {
+  if (scheduledAt) {
+    return ictDayKey(scheduledAt);
+  }
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  return ictDayKey(tomorrow);
+}
+
+function computeDefaultTime(scheduledAt?: string | null): string {
+  if (scheduledAt) {
+    return formatTimeIct(scheduledAt);
+  }
+  return "09:00";
+}
 
 function ScheduleBroadcastDialogContent({
   broadcast,
   onOpenChange,
+  open,
 }: {
   broadcast: BroadcastNotificationDto;
   onOpenChange: (open: boolean) => void;
+  open: boolean;
 }) {
-  const [defaultDate] = useState(() => {
-    const d = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    return d.toISOString().split('T')[0];
-  });
+  const { t } = useTranslation();
+  const { showToast } = useToast();
+  const scheduleMutation = useScheduleBroadcastMutation();
 
-  const [dateStr, setDateStr] = useState(() => {
-    if (broadcast.scheduledAt) {
-      return new Date(broadcast.scheduledAt).toISOString().split('T')[0];
-    }
-    return defaultDate;
-  });
-
-  const [timeStr, setTimeStr] = useState(() => {
-    if (broadcast.scheduledAt) {
-      return new Date(broadcast.scheduledAt).toTimeString().slice(0, 5);
-    }
-    return '09:00';
-  });
-
+  const [dateStr, setDateStr] = useState(() => computeDefaultDate(broadcast.scheduledAt));
+  const [timeStr, setTimeStr] = useState(() => computeDefaultTime(broadcast.scheduledAt));
   const [now, setNow] = useState(() => Date.now());
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const scheduleMutation = useScheduleBroadcastMutation();
+  const minSelectableDate = ictDayKey(new Date(now));
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(Date.now());
-    }, 10000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const targetTimestamp = useMemo(() => {
+  const targetDateIct = useMemo(() => {
     if (!dateStr || !timeStr) return null;
-    const combined = new Date(`${dateStr}T${timeStr}:00`);
-    return isNaN(combined.getTime()) ? null : combined;
+    const parsed = new Date(`${dateStr}T${timeStr}:00+07:00`);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
   }, [dateStr, timeStr]);
 
-  const countdownText = useMemo(() => {
-    if (!targetTimestamp) return null;
-    const diffMs = targetTimestamp.getTime() - now;
-    if (diffMs < 15 * 60 * 1000) {
+  const countdown = useMemo(() => {
+    if (!targetDateIct) return null;
+    const diffMs = targetDateIct.getTime() - now;
+    if (diffMs < MIN_SCHEDULE_ADVANCE_MS) {
       return {
+        text: t("adminBroadcasts.schedule.advanceNotice"),
         valid: false,
-        text: 'Selected time must be at least 15 minutes ahead of current time.',
       };
     }
-
     const totalMinutes = Math.floor(diffMs / 60000);
     const days = Math.floor(totalMinutes / (60 * 24));
     const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
     const minutes = totalMinutes % 60;
 
-    const parts: string[] = [];
-    if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
-    if (hours > 0) parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
-    parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
+    let parts = "";
+    if (days > 0) parts += `${days}d `;
+    if (hours > 0 || days > 0) parts += `${hours}h `;
+    parts += `${minutes}m`;
 
     return {
+      text: t("adminBroadcasts.schedule.dispatchesIn", { time: parts.trim() }),
       valid: true,
-      text: `Execution scheduled in ${parts.join(', ')}`,
     };
-  }, [targetTimestamp, now]);
+  }, [targetDateIct, now, t]);
 
-  async function handleConfirm() {
-    if (!targetTimestamp) {
-      setErrorMsg('Please select a valid future date and time.');
-      return;
-    }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErrorMsg(null);
 
-    if (countdownText && !countdownText.valid) {
-      setErrorMsg(countdownText.text);
+    const checkNow = Date.now();
+    if (!targetDateIct || targetDateIct.getTime() - checkNow < MIN_SCHEDULE_ADVANCE_MS) {
+      setErrorMsg(t("adminBroadcasts.schedule.advanceNotice"));
       return;
     }
 
     try {
       await scheduleMutation.mutateAsync({
         id: broadcast.id,
-        payload: {
-          scheduled_at: targetTimestamp.toISOString(),
-        },
+        scheduled_at: targetDateIct.toISOString(),
+      });
+
+      showToast({
+        message: t("adminBroadcasts.toast.scheduledMessage", {
+          title: broadcast.title,
+        }),
+        title: t("adminBroadcasts.toast.scheduledTitle"),
+        tone: "success",
       });
 
       onOpenChange(false);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to schedule broadcast.';
-      setErrorMsg(message);
+    } catch (err) {
+      setErrorMsg(
+        err instanceof Error
+          ? err.message
+          : t("state.error", { defaultValue: "Failed to schedule broadcast" }),
+      );
     }
   }
 
   return (
-    <DialogContent className="max-w-md gap-0 overflow-hidden rounded-2xl p-0 border border-border/80 shadow-2xl">
-      <DialogHeader className="bg-muted/15 border-b border-border/60 px-6 py-5">
-        <DialogTitle className="flex items-center gap-2 text-xl font-bold tracking-tight">
-          <Calendar className="size-5 text-primary" />
-          Schedule Broadcast Dispatch
-        </DialogTitle>
-        <DialogDescription className="text-xs text-muted-foreground mt-1">
-          Configure this announcement to be automatically published and distributed to target audiences at a future timestamp.
-        </DialogDescription>
-      </DialogHeader>
+    <Dialog onOpenChange={onOpenChange} open={open}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t("adminBroadcasts.dialog.scheduleTitle")}</DialogTitle>
+          <DialogDescription>
+            {t("adminBroadcasts.dialog.scheduleDescription", {
+              title: broadcast.title,
+            })}
+          </DialogDescription>
+        </DialogHeader>
 
-      <div className="max-h-[calc(88vh-160px)] overflow-y-auto px-6 py-5 space-y-4">
-        <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Announcement</p>
-          <p className="font-semibold text-foreground line-clamp-1">{broadcast.title}</p>
-          <p className="text-xs text-muted-foreground">Target: {broadcast.targetAudience} • Priority: {broadcast.priority}</p>
-        </div>
-
-        {errorMsg && (
-          <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-xs text-destructive">
-            <AlertCircle className="size-4 shrink-0" />
-            <span>{errorMsg}</span>
+        {errorMsg ? (
+          <div className="py-1">
+            <InlineErrorAlert>{errorMsg}</InlineErrorAlert>
           </div>
-        )}
+        ) : null}
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="schedule-date">Execution Date</Label>
-            <Input
+        <form className="flex flex-col gap-4 py-2" id="schedule-broadcast-form" onSubmit={handleSubmit}>
+          <FormField
+            htmlFor="schedule-date"
+            label={t("adminBroadcasts.schedule.dateLabel")}
+            required
+          >
+            <DatePicker
+              clearable={false}
               id="schedule-date"
-              onChange={(e) => {
-                setDateStr(e.target.value);
-                setErrorMsg(null);
+              min={minSelectableDate}
+              onChange={(val) => {
+                setDateStr(val);
+                setNow(Date.now());
               }}
-              type="date"
               value={dateStr}
             />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="schedule-time">Execution Time</Label>
-            <Input
-              id="schedule-time"
-              onChange={(e) => {
-                setTimeStr(e.target.value);
-                setErrorMsg(null);
-              }}
-              type="time"
-              value={timeStr}
-            />
-          </div>
-        </div>
+          </FormField>
 
-        <div className="space-y-1.5">
-          <Label>Target Timezone</Label>
-          <Input disabled value="Asia/Ho_Chi_Minh (GMT+7:00)" />
-        </div>
-
-        {countdownText && (
-          <div
-            className={`flex items-center gap-2 rounded-lg border p-3 text-xs ${
-              countdownText.valid
-                ? 'border-emerald-200 bg-emerald-50/70 text-emerald-800 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-300'
-                : 'border-amber-200 bg-amber-50/70 text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/40 dark:text-amber-300'
-            }`}
+          <FormField
+            hint={t("adminBroadcasts.schedule.timezoneHint")}
+            htmlFor="schedule-time"
+            label={t("adminBroadcasts.schedule.timeLabel")}
+            required
           >
-            <Clock className="size-4 shrink-0" />
-            <span className="font-medium">{countdownText.text}</span>
-          </div>
-        )}
+            <div className="relative">
+              <Clock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                className="pl-9"
+                id="schedule-time"
+                onChange={(e) => {
+                  setTimeStr(e.target.value);
+                  setNow(Date.now());
+                }}
+                type="time"
+                value={timeStr}
+              />
+            </div>
+          </FormField>
 
-        <div className="rounded-lg bg-blue-50/60 p-3 text-xs text-blue-900 border border-blue-200/50 dark:bg-blue-950/40 dark:border-blue-900/40 dark:text-blue-300">
-          Scheduled broadcasts can be modified or reverted up until 5 minutes before scheduled execution.
-        </div>
-      </div>
+          {countdown ? (
+            <div
+              className={`rounded-lg p-3 text-xs ${
+                countdown.valid
+                  ? "bg-(--status-info-bg) text-(--status-info-fg)"
+                  : "bg-destructive/10 text-destructive"
+              }`}
+            >
+              {countdown.text}
+            </div>
+          ) : null}
+        </form>
 
-      <DialogFooter className="border-t border-border/60 bg-muted/20 px-6 py-4 flex gap-2 sm:justify-end">
-        <Button onClick={() => onOpenChange(false)} type="button" variant="outline">
-          Cancel
-        </Button>
-        <Button
-          className="gap-1.5"
-          disabled={scheduleMutation.isPending || (countdownText !== null && !countdownText.valid)}
-          onClick={handleConfirm}
-          type="button"
-        >
-          <Clock className="size-4" />
-          {scheduleMutation.isPending ? 'Scheduling...' : 'Confirm Schedule'}
-        </Button>
-      </DialogFooter>
-    </DialogContent>
+        <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-2">
+          <Button
+            className={DIALOG_BUTTON_CLASS}
+            disabled={scheduleMutation.isPending}
+            onClick={() => onOpenChange(false)}
+            type="button"
+            variant="outline"
+          >
+            {t("actions.cancel")}
+          </Button>
+
+          <Button
+            className={DIALOG_BUTTON_CLASS}
+            disabled={scheduleMutation.isPending || (countdown !== null && !countdown.valid)}
+            form="schedule-broadcast-form"
+            type="submit"
+          >
+            <Calendar className="size-4" />
+            {t("adminBroadcasts.actions.confirmSchedule")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 export function ScheduleBroadcastDialog({
   broadcast,
-  open,
   onOpenChange,
+  open,
 }: ScheduleBroadcastDialogProps) {
   if (!broadcast) return null;
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <ScheduleBroadcastDialogContent
-        key={broadcast.id}
-        broadcast={broadcast}
-        onOpenChange={onOpenChange}
-      />
-    </Dialog>
+    <ScheduleBroadcastDialogContent
+      broadcast={broadcast}
+      key={broadcast.id}
+      onOpenChange={onOpenChange}
+      open={open}
+    />
   );
 }

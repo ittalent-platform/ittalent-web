@@ -7,6 +7,8 @@ import { BroadcastNotificationsPage } from '@/features/admin/broadcast-notificat
 import * as broadcastQueries from '@/features/admin/broadcast-notifications/broadcast-notifications.queries';
 import type { BroadcastNotificationDto } from '@/features/admin/broadcast-notifications/broadcast-notifications.types';
 
+import { ToastProvider } from '@/components/toast/toast-provider';
+
 function renderWithClient(ui: React.ReactElement) {
   const testQueryClient = new QueryClient({
     defaultOptions: {
@@ -17,7 +19,9 @@ function renderWithClient(ui: React.ReactElement) {
 
   return render(
     <QueryClientProvider client={testQueryClient}>
-      <MemoryRouter>{ui}</MemoryRouter>
+      <ToastProvider>
+        <MemoryRouter>{ui}</MemoryRouter>
+      </ToastProvider>
     </QueryClientProvider>,
   );
 }
@@ -172,5 +176,41 @@ describe('Broadcast Notifications Feature Tests (UC 01 - UC 07)', () => {
     expect(screen.getByText('Message Content & Preview')).toBeInTheDocument();
     expect(screen.getByText('Delivery & Engagement Analytics')).toBeInTheDocument();
     expect(screen.getAllByText('Status Page').length).toBeGreaterThan(0);
+  });
+
+  it('blocks unsafe javascript: URLs from rendering as clickable links in detail dialog', () => {
+    const maliciousBroadcast: BroadcastNotificationDto = {
+      ...mockBroadcast1,
+      id: 'malicious_1',
+      title: 'Malicious Action Announcement',
+      actionUrl: 'javascript:alert(1)',
+      actionLabel: 'Click Me',
+    };
+
+    vi.spyOn(broadcastQueries, 'useBroadcastsListQuery').mockReturnValue({
+      data: {
+        items: [maliciousBroadcast],
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        summary: { total: 1, drafts: 0, scheduled: 0, sent: 1 },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof broadcastQueries.useBroadcastsListQuery>);
+
+    vi.spyOn(broadcastQueries, 'useBroadcastDetailQuery').mockReturnValue({
+      data: maliciousBroadcast,
+      isLoading: false,
+    } as unknown as ReturnType<typeof broadcastQueries.useBroadcastDetailQuery>);
+
+    renderWithClient(<BroadcastNotificationsPage />);
+
+    fireEvent.click(screen.getByText('Malicious Action Announcement'));
+
+    // Verify anchor with javascript: is NOT rendered
+    const link = screen.queryByRole('link', { name: /click me/i });
+    expect(link).toBeNull();
+    expect(screen.getByText(/external link blocked for security/i)).toBeInTheDocument();
   });
 });

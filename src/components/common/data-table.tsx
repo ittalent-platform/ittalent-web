@@ -103,9 +103,21 @@ export function DataTable<T>({
         ) : (
           rows.map((row) => (
             <TableRow
-              className={cn(onRowClick && "cursor-pointer", rowClassName?.(row))}
+              className={cn(onRowClick && "cursor-pointer focus-visible:outline-none focus-visible:bg-surface-subtle", rowClassName?.(row))}
               key={rowKey(row)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
+              onKeyDown={
+                onRowClick
+                  ? (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onRowClick(row);
+                      }
+                    }
+                  : undefined
+              }
+              role={onRowClick ? "button" : undefined}
+              tabIndex={onRowClick ? 0 : undefined}
             >
               {columns.map((column) => (
                 <TableCell className={column.className} key={column.key}>

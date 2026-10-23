@@ -1692,6 +1692,159 @@
       }
     }
   },
+  "adminBroadcasts": {
+    "page": {
+      "title": "Broadcast Notifications",
+      "description": "Compose, schedule, and dispatch announcements across candidate job seekers, recruiters, and enterprise administrators."
+    },
+    "stats": {
+      "total": "Total Campaigns",
+      "drafts": "Drafts",
+      "scheduled": "Scheduled",
+      "sent": "Sent / Published"
+    },
+    "toolbar": {
+      "searchPlaceholder": "Search broadcasts by title or content...",
+      "statusAll": "Status: All",
+      "audienceAll": "Audience: All",
+      "priorityAll": "Priority: All",
+      "fromDatePlaceholder": "From date",
+      "toDatePlaceholder": "To date",
+      "resetFilters": "Reset filters",
+      "clearFilters": "Clear Filters"
+    },
+    "table": {
+      "announcement": "Announcement",
+      "targetAudience": "Target Audience",
+      "priority": "Priority",
+      "status": "Status",
+      "scheduleSent": "Schedule / Sent",
+      "engagement": "Engagement",
+      "read": "read",
+      "actions": "Actions",
+      "actionsAria": "Actions for {{title}}",
+      "viewDetails": "View Details",
+      "emptyTitle": "No broadcast campaigns created yet",
+      "emptyDescription": "Create your first broadcast announcement to communicate updates or maintenance across user accounts.",
+      "noMatchesTitle": "No matching broadcasts found",
+      "noMatchesDescription": "No broadcast announcements match your active filter criteria. Try adjusting keywords or statuses."
+    },
+    "status": {
+      "Draft": "Draft",
+      "Scheduled": "Scheduled",
+      "Sent": "Sent",
+      "Cancelled": "Cancelled"
+    },
+    "priority": {
+      "Low": "Low",
+      "Normal": "Normal",
+      "High": "High",
+      "Urgent": "Urgent"
+    },
+    "category": {
+      "System Maintenance": "System Maintenance",
+      "Feature Update": "Feature Update",
+      "Policy Update": "Policy Update",
+      "Event Announcement": "Event Announcement",
+      "Security Alert": "Security Alert"
+    },
+    "audience": {
+      "All Users": "All Users",
+      "Applicants only": "Applicants only",
+      "Recruiters only": "Recruiters only",
+      "Enterprise Admins": "Enterprise Admins"
+    },
+    "channel": {
+      "inApp": "In-App Inbox",
+      "emailDigest": "Email Digest"
+    },
+    "actions": {
+      "create": "Create Broadcast",
+      "saveDraft": "Save as Draft",
+      "publishBroadcast": "Publish Broadcast",
+      "schedule": "Schedule Dispatch",
+      "confirmSchedule": "Confirm Schedule",
+      "dispatchNow": "Dispatch Now",
+      "cancelSchedule": "Cancel Schedule"
+    },
+    "dialog": {
+      "createTitle": "Create Broadcast Notification",
+      "createDescription": "Compose an announcement message to broadcast across user accounts. You can dispatch immediately or save as draft.",
+      "editTitle": "Edit Broadcast Notification",
+      "editDescription": "Update broadcast notification content, audience targeting, or priority.",
+      "scheduleTitle": "Schedule Broadcast Dispatch",
+      "scheduleDescription": "Choose a future date and time to automatically dispatch \"{{title}}\".",
+      "deleteTitle": "Delete Broadcast Notification",
+      "deleteConfirmMessage": "Are you sure you want to delete the broadcast announcement \"{{title}}\"?",
+      "deleteNotice": "This action cannot be undone and will permanently remove this draft/scheduled announcement.",
+      "deleteSentNotice": "This broadcast has already been sent to users and will be archived from administrative records.",
+      "dispatchNowTitle": "Dispatch Broadcast Immediately?",
+      "dispatchNowConfirm": "Are you sure you want to dispatch \"{{title}}\" to {{audience}} immediately? This action is irreversible.",
+      "cancelScheduleTitle": "Cancel Scheduled Dispatch?",
+      "cancelScheduleConfirm": "Cancel the scheduled dispatch for \"{{title}}\" and revert it back to draft?"
+    },
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "e.g. Scheduled System Maintenance Window",
+      "titleHint": "{{count}} / 150 characters (min 5)",
+      "content": "Message Content",
+      "contentPlaceholder": "Write your detailed announcement message here...",
+      "contentHint": "{{count}} / 2000 characters (min 10)",
+      "category": "Category",
+      "selectCategory": "Select category",
+      "targetAudience": "Target Audience",
+      "selectAudience": "Select audience",
+      "priority": "Priority",
+      "selectPriority": "Select priority",
+      "actionUrl": "Action URL (Optional)",
+      "actionUrlHint": "Valid web address (must start with http:// or https://)",
+      "actionLabel": "Action Button Label (Optional)",
+      "actionLabelPlaceholder": "e.g. Learn More, View Status",
+      "actionLabelHint": "Max 50 characters",
+      "deliveryChannels": "Delivery Channels",
+      "mandatory": "Mandatory"
+    },
+    "detail": {
+      "messageContent": "Message Content & Preview",
+      "visitLink": "Visit Action Link",
+      "unsafeUrlBlocked": "External link blocked for security (only http/https allowed)",
+      "distributionDetails": "Distribution & Sender",
+      "targetAudience": "Target Audience",
+      "createdBy": "Created By",
+      "systemAdmin": "System Administrator",
+      "createdAt": "Created At",
+      "sentAt": "Dispatched At",
+      "scheduledFor": "Scheduled For",
+      "analyticsTitle": "Delivery & Engagement Analytics",
+      "targeted": "Targeted",
+      "delivered": "Delivered",
+      "readReceipts": "Read Receipts",
+      "openRate": "Read Rate"
+    },
+    "schedule": {
+      "dateLabel": "Scheduled Date",
+      "timeLabel": "Scheduled Time",
+      "timezoneHint": "Vietnam Standard Time (ICT / Asia/Ho_Chi_Minh)",
+      "advanceNotice": "Selected schedule time must be at least 15 minutes in the future.",
+      "dispatchesIn": "Dispatches in ~{{time}}"
+    },
+    "toast": {
+      "createdDraftTitle": "Draft Saved",
+      "createdDraftMessage": "Broadcast announcement was saved as a draft.",
+      "createdSentTitle": "Broadcast Dispatched",
+      "createdSentMessage": "Broadcast announcement has been sent to users.",
+      "updatedTitle": "Broadcast Updated",
+      "updatedMessage": "Changes to the broadcast announcement have been saved.",
+      "deletedTitle": "Broadcast Deleted",
+      "deletedMessage": "Broadcast announcement \"{{title}}\" was deleted.",
+      "scheduledTitle": "Broadcast Scheduled",
+      "scheduledMessage": "Broadcast announcement \"{{title}}\" has been scheduled.",
+      "dispatchedTitle": "Broadcast Dispatched",
+      "dispatchedMessage": "Broadcast announcement \"{{title}}\" has been dispatched immediately.",
+      "cancelScheduleTitle": "Schedule Cancelled",
+      "cancelScheduleMessage": "Scheduled dispatch for \"{{title}}\" has been cancelled and reverted to draft."
+    }
+  },
   "home": {
     "hero": {
       "badge": "IT jobs from companies across Vietnam",

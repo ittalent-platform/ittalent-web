@@ -1,274 +1,273 @@
 import {
   Calendar,
-  CheckCircle,
-  Clock,
   Eye,
   MoreVertical,
   Pencil,
   Send,
   Trash2,
   XCircle,
-} from 'lucide-react';
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { DataTable, type DataTableColumn } from "@/components/common/data-table";
+import { EmptyState } from "@/components/common/empty-state";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableHeaderRow,
-  TableRow,
-} from '@/components/ui/table';
-import { EmptyState } from '@/components/common/empty-state';
-import { BroadcastStatusBadge } from './broadcast-status-badge';
-import { BroadcastPriorityBadge } from './broadcast-priority-badge';
-import type { BroadcastNotificationDto } from './broadcast-notifications.types';
+} from "@/components/ui/dropdown-menu";
+import { formatDateTimeIct } from "@/lib/format";
+
+import { BROADCAST_SORT_FIELD_BY_COLUMN } from "./broadcast-notifications.constants";
+import type { BroadcastNotificationDto } from "./broadcast-notifications.types";
+import { BroadcastPriorityBadge } from "./broadcast-priority-badge";
+import { BroadcastStatusBadge } from "./broadcast-status-badge";
 
 type BroadcastNotificationsTableProps = {
-  items: BroadcastNotificationDto[];
-  isLoading: boolean;
   hasFilters: boolean;
+  isLoading: boolean;
+  items: BroadcastNotificationDto[];
+  onCancelSchedule: (item: BroadcastNotificationDto) => void;
   onClearFilters: () => void;
-  onViewDetails: (item: BroadcastNotificationDto) => void;
+  onDelete: (item: BroadcastNotificationDto) => void;
+  onDispatchNow: (item: BroadcastNotificationDto) => void;
   onEdit: (item: BroadcastNotificationDto) => void;
   onSchedule: (item: BroadcastNotificationDto) => void;
-  onCancelSchedule: (item: BroadcastNotificationDto) => void;
-  onDispatchNow: (item: BroadcastNotificationDto) => void;
-  onDelete: (item: BroadcastNotificationDto) => void;
+  onSort?: (field: "createdAt" | "scheduled_at" | "title" | "status") => void;
+  onViewDetails: (item: BroadcastNotificationDto) => void;
+  sortBy?: "createdAt" | "scheduled_at" | "title" | "status";
+  sortOrder?: "asc" | "desc";
 };
 
-function formatDate(isoString?: string | null): string {
-  if (!isoString) return '—';
-  try {
-    const d = new Date(isoString);
-    return new Intl.DateTimeFormat('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(d);
-  } catch {
-    return '—';
-  }
-}
-
 export function BroadcastNotificationsTable({
-  items,
-  isLoading,
   hasFilters,
+  isLoading,
+  items,
+  onCancelSchedule,
   onClearFilters,
-  onViewDetails,
+  onDelete,
+  onDispatchNow,
   onEdit,
   onSchedule,
-  onCancelSchedule,
-  onDispatchNow,
-  onDelete,
+  onSort,
+  onViewDetails,
+  sortBy = "createdAt",
+  sortOrder = "desc",
 }: BroadcastNotificationsTableProps) {
-  if (isLoading) {
-    return (
-      <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton className="h-12 w-full rounded-lg" key={i} />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const { t } = useTranslation();
 
-  if (items.length === 0) {
+  const columns: DataTableColumn<BroadcastNotificationDto>[] = [
+    {
+      cell: (item) => (
+        <div className="flex min-w-0 flex-col py-1">
+          <span className="truncate font-semibold text-foreground" title={item.title}>
+            {item.title}
+          </span>
+          <span className="truncate text-xs text-muted-foreground" title={item.content}>
+            {item.content}
+          </span>
+        </div>
+      ),
+      className: "w-[30%] min-w-[200px]",
+      header: t("adminBroadcasts.table.announcement"),
+      key: "title",
+      sortable: true,
+    },
+    {
+      cell: (item) => (
+        <span className="text-xs text-foreground">
+          {t(`adminBroadcasts.audience.${item.targetAudience}`, {
+            defaultValue: item.targetAudience,
+          })}
+        </span>
+      ),
+      className: "w-[14%] whitespace-nowrap",
+      header: t("adminBroadcasts.table.targetAudience"),
+      key: "targetAudience",
+    },
+    {
+      cell: (item) => <BroadcastPriorityBadge priority={item.priority} />,
+      className: "w-[10%] whitespace-nowrap",
+      header: t("adminBroadcasts.table.priority"),
+      key: "priority",
+    },
+    {
+      cell: (item) => <BroadcastStatusBadge status={item.status} />,
+      className: "w-[12%] whitespace-nowrap",
+      header: t("adminBroadcasts.table.status"),
+      key: "status",
+      sortable: true,
+    },
+    {
+      cell: (item) => {
+        const dateToShow =
+          item.status === "Sent"
+            ? item.sentAt
+            : item.status === "Scheduled"
+              ? item.scheduledAt
+              : item.createdAt;
+        return (
+          <span className="text-xs text-foreground">
+            {formatDateTimeIct(dateToShow ?? undefined)}
+          </span>
+        );
+      },
+      className: "w-[16%] whitespace-nowrap",
+      header: t("adminBroadcasts.table.scheduleSent"),
+      key: "scheduledAt",
+      sortable: true,
+    },
+    {
+      cell: (item) => {
+        if (item.status !== "Sent") {
+          return <span className="text-xs text-muted-foreground">—</span>;
+        }
+        return (
+          <div className="flex flex-col text-xs">
+            <span className="font-medium text-foreground">
+              {item.deliveryMetrics.readCount} / {item.deliveryMetrics.deliveredCount}
+            </span>
+            <span className="text-[11px] text-muted-foreground">
+              ({item.deliveryMetrics.readPercentage}% {t("adminBroadcasts.table.read")})
+            </span>
+          </div>
+        );
+      },
+      className: "w-[12%] whitespace-nowrap",
+      header: t("adminBroadcasts.table.engagement"),
+      key: "engagement",
+    },
+    {
+      cell: (item) => (
+        <div
+          className="flex justify-end"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label={t("adminBroadcasts.table.actionsAria", { title: item.title })}
+                className="grid size-8 cursor-pointer place-items-center rounded-lg text-muted-foreground hover:bg-muted"
+                type="button"
+              >
+                <MoreVertical className="size-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 py-1">
+              <DropdownMenuItem
+                className="gap-2.5 text-[13px]"
+                onSelect={() => onViewDetails(item)}
+              >
+                <Eye className="size-4" />
+                {t("adminBroadcasts.table.viewDetails")}
+              </DropdownMenuItem>
+
+              {item.status === "Draft" ? (
+                <>
+                  <DropdownMenuItem
+                    className="gap-2.5 text-[13px]"
+                    onSelect={() => onEdit(item)}
+                  >
+                    <Pencil className="size-4" />
+                    {t("actions.edit")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="gap-2.5 text-[13px]"
+                    onSelect={() => onSchedule(item)}
+                  >
+                    <Calendar className="size-4" />
+                    {t("adminBroadcasts.actions.schedule")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="gap-2.5 text-[13px]"
+                    onSelect={() => onDispatchNow(item)}
+                  >
+                    <Send className="size-4" />
+                    {t("adminBroadcasts.actions.dispatchNow")}
+                  </DropdownMenuItem>
+                </>
+              ) : null}
+
+              {item.status === "Scheduled" ? (
+                <>
+                  <DropdownMenuItem
+                    className="gap-2.5 text-[13px] text-destructive focus:text-destructive"
+                    onSelect={() => onCancelSchedule(item)}
+                  >
+                    <XCircle className="size-4" />
+                    {t("adminBroadcasts.actions.cancelSchedule")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="gap-2.5 text-[13px]"
+                    onSelect={() => onDispatchNow(item)}
+                  >
+                    <Send className="size-4" />
+                    {t("adminBroadcasts.actions.dispatchNow")}
+                  </DropdownMenuItem>
+                </>
+              ) : null}
+
+              <DropdownMenuItem
+                className="gap-2.5 text-[13px] text-destructive focus:text-destructive"
+                onSelect={() => onDelete(item)}
+              >
+                <Trash2 className="size-4" />
+                {t("actions.delete")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ),
+      className: "w-[6%] min-w-[48px]",
+      header: <span className="sr-only">{t("adminBroadcasts.table.actions")}</span>,
+      key: "actions",
+    },
+  ];
+
+  if (!isLoading && items.length === 0) {
     if (hasFilters) {
       return (
         <EmptyState
           action={{
-            label: 'Clear Filters',
+            label: t("adminBroadcasts.toolbar.clearFilters"),
             onClick: onClearFilters,
           }}
-          description="No broadcast announcements match your active filter criteria. Try adjusting keywords or statuses."
-          title="No matching broadcasts found"
+          description={t("adminBroadcasts.table.noMatchesDescription")}
+          title={t("adminBroadcasts.table.noMatchesTitle")}
         />
       );
     }
     return (
       <EmptyState
-        description="No broadcast notifications have been composed yet. Create your first announcement to notify users across the platform."
-        title="No broadcast notifications yet"
+        description={t("adminBroadcasts.table.emptyDescription")}
+        title={t("adminBroadcasts.table.emptyTitle")}
       />
     );
   }
 
+  // Active sort column header key
+  const activeSortKey =
+    Object.entries(BROADCAST_SORT_FIELD_BY_COLUMN).find(
+      ([, val]) => val === sortBy,
+    )?.[0] ?? "createdAt";
+
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <Table>
-        <TableHead>
-          <TableHeaderRow className="bg-muted/30">
-            <TableHeaderCell className="w-[320px] font-semibold">Title & Category</TableHeaderCell>
-            <TableHeaderCell className="font-semibold">Target Audience</TableHeaderCell>
-            <TableHeaderCell className="font-semibold">Priority</TableHeaderCell>
-            <TableHeaderCell className="font-semibold">Status</TableHeaderCell>
-            <TableHeaderCell className="font-semibold">Execution / Sent</TableHeaderCell>
-            <TableHeaderCell className="w-[180px] font-semibold">Reach & Reads</TableHeaderCell>
-            <TableHeaderCell className="w-[60px] text-right font-semibold">Actions</TableHeaderCell>
-          </TableHeaderRow>
-        </TableHead>
-        <TableBody>
-          {items.map((item) => {
-            const isSent = item.status === 'Sent';
-            const isScheduled = item.status === 'Scheduled';
-
-            return (
-              <TableRow
-                className="cursor-pointer transition-colors hover:bg-muted/20"
-                key={item.id}
-                onClick={() => onViewDetails(item)}
-              >
-                <TableCell className="font-medium">
-                  <div className="flex flex-col">
-                    <span className="line-clamp-1 font-semibold text-foreground hover:text-primary">
-                      {item.title}
-                    </span>
-                    <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="rounded bg-muted px-1.5 py-0.2 text-[11px] font-medium">
-                        {item.category}
-                      </span>
-                      {item.actionUrl && (
-                        <span className="text-[11px] text-primary/80 hover:underline">
-                          {item.actionLabel || 'Action Link'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <span className="text-sm text-foreground">{item.targetAudience}</span>
-                </TableCell>
-
-                <TableCell>
-                  <BroadcastPriorityBadge priority={item.priority} />
-                </TableCell>
-
-                <TableCell>
-                  <BroadcastStatusBadge status={item.status} />
-                </TableCell>
-
-                <TableCell className="text-xs text-muted-foreground">
-                  {isSent ? (
-                    <div className="flex items-center gap-1.5 text-foreground">
-                      <CheckCircle className="size-3.5 text-emerald-500" />
-                      <span>{formatDate(item.sentAt)}</span>
-                    </div>
-                  ) : isScheduled ? (
-                    <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                      <Clock className="size-3.5" />
-                      <span>{formatDate(item.scheduledAt)}</span>
-                    </div>
-                  ) : (
-                    <span>Created: {formatDate(item.createdAt)}</span>
-                  )}
-                </TableCell>
-
-                <TableCell>
-                  {isSent ? (
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground">
-                          {item.deliveryMetrics.readCount} / {item.deliveryMetrics.targetedCount} read
-                        </span>
-                        <span className="font-semibold text-foreground">
-                          {item.deliveryMetrics.readPercentage}%
-                        </span>
-                      </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full rounded-full bg-primary transition-all"
-                          style={{ width: `${Math.min(100, item.deliveryMetrics.readPercentage)}%` }}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <span className="text-xs text-muted-foreground italic">
-                      {isScheduled ? 'Pending execution' : 'Draft stage'}
-                    </span>
-                  )}
-                </TableCell>
-
-                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="inline-flex size-8 items-center justify-center rounded-lg border border-transparent text-muted-foreground transition hover:border-border hover:bg-muted hover:text-foreground">
-                      <MoreVertical className="size-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44">
-                      <DropdownMenuItem
-                        className="cursor-pointer gap-2"
-                        onClick={() => onViewDetails(item)}
-                      >
-                        <Eye className="size-4" />
-                        View details
-                      </DropdownMenuItem>
-
-                      {!isSent && (
-                        <DropdownMenuItem
-                          className="cursor-pointer gap-2"
-                          onClick={() => onEdit(item)}
-                        >
-                          <Pencil className="size-4" />
-                          Edit content
-                        </DropdownMenuItem>
-                      )}
-
-                      {!isSent && (
-                        <DropdownMenuItem
-                          className="cursor-pointer gap-2"
-                          onClick={() => onSchedule(item)}
-                        >
-                          <Calendar className="size-4" />
-                          {isScheduled ? 'Reschedule' : 'Schedule dispatch'}
-                        </DropdownMenuItem>
-                      )}
-
-                      {!isSent && (
-                        <DropdownMenuItem
-                          className="cursor-pointer gap-2 text-primary"
-                          onClick={() => onDispatchNow(item)}
-                        >
-                          <Send className="size-4" />
-                          Dispatch now
-                        </DropdownMenuItem>
-                      )}
-
-                      {isScheduled && (
-                        <DropdownMenuItem
-                          className="cursor-pointer gap-2 text-amber-600"
-                          onClick={() => onCancelSchedule(item)}
-                        >
-                          <XCircle className="size-4" />
-                          Cancel schedule
-                        </DropdownMenuItem>
-                      )}
-
-                      <DropdownMenuItem
-                        className="cursor-pointer gap-2 text-destructive focus:text-destructive"
-                        onClick={() => onDelete(item)}
-                      >
-                        <Trash2 className="size-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+    <DataTable<BroadcastNotificationDto>
+      className="table-fixed"
+      columns={columns}
+      isLoading={isLoading}
+      onRowClick={(item) => onViewDetails(item)}
+      onSort={(key) => {
+        const field = BROADCAST_SORT_FIELD_BY_COLUMN[key];
+        if (field && onSort) {
+          onSort(field);
+        }
+      }}
+      rowKey={(item) => item.id}
+      rows={items}
+      sort={{ direction: sortOrder, key: activeSortKey }}
+    />
   );
 }

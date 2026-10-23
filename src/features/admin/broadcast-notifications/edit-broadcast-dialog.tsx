@@ -1,5 +1,13 @@
-import { useState } from 'react';
-import { Edit3, AlertCircle } from 'lucide-react';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { Save } from "lucide-react";
+
+import { DIALOG_BUTTON_CLASS } from "@/components/common/action-confirm-dialog";
+import { InlineErrorAlert } from "@/components/common/inline-error-alert";
+import { useToast } from "@/components/toast/toast-provider";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,290 +15,147 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+
+import { BroadcastForm } from "./broadcast-form";
+import { useUpdateBroadcastMutation } from "./broadcast-notifications.queries";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import type {
-  BroadcastAudience,
-  BroadcastCategory,
-  BroadcastChannel,
-  BroadcastNotificationDto,
-  BroadcastPriority,
-} from './broadcast-notifications.types';
-import { useUpdateBroadcastMutation } from './broadcast-notifications.queries';
+  broadcastFormSchema,
+  type BroadcastFormValues,
+} from "./broadcast-notifications.schemas";
+import type { BroadcastNotificationDto } from "./broadcast-notifications.types";
 
 type EditBroadcastDialogProps = {
   broadcast: BroadcastNotificationDto | null;
-  open: boolean;
   onOpenChange: (open: boolean) => void;
+  open: boolean;
 };
 
 function EditBroadcastDialogContent({
   broadcast,
   onOpenChange,
+  open,
 }: {
   broadcast: BroadcastNotificationDto;
   onOpenChange: (open: boolean) => void;
+  open: boolean;
 }) {
-  const [title, setTitle] = useState(() => broadcast.title || '');
-  const [content, setContent] = useState(() => broadcast.content || '');
-  const [category, setCategory] = useState<BroadcastCategory>(() => broadcast.category || 'System Maintenance');
-  const [targetAudience, setTargetAudience] = useState<BroadcastAudience>(() => broadcast.targetAudience || 'All Users');
-  const [priority, setPriority] = useState<BroadcastPriority>(() => broadcast.priority || 'Normal');
-  const [actionUrl, setActionUrl] = useState(() => broadcast.actionUrl || '');
-  const [actionLabel, setActionLabel] = useState(() => broadcast.actionLabel || '');
-  const [channels, setChannels] = useState<BroadcastChannel[]>(() => broadcast.channels?.length ? broadcast.channels : ['In-App Inbox']);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
+  const { t } = useTranslation();
+  const { showToast } = useToast();
   const updateMutation = useUpdateBroadcastMutation();
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  function validate(): boolean {
-    if (!title.trim() || title.trim().length < 5 || title.trim().length > 150) {
-      setErrorMsg('Title must be between 5 and 150 characters.');
-      return false;
-    }
+  const form = useForm<BroadcastFormValues>({
+    defaultValues: {
+      action_label: broadcast.actionLabel ?? "",
+      action_url: broadcast.actionUrl ?? "",
+      category: broadcast.category,
+      channels: broadcast.channels?.length ? broadcast.channels : ["In-App Inbox"],
+      content: broadcast.content,
+      priority: broadcast.priority,
+      target_audience: broadcast.targetAudience,
+      title: broadcast.title,
+    },
+    resolver: zodResolver(broadcastFormSchema),
+  });
 
-    if (!content.trim() || content.trim().length < 10 || content.trim().length > 2000) {
-      setErrorMsg('Message content must be between 10 and 2000 characters.');
-      return false;
-    }
-
-    if (actionUrl.trim()) {
-      try {
-        new URL(actionUrl.trim());
-      } catch {
-        setErrorMsg('Call-to-Action Link must be a valid HTTP or HTTPS URL.');
-        return false;
-      }
-    }
-
-    if (channels.length === 0) {
-      setErrorMsg('At least one distribution channel must be selected.');
-      return false;
-    }
-
-    return true;
-  }
-
-  async function handleSave() {
-    setErrorMsg(null);
-    if (!validate()) return;
-
+  async function onSubmit(values: BroadcastFormValues) {
+    setSubmitError(null);
     try {
       await updateMutation.mutateAsync({
-        id: broadcast.id,
-        payload: {
-          title: title.trim(),
-          content: content.trim(),
-          category,
-          target_audience: targetAudience,
-          priority,
-          action_url: actionUrl.trim() || null,
-          action_label: actionLabel.trim() || null,
-          channels,
+        body: {
+          action_label: values.action_label?.trim() || null,
+          action_url: values.action_url?.trim() || null,
+          category: values.category,
+          channels: values.channels,
+          content: values.content.trim(),
+          priority: values.priority,
+          target_audience: values.target_audience,
+          title: values.title.trim(),
         },
+        id: broadcast.id,
+      });
+
+      showToast({
+        message: t("adminBroadcasts.toast.updatedMessage"),
+        title: t("adminBroadcasts.toast.updatedTitle"),
+        tone: "success",
       });
 
       onOpenChange(false);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to update broadcast notification.';
-      setErrorMsg(message);
-    }
-  }
-
-  function toggleChannel(channel: BroadcastChannel) {
-    if (channels.includes(channel)) {
-      if (channels.length === 1) return; // Keep at least one
-      setChannels(channels.filter((c) => c !== channel));
-    } else {
-      setChannels([...channels, channel]);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : t("state.error", { defaultValue: "An error occurred" }),
+      );
     }
   }
 
   return (
-    <DialogContent className="w-full max-w-[720px] gap-0 overflow-hidden rounded-2xl p-0 border border-border/80 shadow-2xl">
-      <DialogHeader className="bg-muted/15 border-b border-border/60 px-6 py-5">
-        <DialogTitle className="flex items-center gap-2 text-xl font-bold tracking-tight">
-          <Edit3 className="size-5 text-primary" />
-          Edit Broadcast Notification
-        </DialogTitle>
-        <DialogDescription className="text-xs text-muted-foreground mt-1">
-          Update notification content and delivery parameters. Modifications will take effect at scheduled execution time.
-        </DialogDescription>
-      </DialogHeader>
+    <Dialog onOpenChange={onOpenChange} open={open}>
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{t("adminBroadcasts.dialog.editTitle")}</DialogTitle>
+          <DialogDescription>
+            {t("adminBroadcasts.dialog.editDescription")}
+          </DialogDescription>
+        </DialogHeader>
 
-      <div className="max-h-[calc(88vh-160px)] overflow-y-auto px-6 py-5 space-y-4">
-        {broadcast.status === 'Scheduled' && (
-          <div className="rounded-lg bg-blue-50/70 p-3 text-xs text-blue-900 border border-blue-200 dark:bg-blue-950/40 dark:border-blue-900/40 dark:text-blue-300">
-            ℹ️ Editing a scheduled announcement updates the message delivered when the scheduled trigger fires.
+        {submitError ? (
+          <div className="py-1">
+            <InlineErrorAlert>{submitError}</InlineErrorAlert>
           </div>
-        )}
+        ) : null}
 
-        {errorMsg && (
-          <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-xs text-destructive">
-            <AlertCircle className="size-4 shrink-0" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        <div className="space-y-1.5">
-          <Label htmlFor="edit-title">
-            Broadcast Title <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="edit-title"
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Scheduled Infrastructure Maintenance"
-            value={title}
-          />
-          <p className="text-[11px] text-muted-foreground">Between 5 and 150 characters ({title.length}/150)</p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="space-y-1.5">
-            <Label>Category</Label>
-            <Select onValueChange={(val) => setCategory(val as BroadcastCategory)} value={category}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="System Maintenance">System Maintenance</SelectItem>
-                <SelectItem value="Feature Update">Feature Update</SelectItem>
-                <SelectItem value="Policy Update">Policy Update</SelectItem>
-                <SelectItem value="Event Announcement">Event Announcement</SelectItem>
-                <SelectItem value="Security Alert">Security Alert</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>Target Audience</Label>
-            <Select onValueChange={(val) => setTargetAudience(val as BroadcastAudience)} value={targetAudience}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select audience" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All Users">All Users</SelectItem>
-                <SelectItem value="Applicants Only">Applicants Only</SelectItem>
-                <SelectItem value="Recruiters Only">Recruiters Only</SelectItem>
-                <SelectItem value="Enterprise Admins">Enterprise Admins</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>Priority</Label>
-            <Select onValueChange={(val) => setPriority(val as BroadcastPriority)} value={priority}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Low">Low</SelectItem>
-                <SelectItem value="Normal">Normal</SelectItem>
-                <SelectItem value="High">High</SelectItem>
-                <SelectItem value="Urgent">Urgent</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <Label>Distribution Channels</Label>
-          <div className="flex flex-wrap gap-4 pt-1">
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                checked={channels.includes('In-App Inbox')}
-                onChange={() => toggleChannel('In-App Inbox')}
-                type="checkbox"
-              />
-              <span>In-App Inbox</span>
-            </label>
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                checked={channels.includes('Email Digest')}
-                onChange={() => toggleChannel('Email Digest')}
-                type="checkbox"
-              />
-              <span>Email Digest</span>
-            </label>
-          </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="edit-content">
-            Message Content <span className="text-destructive">*</span>
-          </Label>
-          <Textarea
-            id="edit-content"
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Detail the announcement notice, instructions, or downtime window..."
-            rows={5}
-            value={content}
-          />
-          <p className="text-[11px] text-muted-foreground">Between 10 and 2000 characters ({content.length}/2000)</p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="edit-action-url">Action Link (Optional)</Label>
-            <Input
-              id="edit-action-url"
-              onChange={(e) => setActionUrl(e.target.value)}
-              placeholder="https://status.italent.com"
-              value={actionUrl}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="edit-action-label">Button Label (Optional)</Label>
-            <Input
-              id="edit-action-label"
-              onChange={(e) => setActionLabel(e.target.value)}
-              placeholder="e.g. Check Status"
-              value={actionLabel}
-            />
-          </div>
-        </div>
-      </div>
-
-      <DialogFooter className="border-t border-border/60 bg-muted/20 px-6 py-4 flex gap-2 sm:justify-end">
-        <Button onClick={() => onOpenChange(false)} type="button" variant="outline">
-          Cancel
-        </Button>
-        <Button
-          disabled={updateMutation.isPending}
-          onClick={handleSave}
-          type="button"
+        <form
+          className="flex flex-col gap-4 py-2"
+          id="edit-broadcast-form"
+          onSubmit={form.handleSubmit(onSubmit)}
         >
-          {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
-        </Button>
-      </DialogFooter>
-    </DialogContent>
+          <BroadcastForm
+            disabled={updateMutation.isPending}
+            form={form}
+            isEditing
+          />
+        </form>
+
+        <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-2">
+          <Button
+            className={DIALOG_BUTTON_CLASS}
+            disabled={updateMutation.isPending}
+            onClick={() => onOpenChange(false)}
+            type="button"
+            variant="outline"
+          >
+            {t("actions.cancel")}
+          </Button>
+
+          <Button
+            className={DIALOG_BUTTON_CLASS}
+            disabled={updateMutation.isPending}
+            form="edit-broadcast-form"
+            type="submit"
+          >
+            <Save className="size-4" />
+            {t("actions.save")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 export function EditBroadcastDialog({
   broadcast,
-  open,
   onOpenChange,
+  open,
 }: EditBroadcastDialogProps) {
   if (!broadcast) return null;
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <EditBroadcastDialogContent
-        key={broadcast.id}
-        broadcast={broadcast}
-        onOpenChange={onOpenChange}
-      />
-    </Dialog>
+    <EditBroadcastDialogContent
+      broadcast={broadcast}
+      key={broadcast.id}
+      onOpenChange={onOpenChange}
+      open={open}
+    />
   );
 }

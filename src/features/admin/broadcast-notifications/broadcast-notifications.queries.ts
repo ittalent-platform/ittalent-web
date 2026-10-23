@@ -19,7 +19,6 @@ export const broadcastsKeys = {
 };
 
 export const DEFAULT_PAGE_SIZE = 10;
-export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
 
 export function useBroadcastsListQuery(params: BroadcastListParams) {
   const { enabled = true, limit = DEFAULT_PAGE_SIZE, ...queryParams } = params;
@@ -92,15 +91,17 @@ export function useUpdateBroadcastMutation() {
 
   return useMutation({
     mutationFn: async ({
+      body,
       id,
       payload,
     }: {
+      body?: UpdateBroadcastInput;
       id: string;
-      payload: UpdateBroadcastInput;
+      payload?: UpdateBroadcastInput;
     }): Promise<BroadcastNotificationDto> => {
       const res = await client.patch<{ 200: { success: boolean; data: BroadcastNotificationDto } }>({
+        body: payload ?? body!,
         url: `/api/v1/broadcast-notifications/${id}`,
-        body: payload,
       });
       const data = unwrap(res, 'Failed to update broadcast notification');
       return data.data;
@@ -119,13 +120,16 @@ export function useScheduleBroadcastMutation() {
     mutationFn: async ({
       id,
       payload,
+      scheduled_at,
     }: {
       id: string;
-      payload: ScheduleBroadcastInput;
+      payload?: ScheduleBroadcastInput;
+      scheduled_at?: string;
     }): Promise<BroadcastNotificationDto> => {
+      const body = payload ?? { scheduled_at: scheduled_at! };
       const res = await client.patch<{ 200: { success: boolean; data: BroadcastNotificationDto } }>({
+        body,
         url: `/api/v1/broadcast-notifications/${id}/schedule`,
-        body: payload,
       });
       const data = unwrap(res, 'Failed to schedule broadcast notification');
       return data.data;

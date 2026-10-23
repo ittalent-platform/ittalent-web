@@ -32,10 +32,6 @@ export function adminEnterprisePath(enterpriseId: string): string {
 /** Admin broadcast notifications management (UC 01 - UC 07). */
 export const ADMIN_BROADCASTS_PATH = "/admin/broadcast-notifications";
 
-export function adminBroadcastDetailPath(broadcastId: string): string {
-  return `${ADMIN_BROADCASTS_PATH}/${broadcastId}`;
-}
-
 /** Recruiter employee accounts management (UC 10 - UC 16). */
 export const RECRUITER_EMPLOYEES_PATH = "/recruiter/employees";
 
