@@ -142,7 +142,7 @@ export function NotificationItemRow({
         )}
         <button
           aria-label={t("notifications.actions.delete", { defaultValue: "Delete" })}
-          className="flex size-[34px] items-center justify-center rounded-[10px] text-danger-text transition-colors hover:bg-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-text/30 cursor-pointer"
+          className="flex size-[34px] items-center justify-center rounded-[10px] text-danger transition-colors hover:bg-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/30 cursor-pointer"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

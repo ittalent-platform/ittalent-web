@@ -154,6 +154,7 @@
   --border: oklch(0.2393 0 0);
   --input: oklch(0.3523 0 0);
   --fg-link: #f6c9b6;
+  --ember-wash: rgba(242, 71, 12, 0.18);
   --line-muted: #2e2e32;
   --line-dashed: #4a4a50;
   --surface-readonly: #26262a;
@@ -549,6 +550,7 @@
 
 .candidate-root.dark {
   --fg-link: #f6c9b6;
+  --ember-wash: rgba(242, 71, 12, 0.18);
   --line-muted: #2e2e32;
   --line-dashed: #4a4a50;
   --surface-readonly: #26262a;
