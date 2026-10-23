@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { useSession } from "@/auth/use-session";
 import { cn } from "@/lib/utils";
-import { useCheckSavedJobQuery, useToggleSaveJobMutation } from "../saved-jobs.queries";
+import { useCheckSavedJobQuery, useToggleSaveJobMutation } from "@/features/applicant/saved-jobs/saved-jobs.queries";
 import { SignInToSaveDialog } from "./sign-in-to-save-dialog";
 
 export type SaveJobButtonProps = {
@@ -103,8 +103,8 @@ export function SaveJobButton({
             "relative inline-flex h-10 select-none items-center gap-2 rounded-full border px-4 text-sm font-semibold whitespace-nowrap transition-colors",
             isPending && "cursor-wait opacity-80",
             isSaved
-              ? "border-[#f6c9b6] bg-[#fff3ee] text-[#b33305] hover:bg-[#ffece4]"
-              : "border-[#dedcd6] bg-white text-[#19191c] hover:border-[#cfcdc6] hover:bg-[#f6f5f0]",
+              ? "border-mkt-accent-border bg-mkt-accent-soft text-mkt-accent-hover hover:bg-mkt-accent-soft/80"
+              : "border-mkt-line-strong bg-white text-mkt-ink hover:border-mkt-line hover:bg-mkt-chip",
             className,
           )}
           disabled={isPending}
@@ -115,7 +115,7 @@ export function SaveJobButton({
           {isPending ? (
             <Loader2 aria-hidden="true" className="size-[17px] animate-spin text-mkt-muted" />
           ) : isSaved ? (
-            <Heart aria-hidden="true" className="size-[17px] fill-[#f2470c] stroke-[#f2470c]" />
+            <Heart aria-hidden="true" className="size-[17px] fill-mkt-brand stroke-mkt-brand" />
           ) : (
             <Heart aria-hidden="true" className="size-[17px] fill-none stroke-current" />
           )}
@@ -128,7 +128,7 @@ export function SaveJobButton({
           className={cn(
             "inline-flex size-9 select-none items-center justify-center rounded-full border transition-colors",
             isSaved
-              ? "border-[#f6c9b6] bg-[#fff3ee] text-[#f2470c] hover:bg-[#ffece4]"
+              ? "border-mkt-accent-border bg-mkt-accent-soft text-mkt-brand hover:bg-mkt-accent-soft/80"
               : "border-transparent text-mkt-muted hover:border-mkt-line hover:bg-white hover:text-mkt-ink",
             isPending && "cursor-wait opacity-80",
             className,
@@ -141,7 +141,7 @@ export function SaveJobButton({
           {isPending ? (
             <Loader2 aria-hidden="true" className="size-4 animate-spin text-mkt-muted" />
           ) : isSaved ? (
-            <Heart aria-hidden="true" className="size-4 fill-[#f2470c] stroke-[#f2470c]" />
+            <Heart aria-hidden="true" className="size-4 fill-mkt-brand stroke-mkt-brand" />
           ) : (
             <Heart aria-hidden="true" className="size-4 fill-none stroke-current" />
           )}
