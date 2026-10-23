@@ -35,7 +35,7 @@ export function NotificationRowMini({
     <div
       className={cn(
         "group relative flex items-center gap-3.5 border-t border-line-muted py-3.5 pl-6 pr-3 transition-colors",
-        isUnread ? "bg-ember-wash/30" : "bg-card",
+        isUnread ? "bg-primary/[0.04] hover:bg-primary/[0.08]" : "bg-card",
         "hover:bg-muted focus-within:bg-muted",
       )}
       data-slot="notification-row-mini"

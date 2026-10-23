@@ -75,7 +75,7 @@ export function NotificationItemRow({
     <div
       className={cn(
         "group relative flex items-center gap-3.5 border-t border-line-muted py-3.5 pl-6 pr-4 sm:pr-6 transition-colors",
-        isUnread ? "bg-ember-wash/20 hover:bg-ember-wash/35" : "bg-card hover:bg-muted",
+        isUnread ? "bg-primary/[0.04] hover:bg-primary/[0.08]" : "bg-card hover:bg-muted",
         "focus-within:bg-muted",
         className,
       )}
