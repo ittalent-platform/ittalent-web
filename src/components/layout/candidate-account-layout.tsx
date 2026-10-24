@@ -1,4 +1,4 @@
-import { Award, Briefcase, FileText, type LucideIcon } from "lucide-react";
+import { Award, Bookmark, Briefcase, FileText, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router";
 
@@ -8,7 +8,13 @@ type AccountNavGroup = { labelKey: string; items: Array<{ icon: LucideIcon; labe
 
 // Only pages that exist today; the design's other entries arrive with their features.
 const ACCOUNT_NAV: AccountNavGroup[] = [
-  { items: [{ icon: Briefcase, labelKey: "accountNav.myApplications", to: "/my-applications" }], labelKey: "accountNav.jobSearch" },
+  {
+    items: [
+      { icon: Briefcase, labelKey: "accountNav.myApplications", to: "/my-applications" },
+      { icon: Bookmark, labelKey: "accountNav.savedJobs", to: "/saved-jobs" },
+    ],
+    labelKey: "accountNav.jobSearch",
+  },
   {
     items: [
       { icon: FileText, labelKey: "accountNav.documents", to: "/documents" },
