@@ -41,10 +41,16 @@ export function TableRow({
   children,
   className,
   onClick,
+  onKeyDown,
+  role,
+  tabIndex,
 }: {
   children: ReactNode;
   className?: string;
   onClick?: MouseEventHandler<HTMLTableRowElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLTableRowElement>;
+  role?: string;
+  tabIndex?: number;
 }) {
   return (
     <tr
@@ -53,6 +59,9 @@ export function TableRow({
         className,
       )}
       onClick={onClick}
+      onKeyDown={onKeyDown}
+      role={role}
+      tabIndex={tabIndex}
     >
       {children}
     </tr>
