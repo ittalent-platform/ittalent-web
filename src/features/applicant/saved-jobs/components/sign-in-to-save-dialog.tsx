@@ -1,4 +1,5 @@
 import { Bookmark } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router";
 
 import {
@@ -16,6 +17,7 @@ export type SignInToSaveDialogProps = {
 };
 
 export function SignInToSaveDialog({ open, onOpenChange }: SignInToSaveDialogProps) {
+  const { t } = useTranslation();
   const location = useLocation();
   const currentPath = encodeURIComponent(`${location.pathname}${location.search}`);
 
@@ -28,10 +30,13 @@ export function SignInToSaveDialog({ open, onOpenChange }: SignInToSaveDialogPro
           </div>
           <div className="flex flex-col gap-1.5">
             <AlertDialogTitle className="itt-display text-xl font-semibold text-mkt-ink">
-              Sign in to save jobs
+              {t("savedJobs.dialog.signInTitle", "Sign in to save jobs")}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm leading-relaxed text-mkt-ink-2">
-              Saved jobs are private to your candidate account. You’ll come back to this job after signing in.
+              {t(
+                "savedJobs.dialog.signInDescription",
+                "Saved jobs are private to your candidate account. You’ll come back to this job after signing in.",
+              )}
             </AlertDialogDescription>
           </div>
         </div>
@@ -45,7 +50,7 @@ export function SignInToSaveDialog({ open, onOpenChange }: SignInToSaveDialogPro
               variant="outline"
             >
               <Link to={`/register?next=${currentPath}`}>
-                Create an account
+                {t("savedJobs.dialog.createAccountAction", "Create an account")}
               </Link>
             </Button>
           </AlertDialogCancel>
@@ -55,7 +60,7 @@ export function SignInToSaveDialog({ open, onOpenChange }: SignInToSaveDialogPro
             shape="pill"
           >
             <Link onClick={() => onOpenChange(false)} to={`/login?next=${currentPath}`}>
-              Sign in
+              {t("savedJobs.dialog.signInAction", "Sign in")}
             </Link>
           </Button>
         </div>

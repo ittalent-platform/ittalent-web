@@ -1,5 +1,6 @@
 import { Heart, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import { requestErrorMessage } from "@/api/request-error";
@@ -30,6 +31,7 @@ export function SaveJobButton({
   onSaveSuccess,
   onRemoveSuccess,
 }: SaveJobButtonProps) {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -66,10 +68,10 @@ export function SaveJobButton({
           onRemoveSuccess?.();
           showToast({
             tone: "success",
-            title: "Removed from saved jobs",
-            message: "Job removed from your bookmarks.",
+            title: t("savedJobs.toast.removedTitle", "Removed from saved jobs"),
+            message: t("savedJobs.toast.removedMessage", "Job removed from your bookmarks."),
             action: {
-              label: "Undo",
+              label: t("savedJobs.toast.undo", "Undo"),
               onClick: () => {
                 saveMutation.mutate(jobId, {
                   onSuccess: () => {
@@ -78,8 +80,11 @@ export function SaveJobButton({
                   onError: (error) => {
                     showToast({
                       tone: "error",
-                      title: "Couldn't save job",
-                      message: requestErrorMessage(error, "Unable to save job to bookmarks."),
+                      title: t("savedJobs.toast.errorSaveTitle", "Couldn't save job"),
+                      message: requestErrorMessage(
+                        error,
+                        t("savedJobs.toast.errorSaveFallback", "Unable to save job to bookmarks."),
+                      ),
                     });
                   },
                 });
@@ -90,8 +95,11 @@ export function SaveJobButton({
         onError: (error) => {
           showToast({
             tone: "error",
-            title: "Couldn't remove job",
-            message: requestErrorMessage(error, "Unable to remove job from saved jobs."),
+            title: t("savedJobs.toast.errorRemoveTitle", "Couldn't remove job"),
+            message: requestErrorMessage(
+              error,
+              t("savedJobs.toast.errorRemoveFallback", "Unable to remove job from saved jobs."),
+            ),
           });
         },
       });
@@ -101,10 +109,10 @@ export function SaveJobButton({
           onSaveSuccess?.();
           showToast({
             tone: "success",
-            title: "Job saved",
-            message: "Job saved to your bookmarks.",
+            title: t("savedJobs.toast.savedTitle", "Job saved"),
+            message: t("savedJobs.toast.savedMessage", "Job saved to your bookmarks."),
             action: {
-              label: "View saved jobs",
+              label: t("savedJobs.toast.viewSavedJobs", "View saved jobs"),
               onClick: () => {
                 navigate("/saved-jobs");
               },
@@ -114,8 +122,11 @@ export function SaveJobButton({
         onError: (error) => {
           showToast({
             tone: "error",
-            title: "Couldn't save job",
-            message: requestErrorMessage(error, "Unable to save job to bookmarks."),
+            title: t("savedJobs.toast.errorSaveTitle", "Couldn't save job"),
+            message: requestErrorMessage(
+              error,
+              t("savedJobs.toast.errorSaveFallback", "Unable to save job to bookmarks."),
+            ),
           });
         },
       });
@@ -131,24 +142,30 @@ export function SaveJobButton({
           "inline-flex h-10 select-none items-center gap-2 rounded-full border border-mkt-line bg-mkt-chip px-4 text-sm font-semibold text-mkt-muted opacity-60 cursor-not-allowed",
           className,
         )}
-        title="Saving jobs is for candidate accounts"
+        title={t("savedJobs.button.staffDisabled", "Saving jobs is for candidate accounts")}
         type="button"
       >
         <Heart aria-hidden="true" className="size-[17px] stroke-current" />
-        <span>Save</span>
+        <span>{t("savedJobs.button.save", "Save")}</span>
       </button>
     );
   }
 
   const tooltipText = isSaved
-    ? "Click to remove from saved jobs"
+    ? t("savedJobs.button.tooltipRemove", "Click to remove from saved jobs")
     : isPending
-      ? "Saving…"
-      : "Save job";
+      ? t("savedJobs.button.saving", "Saving…")
+      : t("savedJobs.button.tooltipSave", "Save job");
 
   const ariaLabel = isSaved
-    ? `Saved. Remove ${jobTitle ?? "job"} from saved jobs`
-    : `Save ${jobTitle ?? "job"}`;
+    ? t("savedJobs.button.ariaSaved", {
+        title: jobTitle ?? "job",
+        defaultValue: `Saved. Remove ${jobTitle ?? "job"} from saved jobs`,
+      })
+    : t("savedJobs.button.ariaSave", {
+        title: jobTitle ?? "job",
+        defaultValue: `Save ${jobTitle ?? "job"}`,
+      });
 
   return (
     <>
@@ -176,7 +193,13 @@ export function SaveJobButton({
           ) : (
             <Heart aria-hidden="true" className="size-[17px] fill-none stroke-current" />
           )}
-          <span>{isPending ? "Saving…" : isSaved ? "Saved" : "Save"}</span>
+          <span>
+            {isPending
+              ? t("savedJobs.button.saving", "Saving…")
+              : isSaved
+                ? t("savedJobs.button.saved", "Saved")
+                : t("savedJobs.button.save", "Save")}
+          </span>
         </button>
       ) : (
         <button

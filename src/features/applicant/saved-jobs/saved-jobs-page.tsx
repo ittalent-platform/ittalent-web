@@ -8,7 +8,7 @@ export function SavedJobsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h1 className="itt-display text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-          {t("accountNav.savedJobs", "Saved jobs")}
+          {t("savedJobs.title", "Saved jobs")}
         </h1>
         <p className="text-sm text-muted-foreground">
           {t("savedJobs.subtitle", "Review, track and manage your saved IT opportunities.")}
