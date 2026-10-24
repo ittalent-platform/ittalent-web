@@ -168,9 +168,14 @@ export function NotificationCenterPage() {
 
   const handleOpenMarkAllDialog = () => {
     if (unreadCount > 0 && !markAllReadMutation.isPending) {
-      // Use newest server-side timestamp from loaded items to avoid client clock skew issues
-      const newestServerCutoff =
-        items.find((item) => Boolean(item.createdAt))?.createdAt ?? new Date().toISOString();
+      // Use newest server-side timestamp from unfiltered items to avoid client clock skew
+      // and prevent tab-filtered lists (e.g. Announcements) from setting an older cutoff.
+      const globalNewestCreatedAt =
+        activeTab === "all"
+          ? items.find((item) => Boolean(item.createdAt))?.createdAt
+          : (allCountQuery.data?.items?.[0]?.createdAt ??
+            items.find((item) => Boolean(item.createdAt))?.createdAt);
+      const newestServerCutoff = globalNewestCreatedAt ?? new Date().toISOString();
       setCapturedMarkAllCount(unreadCount);
       setCapturedMarkAllCutoff(newestServerCutoff);
       setShowMarkAllDialog(true);

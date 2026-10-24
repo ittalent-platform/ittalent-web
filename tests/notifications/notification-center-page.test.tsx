@@ -282,6 +282,85 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       });
     });
 
+    it("uses global newest server timestamp when marking all as read from announcements tab", async () => {
+      const user = userEvent.setup();
+
+      const globalNewestTimestamp = "2026-10-24T12:00:00.000Z";
+      const olderAnnouncementTimestamp = "2026-10-18T10:00:00.000Z";
+
+      vi.mocked(api.getApiV1Notifications).mockImplementation(async (req) => {
+        const query = req?.query as { type?: string; limit?: number; page?: number } | undefined;
+        if (query?.type === "system_announcement") {
+          return {
+            data: {
+              hasNext: false,
+              items: [
+                {
+                  ...sampleNotifications[2],
+                  createdAt: olderAnnouncementTimestamp,
+                },
+              ],
+              limit: 20,
+              page: 1,
+              total: 1,
+              totalPages: 1,
+              unreadCount: 2,
+            },
+            response: new Response(null, { status: 200 }),
+          };
+        }
+        if (query?.limit === 1) {
+          // This is allCountQuery (unfiltered)
+          return {
+            data: {
+              hasNext: true,
+              items: [
+                {
+                  ...sampleNotifications[0],
+                  createdAt: globalNewestTimestamp,
+                },
+              ],
+              limit: 1,
+              page: 1,
+              total: 25,
+              totalPages: 25,
+              unreadCount: 2,
+            },
+            response: new Response(null, { status: 200 }),
+          };
+        }
+        return {
+          data: {
+            hasNext: true,
+            items: sampleNotifications,
+            limit: 20,
+            page: 1,
+            total: 25,
+            totalPages: 2,
+            unreadCount: 2,
+          },
+          response: new Response(null, { status: 200 }),
+        };
+      });
+
+      renderWithProviders(<NotificationCenterPage />, ["/notifications?tab=announcements"]);
+
+      // Wait for announcement to render
+      expect(await screen.findByText(sampleNotifications[2].title)).toBeInTheDocument();
+
+      const markAllBtn = await screen.findByRole("button", { name: /mark all as read/i });
+      await user.click(markAllBtn);
+
+      const dialog = await screen.findByRole("alertdialog");
+      const confirmBtn = within(dialog).getByRole("button", { name: /^mark as read$/i });
+      await user.click(confirmBtn);
+
+      expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledTimes(1);
+      expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledWith({
+        query: { before: globalNewestTimestamp },
+      });
+    });
+
     it("uses singular wording when 1 unread notification is marked as read", async () => {
       const user = userEvent.setup();
       vi.mocked(api.getApiV1NotificationsUnreadCount).mockResolvedValue({
