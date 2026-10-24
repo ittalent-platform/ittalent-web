@@ -15,6 +15,7 @@ import {
   useNotificationsQuery,
   useUnreadCountQuery,
 } from "@/features/notifications";
+import { formatAnnouncementDateTime } from "@/features/notifications/notifications.format";
 
 vi.mock("@/api/generated", () => ({
   deleteApiV1Notifications: vi.fn(),
@@ -312,6 +313,19 @@ describe("Notifications API & React Query Layer", () => {
 
       expect(api.deleteApiV1Notifications).toHaveBeenCalled();
       expect(queryClient.getQueryData(notificationKeys.unreadCount())).toEqual({ unreadCount: 0 });
+    });
+  });
+
+  describe("formatAnnouncementDateTime", () => {
+    it("formats announcement date strictly in Vietnam ICT timezone", () => {
+      // 2026-10-23T23:30:00Z is 2026-10-24 06:30 in ICT (GMT+7)
+      const lateUtcIso = "2026-10-23T23:30:00Z";
+      expect(formatAnnouncementDateTime(lateUtcIso, "en")).toBe("24 Oct 2026, 06:30");
+      expect(formatAnnouncementDateTime(lateUtcIso, "vi")).toMatch(/24 (thg|tháng) 10 2026, 06:30/i);
+
+      // 2026-10-23T16:59:00Z is 2026-10-23 23:59 in ICT (GMT+7)
+      const nearMidnightIso = "2026-10-23T16:59:00Z";
+      expect(formatAnnouncementDateTime(nearMidnightIso, "en")).toBe("23 Oct 2026, 23:59");
     });
   });
 });
