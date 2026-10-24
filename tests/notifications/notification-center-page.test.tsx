@@ -404,6 +404,57 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       });
     });
 
+    it("keeps existing rows visible and shows inline retry when fetching next page fails", async () => {
+      const user = userEvent.setup();
+      let failPage2 = true;
+      vi.mocked(api.getApiV1Notifications).mockImplementation(async ({ query }) => {
+        const page = (query?.page as number) ?? 1;
+        if (page === 2 && failPage2) {
+          failPage2 = false;
+          throw new Error("Page 2 fetch failed");
+        }
+        return {
+          data: {
+            hasNext: page === 1,
+            items:
+              page === 1
+                ? sampleNotifications
+                : [{ ...sampleNotifications[0], id: "notif-p2-1", title: "Page 2 item" }],
+            limit: 10,
+            page,
+            total: 25,
+            totalPages: 3,
+            unreadCount: 2,
+          },
+          response: new Response(null, { status: 200 }),
+        };
+      });
+
+      renderWithProviders(<NotificationCenterPage />);
+
+      // Existing items from page 1 are shown
+      expect(await screen.findByText("Interview scheduled")).toBeInTheDocument();
+
+      const showOlderBtn = screen.getByRole("button", { name: /show older/i });
+      await user.click(showOlderBtn);
+
+      // Page 1 rows are NOT wiped out
+      expect(screen.getByText("Interview scheduled")).toBeInTheDocument();
+
+      // Inline error message appears
+      expect(await screen.findByRole("alert")).toHaveTextContent(/couldn['’]t load older notifications/i);
+
+      // Button now says "Try again"
+      const tryAgainBtn = screen.getByRole("button", { name: /try again/i });
+      expect(tryAgainBtn).toBeInTheDocument();
+
+      // Click "Try again"
+      await user.click(tryAgainBtn);
+
+      // Page 2 items load successfully
+      expect(await screen.findByText("Page 2 item")).toBeInTheDocument();
+    });
+
     it("renders contextual empty states when list has no items", async () => {
       vi.mocked(api.getApiV1Notifications).mockResolvedValue({
         data: {

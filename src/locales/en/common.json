@@ -3083,7 +3083,8 @@
     },
     "error": {
       "loadTitle": "Notifications couldn't be loaded",
-      "loadDesc": "Something went wrong on our side. Your notifications are safe; try again in a moment."
+      "loadDesc": "Something went wrong on our side. Your notifications are safe; try again in a moment.",
+      "olderFailed": "Couldn't load older notifications."
     },
     "errors": {
       "unauthenticatedTitle": "Sign in to see your notifications",

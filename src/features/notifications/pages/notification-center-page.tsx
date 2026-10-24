@@ -398,7 +398,7 @@ export function NotificationCenterPage() {
             <div className="flex items-center justify-center py-16 text-muted-foreground">
               <span className="text-[13.5px]">{t("common.loading", { defaultValue: "Loading..." })}</span>
             </div>
-          ) : notificationsQuery.isError ? (
+          ) : notificationsQuery.isError && items.length === 0 ? (
             <div className="flex flex-col items-start gap-4 p-8 text-left sm:p-10">
               <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-destructive/10 text-destructive">
                 <TriangleAlert className="h-5 w-5" />
@@ -493,6 +493,11 @@ export function NotificationCenterPage() {
                 total: Math.max(0, totalCount - pendingDeleteIds.size),
               })}
             </span>
+            {notificationsQuery.isFetchNextPageError ? (
+              <span className="text-[13px] text-destructive" role="alert">
+                {t("notifications.error.olderFailed", { defaultValue: "Couldn’t load older notifications." })}
+              </span>
+            ) : null}
             {Boolean(notificationsQuery.hasNextPage) && (
               <button
                 className="inline-flex h-10 items-center justify-center rounded-[12px] border border-border bg-card px-4 text-[14px] font-semibold text-foreground transition-colors hover:bg-muted cursor-pointer disabled:opacity-50"
@@ -502,7 +507,9 @@ export function NotificationCenterPage() {
               >
                 {notificationsQuery.isFetchingNextPage
                   ? t("common.loading", { defaultValue: "Loading..." })
-                  : t("notifications.showOlder", { defaultValue: "Show older" })}
+                  : notificationsQuery.isFetchNextPageError
+                    ? t("notifications.actions.tryAgain", { defaultValue: "Try again" })
+                    : t("notifications.showOlder", { defaultValue: "Show older" })}
               </button>
             )}
           </div>
