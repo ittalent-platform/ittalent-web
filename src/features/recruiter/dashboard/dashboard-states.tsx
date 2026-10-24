@@ -93,12 +93,12 @@ export function PeriodNoticeCallout({ company, notice }: { company?: string; not
 }
 
 /** Old numbers stay on screen, labelled with their time, until the new set is complete. */
-export function UpdatingNote({ time }: { time: string }) {
+export function UpdatingNote({ range, time }: { range: string; time: string }) {
   const { t } = useTranslation();
   return (
     <p className={`${CARD_FRAME} m-0 flex items-center gap-2.5 px-4 py-3 text-[13.5px] text-(--status-neutral-fg)`} role="status">
       <RefreshCw aria-hidden className="size-4 shrink-0 animate-spin" />
-      {t("dashboard.states.updating", { time })}
+      {t("dashboard.states.updatingPeriod", { range, time })}
     </p>
   );
 }

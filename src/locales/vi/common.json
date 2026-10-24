@@ -3094,6 +3094,7 @@
       "days_other": "Tức {{count}} ngày.",
       "apply": "Áp dụng",
       "cancel": "Hủy",
+      "reset": "Đặt lại về 30 ngày qua",
       "errors": {
         "order": "“Đến ngày” phải bằng hoặc sau “Từ ngày”.",
         "tooLong": "Một khoảng thời gian tối đa {{days}} ngày."
@@ -3227,6 +3228,7 @@
     "states": {
       "loading": "Đang tải thống kê",
       "updating": "Đang cập nhật… số liệu đang hiển thị là của {{time}}",
+      "updatingPeriod": "Đang cập nhật… số liệu đang hiển thị là của {{range}}, tính đến {{time}}",
       "error": {
         "title": "Không tải được thống kê",
         "body": "Không hiển thị gì để số liệu ở các thời điểm khác nhau không bị lẫn vào nhau.",

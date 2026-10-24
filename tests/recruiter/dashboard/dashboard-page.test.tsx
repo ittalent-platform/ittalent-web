@@ -199,7 +199,7 @@ describe("DashboardPage", () => {
     mockResult({ data: companyDashboard(), isFetching: true });
     renderPage();
 
-    expect(screen.getByText(/Updating… numbers shown are from 10:42/)).toBeInTheDocument();
+    expect(screen.getByText(/Updating… numbers shown are for 11 Sep – 10 Oct, as of 10:42/)).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Key numbers" })).toBeInTheDocument();
   });
 
@@ -209,7 +209,7 @@ describe("DashboardPage", () => {
 
     expect(screen.getByRole("button", { name: "Time period" })).toHaveTextContent("Last 7 days");
     expect(screen.getByRole("button", { name: "Time period" })).not.toHaveTextContent("Last 30 days");
-    expect(screen.getByText(/Updating… numbers shown are from 10:42/)).toBeInTheDocument();
+    expect(screen.getByText(/Updating… numbers shown are for 11 Sep – 10 Oct, as of 10:42/)).toBeInTheDocument();
   });
 
   it("refreshes on request", async () => {
@@ -246,6 +246,33 @@ describe("DashboardPage", () => {
       expect(spy).toHaveBeenLastCalledWith({ range: "last_7_days" });
       expect(screen.getByTestId("location")).toHaveTextContent("/recruiter/dashboard?range=last_7_days");
       expect(screen.queryByRole("group", { name: "Time period" })).not.toBeInTheDocument();
+    });
+
+    it("offers no reset on the default period", () => {
+      mockResult({ data: companyDashboard() });
+      renderPage();
+
+      expect(screen.queryByRole("button", { name: "Reset to last 30 days" })).not.toBeInTheDocument();
+    });
+
+    it("offers a way back to the last 30 days whenever another period is shown", async () => {
+      const user = userEvent.setup();
+      const spy = mockResult({ data: companyDashboard() });
+      renderPage("/recruiter/dashboard?range=custom&from=2026-10-04&to=2026-10-10");
+
+      expect(screen.getByText(/Data as of/)).toHaveTextContent("Reset to last 30 days");
+      await user.click(screen.getByRole("button", { name: "Reset to last 30 days" }));
+
+      expect(spy).toHaveBeenLastCalledWith({ range: "last_30_days" });
+      expect(screen.getByTestId("location")).toHaveTextContent(/^\/recruiter\/dashboard$/);
+      expect(screen.queryByRole("button", { name: "Reset to last 30 days" })).not.toBeInTheDocument();
+    });
+
+    it("offers the reset before the first answer arrives", () => {
+      mockResult({ data: undefined, isLoading: true });
+      renderPage("/recruiter/dashboard?range=last_7_days");
+
+      expect(screen.getByRole("button", { name: "Reset to last 30 days" })).toBeInTheDocument();
     });
 
     it("keeps the address clean for the default period", async () => {

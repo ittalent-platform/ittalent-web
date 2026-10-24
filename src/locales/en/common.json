@@ -3121,6 +3121,7 @@
       "days_other": "That is {{count}} days.",
       "apply": "Apply",
       "cancel": "Cancel",
+      "reset": "Reset to last 30 days",
       "errors": {
         "order": "“To” must be on or after “From”.",
         "tooLong": "A period can cover at most {{days}} days."
@@ -3257,6 +3258,7 @@
     "states": {
       "loading": "Loading statistics",
       "updating": "Updating… numbers shown are from {{time}}",
+      "updatingPeriod": "Updating… numbers shown are for {{range}}, as of {{time}}",
       "error": {
         "title": "Statistics didn’t load",
         "body": "Nothing is shown so numbers from different moments never mix.",

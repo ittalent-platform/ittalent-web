@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 import { DashboardKpis } from "./dashboard-kpis";
 import { DashboardFailure, DashboardSkeleton, EmptyPeriodNote, PeriodNoticeCallout, UpdatingNote } from "./dashboard-states";
+import { DEFAULT_RANGE } from "./dashboard.constants";
 import { isEmptyPeriod } from "./dashboard.derive";
 import { isFuturePeriod, presetWindow, todayInVietnam } from "./dashboard.period";
 import { InterviewStatusCard } from "./interview-status-card";
@@ -39,6 +40,8 @@ export function DashboardPage() {
       : { ...presetWindow(selection.range === "custom" ? "last_30_days" : selection.range, today), range: selection.range });
   const asOf = data ? formatAsOf(data.asOf, language) : null;
   const failed = dashboard.isError;
+  // Anything but the default period can be undone in one click, as in the design.
+  const canReset = selection.range !== DEFAULT_RANGE;
 
   return (
     <div className="flex flex-col gap-[18px] leading-[1.2]">
@@ -51,7 +54,23 @@ export function DashboardPage() {
             </Button>
           </>
         }
-        description={asOf ? t("dashboard.asOf", { date: asOf.date, time: asOf.time }) : undefined}
+        description={
+          asOf || canReset ? (
+            <>
+              {asOf ? t("dashboard.asOf", { date: asOf.date, time: asOf.time }) : null}
+              {asOf && canReset ? " · " : null}
+              {canReset ? (
+                <button
+                  className="cursor-pointer font-semibold text-primary outline-none hover:underline focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-primary/30"
+                  onClick={() => selectPreset(DEFAULT_RANGE)}
+                  type="button"
+                >
+                  {t("dashboard.period.reset")}
+                </button>
+              ) : null}
+            </>
+          ) : undefined
+        }
         title={t("dashboard.title")}
         titleAddon={
           data ? (
@@ -71,7 +90,7 @@ export function DashboardPage() {
         <DashboardSkeleton />
       ) : (
         <>
-          {dashboard.isFetching ? <UpdatingNote time={asOf?.time ?? ""} /> : null}
+          {dashboard.isFetching ? <UpdatingNote range={formatDayRange(data.period.from, data.period.to, language)} time={asOf?.time ?? ""} /> : null}
           <DashboardKpis data={data} />
           {isEmptyPeriod(data) ? (
             <EmptyPeriodNote future={isFuturePeriod(data.period.from, today)} range={formatDayRange(data.period.from, data.period.to, language)} />
