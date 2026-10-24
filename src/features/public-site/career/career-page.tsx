@@ -22,6 +22,7 @@ import {
   publicKeys,
   type PublicJob as Job,
 } from "@/features/public-site/shared/public-site.data";
+import { SaveJobButton } from "@/features/applicant/saved-jobs/components/save-job-button";
 
 type JobSort = "newest" | "oldest" | "salary_high" | "salary_low";
 type PostedWithin = "24h" | "7d" | "30d";
@@ -267,10 +268,18 @@ function JobCard({
         ) : null}
       </div>
 
-      <div className="flex shrink-0 flex-col items-start gap-1.5 text-left sm:w-[200px] sm:items-end sm:text-right">
-        <span className="text-[15px] font-semibold text-mkt-ink">
-          {formatSalaryCard(job.salary_min, job.salary_max, job.currency)}
-        </span>
+      <div className="flex shrink-0 flex-col items-start gap-1.5 text-left sm:w-[220px] sm:items-end sm:text-right">
+        <div className="flex w-full items-center justify-between sm:justify-end sm:gap-3">
+          <span className="text-[15px] font-semibold text-mkt-ink">
+            {formatSalaryCard(job.salary_min, job.salary_max, job.currency)}
+          </span>
+          <SaveJobButton
+            jobId={job._id}
+            jobTitle={job.title}
+            redirectTo={`/career/${job.slug}`}
+            variant="icon"
+          />
+        </div>
         {posted ? (
           <span className="text-xs text-mkt-subtle">Posted {posted}</span>
         ) : null}
