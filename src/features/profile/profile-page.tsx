@@ -1,23 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Camera,
   Check,
+  ImageUp,
   LockKeyhole,
   Monitor,
   Pencil,
   RefreshCw,
+  TriangleAlert,
 } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { z } from "zod";
 
 import type { MyProfile } from "@/api/generated/types.gen";
-import { requestErrorMessage } from "@/api/request-error";
-import { useSession } from "@/auth/use-session";
+import { HTTP_CONFLICT, HTTP_TOO_MANY_REQUESTS } from "@/api/http-status";
+import { requestErrorMessage, requestStatus } from "@/api/request-error";
+import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
+import { PageHeader } from "@/components/common/admin-page-header";
 import { DetailRow } from "@/components/common/detail-row";
 import { ErrorState } from "@/components/common/error-state";
 import { FormField } from "@/components/common/form-field";
@@ -28,22 +31,31 @@ import { PersonAvatar } from "@/components/common/person-avatar";
 import { SectionCard } from "@/components/common/section-card";
 import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { userDisplayId } from "@/lib/display-id";
 import { formatDate } from "@/lib/format";
+import { PASSWORD_RULES } from "@/lib/password-rules";
 import { strongPasswordSchema } from "@/lib/password-schema";
 import { cn } from "@/lib/utils";
 
 import {
   AVATAR_MAX_BYTES,
   AVATAR_TYPES,
-  PASSWORD_RULES,
   PROFILE_NAME_MAX,
   PROFILE_NAME_MIN,
   PROFILE_PHONE_PATTERN,
-  PROFILE_ROLE_KEYS,
   PROFILE_STATUS_LABEL_KEYS,
-  PROFILE_STATUS_STYLES,
+  PROFILE_STATUS_VARIANTS,
 } from "./profile.constants";
 import {
   useChangeMyPassword,
@@ -52,28 +64,27 @@ import {
   useUploadMyAvatar,
 } from "./profile.queries";
 
-type Section = "details" | "password";
 type DetailsForm = { fullName: string; phone: string };
 type PasswordForm = {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 };
+type PendingNavigation = "cancel" | "password" | null;
 
 export function ProfilePage() {
   const { t } = useTranslation();
-  const [section, setSection] = useState<Section>("details");
-  const [editing, setEditing] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
   const profile = useMyProfile();
+  const passwordView = location.pathname.endsWith("/password");
+  const profilePath = location.pathname.replace(/\/password$/, "");
 
   if (profile.isPending) return <ProfileSkeleton />;
   if (profile.isError)
     return (
       <ErrorState
-        description={requestErrorMessage(
-          profile.error,
-          t("myProfile.loadFailed"),
-        )}
+        description={t("myProfile.loadFailedDescription")}
         onRetry={() => void profile.refetch()}
         title={t("myProfile.loadFailed")}
       />
@@ -86,29 +97,26 @@ export function ProfilePage() {
       />
     );
 
-  const title =
-    section === "password"
-      ? t("myProfile.password")
-      : editing
-        ? t("myProfile.editTitle")
-        : t("myProfile.title");
-  const subtitle =
-    section === "password"
-      ? t("myProfile.passwordSubtitle")
-      : editing
-        ? t("myProfile.editSubtitle")
-        : t("myProfile.subtitle");
+  const title = passwordView ? t("myProfile.password") : t("myProfile.title");
+  const subtitle = passwordView
+    ? t("myProfile.passwordSubtitle")
+    : profileSubtitle(profile.data, t);
 
   return (
     <div className="mx-auto flex w-full max-w-[1028px] flex-col gap-5">
-      <header className="flex flex-wrap items-end gap-4">
-        <div className="min-w-0 flex-1">
-          <h1 className="itt-display text-[28px] font-semibold leading-tight">
-            {title}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
-        </div>
-        {section === "details" && !editing ? (
+      <PageHeader
+        actions={
+          passwordView ? (
+            <Button
+              onClick={() => navigate(profilePath)}
+              size="lg"
+              type="button"
+              variant="ghost"
+            >
+              <ArrowLeft aria-hidden className="size-4" />
+              {t("myProfile.backToProfile")}
+            </Button>
+          ) : (
           <Button
             className="text-muted-foreground"
             disabled={profile.isFetching}
@@ -124,40 +132,36 @@ export function ProfilePage() {
             />
             {t("myProfile.refresh")}
           </Button>
-        ) : (
-          <Button
-            onClick={() => {
-              setSection("details");
-              setEditing(false);
-            }}
-            size="lg"
-            type="button"
-            variant="ghost"
-          >
-            <ArrowLeft aria-hidden className="size-4" />
-            {t("myProfile.backToProfile")}
-          </Button>
-        )}
-      </header>
+          )
+        }
+        description={subtitle}
+        title={title}
+      />
 
-      {section === "details" ? (
-        <ProfileDetails
-          editing={editing}
-          onEditChange={setEditing}
-          onOpenPassword={() => {
-            setEditing(false);
-            setSection("password");
-          }}
-          profile={profile.data}
-        />
-      ) : (
+      {passwordView ? (
         <ChangePassword
           hasPassword={profile.data.hasPassword}
-          onCancel={() => setSection("details")}
+          onCancel={() => navigate(profilePath)}
+        />
+      ) : (
+        <ProfileDetails
+          onOpenPassword={() => navigate("password")}
+          profile={profile.data}
         />
       )}
     </div>
   );
+}
+
+function profileSubtitle(
+  profile: MyProfile,
+  t: (key: string, options?: Record<string, unknown>) => string,
+) {
+  if (profile.role === "admin") return t("myProfile.subtitleAdmin");
+  if (profile.role === "recruiter" || profile.role === "enterprise_admin") {
+    return t("myProfile.subtitleRecruiter");
+  }
+  return t("myProfile.subtitleCandidate");
 }
 
 function ProfileSkeleton() {
@@ -185,23 +189,18 @@ function ProfileSkeleton() {
 }
 
 function ProfileDetails({
-  editing,
-  onEditChange,
   onOpenPassword,
   profile,
 }: {
-  editing: boolean;
-  onEditChange: (editing: boolean) => void;
   onOpenPassword: () => void;
   profile: MyProfile;
 }) {
   const { t } = useTranslation();
   const { showToast } = useToast();
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation>(null);
   const update = useUpdateMyProfile();
   const upload = useUploadMyAvatar();
   const schema = z.object({
@@ -235,52 +234,46 @@ function ProfileDetails({
         phone: profile.phone ?? "",
       });
   }, [profile.fullName, profile.phone, form]);
-  useEffect(
-    () => () => {
-      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-    },
-    [avatarPreview],
-  );
-
   const displayName = profile.fullName || profile.username;
-  const roleKey =
-    PROFILE_ROLE_KEYS[profile.role as keyof typeof PROFILE_ROLE_KEYS];
   const statusKey =
     PROFILE_STATUS_LABEL_KEYS[
       profile.status as keyof typeof PROFILE_STATUS_LABEL_KEYS
     ];
-  const statusStyle =
-    PROFILE_STATUS_STYLES[
-      profile.status as keyof typeof PROFILE_STATUS_STYLES
-    ] ?? "bg-muted text-muted-foreground";
+  const statusVariant =
+    PROFILE_STATUS_VARIANTS[
+      profile.status as keyof typeof PROFILE_STATUS_VARIANTS
+    ] ?? "neutral";
 
-  function clearAvatarSelection() {
-    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-    setAvatarFile(null);
-    setAvatarPreview(null);
-    if (fileInput.current) fileInput.current.value = "";
+  function resetEditing() {
+    form.reset({
+      fullName: profile.fullName ?? "",
+      phone: profile.phone ?? "",
+    });
+    setSaveError(null);
+    setEditing(false);
   }
 
-  function selectAvatar(file?: File) {
-    setAvatarError(null);
-    clearAvatarSelection();
-    if (!file) return;
-    if (!AVATAR_TYPES.includes(file.type as (typeof AVATAR_TYPES)[number])) {
-      setAvatarError(t("myProfile.avatarType"));
+  function requestNavigation(destination: Exclude<PendingNavigation, null>) {
+    if (form.formState.isDirty) {
+      setPendingNavigation(destination);
       return;
     }
-    if (file.size === 0 || file.size > AVATAR_MAX_BYTES) {
-      setAvatarError(t("myProfile.avatarSize"));
-      return;
-    }
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
+    if (destination === "cancel") resetEditing();
+    else onOpenPassword();
+  }
+
+  function discardChanges() {
+    const destination = pendingNavigation;
+    setPendingNavigation(null);
+    resetEditing();
+    if (destination === "password") onOpenPassword();
   }
 
   async function save(values: DetailsForm) {
     setSaveError(null);
     try {
       const updated = await update.mutateAsync({
+        expectedVersion: profile.version,
         fullName: values.fullName.trim(),
         phone: values.phone.replace(/[\s().-]/g, "") || null,
       });
@@ -288,40 +281,32 @@ function ProfileDetails({
         fullName: updated.fullName ?? "",
         phone: updated.phone ?? "",
       });
-      onEditChange(false);
+      setEditing(false);
       showToast({
         message: t("myProfile.saved"),
         title: t("myProfile.saved"),
         tone: "success",
       });
     } catch (error) {
-      setSaveError(requestErrorMessage(error, t("myProfile.saveFailed")));
+      setSaveError(
+        requestStatus(error) === HTTP_CONFLICT
+          ? t("myProfile.conflict")
+          : t("myProfile.saveFailed"),
+      );
     }
   }
 
-  async function saveAvatar() {
-    if (!avatarFile) return;
-    setAvatarError(null);
+  async function saveAvatar(file: File) {
     try {
-      await upload.mutateAsync(avatarFile);
-      clearAvatarSelection();
+      await upload.mutateAsync(file);
       showToast({
         message: t("myProfile.avatarSaved"),
         title: t("myProfile.avatarSaved"),
         tone: "success",
       });
-    } catch (error) {
-      setAvatarError(requestErrorMessage(error, t("myProfile.avatarFailed")));
+    } catch {
+      throw new Error(t("myProfile.avatarFailed"));
     }
-  }
-
-  function cancelEditing() {
-    form.reset({
-      fullName: profile.fullName ?? "",
-      phone: profile.phone ?? "",
-    });
-    setSaveError(null);
-    onEditChange(false);
   }
 
   return (
@@ -332,20 +317,12 @@ function ProfileDetails({
             <PersonAvatar
               className="size-[88px] itt-display text-[26px]"
               name={displayName}
-              src={avatarPreview ?? profile.avatarUrl}
-            />
-            <input
-              ref={fileInput}
-              accept="image/jpeg,image/png,image/webp"
-              aria-label={t("myProfile.chooseAvatar")}
-              className="sr-only"
-              onChange={(event) => selectAvatar(event.target.files?.[0])}
-              type="file"
+              src={profile.avatarUrl}
             />
             <button
               aria-label={t("myProfile.changeAvatar")}
               className="absolute -bottom-0.5 -right-0.5 grid size-8 place-items-center rounded-full border-[3px] border-card bg-foreground text-card transition-colors hover:bg-foreground/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              onClick={() => fileInput.current?.click()}
+              onClick={() => setAvatarDialogOpen(true)}
               type="button"
             >
               <Camera aria-hidden className="size-3.5" />
@@ -365,7 +342,7 @@ function ProfileDetails({
           </div>
           {!editing ? (
             <Button
-              onClick={() => onEditChange(true)}
+              onClick={() => setEditing(true)}
               shape="pill"
               size="xl"
               type="button"
@@ -376,39 +353,6 @@ function ProfileDetails({
             </Button>
           ) : null}
         </div>
-        {avatarFile ? (
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-[18px]">
-            <p className="min-w-0 flex-1 truncate text-[13px] text-muted-foreground">
-              {avatarFile.name}
-            </p>
-            <div className="flex gap-2">
-              <Button
-                disabled={upload.isPending}
-                onClick={clearAvatarSelection}
-                size="lg"
-                type="button"
-                variant="outline"
-              >
-                {t("myProfile.cancel")}
-              </Button>
-              <Button
-                disabled={upload.isPending}
-                onClick={() => void saveAvatar()}
-                size="lg"
-                type="button"
-              >
-                {upload.isPending
-                  ? t("myProfile.uploading")
-                  : t("myProfile.saveAvatar")}
-              </Button>
-            </div>
-          </div>
-        ) : null}
-        {avatarError ? (
-          <div role="alert">
-            <InlineErrorAlert>{avatarError}</InlineErrorAlert>
-          </div>
-        ) : null}
       </SectionCard>
 
       {editing ? (
@@ -455,9 +399,14 @@ function ProfileDetails({
               <InlineErrorAlert>{saveError}</InlineErrorAlert>
             ) : null}
             <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/60 pt-[18px]">
+              {form.formState.isDirty ? (
+                <p className="mr-auto text-[12.5px] text-muted-foreground">
+                  {t("myProfile.unsavedChanges", { count: 1 })}
+                </p>
+              ) : null}
               <Button
                 disabled={update.isPending}
-                onClick={cancelEditing}
+                onClick={() => requestNavigation("cancel")}
                 shape="pill"
                 size="xl"
                 type="button"
@@ -525,21 +474,16 @@ function ProfileDetails({
             className="sm:grid-cols-[180px_minmax(0,1fr)]"
             label={t("myProfile.roleLabel")}
             layout="grid"
-            value={roleKey ? t(roleKey) : profile.role}
+            value={roleLabel(profile, t)}
           />
           <DetailRow
             className="sm:grid-cols-[180px_minmax(0,1fr)]"
             label={t("myProfile.accountStatus")}
             layout="grid"
             value={
-              <span
-                className={cn(
-                  "inline-flex h-[22px] items-center rounded-full px-2.5 text-xs font-semibold",
-                  statusStyle,
-                )}
-              >
+              <Badge variant={statusVariant}>
                 {statusKey ? t(statusKey) : profile.status}
-              </span>
+              </Badge>
             }
           />
           {profile.createdAt ? (
@@ -554,12 +498,12 @@ function ProfileDetails({
             className="sm:grid-cols-[180px_minmax(0,1fr)]"
             label={t("myProfile.accountId")}
             layout="grid"
-            value={<span className="itt-mono text-[12.5px]">{profile.id}</span>}
+            value={<span className="itt-mono text-[12.5px]">{userDisplayId(profile.id)}</span>}
           />
         </dl>
         <div className="flex justify-end border-t border-border/60 pt-[18px]">
           <Button
-            onClick={onOpenPassword}
+            onClick={() => requestNavigation("password")}
             shape="pill"
             size="xl"
             type="button"
@@ -570,6 +514,22 @@ function ProfileDetails({
           </Button>
         </div>
       </SectionCard>
+      <ActionConfirmDialog
+        action={t("myProfile.discard")}
+        cancelLabel={t("myProfile.keepEditing")}
+        description={t("myProfile.discardDescription")}
+        icon={TriangleAlert}
+        onConfirm={discardChanges}
+        onOpenChange={(open) => !open && setPendingNavigation(null)}
+        open={pendingNavigation !== null}
+        title={t("myProfile.discardTitle")}
+        variant="destructive-solid"
+      />
+      <AvatarUploadDialog
+        onOpenChange={setAvatarDialogOpen}
+        onUpload={saveAvatar}
+        open={avatarDialogOpen}
+      />
     </div>
   );
 }
@@ -577,19 +537,174 @@ function ProfileDetails({
 function VerificationBadge({ verified }: { verified: boolean }) {
   const { t } = useTranslation();
   return (
-    <span
-      className={cn(
-        "inline-flex h-[22px] items-center gap-1 rounded-full px-2.5 text-xs font-semibold",
-        verified
-          ? "bg-(--status-success-bg) text-(--status-success-fg)"
-          : "bg-(--status-warning-bg) text-(--status-warning-fg)",
-      )}
-    >
+    <Badge variant={verified ? "success" : "warning"}>
       {verified ? (
         <Check aria-hidden className="size-3" strokeWidth={3} />
       ) : null}
       {t(verified ? "myProfile.verified" : "myProfile.notVerified")}
-    </span>
+    </Badge>
+  );
+}
+
+function roleLabel(
+  profile: MyProfile,
+  t: (key: string, options?: Record<string, unknown>) => string,
+) {
+  if (profile.role === "admin") return t("myProfile.roleAdmin");
+  if (profile.role === "recruiter" || profile.role === "enterprise_admin") {
+    return t("myProfile.roleHr", {
+      company: profile.enterpriseName || t("myProfile.companyNotAssigned"),
+    });
+  }
+  return t("myProfile.roleCandidate");
+}
+
+function AvatarUploadDialog({
+  onOpenChange,
+  onUpload,
+  open,
+}: {
+  onOpenChange: (open: boolean) => void;
+  onUpload: (file: File) => Promise<void>;
+  open: boolean;
+}) {
+  const { t } = useTranslation();
+  const input = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(
+    () => () => {
+      if (preview) URL.revokeObjectURL(preview);
+    },
+    [preview],
+  );
+
+  function clearSelection() {
+    if (preview) URL.revokeObjectURL(preview);
+    setFile(null);
+    setPreview(null);
+    setError(null);
+    if (input.current) input.current.value = "";
+  }
+
+  function selectFile(candidate?: File) {
+    clearSelection();
+    if (!candidate) return;
+    if (candidate.size === 0) {
+      setError(t("myProfile.avatarEmpty"));
+      return;
+    }
+    if (!AVATAR_TYPES.includes(candidate.type as (typeof AVATAR_TYPES)[number])) {
+      setError(t("myProfile.avatarType"));
+      return;
+    }
+    if (candidate.size > AVATAR_MAX_BYTES) {
+      setError(t("myProfile.avatarSize"));
+      return;
+    }
+    setFile(candidate);
+    setPreview(URL.createObjectURL(candidate));
+  }
+
+  async function save() {
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+    try {
+      await onUpload(file);
+      clearSelection();
+      onOpenChange(false);
+    } catch (failure) {
+      setError(requestErrorMessage(failure, t("myProfile.avatarFailed")));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <Dialog
+      onOpenChange={(next) => {
+        if (!uploading) {
+          if (!next) clearSelection();
+          onOpenChange(next);
+        }
+      }}
+      open={open}
+    >
+      <DialogContent className="max-w-[560px]">
+        <DialogHeader>
+          <DialogTitle>{t("myProfile.uploadAvatar")}</DialogTitle>
+          <DialogDescription>{t("myProfile.avatarHint")}</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-4 px-[26px] py-5 sm:flex-row sm:items-center">
+          <input
+            ref={input}
+            accept="image/jpeg,image/png,image/webp"
+            aria-label={t("myProfile.chooseAvatar")}
+            className="sr-only"
+            onChange={(event) => selectFile(event.target.files?.[0])}
+            type="file"
+          />
+          <button
+            className="flex min-h-[120px] flex-1 flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border-dashed bg-canvas px-4 text-center text-[13px] text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            onClick={() => input.current?.click()}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault();
+              selectFile(event.dataTransfer.files[0]);
+            }}
+            type="button"
+          >
+            <ImageUp aria-hidden className="size-5" />
+            <span className="font-semibold text-foreground">
+              {t("myProfile.dropAvatar")}
+            </span>
+            <span>{t("myProfile.avatarHint")}</span>
+          </button>
+          <div className="flex w-full flex-col items-center gap-2 sm:w-[160px]">
+            <div className="grid size-[128px] place-items-center overflow-hidden rounded-full border border-border bg-muted">
+              {preview ? (
+                <img
+                  alt={t("myProfile.avatarPreview")}
+                  className="size-full object-cover"
+                  src={preview}
+                />
+              ) : (
+                <Camera aria-hidden className="size-5 text-muted-foreground" />
+              )}
+            </div>
+            <p className="text-center text-[12.5px] text-muted-foreground">
+              {t("myProfile.avatarPreview")}
+            </p>
+          </div>
+        </div>
+        {error ? (
+          <div className="px-[26px] pb-5" role="alert">
+            <InlineErrorAlert>{error}</InlineErrorAlert>
+          </div>
+        ) : null}
+        <DialogFooter>
+          <Button
+            disabled={uploading}
+            onClick={() => {
+              clearSelection();
+              onOpenChange(false);
+            }}
+            size="lg"
+            type="button"
+            variant="outline"
+          >
+            {t("myProfile.cancel")}
+          </Button>
+          <Button disabled={!file || uploading} onClick={() => void save()} size="lg" type="button">
+            {uploading ? t("myProfile.uploading") : t("myProfile.saveAvatar")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -602,18 +717,12 @@ function ChangePassword({
 }) {
   const { t } = useTranslation();
   const { showToast } = useToast();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const { logout } = useSession();
   const [error, setError] = useState<string | null>(null);
   const change = useChangeMyPassword();
   const schema = z
     .object({
       currentPassword: z.string().min(1, t("myProfile.currentRequired")),
-      newPassword: strongPasswordSchema.regex(
-        PASSWORD_RULES.symbol,
-        t("myProfile.passwordHint"),
-      ),
+      newPassword: strongPasswordSchema,
       confirmPassword: z.string().min(1, t("myProfile.confirmRequired")),
     })
     .refine((value) => value.newPassword === value.confirmPassword, {
@@ -637,38 +746,16 @@ function ChangePassword({
     control: form.control,
     name: ["currentPassword", "newPassword"],
   });
-  const passwordRules = [
-    {
-      key: "length",
-      met: PASSWORD_RULES.length.test(newPassword),
-      text: t("myProfile.passwordRules.length"),
-    },
-    {
-      key: "uppercase",
-      met: PASSWORD_RULES.uppercase.test(newPassword),
-      text: t("myProfile.passwordRules.uppercase"),
-    },
-    {
-      key: "lowercase",
-      met: PASSWORD_RULES.lowercase.test(newPassword),
-      text: t("myProfile.passwordRules.lowercase"),
-    },
-    {
-      key: "number",
-      met: PASSWORD_RULES.number.test(newPassword),
-      text: t("myProfile.passwordRules.number"),
-    },
-    {
-      key: "symbol",
-      met: PASSWORD_RULES.symbol.test(newPassword),
-      text: t("myProfile.passwordRules.symbol"),
-    },
-    {
-      key: "different",
-      met: Boolean(newPassword && currentPassword !== newPassword),
-      text: t("myProfile.passwordRules.different"),
-    },
-  ];
+  const passwordRules: Array<{ key: string; met: boolean; text: string }> = PASSWORD_RULES.map((rule) => ({
+    key: rule.id,
+    met: rule.test(newPassword ?? ""),
+    text: t(`myProfile.passwordRules.${rule.id}`),
+  }));
+  passwordRules.push({
+    key: "different",
+    met: Boolean(newPassword && currentPassword !== newPassword),
+    text: t("myProfile.passwordRules.different"),
+  });
 
   if (!hasPassword)
     return (
@@ -694,11 +781,13 @@ function ChangePassword({
         title: t("myProfile.passwordChanged"),
         tone: "success",
       });
-      logout();
-      queryClient.clear();
-      navigate("/login", { replace: true });
+      onCancel();
     } catch (failure) {
-      setError(requestErrorMessage(failure, t("myProfile.passwordFailed")));
+      setError(
+        requestStatus(failure) === HTTP_TOO_MANY_REQUESTS
+          ? t("myProfile.passwordRateLimited")
+          : t("myProfile.passwordIncorrect"),
+      );
     }
   }
 

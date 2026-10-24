@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { registerSchema, type RegisterFormValues } from "./register.schema";
-import { getPasswordRules } from "./password-rules";
+import { getPasswordRules } from "@/lib/password-rules";
 import { PasswordField } from "./password-field";
 import { AuthHeroCopy } from "./auth-hero-copy";
 import { AuthPageShell } from "./auth-page-shell";

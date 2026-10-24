@@ -666,13 +666,20 @@
           },
           "data": {
             "type": "object",
-            "properties": {},
-            "default": {}
+            "properties": {
+              "tokens": {
+                "$ref": "#/components/schemas/RefreshTokenResponse"
+              }
+            },
+            "required": [
+              "tokens"
+            ]
           }
         },
         "required": [
           "success",
-          "message"
+          "message",
+          "data"
         ]
       },
       "Document": {
@@ -7099,6 +7106,10 @@
           "phone": {
             "type": "string",
             "nullable": true
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "additionalProperties": false
@@ -7719,6 +7730,9 @@
           },
           "401": {
             "description": "Authentication required"
+          },
+          "429": {
+            "description": "Too many password change attempts"
           }
         }
       }
@@ -12749,6 +12763,9 @@
           },
           "404": {
             "description": "Profile not found"
+          },
+          "409": {
+            "description": "VERSION_CONFLICT"
           }
         }
       }

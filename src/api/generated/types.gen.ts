@@ -171,8 +171,8 @@ export type ChangePasswordRequest = {
 export type ChangePasswordResponse = {
     success: true;
     message: string;
-    data?: {
-        [key: string]: unknown;
+    data: {
+        tokens: RefreshTokenResponse;
     };
 };
 
@@ -1566,6 +1566,7 @@ export type MyProfile = {
 export type UpdateMyProfile = {
     fullName?: string;
     phone?: string | null;
+    expectedVersion?: number;
 };
 
 export type MyAvatarUpload = {
@@ -1877,6 +1878,10 @@ export type PostApiV1AuthChangePasswordErrors = {
      * Authentication required
      */
     401: unknown;
+    /**
+     * Too many password change attempts
+     */
+    429: unknown;
 };
 
 export type PostApiV1AuthChangePasswordResponses = {
@@ -4777,6 +4782,10 @@ export type UpdateMyProfileErrors = {
      * Profile not found
      */
     404: unknown;
+    /**
+     * VERSION_CONFLICT
+     */
+    409: unknown;
 };
 
 export type UpdateMyProfileResponses = {

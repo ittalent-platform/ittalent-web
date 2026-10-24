@@ -8,6 +8,7 @@ import {
   postApiV1AuthChangePassword,
 } from "@/api/generated";
 import type { MyProfile, UpdateMyProfile } from "@/api/generated/types.gen";
+import { setStoredTokens, type AuthTokens } from "@/api/client";
 import { requestError, unwrap } from "@/api/request-error";
 import { authKeys } from "@/auth/use-session";
 
@@ -31,10 +32,11 @@ async function uploadAvatar(file: File): Promise<MyProfile> {
 async function changePassword(body: {
   currentPassword: string;
   newPassword: string;
-}): Promise<void> {
+}): Promise<AuthTokens> {
   const result = await postApiV1AuthChangePassword({ body });
   if (result.error || !result.data)
     throw requestError(result, "Unable to change your password.");
+  return result.data.data.tokens;
 }
 
 export function useMyProfile() {
@@ -68,5 +70,12 @@ export function useUploadMyAvatar() {
 }
 
 export function useChangeMyPassword() {
-  return useMutation({ mutationFn: changePassword });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: changePassword,
+    onSuccess: (tokens) => {
+      setStoredTokens(tokens);
+      void queryClient.invalidateQueries({ queryKey: authKeys.me() });
+    },
+  });
 }

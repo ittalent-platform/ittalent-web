@@ -14,7 +14,7 @@ import { HomePage } from "@/features/public-site/home/home-page";
 const LoginPage = lazy(() =>
   import("@/features/auth/login-page").then((m) => ({ default: m.LoginPage })),
 );
-const ProfilePage = lazy(() => import('@/features/profile/profile-page').then((m) => ({ default: m.ProfilePage })));
+const ProfilePage = lazy(() => import("@/features/profile/profile-page").then((m) => ({ default: m.ProfilePage })));
 const RegisterPage = lazy(() =>
   import("@/features/auth/register-page").then((m) => ({
     default: m.RegisterPage,
@@ -239,6 +239,7 @@ export const appRoutes = [
             children: [
               { path: "documents", element: <DocumentsPage /> },
               { path: "profile", element: <ProfilePage /> },
+              { path: "profile/password", element: <ProfilePage /> },
               { path: "my-applications", element: <ApplicationsPage /> },
               {
                 path: "my-applications/:id",
@@ -261,6 +262,7 @@ export const appRoutes = [
           { index: true, element: <Navigate replace to="/admin/users" /> },
           { path: "users", element: <UsersPage /> },
           { path: "profile", element: <ProfilePage /> },
+          { path: "profile/password", element: <ProfilePage /> },
           { path: "users/:userId", element: <AdminUserDetailPage /> },
           { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
@@ -299,7 +301,8 @@ export const appRoutes = [
             element: <Navigate replace to="/recruiter/job-postings" />,
           },
           { path: "job-postings", element: <RecruiterJobPostingsPage /> },
-          { path: "profile", element: <ProfilePage /> },
+          { path: "my-profile", element: <ProfilePage /> },
+          { path: "my-profile/password", element: <ProfilePage /> },
           {
             element: <ProtectedRoute requiredRoles={JOB_POSTING_WRITER_ROLES} />,
             children: [
@@ -332,9 +335,9 @@ export const appRoutes = [
             path: "employees/:employeeId",
             element: <RecruiterEmployeeDetailPage />,
           },
-          { path: "profile", element: <RecruiterCompanyProfilePage /> },
+          { path: "company-profile", element: <RecruiterCompanyProfilePage /> },
           {
-            path: "profile/edit",
+            path: "company-profile/edit",
             element: <RecruiterEditCompanyProfilePage />,
           },
         ],

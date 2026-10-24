@@ -26,11 +26,6 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(),
   upload: vi.fn(),
   changePassword: vi.fn(),
-  logout: vi.fn(),
-}));
-
-vi.mock("@/auth/use-session", () => ({
-  useSession: () => ({ logout: mocks.logout }),
 }));
 
 vi.mock("@/features/profile/profile.queries", () => ({
@@ -50,6 +45,7 @@ function renderProfile() {
         <ToastProvider>
           <Routes>
             <Route element={<ProfilePage />} path="/profile" />
+            <Route element={<ProfilePage />} path="/profile/password" />
             <Route element={<p>Sign in page</p>} path="/login" />
           </Routes>
         </ToastProvider>
@@ -97,6 +93,7 @@ describe("ProfilePage", () => {
     await user.click(screen.getByRole("button", { name: "Save changes" }));
     await waitFor(() =>
       expect(mocks.update().mutateAsync).toHaveBeenCalledWith({
+        expectedVersion: undefined,
         fullName: "New Name",
         phone: "0901234567",
       }),
@@ -104,13 +101,29 @@ describe("ProfilePage", () => {
   });
 
   it("rejects an invalid image before upload", async () => {
+    const user = userEvent.setup();
     renderProfile();
+    await user.click(screen.getByRole("button", { name: "Change profile photo" }));
     const file = new File(["invalid"], "avatar.txt", { type: "text/plain" });
     fireEvent.change(screen.getByLabelText("Choose image"), {
       target: { files: [file] },
     });
     expect(screen.getByRole("alert")).toHaveTextContent(
       "Choose a JPEG, PNG, or WebP image.",
+    );
+    expect(mocks.upload().mutateAsync).not.toHaveBeenCalled();
+  });
+
+  it("explains when an avatar file is empty", async () => {
+    const user = userEvent.setup();
+    renderProfile();
+    await user.click(screen.getByRole("button", { name: "Change profile photo" }));
+    const file = new File([], "avatar.png", { type: "image/png" });
+    fireEvent.change(screen.getByLabelText("Choose image"), {
+      target: { files: [file] },
+    });
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "This file is empty. Choose another image.",
     );
     expect(mocks.upload().mutateAsync).not.toHaveBeenCalled();
   });
@@ -126,6 +139,7 @@ describe("ProfilePage", () => {
       value: vi.fn(),
     });
     renderProfile();
+    await user.click(screen.getByRole("button", { name: "Change profile photo" }));
     const file = new File(["png"], "avatar.png", { type: "image/png" });
     fireEvent.change(screen.getByLabelText("Choose image"), {
       target: { files: [file] },
@@ -139,7 +153,7 @@ describe("ProfilePage", () => {
     );
   });
 
-  it("logs out after a successful password change", async () => {
+  it("keeps the current session signed in after a successful password change", async () => {
     const user = userEvent.setup();
     renderProfile();
     await user.click(screen.getByRole("button", { name: "Change password" }));
@@ -159,8 +173,10 @@ describe("ProfilePage", () => {
         newPassword: "New123!a",
       }),
     );
-    expect(mocks.logout).toHaveBeenCalledOnce();
-    expect(screen.getByText("Sign in page")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "Profile" })).toBeInTheDocument(),
+    );
+    expect(screen.queryByText("Sign in page")).not.toBeInTheDocument();
     expect(
       await screen.findAllByText("Password changed successfully."),
     ).not.toHaveLength(0);
@@ -217,9 +233,32 @@ describe("ProfilePage", () => {
       target: { value: "New123!a" },
     });
     await user.click(screen.getByRole("button", { name: "Change password" }));
-    expect(
-      await screen.findByText("Incorrect current password."),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/That password isn't right/)).toBeInTheDocument();
     expect(screen.getByLabelText(/New password/)).toHaveValue("New123!a");
+  });
+
+  it("asks before discarding dirty profile changes", async () => {
+    const user = userEvent.setup();
+    renderProfile();
+    await user.click(screen.getByRole("button", { name: "Edit profile" }));
+    await user.clear(screen.getByLabelText(/Full name/));
+    await user.type(screen.getByLabelText(/Full name/), "Changed name");
+    expect(screen.getByText("1 unsaved change")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getByRole("heading", { name: "Discard your changes?" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Keep editing" }));
+    expect(screen.getByDisplayValue("Changed name")).toBeInTheDocument();
+  });
+
+  it("uses the recruiter-specific heading copy", () => {
+    mocks.profile.mockReturnValue({
+      data: { ...fixture, role: "recruiter", enterpriseName: "Northstar Labs" },
+      isPending: false,
+      isError: false,
+    });
+    renderProfile();
+    expect(screen.getByRole("heading", { name: "Profile" })).toBeInTheDocument();
+    expect(screen.getByText("HR · Northstar Labs")).toBeInTheDocument();
+    expect(screen.queryByText(/companies you apply to/)).not.toBeInTheDocument();
   });
 });

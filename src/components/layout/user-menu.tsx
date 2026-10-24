@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Award, BriefcaseBusiness, ChevronDown, FileText, LogOut, UserRound, Users } from "lucide-react";
+import { Award, BriefcaseBusiness, ChevronDown, FileText, LockKeyhole, LogOut, UserRound, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/toast/toast-provider";
 import { getLogoutSuccessToast } from "@/features/auth/logout-toast";
-import { APPLICATIONS_PATH, profilePathForRole } from "@/config/routes";
+import { APPLICATIONS_PATH, profilePasswordPathForRole, profilePathForRole } from "@/config/routes";
 import { cn } from "@/lib/utils";
 import { PersonAvatar } from "@/components/common/person-avatar";
 
@@ -26,7 +26,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
   const { data: session, logout } = useSession();
 
   const user = session?.user;
-  const displayName = user?.username ?? user?.email ?? "User";
+  const displayName = user?.username ?? user?.email ?? t("roles.user");
   const avatarName = user?.fullName?.trim() || displayName;
   const roleLabel =
     user?.role === "admin"
@@ -99,7 +99,10 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
         </div>
 
         <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate(profilePathForRole(user?.role))}>
-          <UserRound className="size-4" />{t('accountNav.myProfile')}
+          <UserRound className="size-4" />{t("accountNav.myProfile")}
+        </DropdownMenuItem>
+        <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate(profilePasswordPathForRole(user?.role))}>
+          <LockKeyhole className="size-4" />{t("accountNav.password")}
         </DropdownMenuItem>
 
         {user?.role === "admin" ? (
@@ -108,7 +111,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
             onSelect={() => navigate("/admin/users")}
           >
             <Users className="size-4" />
-            User Management
+            {t("accountNav.userManagement")}
           </DropdownMenuItem>
         ) : null}
 
@@ -118,7 +121,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
             onSelect={() => navigate("/documents")}
           >
             <FileText className="size-4" />
-            My Documents
+            {t("accountNav.documents")}
           </DropdownMenuItem>
         ) : null}
 
@@ -128,7 +131,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
             onSelect={() => navigate("/recruiter/job-postings")}
           >
             <BriefcaseBusiness className="size-4" />
-            Job postings
+            {t("accountNav.jobPostings")}
           </DropdownMenuItem>
         ) : null}
         {user?.role === "user" ? <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate(APPLICATIONS_PATH)}><BriefcaseBusiness className="size-4" />{t("applications.title")}</DropdownMenuItem> : null}
