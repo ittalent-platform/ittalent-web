@@ -8,7 +8,7 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { DIALOG_BUTTON_CLASS } from "@/components/common/action-confirm-dialog";
+import { Button } from "@/components/ui/button";
 
 export type SignInToSaveDialogProps = {
   open: boolean;
@@ -37,21 +37,27 @@ export function SignInToSaveDialog({ open, onOpenChange }: SignInToSaveDialogPro
         </div>
 
         <div className="flex flex-col-reverse items-stretch justify-end gap-2.5 border-t border-mkt-line bg-mkt-card px-6 py-4 sm:flex-row sm:items-center">
-          <AlertDialogCancel asChild className={DIALOG_BUTTON_CLASS}>
-            <Link
-              className="flex h-10 items-center justify-center rounded-lg border border-mkt-line bg-white px-4 text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
-              to={`/register?redirect=${currentPath}`}
+          <AlertDialogCancel asChild>
+            <Button
+              asChild
+              className="h-10 px-4 text-[13.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
+              shape="pill"
+              variant="outline"
             >
-              Create an account
-            </Link>
+              <Link to={`/register?next=${currentPath}`}>
+                Create an account
+              </Link>
+            </Button>
           </AlertDialogCancel>
-          <Link
-            className="flex h-10 items-center justify-center rounded-lg bg-mkt-accent px-5 text-[13.5px] font-semibold text-white hover:bg-mkt-accent-hover"
-            onClick={() => onOpenChange(false)}
-            to={`/login?redirect=${currentPath}`}
+          <Button
+            asChild
+            className="h-10 px-5 text-[13.5px] font-semibold bg-mkt-accent text-white hover:bg-mkt-accent-hover"
+            shape="pill"
           >
-            Sign in
-          </Link>
+            <Link onClick={() => onOpenChange(false)} to={`/login?next=${currentPath}`}>
+              Sign in
+            </Link>
+          </Button>
         </div>
       </AlertDialogContent>
     </AlertDialog>

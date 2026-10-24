@@ -1,9 +1,16 @@
 import { Heart, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
+import { requestErrorMessage } from "@/api/request-error";
 import { useSession } from "@/auth/use-session";
+import { useToast } from "@/components/toast/toast-provider";
 import { cn } from "@/lib/utils";
-import { useCheckSavedJobQuery, useToggleSaveJobMutation } from "@/features/applicant/saved-jobs/saved-jobs.queries";
+import {
+  useCheckSavedJobQuery,
+  useRemoveSavedJobMutation,
+  useSaveJobMutation,
+} from "@/features/applicant/saved-jobs/saved-jobs.queries";
 import { SignInToSaveDialog } from "./sign-in-to-save-dialog";
 
 export type SaveJobButtonProps = {
@@ -24,6 +31,8 @@ export function SaveJobButton({
   onRemoveSuccess,
 }: SaveJobButtonProps) {
   const { data: session } = useSession();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
   const [signInOpen, setSignInOpen] = useState(false);
 
   const isCandidate = session?.user?.role === "user";
@@ -34,8 +43,9 @@ export function SaveJobButton({
   });
 
   const isSaved = Boolean(checkData?.isSaved);
-  const toggleMutation = useToggleSaveJobMutation();
-  const isPending = toggleMutation.isPending;
+  const saveMutation = useSaveJobMutation();
+  const removeMutation = useRemoveSavedJobMutation();
+  const isPending = saveMutation.isPending || removeMutation.isPending;
 
   function handleClick(e: React.MouseEvent) {
     e.stopPropagation();
@@ -46,23 +56,70 @@ export function SaveJobButton({
       return;
     }
 
-    if (isStaff) {
+    if (isStaff || isPending) {
       return;
     }
 
-    if (isPending) {
-      return;
-    }
-
-    toggleMutation.mutate(jobId, {
-      onSuccess: (data) => {
-        if (data.saved) {
-          onSaveSuccess?.();
-        } else {
+    if (isSaved) {
+      removeMutation.mutate(jobId, {
+        onSuccess: () => {
           onRemoveSuccess?.();
-        }
-      },
-    });
+          showToast({
+            tone: "success",
+            title: "Removed from saved jobs",
+            message: "Job removed from your bookmarks.",
+            action: {
+              label: "Undo",
+              onClick: () => {
+                saveMutation.mutate(jobId, {
+                  onSuccess: () => {
+                    onSaveSuccess?.();
+                  },
+                  onError: (error) => {
+                    showToast({
+                      tone: "error",
+                      title: "Couldn't save job",
+                      message: requestErrorMessage(error, "Unable to save job to bookmarks."),
+                    });
+                  },
+                });
+              },
+            },
+          });
+        },
+        onError: (error) => {
+          showToast({
+            tone: "error",
+            title: "Couldn't remove job",
+            message: requestErrorMessage(error, "Unable to remove job from saved jobs."),
+          });
+        },
+      });
+    } else {
+      saveMutation.mutate(jobId, {
+        onSuccess: () => {
+          onSaveSuccess?.();
+          showToast({
+            tone: "success",
+            title: "Job saved",
+            message: "Job saved to your bookmarks.",
+            action: {
+              label: "View saved jobs",
+              onClick: () => {
+                navigate("/saved-jobs");
+              },
+            },
+          });
+        },
+        onError: (error) => {
+          showToast({
+            tone: "error",
+            title: "Couldn't save job",
+            message: requestErrorMessage(error, "Unable to save job to bookmarks."),
+          });
+        },
+      });
+    }
   }
 
   if (isStaff) {

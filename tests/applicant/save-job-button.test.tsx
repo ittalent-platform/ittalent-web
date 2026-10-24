@@ -8,6 +8,11 @@ import * as sessionHook from "@/auth/use-session";
 import { SaveJobButton } from "@/features/applicant/saved-jobs/components/save-job-button";
 import * as savedJobsApi from "@/features/applicant/saved-jobs/saved-jobs.api";
 
+const mockShowToast = vi.fn();
+vi.mock("@/components/toast/toast-provider", () => ({
+  useToast: () => ({ showToast: mockShowToast, dismissToast: vi.fn() }),
+}));
+
 vi.mock("@/auth/use-session", () => ({
   useSession: vi.fn(),
 }));
@@ -31,7 +36,7 @@ function renderWithClient(ui: React.ReactElement) {
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>{ui}</MemoryRouter>
+      <MemoryRouter initialEntries={["/jobs/frontend-dev"]}>{ui}</MemoryRouter>
     </QueryClientProvider>,
   );
 }
@@ -69,7 +74,7 @@ describe("SaveJobButton", () => {
     });
   });
 
-  it("opens SignInToSaveDialog when guest clicks save", async () => {
+  it("opens SignInToSaveDialog with next param when guest clicks save", async () => {
     vi.mocked(sessionHook.useSession).mockReturnValue({
       data: null,
     } as never);
@@ -83,14 +88,21 @@ describe("SaveJobButton", () => {
     expect(
       screen.getByText("Saved jobs are private to your candidate account. You’ll come back to this job after signing in."),
     ).toBeInTheDocument();
+
+    const signInLink = screen.getByRole("link", { name: "Sign in" });
+    expect(signInLink).toHaveAttribute("href", expect.stringContaining("next="));
+    expect(signInLink).not.toHaveAttribute("href", expect.stringContaining("redirect="));
+
+    const registerLink = screen.getByRole("link", { name: "Create an account" });
+    expect(registerLink).toHaveAttribute("href", expect.stringContaining("next="));
   });
 
-  it("triggers toggle mutation when candidate clicks save button", async () => {
+  it("triggers idempotent saveJob mutation and shows toast when candidate clicks save", async () => {
     vi.mocked(sessionHook.useSession).mockReturnValue({
       data: { user: { id: "u-1", role: "user" } },
     } as never);
     vi.mocked(savedJobsApi.checkJobSaved).mockResolvedValue({ isSaved: false });
-    vi.mocked(savedJobsApi.toggleSaveJob).mockResolvedValue({
+    vi.mocked(savedJobsApi.saveJob).mockResolvedValue({
       saved: true,
       message: "Job added to wishlist successfully",
       id: "wl-1",
@@ -103,8 +115,75 @@ describe("SaveJobButton", () => {
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(savedJobsApi.toggleSaveJob).toHaveBeenCalledWith("job-1");
+      expect(savedJobsApi.saveJob).toHaveBeenCalledWith("job-1");
+      expect(savedJobsApi.toggleSaveJob).not.toHaveBeenCalled();
       expect(onSaveSuccess).toHaveBeenCalled();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tone: "success",
+          title: "Job saved",
+          action: expect.objectContaining({ label: "View saved jobs" }),
+        }),
+      );
+    });
+  });
+
+  it("triggers idempotent removeSavedJob mutation and shows toast when candidate clicks saved", async () => {
+    vi.mocked(sessionHook.useSession).mockReturnValue({
+      data: { user: { id: "u-1", role: "user" } },
+    } as never);
+    vi.mocked(savedJobsApi.checkJobSaved).mockResolvedValue({ isSaved: true, wishlistId: "wl-1" });
+    vi.mocked(savedJobsApi.removeSavedJob).mockResolvedValue({
+      removed: true,
+      message: "Job removed from wishlist",
+    });
+
+    const onRemoveSuccess = vi.fn();
+    renderWithClient(<SaveJobButton jobId="job-1" onRemoveSuccess={onRemoveSuccess} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Saved")).toBeInTheDocument();
+    });
+
+    const button = screen.getByRole("button", { name: /saved/i });
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(savedJobsApi.removeSavedJob).toHaveBeenCalledWith("job-1");
+      expect(savedJobsApi.toggleSaveJob).not.toHaveBeenCalled();
+      expect(onRemoveSuccess).toHaveBeenCalled();
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tone: "success",
+          title: "Removed from saved jobs",
+          action: expect.objectContaining({ label: "Undo" }),
+        }),
+      );
+    });
+  });
+
+  it("shows error toast when save fails", async () => {
+    vi.mocked(sessionHook.useSession).mockReturnValue({
+      data: { user: { id: "u-1", role: "user" } },
+    } as never);
+    vi.mocked(savedJobsApi.checkJobSaved).mockResolvedValue({ isSaved: false });
+    vi.mocked(savedJobsApi.saveJob).mockRejectedValue(
+      new Error("This job is no longer open, so it can't be saved"),
+    );
+
+    renderWithClient(<SaveJobButton jobId="job-1" />);
+
+    const button = screen.getByRole("button", { name: /save/i });
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tone: "error",
+          title: "Couldn't save job",
+          message: "This job is no longer open, so it can't be saved",
+        }),
+      );
     });
   });
 
