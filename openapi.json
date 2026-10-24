@@ -7381,6 +7381,263 @@
           "platform"
         ],
         "additionalProperties": false
+      },
+      "AddWishlistRequest": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "additionalProperties": false
+      },
+      "WishlistSaveResponse": {
+        "type": "object",
+        "properties": {
+          "saved": {
+            "type": "boolean"
+          },
+          "alreadySaved": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "saved",
+          "message"
+        ]
+      },
+      "WishlistToggleResponse": {
+        "type": "object",
+        "properties": {
+          "saved": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "saved",
+          "message"
+        ]
+      },
+      "WishlistCheckResponse": {
+        "type": "object",
+        "properties": {
+          "isSaved": {
+            "type": "boolean"
+          },
+          "wishlistId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "isSaved"
+        ]
+      },
+      "PaginatedWishlistResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "jobId": {
+                  "type": "string"
+                },
+                "savedAt": {
+                  "type": "string"
+                },
+                "availability": {
+                  "type": "string",
+                  "enum": [
+                    "available",
+                    "unavailable"
+                  ]
+                },
+                "isClosingSoon": {
+                  "type": "boolean"
+                },
+                "title": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "slug": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "enterprise": {
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "logoUrl": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name"
+                  ]
+                },
+                "location": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "employmentType": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "level": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "salaryMin": {
+                  "type": "number",
+                  "nullable": true
+                },
+                "salaryMax": {
+                  "type": "number",
+                  "nullable": true
+                },
+                "salaryNegotiable": {
+                  "type": "boolean"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "jobId",
+                "savedAt",
+                "availability",
+                "title",
+                "slug",
+                "enterprise",
+                "location",
+                "employmentType",
+                "level"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "WishlistQuery": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          "q": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "all",
+              "available",
+              "unavailable"
+            ],
+            "default": "all"
+          },
+          "location": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "additionalProperties": false
+      },
+      "WishlistDeleteResponse": {
+        "type": "object",
+        "properties": {
+          "removed": {
+            "type": "boolean"
+          },
+          "alreadyRemoved": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "removed",
+          "message"
+        ]
+      },
+      "WishlistBulkDeleteResponse": {
+        "type": "object",
+        "properties": {
+          "removedCount": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "removedCount",
+          "message"
+        ]
       }
     },
     "parameters": {}
@@ -13201,6 +13458,428 @@
           },
           "401": {
             "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/api/v1/me/wishlist": {
+      "post": {
+        "tags": [
+          "Wishlist"
+        ],
+        "summary": "Add an active job posting to candidate wishlist",
+        "description": "Saves an active, published job posting to the authenticated applicant personal wishlist. Enforces a maximum capacity limit of 500 saved jobs. Idempotent: repeated calls on an already-saved job return 200 OK.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddWishlistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job is already in wishlist (idempotent)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistSaveResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Job added to wishlist successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistSaveResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Target job is closed, expired, or enterprise is inactive"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Saving jobs is for candidate accounts"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Wishlist capacity limit reached (maximum 500 saved jobs)"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Wishlist"
+        ],
+        "summary": "List and filter candidate saved jobs",
+        "description": "Retrieves a paginated list of saved jobs sorted reverse-chronologically (newest saved first). Supports text search (q), status filtering (all, available, unavailable), and location. Closed/expired jobs have sensitive details masked per privacy rules.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "available",
+                "unavailable"
+              ],
+              "default": "all"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "location",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of candidate saved jobs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedWishlistResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters or unsupported filter"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Saving jobs is for candidate accounts"
+          }
+        }
+      }
+    },
+    "/api/v1/me/wishlist/jobs/{jobId}/toggle": {
+      "patch": {
+        "tags": [
+          "Wishlist"
+        ],
+        "summary": "Toggle job bookmark status in candidate wishlist",
+        "description": "Toggles bookmark state: if already saved, removes it from wishlist; if unsaved, adds it to wishlist. Enforces active job and 500-item capacity rules.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "jobId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bookmark status toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistToggleResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Target job is closed, expired, or invalid ID"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Saving jobs is for candidate accounts"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Wishlist capacity limit reached (maximum 500 saved jobs)"
+          }
+        }
+      }
+    },
+    "/api/v1/me/wishlist/toggle": {
+      "post": {
+        "tags": [
+          "Wishlist"
+        ],
+        "summary": "Toggle job bookmark status (JSON body alias)",
+        "description": "Alias for heart icon toggle accepting jobId in JSON request body.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddWishlistRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bookmark status toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistToggleResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Target job is closed, expired, or invalid ID"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Saving jobs is for candidate accounts"
+          },
+          "404": {
+            "description": "Job posting not found"
+          },
+          "409": {
+            "description": "Wishlist capacity limit reached (maximum 500 saved jobs)"
+          }
+        }
+      }
+    },
+    "/api/v1/me/wishlist/jobs/{jobId}": {
+      "get": {
+        "tags": [
+          "Wishlist"
+        ],
+        "summary": "Check if a job posting is saved in candidate wishlist",
+        "description": "Returns boolean flag indicating whether the job is currently saved in the candidate wishlist.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "jobId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job saved status check result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistCheckResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid job ID format"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Saving jobs is for candidate accounts"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Wishlist"
+        ],
+        "summary": "Remove a saved job from candidate wishlist by job ID",
+        "description": "Removes the specified job posting from candidate wishlist. Idempotent: if already removed, returns 200 OK with alreadyRemoved=true.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "jobId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job removed from wishlist successfully (or already removed)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistDeleteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid job ID format"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Removing saved jobs is for candidate accounts"
+          }
+        }
+      }
+    },
+    "/api/v1/me/wishlist/unavailable": {
+      "delete": {
+        "tags": [
+          "Wishlist"
+        ],
+        "summary": "Bulk remove all unavailable or closed saved jobs",
+        "description": "Purges all bookmarks whose target job posting is closed, expired, or whose company is inactive from candidate wishlist.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unavailable saved jobs cleared successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistBulkDeleteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Removing saved jobs is for candidate accounts"
+          }
+        }
+      }
+    },
+    "/api/v1/me/wishlist/{id}": {
+      "delete": {
+        "tags": [
+          "Wishlist"
+        ],
+        "summary": "Remove a saved job from candidate wishlist by wishlist record ID",
+        "description": "Removes the wishlist record matching ID belonging to the candidate. Idempotent: if already removed, returns 200 OK with alreadyRemoved=true.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job removed from wishlist successfully (or already removed)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WishlistDeleteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid wishlist ID format"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Removing saved jobs is for candidate accounts"
           }
         }
       }

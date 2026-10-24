@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 
@@ -52,6 +52,8 @@ function PasswordRules({ password, confirmPassword }: { password: string; confir
 export function RegisterPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const next = searchParams.get("next");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const [deliveryFailed, setDeliveryFailed] = useState(false);
@@ -247,7 +249,7 @@ export function RegisterPage() {
               <Link
                 aria-label={t("auth.register.signInInstead")}
                 className="font-semibold text-fg-link hover:underline"
-                to="/login"
+                to={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
               >
                 {t("auth.register.signIn")}
               </Link>

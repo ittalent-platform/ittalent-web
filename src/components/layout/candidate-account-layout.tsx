@@ -1,5 +1,6 @@
 import {
   Award,
+  Bookmark,
   Briefcase,
   FileText,
   UserRound,
@@ -24,6 +25,11 @@ const ACCOUNT_NAV: AccountNavGroup[] = [
         icon: Briefcase,
         labelKey: "accountNav.myApplications",
         to: "/my-applications",
+      },
+      {
+        icon: Bookmark,
+        labelKey: "accountNav.savedJobs",
+        to: "/saved-jobs",
       },
     ],
     labelKey: "accountNav.jobSearch",

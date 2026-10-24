@@ -159,6 +159,11 @@ const ApplicationDetailPage = lazy(() =>
     (m) => ({ default: m.ApplicationDetailPage }),
   ),
 );
+const SavedJobsPage = lazy(() =>
+  import("@/features/applicant/saved-jobs/saved-jobs-page").then((m) => ({
+    default: m.SavedJobsPage,
+  })),
+);
 const EnterprisesPage = lazy(() =>
   import("@/features/admin/enterprises/enterprises-page").then((m) => ({
     default: m.EnterprisesPage,
@@ -245,6 +250,7 @@ export const appRoutes = [
                 path: "my-applications/:id",
                 element: <ApplicationDetailPage />,
               },
+              { path: "saved-jobs", element: <SavedJobsPage /> },
               { path: "certificates", element: <CertificatesPage /> },
             ],
           },

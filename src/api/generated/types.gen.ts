@@ -1635,6 +1635,76 @@ export type RegisterDeviceTokenRequest = {
     platform: 'ios' | 'android' | 'web';
 };
 
+export type AddWishlistRequest = {
+    jobId: string;
+};
+
+export type WishlistSaveResponse = {
+    saved: boolean;
+    alreadySaved?: boolean;
+    message: string;
+    id?: string;
+};
+
+export type WishlistToggleResponse = {
+    saved: boolean;
+    message: string;
+    id?: string;
+};
+
+export type WishlistCheckResponse = {
+    isSaved: boolean;
+    wishlistId?: string | null;
+};
+
+export type PaginatedWishlistResponse = {
+    items: Array<{
+        id: string;
+        jobId: string;
+        savedAt: string;
+        availability: 'available' | 'unavailable';
+        isClosingSoon?: boolean;
+        title: string | null;
+        slug: string | null;
+        enterprise: {
+            id: string;
+            name: string;
+            logoUrl?: string | null;
+        } | null;
+        location: string | null;
+        employmentType: string | null;
+        level: string | null;
+        salaryMin?: number | null;
+        salaryMax?: number | null;
+        salaryNegotiable?: boolean;
+        currency?: string;
+        expiresAt?: string | null;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type WishlistQuery = {
+    page?: number;
+    limit?: number;
+    q?: string;
+    status?: 'all' | 'available' | 'unavailable';
+    location?: string;
+};
+
+export type WishlistDeleteResponse = {
+    removed: boolean;
+    alreadyRemoved?: boolean;
+    message: string;
+};
+
+export type WishlistBulkDeleteResponse = {
+    removedCount: number;
+    message: string;
+};
+
 export type GetHealthData = {
     body?: never;
     path?: never;
@@ -5084,3 +5154,289 @@ export type DeleteApiV1NotificationsDevicesByTokenResponses = {
 };
 
 export type DeleteApiV1NotificationsDevicesByTokenResponse = DeleteApiV1NotificationsDevicesByTokenResponses[keyof DeleteApiV1NotificationsDevicesByTokenResponses];
+
+export type GetApiV1MeWishlistData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        q?: string;
+        status?: 'all' | 'available' | 'unavailable';
+        location?: string;
+    };
+    url: '/api/v1/me/wishlist';
+};
+
+export type GetApiV1MeWishlistErrors = {
+    /**
+     * Invalid query parameters or unsupported filter
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Saving jobs is for candidate accounts
+     */
+    403: unknown;
+};
+
+export type GetApiV1MeWishlistResponses = {
+    /**
+     * Paginated list of candidate saved jobs
+     */
+    200: PaginatedWishlistResponse;
+};
+
+export type GetApiV1MeWishlistResponse = GetApiV1MeWishlistResponses[keyof GetApiV1MeWishlistResponses];
+
+export type PostApiV1MeWishlistData = {
+    body: AddWishlistRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/wishlist';
+};
+
+export type PostApiV1MeWishlistErrors = {
+    /**
+     * Target job is closed, expired, or enterprise is inactive
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Saving jobs is for candidate accounts
+     */
+    403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+    /**
+     * Wishlist capacity limit reached (maximum 500 saved jobs)
+     */
+    409: unknown;
+};
+
+export type PostApiV1MeWishlistResponses = {
+    /**
+     * Job is already in wishlist (idempotent)
+     */
+    200: WishlistSaveResponse;
+    /**
+     * Job added to wishlist successfully
+     */
+    201: WishlistSaveResponse;
+};
+
+export type PostApiV1MeWishlistResponse = PostApiV1MeWishlistResponses[keyof PostApiV1MeWishlistResponses];
+
+export type PatchApiV1MeWishlistJobsByJobIdToggleData = {
+    body?: never;
+    path: {
+        jobId: string;
+    };
+    query?: never;
+    url: '/api/v1/me/wishlist/jobs/{jobId}/toggle';
+};
+
+export type PatchApiV1MeWishlistJobsByJobIdToggleErrors = {
+    /**
+     * Target job is closed, expired, or invalid ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Saving jobs is for candidate accounts
+     */
+    403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+    /**
+     * Wishlist capacity limit reached (maximum 500 saved jobs)
+     */
+    409: unknown;
+};
+
+export type PatchApiV1MeWishlistJobsByJobIdToggleResponses = {
+    /**
+     * Bookmark status toggled successfully
+     */
+    200: WishlistToggleResponse;
+};
+
+export type PatchApiV1MeWishlistJobsByJobIdToggleResponse = PatchApiV1MeWishlistJobsByJobIdToggleResponses[keyof PatchApiV1MeWishlistJobsByJobIdToggleResponses];
+
+export type PostApiV1MeWishlistToggleData = {
+    body: AddWishlistRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/wishlist/toggle';
+};
+
+export type PostApiV1MeWishlistToggleErrors = {
+    /**
+     * Target job is closed, expired, or invalid ID
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Saving jobs is for candidate accounts
+     */
+    403: unknown;
+    /**
+     * Job posting not found
+     */
+    404: unknown;
+    /**
+     * Wishlist capacity limit reached (maximum 500 saved jobs)
+     */
+    409: unknown;
+};
+
+export type PostApiV1MeWishlistToggleResponses = {
+    /**
+     * Bookmark status toggled successfully
+     */
+    200: WishlistToggleResponse;
+};
+
+export type PostApiV1MeWishlistToggleResponse = PostApiV1MeWishlistToggleResponses[keyof PostApiV1MeWishlistToggleResponses];
+
+export type DeleteApiV1MeWishlistJobsByJobIdData = {
+    body?: never;
+    path: {
+        jobId: string;
+    };
+    query?: never;
+    url: '/api/v1/me/wishlist/jobs/{jobId}';
+};
+
+export type DeleteApiV1MeWishlistJobsByJobIdErrors = {
+    /**
+     * Invalid job ID format
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Removing saved jobs is for candidate accounts
+     */
+    403: unknown;
+};
+
+export type DeleteApiV1MeWishlistJobsByJobIdResponses = {
+    /**
+     * Job removed from wishlist successfully (or already removed)
+     */
+    200: WishlistDeleteResponse;
+};
+
+export type DeleteApiV1MeWishlistJobsByJobIdResponse = DeleteApiV1MeWishlistJobsByJobIdResponses[keyof DeleteApiV1MeWishlistJobsByJobIdResponses];
+
+export type GetApiV1MeWishlistJobsByJobIdData = {
+    body?: never;
+    path: {
+        jobId: string;
+    };
+    query?: never;
+    url: '/api/v1/me/wishlist/jobs/{jobId}';
+};
+
+export type GetApiV1MeWishlistJobsByJobIdErrors = {
+    /**
+     * Invalid job ID format
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Saving jobs is for candidate accounts
+     */
+    403: unknown;
+};
+
+export type GetApiV1MeWishlistJobsByJobIdResponses = {
+    /**
+     * Job saved status check result
+     */
+    200: WishlistCheckResponse;
+};
+
+export type GetApiV1MeWishlistJobsByJobIdResponse = GetApiV1MeWishlistJobsByJobIdResponses[keyof GetApiV1MeWishlistJobsByJobIdResponses];
+
+export type DeleteApiV1MeWishlistUnavailableData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/wishlist/unavailable';
+};
+
+export type DeleteApiV1MeWishlistUnavailableErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Removing saved jobs is for candidate accounts
+     */
+    403: unknown;
+};
+
+export type DeleteApiV1MeWishlistUnavailableResponses = {
+    /**
+     * Unavailable saved jobs cleared successfully
+     */
+    200: WishlistBulkDeleteResponse;
+};
+
+export type DeleteApiV1MeWishlistUnavailableResponse = DeleteApiV1MeWishlistUnavailableResponses[keyof DeleteApiV1MeWishlistUnavailableResponses];
+
+export type DeleteApiV1MeWishlistByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/me/wishlist/{id}';
+};
+
+export type DeleteApiV1MeWishlistByIdErrors = {
+    /**
+     * Invalid wishlist ID format
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Removing saved jobs is for candidate accounts
+     */
+    403: unknown;
+};
+
+export type DeleteApiV1MeWishlistByIdResponses = {
+    /**
+     * Job removed from wishlist successfully (or already removed)
+     */
+    200: WishlistDeleteResponse;
+};
+
+export type DeleteApiV1MeWishlistByIdResponse = DeleteApiV1MeWishlistByIdResponses[keyof DeleteApiV1MeWishlistByIdResponses];
