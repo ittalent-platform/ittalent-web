@@ -12,7 +12,7 @@ import {
   TriangleAlert,
   Users,
 } from "lucide-react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useLocation, useNavigate, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { useSession } from "@/auth/use-session";
@@ -115,6 +115,7 @@ const MORE_JOBS_SHOWN = 3;
 
 export function CareerJobPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { slug } = useParams();
   const { data: session } = useSession();
 
@@ -481,7 +482,7 @@ export function CareerJobPage() {
                 <>
                   <button
                     className="flex h-[46px] items-center justify-center gap-2 rounded-full bg-mkt-accent text-[14.5px] font-semibold text-white hover:bg-mkt-accent-hover"
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate(`/login?next=${encodeURIComponent(location.pathname + location.search)}`)}
                     type="button"
                   >
                     <Lock aria-hidden="true" className="size-4" />
@@ -489,7 +490,7 @@ export function CareerJobPage() {
                   </button>
                   <Link
                     className="flex h-[46px] items-center justify-center rounded-full border border-mkt-line-strong text-[14.5px] font-semibold text-mkt-ink hover:bg-mkt-chip"
-                    to="/register"
+                    to={`/register?next=${encodeURIComponent(location.pathname + location.search)}`}
                   >
                     Create an account
                   </Link>
