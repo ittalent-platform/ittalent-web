@@ -54,6 +54,7 @@ export const STATUS_BADGE_VARIANT = {
   completed: "success",
   no_show: "warning",
   scheduled: "info",
+  reschedule_requested: "warning",
 } as const satisfies Record<InterviewStatus, string>;
 
 /** Dot colour of each status in the history, matching the status badge. */
@@ -62,6 +63,7 @@ export const HISTORY_TONE = {
   completed: "success",
   no_show: "warning",
   scheduled: "info",
+  reschedule_requested: "warning",
 } as const satisfies Record<InterviewStatus, TimelineTone>;
 
 export const MODE_BADGE_VARIANT = { online: "blocked", onsite: "warning" } as const satisfies Record<InterviewMode, string>;
@@ -84,6 +86,7 @@ export const CHIP_TONE_CLASS = {
   completed: "bg-(--status-success-bg) text-(--status-success-fg)",
   no_show: "bg-(--status-warning-bg) text-(--status-warning-fg)",
   scheduled: "bg-(--status-info-bg) text-(--status-info-fg)",
+  reschedule_requested: "bg-(--status-warning-bg) text-(--status-warning-fg)",
 } as const satisfies Record<InterviewStatus, string>;
 
 /** What a calendar chip shows besides the interview's colour. */

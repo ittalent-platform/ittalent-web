@@ -35,7 +35,7 @@ import {
   USER_FORM_ROLES,
   type UserFormRole,
 } from "./users.constants";
-import { useActiveEnterprisesQuery, useCreateUserMutation, useUpdateUserMutation } from "./users.queries";
+import { isCreateAdminUserResponse, useActiveEnterprisesQuery, useCreateUserMutation, useUpdateUserMutation } from "./users.queries";
 
 type UserFormDialogProps = {
   /** Edit mode: opens the separate "Change email" flow, since email is not editable here. */
@@ -141,6 +141,9 @@ export function UserFormDialog({ onChangeEmail, onCreated, onOpenChange, onReloa
           ...(requiresEnterprise ? { enterpriseId: values.enterpriseId } : {}),
         };
         const created = await createMutation.mutateAsync(body);
+        if (!isCreateAdminUserResponse(created)) {
+          throw new Error("The account response did not include invitation details.");
+        }
         onCreated?.(created.user);
         if (created.invitation.deliveryStatus !== "sent") {
           showToast({ message: t("adminUsers.form.inviteFailed", { email: created.user.email }), title: t("adminUsers.form.createdNoInvite"), tone: "warning" });

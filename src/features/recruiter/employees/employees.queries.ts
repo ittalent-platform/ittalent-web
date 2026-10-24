@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { client } from "@/api/client";
 import i18n from "@/i18n";
-import { getApiV1UsersById, getApiV1UsersByIdHistory } from "@/api/generated";
+import { getUserById, getApiV1UsersByIdHistory } from "@/api/generated";
 import type { UserDto, UserListResponse } from "@/api/generated/types.gen";
 
 import type {
@@ -96,7 +96,7 @@ export function useEmployeeDetailQuery(employeeId: string, enabled = true) {
     enabled: Boolean(employeeId) && enabled,
     queryKey: employeesKeys.detail(employeeId),
     queryFn: async (): Promise<UserDto> => {
-      const result = await getApiV1UsersById({
+      const result = await getUserById({
         client,
         path: { id: employeeId },
       });
