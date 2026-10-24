@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { Archive, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -27,14 +27,20 @@ export function DeleteBroadcastDialog({
 
   if (!broadcast) return null;
 
+  const isSent = broadcast.status === "Sent";
+
   async function handleConfirm() {
     if (!broadcast) return;
     setErrorMsg(null);
     try {
       await deleteMutation.mutateAsync(broadcast.id);
       showToast({
-        message: t("adminBroadcasts.toast.deletedMessage", { title: broadcast.title }),
-        title: t("adminBroadcasts.toast.deletedTitle"),
+        message: isSent
+          ? t("adminBroadcasts.toast.archivedMessage", { title: broadcast.title })
+          : t("adminBroadcasts.toast.deletedMessage", { title: broadcast.title }),
+        title: isSent
+          ? t("adminBroadcasts.toast.archivedTitle")
+          : t("adminBroadcasts.toast.deletedTitle"),
         tone: "success",
       });
       onOpenChange(false);
@@ -47,23 +53,25 @@ export function DeleteBroadcastDialog({
 
   return (
     <ActionConfirmDialog
-      action={t("actions.delete")}
+      action={isSent ? t("adminBroadcasts.actions.archive") : t("actions.delete")}
       cancelLabel={t("actions.cancel")}
       description={
-        <div className="space-y-2">
-          <p>
-            {t("adminBroadcasts.dialog.deleteConfirmMessage", { title: broadcast.title })}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {broadcast.status === "Sent"
+        <span className="flex flex-col gap-1.5">
+          <span>
+            {isSent
+              ? t("adminBroadcasts.dialog.archiveConfirmMessage", { title: broadcast.title })
+              : t("adminBroadcasts.dialog.deleteConfirmMessage", { title: broadcast.title })}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {isSent
               ? t("adminBroadcasts.dialog.deleteSentNotice")
               : t("adminBroadcasts.dialog.deleteNotice")}
-          </p>
-        </div>
+          </span>
+        </span>
       }
       disabled={deleteMutation.isPending}
       error={errorMsg ? <InlineErrorAlert>{errorMsg}</InlineErrorAlert> : null}
-      icon={Trash2}
+      icon={isSent ? Archive : Trash2}
       keepOpenOnConfirm
       onConfirm={() => void handleConfirm()}
       onOpenChange={(next) => {
@@ -71,7 +79,7 @@ export function DeleteBroadcastDialog({
         onOpenChange(next);
       }}
       open={open}
-      title={t("adminBroadcasts.dialog.deleteTitle")}
+      title={isSent ? t("adminBroadcasts.dialog.archiveTitle") : t("adminBroadcasts.dialog.deleteTitle")}
       variant="destructive-solid"
     />
   );

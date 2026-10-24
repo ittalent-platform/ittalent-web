@@ -106,21 +106,31 @@ export function BroadcastNotificationsToolbar({
               value={priority}
             />
 
-            <div className="flex items-center gap-1.5">
-              <DatePicker
-                clearable
-                onChange={onFromDateChange}
-                placeholder={t("adminBroadcasts.toolbar.fromDatePlaceholder")}
-                value={fromDate}
-              />
-              <span className="text-xs text-muted-foreground">—</span>
-              <DatePicker
-                clearable
-                min={fromDate || undefined}
-                onChange={onToDateChange}
-                placeholder={t("adminBroadcasts.toolbar.toDatePlaceholder")}
-                value={toDate}
-              />
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-1.5">
+                <DatePicker
+                  aria-invalid={Boolean(fromDate && toDate && fromDate > toDate)}
+                  clearable
+                  max={toDate || undefined}
+                  onChange={onFromDateChange}
+                  placeholder={t("adminBroadcasts.toolbar.fromDatePlaceholder")}
+                  value={fromDate}
+                />
+                <span className="text-xs text-muted-foreground">—</span>
+                <DatePicker
+                  aria-invalid={Boolean(fromDate && toDate && fromDate > toDate)}
+                  clearable
+                  min={fromDate || undefined}
+                  onChange={onToDateChange}
+                  placeholder={t("adminBroadcasts.toolbar.toDatePlaceholder")}
+                  value={toDate}
+                />
+              </div>
+              {fromDate && toDate && fromDate > toDate ? (
+                <span className="text-xs font-medium text-destructive">
+                  {t("adminBroadcasts.toolbar.invalidDateRange")}
+                </span>
+              ) : null}
             </div>
 
             {hasActiveFilters ? (

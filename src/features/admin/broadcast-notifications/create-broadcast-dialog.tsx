@@ -4,7 +4,10 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Save, Send } from "lucide-react";
 
-import { DIALOG_BUTTON_CLASS } from "@/components/common/action-confirm-dialog";
+import {
+  ActionConfirmDialog,
+  DIALOG_BUTTON_CLASS,
+} from "@/components/common/action-confirm-dialog";
 import { InlineErrorAlert } from "@/components/common/inline-error-alert";
 import { useToast } from "@/components/toast/toast-provider";
 import { Button } from "@/components/ui/button";
@@ -48,6 +51,8 @@ export function CreateBroadcastDialog({
   const { showToast } = useToast();
   const createMutation = useCreateBroadcastMutation();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [pendingPublishValues, setPendingPublishValues] =
+    useState<BroadcastFormValues | null>(null);
 
   const form = useForm<BroadcastFormValues>({
     defaultValues: DEFAULT_VALUES,
@@ -58,6 +63,7 @@ export function CreateBroadcastDialog({
     if (!next) {
       form.reset(DEFAULT_VALUES);
       setSubmitError(null);
+      setPendingPublishValues(null);
     }
     onOpenChange(next);
   }
@@ -91,6 +97,7 @@ export function CreateBroadcastDialog({
         tone: "success",
       });
 
+      setPendingPublishValues(null);
       handleClose(false);
     } catch (err) {
       setSubmitError(
@@ -100,62 +107,87 @@ export function CreateBroadcastDialog({
   }
 
   return (
-    <Dialog onOpenChange={handleClose} open={open}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{t("adminBroadcasts.dialog.createTitle")}</DialogTitle>
-          <DialogDescription>
-            {t("adminBroadcasts.dialog.createDescription")}
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog onOpenChange={handleClose} open={open}>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("adminBroadcasts.dialog.createTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("adminBroadcasts.dialog.createDescription")}
+            </DialogDescription>
+          </DialogHeader>
 
-        {submitError ? (
-          <div className="py-1">
-            <InlineErrorAlert>{submitError}</InlineErrorAlert>
-          </div>
-        ) : null}
+          {submitError ? (
+            <div className="px-6 py-1">
+              <InlineErrorAlert>{submitError}</InlineErrorAlert>
+            </div>
+          ) : null}
 
-        <form
-          className="flex flex-col gap-4 py-2"
-          id="create-broadcast-form"
-          onSubmit={form.handleSubmit((values) => submitPayload(values, false))}
-        >
-          <BroadcastForm disabled={createMutation.isPending} form={form} />
-        </form>
-
-        <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-2">
-          <Button
-            className={DIALOG_BUTTON_CLASS}
-            disabled={createMutation.isPending}
-            onClick={() => handleClose(false)}
-            type="button"
-            variant="outline"
+          <form
+            className="flex flex-col gap-4 px-6 py-4"
+            id="create-broadcast-form"
+            onSubmit={form.handleSubmit((values) => setPendingPublishValues(values))}
           >
-            {t("actions.cancel")}
-          </Button>
+            <BroadcastForm disabled={createMutation.isPending} form={form} />
+          </form>
 
-          <Button
-            className={DIALOG_BUTTON_CLASS}
-            disabled={createMutation.isPending}
-            onClick={form.handleSubmit((values) => submitPayload(values, true))}
-            type="button"
-            variant="secondary"
-          >
-            <Save className="size-4" />
-            {t("adminBroadcasts.actions.saveDraft")}
-          </Button>
+          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-2">
+            <Button
+              className={DIALOG_BUTTON_CLASS}
+              disabled={createMutation.isPending}
+              onClick={() => handleClose(false)}
+              type="button"
+              variant="outline"
+            >
+              {t("actions.cancel")}
+            </Button>
 
-          <Button
-            className={DIALOG_BUTTON_CLASS}
-            disabled={createMutation.isPending}
-            form="create-broadcast-form"
-            type="submit"
-          >
-            <Send className="size-4" />
-            {t("adminBroadcasts.actions.publishBroadcast")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            <Button
+              className={DIALOG_BUTTON_CLASS}
+              disabled={createMutation.isPending}
+              onClick={form.handleSubmit((values) => submitPayload(values, true))}
+              type="button"
+              variant="secondary"
+            >
+              <Save className="size-4" />
+              {t("adminBroadcasts.actions.saveDraft")}
+            </Button>
+
+            <Button
+              className={DIALOG_BUTTON_CLASS}
+              disabled={createMutation.isPending}
+              form="create-broadcast-form"
+              type="submit"
+            >
+              <Send className="size-4" />
+              {t("adminBroadcasts.actions.publishBroadcast")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {pendingPublishValues ? (
+        <ActionConfirmDialog
+          action={t("adminBroadcasts.actions.publishBroadcast")}
+          cancelLabel={t("actions.cancel")}
+          description={t("adminBroadcasts.dialog.publishConfirmDescription")}
+          disabled={createMutation.isPending}
+          icon={Send}
+          iconVariant="info-solid"
+          keepOpenOnConfirm
+          onConfirm={() => void submitPayload(pendingPublishValues, false)}
+          onOpenChange={(next) => {
+            if (!next) setPendingPublishValues(null);
+          }}
+          open={Boolean(pendingPublishValues)}
+          title={t("adminBroadcasts.dialog.publishConfirmTitle", {
+            audience: t(`adminBroadcasts.audience.${pendingPublishValues.target_audience}`, {
+              defaultValue: pendingPublishValues.target_audience,
+            }),
+          })}
+          variant="info-solid"
+        />
+      ) : null}
+    </>
   );
 }

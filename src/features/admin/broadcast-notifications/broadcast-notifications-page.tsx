@@ -12,6 +12,7 @@ import {
 import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { AdminPageHeader } from "@/components/common/admin-page-header";
 import { TableSurface } from "@/components/common/data-table";
+import { InlineErrorAlert } from "@/components/common/inline-error-alert";
 import { useToast } from "@/components/toast/toast-provider";
 import { Pagination } from "@/components/ui/pagination";
 import { useListParams } from "@/hooks/use-list-params";
@@ -53,6 +54,8 @@ export function BroadcastNotificationsPage() {
   const [sortBy, setSortBy] = useState<"createdAt" | "scheduled_at" | "title" | "status">("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+  const isDateRangeInvalid = Boolean(fromDate && toDate && fromDate > toDate);
+
   // Dialog and drawer state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedBroadcast, setSelectedBroadcast] = useState<BroadcastNotificationDto | null>(null);
@@ -70,7 +73,8 @@ export function BroadcastNotificationsPage() {
 
   const listQuery = useBroadcastsListQuery({
     audience: audience !== "all" ? audience : undefined,
-    fromDate: fromDate || undefined,
+    enabled: !isDateRangeInvalid,
+    fromDate: isDateRangeInvalid ? undefined : (fromDate || undefined),
     limit,
     page,
     priority: priority !== "all" ? priority : undefined,
@@ -78,7 +82,7 @@ export function BroadcastNotificationsPage() {
     sortBy,
     sortOrder,
     status: status !== "all" ? status : undefined,
-    toDate: toDate || undefined,
+    toDate: isDateRangeInvalid ? undefined : (toDate || undefined),
   });
 
   const items = listQuery.data?.items ?? [];
@@ -261,6 +265,12 @@ export function BroadcastNotificationsPage() {
         status={status}
         toDate={toDate}
       />
+
+      {isDateRangeInvalid ? (
+        <InlineErrorAlert>
+          {t("adminBroadcasts.toolbar.invalidDateRange")}
+        </InlineErrorAlert>
+      ) : null}
 
       {/* Data Table Surface */}
       <TableSurface>

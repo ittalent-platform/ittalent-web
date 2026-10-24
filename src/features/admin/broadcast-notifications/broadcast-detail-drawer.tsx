@@ -1,4 +1,5 @@
 import {
+  Archive,
   Calendar,
   CheckCircle2,
   Clock,
@@ -249,8 +250,17 @@ export function BroadcastDetailDialog({
             type="button"
             variant="ghost"
           >
-            <Trash2 className="size-4 text-destructive" />
-            <span className="text-destructive">{t("actions.delete")}</span>
+            {data.status === "Sent" ? (
+              <>
+                <Archive className="size-4 text-destructive" />
+                <span className="text-destructive">{t("adminBroadcasts.actions.archive")}</span>
+              </>
+            ) : (
+              <>
+                <Trash2 className="size-4 text-destructive" />
+                <span className="text-destructive">{t("actions.delete")}</span>
+              </>
+            )}
           </Button>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -296,6 +306,18 @@ export function BroadcastDetailDialog({
 
             {isScheduled ? (
               <>
+                <Button
+                  className={DIALOG_BUTTON_CLASS}
+                  onClick={() => {
+                    onOpenChange(false);
+                    onSchedule(data);
+                  }}
+                  type="button"
+                  variant="outline"
+                >
+                  <Calendar className="size-4" />
+                  {t("adminBroadcasts.actions.reschedule")}
+                </Button>
                 <Button
                   className={DIALOG_BUTTON_CLASS}
                   onClick={() => {

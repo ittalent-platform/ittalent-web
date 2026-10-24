@@ -213,4 +213,75 @@ describe('Broadcast Notifications Feature Tests (UC 01 - UC 07)', () => {
     expect(link).toBeNull();
     expect(screen.getByText(/external link blocked for security/i)).toBeInTheDocument();
   });
+
+  it('shows Archive action for Sent broadcasts and Reschedule action for Scheduled broadcasts in detail dialog', () => {
+    vi.spyOn(broadcastQueries, 'useBroadcastsListQuery').mockReturnValue({
+      data: {
+        items: [mockBroadcast1, mockBroadcast2],
+        total: 2,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        summary: { total: 2, drafts: 0, scheduled: 1, sent: 1 },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof broadcastQueries.useBroadcastsListQuery>);
+
+    vi.spyOn(broadcastQueries, 'useBroadcastDetailQuery').mockReturnValue({
+      data: mockBroadcast1, // Sent broadcast
+      isLoading: false,
+    } as unknown as ReturnType<typeof broadcastQueries.useBroadcastDetailQuery>);
+
+    const { unmount } = renderWithClient(<BroadcastNotificationsPage />);
+
+    // Open Sent broadcast detail
+    fireEvent.click(screen.getByText('Platform Maintenance Notice'));
+    expect(screen.getByRole('button', { name: /archive/i })).toBeInTheDocument();
+
+    unmount();
+
+    // Now test Scheduled broadcast detail
+    vi.spyOn(broadcastQueries, 'useBroadcastDetailQuery').mockReturnValue({
+      data: mockBroadcast2, // Scheduled broadcast
+      isLoading: false,
+    } as unknown as ReturnType<typeof broadcastQueries.useBroadcastDetailQuery>);
+
+    renderWithClient(<BroadcastNotificationsPage />);
+    fireEvent.click(screen.getByText('Feature Release Announcement'));
+    expect(screen.getByRole('button', { name: /reschedule/i })).toBeInTheDocument();
+  });
+
+  it('prompts confirmation modal before immediately publishing broadcast', async () => {
+    vi.spyOn(broadcastQueries, 'useBroadcastsListQuery').mockReturnValue({
+      data: {
+        items: [],
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 0,
+        summary: { total: 0, drafts: 0, scheduled: 0, sent: 0 },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof broadcastQueries.useBroadcastsListQuery>);
+
+    renderWithClient(<BroadcastNotificationsPage />);
+
+    // Open create dialog
+    fireEvent.click(screen.getByRole('button', { name: /create broadcast/i }));
+
+    // Fill valid form inputs
+    const titleInput = screen.getByLabelText(/title/i);
+    const contentInput = screen.getByLabelText(/message content/i);
+    fireEvent.change(titleInput, { target: { value: 'Valid Test Title' } });
+    fireEvent.change(contentInput, { target: { value: 'Valid announcement content exceeding ten chars' } });
+
+    // Submit via Publish Broadcast button
+    const publishBtn = screen.getByRole('button', { name: /publish broadcast/i });
+    fireEvent.click(publishBtn);
+
+    // Confirmation dialog should appear with confirm button
+    expect(await screen.findByText(/publish to all users now\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/the announcement will be broadcast immediately/i)).toBeInTheDocument();
+  });
 });
+

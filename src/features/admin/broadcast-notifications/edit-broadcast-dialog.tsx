@@ -101,13 +101,13 @@ function EditBroadcastDialogContent({
         </DialogHeader>
 
         {submitError ? (
-          <div className="py-1">
+          <div className="px-6 py-1">
             <InlineErrorAlert>{submitError}</InlineErrorAlert>
           </div>
         ) : null}
 
         <form
-          className="flex flex-col gap-4 py-2"
+          className="flex flex-col gap-4 px-6 py-4"
           id="edit-broadcast-form"
           onSubmit={form.handleSubmit(onSubmit)}
         >

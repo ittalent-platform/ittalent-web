@@ -1,4 +1,5 @@
 import {
+  Archive,
   Calendar,
   Eye,
   MoreVertical,
@@ -193,6 +194,13 @@ export function BroadcastNotificationsTable({
               {item.status === "Scheduled" ? (
                 <>
                   <DropdownMenuItem
+                    className="gap-2.5 text-[13px]"
+                    onSelect={() => onSchedule(item)}
+                  >
+                    <Calendar className="size-4" />
+                    {t("adminBroadcasts.actions.reschedule")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
                     className="gap-2.5 text-[13px] text-destructive focus:text-destructive"
                     onSelect={() => onCancelSchedule(item)}
                   >
@@ -213,8 +221,17 @@ export function BroadcastNotificationsTable({
                 className="gap-2.5 text-[13px] text-destructive focus:text-destructive"
                 onSelect={() => onDelete(item)}
               >
-                <Trash2 className="size-4" />
-                {t("actions.delete")}
+                {item.status === "Sent" ? (
+                  <>
+                    <Archive className="size-4" />
+                    {t("adminBroadcasts.actions.archive")}
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="size-4" />
+                    {t("actions.delete")}
+                  </>
+                )}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

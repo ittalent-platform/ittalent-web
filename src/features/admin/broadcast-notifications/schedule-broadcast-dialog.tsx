@@ -95,6 +95,8 @@ function ScheduleBroadcastDialogContent({
     };
   }, [targetDateIct, now, t]);
 
+  const isReschedule = broadcast.status === "Scheduled";
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrorMsg(null);
@@ -112,10 +114,16 @@ function ScheduleBroadcastDialogContent({
       });
 
       showToast({
-        message: t("adminBroadcasts.toast.scheduledMessage", {
-          title: broadcast.title,
-        }),
-        title: t("adminBroadcasts.toast.scheduledTitle"),
+        message: isReschedule
+          ? t("adminBroadcasts.toast.rescheduledMessage", {
+              title: broadcast.title,
+            })
+          : t("adminBroadcasts.toast.scheduledMessage", {
+              title: broadcast.title,
+            }),
+        title: isReschedule
+          ? t("adminBroadcasts.toast.rescheduledTitle")
+          : t("adminBroadcasts.toast.scheduledTitle"),
         tone: "success",
       });
 
@@ -133,21 +141,29 @@ function ScheduleBroadcastDialogContent({
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{t("adminBroadcasts.dialog.scheduleTitle")}</DialogTitle>
+          <DialogTitle>
+            {isReschedule
+              ? t("adminBroadcasts.dialog.rescheduleTitle")
+              : t("adminBroadcasts.dialog.scheduleTitle")}
+          </DialogTitle>
           <DialogDescription>
-            {t("adminBroadcasts.dialog.scheduleDescription", {
-              title: broadcast.title,
-            })}
+            {isReschedule
+              ? t("adminBroadcasts.dialog.rescheduleDescription", {
+                  title: broadcast.title,
+                })
+              : t("adminBroadcasts.dialog.scheduleDescription", {
+                  title: broadcast.title,
+                })}
           </DialogDescription>
         </DialogHeader>
 
         {errorMsg ? (
-          <div className="py-1">
+          <div className="px-6 py-1">
             <InlineErrorAlert>{errorMsg}</InlineErrorAlert>
           </div>
         ) : null}
 
-        <form className="flex flex-col gap-4 py-2" id="schedule-broadcast-form" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-4 px-6 py-4" id="schedule-broadcast-form" onSubmit={handleSubmit}>
           <FormField
             htmlFor="schedule-date"
             label={t("adminBroadcasts.schedule.dateLabel")}
@@ -217,7 +233,9 @@ function ScheduleBroadcastDialogContent({
             type="submit"
           >
             <Calendar className="size-4" />
-            {t("adminBroadcasts.actions.confirmSchedule")}
+            {isReschedule
+              ? t("adminBroadcasts.actions.confirmReschedule")
+              : t("adminBroadcasts.actions.confirmSchedule")}
           </Button>
         </DialogFooter>
       </DialogContent>
