@@ -684,7 +684,8 @@
     "companyProfile": "Company profile",
     "collapse": "Collapse sidebar",
     "closeMenu": "Close menu",
-    "interviews": "Interviews"
+    "interviews": "Interviews",
+    "dashboard": "Dashboard"
   },
   "jobPostings": {
     "title": "Job postings",
@@ -3133,6 +3134,246 @@
     },
     "popover": {
       "viewAll": "View all notifications"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "refresh": "Refresh",
+    "scope": "Whole company · {{company}}",
+    "asOf": "Data as of {{date}}, {{time}} · dates in Ho Chi Minh City time (UTC+7)",
+    "period": {
+      "label": "Time period",
+      "last_7_days": "Last 7 days",
+      "last_30_days": "Last 30 days",
+      "last_90_days": "Last 90 days",
+      "this_month": "This month",
+      "custom": "Custom range",
+      "customOpen": "Custom range…",
+      "from": "From",
+      "to": "To",
+      "note": "Whole days in Ho Chi Minh City time, “To” included.",
+      "days_one": "That is {{count}} day.",
+      "days_other": "That is {{count}} days.",
+      "apply": "Apply",
+      "cancel": "Cancel",
+      "reset": "Reset to last 30 days",
+      "errors": {
+        "order": "“To” must be on or after “From”.",
+        "tooLong": "A period can cover at most {{days}} days."
+      }
+    },
+    "kpi": {
+      "label": "Key numbers",
+      "jobsPosted": "Jobs posted",
+      "applications": "Applications received",
+      "interviews": "Interviews",
+      "hired": "Hired",
+      "jobsOpen": "{{formatted}} still open",
+      "averagePerDay": "avg {{value}} a day",
+      "interviewsCompleted": "{{formatted}} completed",
+      "hiredPercent": "{{value}}% of applications",
+      "none": "none in this period",
+      "hints": {
+        "jobs": "Jobs created in this period. “Still open” counts the ones that are published now.",
+        "hired": "Applications received in this period that are hired now. It is not the number of hiring decisions made in this period."
+      }
+    },
+    "pipeline": {
+      "title": "Where this period’s applications are now",
+      "subtitle": "Received {{range}} · grouped by current status",
+      "inProgress": "still in progress",
+      "hired": "hired",
+      "open": "Open Applications",
+      "ariaLabel": "Applications by status",
+      "segmentTitle": "{{status}}: {{count}}",
+      "status": {
+        "submitted": "Submitted",
+        "underReview": "Under review",
+        "interviewing": "Interviewing",
+        "offered": "Offered",
+        "hired": "Hired",
+        "closed": "Closed without hiring"
+      },
+      "closedDetail": "Rejected {{rejected}} · Withdrawn {{withdrawn}} · Position filled {{positionFilled}}"
+    },
+    "weekly": {
+      "title": "Applications received per week",
+      "subtitle": "Same applications as the bar above, by the day they were sent",
+      "ariaLabel": "Applications received per week",
+      "average": "Weekly avg {{value}}",
+      "partialNote": "Striped bar: {{range}} is a partial week.",
+      "viewTable": "View as table",
+      "viewChart": "View as chart",
+      "table": {
+        "week": "Week",
+        "applications": "Applications",
+        "jobs": "Jobs posted",
+        "interviews": "Interviews",
+        "hired": "Hired",
+        "partial_one": "partial week ({{count}} day)",
+        "partial_other": "partial week ({{count}} days)"
+      }
+    },
+    "heatmap": {
+      "title": "When interviews happen",
+      "subtitle": "Interviews starting {{range}}, by day",
+      "open": "Open Interviews",
+      "byWeekday": "By weekday",
+      "busiest": "Busiest:",
+      "busiestDay": {
+        "mon": "Mondays",
+        "tue": "Tuesdays",
+        "wed": "Wednesdays",
+        "thu": "Thursdays",
+        "fri": "Fridays",
+        "sat": "Saturdays",
+        "sun": "Sundays"
+      },
+      "fewer": "Fewer",
+      "more": "More · each interview counted once, on the day it starts",
+      "cell_one": "{{day}}: {{count}} interview",
+      "cell_other": "{{day}}: {{count}} interviews"
+    },
+    "interviewStatus": {
+      "title": "Interviews by status now",
+      "subtitle": "Same interviews, where they stand now",
+      "open": "Open Interviews",
+      "ariaLabel": "Interviews by status",
+      "unit_one": "interview",
+      "unit_other": "interviews",
+      "completedShare": "{{percent}}% completed",
+      "note": "Striped: cancelled. Each interview counted once.",
+      "status": {
+        "scheduled": "Scheduled",
+        "completed": "Completed",
+        "rescheduleRequested": "New time requested",
+        "noShow": "No-show",
+        "cancelled": "Cancelled"
+      }
+    },
+    "jobStatus": {
+      "title": "Jobs posted",
+      "subtitle": "By status now",
+      "open": "Open Job postings",
+      "ariaLabel": "Jobs posted by status",
+      "unit": "open now",
+      "note": "Jobs created {{range}}. Dashed: draft, not visible to candidates.",
+      "status": {
+        "published": "Open",
+        "closed": "Closed",
+        "draft": "Draft",
+        "archived": "Archived"
+      }
+    },
+    "topJobs": {
+      "title": "Jobs with the most applications",
+      "subtitle": "Top {{count}} by applications received {{range}}",
+      "open": "Open Job postings",
+      "empty": "No applications were received in this period.",
+      "columns": {
+        "job": "Job",
+        "applications": "Applications",
+        "interviews": "Interviews",
+        "hired": "Hired"
+      }
+    },
+    "notices": {
+      "timeZone": {
+        "title": "That link uses a time zone we can’t apply",
+        "body": "Showing the last 30 days in Ho Chi Minh City time instead."
+      },
+      "dates": {
+        "title": "That link has dates we can’t use",
+        "body": "Showing the last 30 days in Ho Chi Minh City time instead."
+      },
+      "company": "Showing {{company}}. Other companies’ numbers are never shown.",
+      "empty": "Nothing was posted, received or scheduled in {{range}}.",
+      "future": "This period hasn’t started yet, so every count is 0."
+    },
+    "states": {
+      "loading": "Loading statistics",
+      "updating": "Updating… numbers shown are from {{time}}",
+      "updatingPeriod": "Updating… numbers shown are for {{range}}, as of {{time}}",
+      "error": {
+        "title": "Statistics didn’t load",
+        "body": "Nothing is shown so numbers from different moments never mix.",
+        "retry": "Try again"
+      },
+      "noAccess": {
+        "title": "You don’t have access",
+        "body": "The dashboard is for HR and enterprise admins of a company."
+      },
+      "notMember": {
+        "title": "You’re no longer a member of a company",
+        "body": "Ask your company admin if this is a mistake."
+      },
+      "notActive": {
+        "title": "Dashboard isn’t available",
+        "body": "Your company isn’t active. Contact ITTalent support."
+      }
+    }
+  },
+  "adminDashboard": {
+    "title": "Overview",
+    "asOf": "Platform as of {{date}}, {{time}} · company hiring data isn’t shown here",
+    "kpi": {
+      "label": "Platform numbers",
+      "accounts": "Accounts",
+      "newInLast30Days": "+{{formatted}} in the last 30 days",
+      "activeCompanies": "Active companies",
+      "approved": "of {{approved}} approved · {{suspended}} suspended",
+      "waiting": "Companies waiting for review",
+      "oldestWaiting_one": "oldest waiting {{count}} day",
+      "oldestWaiting_other": "oldest waiting {{count}} days",
+      "nothingWaiting": "nothing is waiting"
+    },
+    "newAccounts": {
+      "title": "New accounts per week",
+      "subtitle": "Last {{count}} weeks, all roles",
+      "open": "Open Users",
+      "ariaLabel": "New accounts per week",
+      "now": "now",
+      "pill_one": "{{count}} new",
+      "pill_other": "{{count}} new",
+      "pointTitle_one": "Week of {{day}}: {{count}} new account",
+      "pointTitle_other": "Week of {{day}}: {{count}} new accounts"
+    },
+    "byRole": {
+      "title": "Accounts by role",
+      "subtitle": "All accounts on the platform",
+      "ariaLabel": "Accounts by role",
+      "unit_one": "account",
+      "unit_other": "accounts"
+    },
+    "roles": {
+      "candidates": "Candidates",
+      "hr": "HR",
+      "enterpriseAdmins": "Enterprise admins"
+    },
+    "accountStatus": {
+      "active": "Active",
+      "invited": "Invited",
+      "inactive": "Inactive",
+      "suspended": "Suspended"
+    },
+    "waiting": {
+      "title": "Waiting for review",
+      "subtitle": "Company sign-ups, oldest first",
+      "viewAll": "View all",
+      "submitted": "Submitted {{date}}",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "today": "today",
+      "empty": "Nothing is waiting for review."
+    },
+    "states": {
+      "noAccess": {
+        "title": "You don’t have access",
+        "body": "The platform overview is for system admins."
+      },
+      "error": {
+        "title": "The overview didn’t load"
+      }
     }
   }
 }

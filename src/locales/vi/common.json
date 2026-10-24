@@ -676,7 +676,8 @@
     "companyProfile": "Hồ sơ công ty",
     "collapse": "Thu gọn thanh bên",
     "closeMenu": "Đóng menu",
-    "interviews": "Phỏng vấn"
+    "interviews": "Phỏng vấn",
+    "dashboard": "Bảng điều khiển"
   },
   "jobPostings": {
     "title": "Tin tuyển dụng",
@@ -3107,6 +3108,237 @@
     },
     "popover": {
       "viewAll": "Xem tất cả thông báo"
+    }
+  },
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "refresh": "Làm mới",
+    "scope": "Toàn công ty · {{company}}",
+    "asOf": "Dữ liệu tính đến {{time}}, {{date}} · ngày theo giờ TP. Hồ Chí Minh (UTC+7)",
+    "period": {
+      "label": "Khoảng thời gian",
+      "last_7_days": "7 ngày qua",
+      "last_30_days": "30 ngày qua",
+      "last_90_days": "90 ngày qua",
+      "this_month": "Tháng này",
+      "custom": "Tùy chọn",
+      "customOpen": "Tùy chọn khoảng ngày…",
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "note": "Tính theo ngày trọn vẹn, giờ TP. Hồ Chí Minh, gồm cả “Đến ngày”.",
+      "days_other": "Tức {{count}} ngày.",
+      "apply": "Áp dụng",
+      "cancel": "Hủy",
+      "reset": "Đặt lại về 30 ngày qua",
+      "errors": {
+        "order": "“Đến ngày” phải bằng hoặc sau “Từ ngày”.",
+        "tooLong": "Một khoảng thời gian tối đa {{days}} ngày."
+      }
+    },
+    "kpi": {
+      "label": "Chỉ số chính",
+      "jobsPosted": "Tin đã đăng",
+      "applications": "Đơn ứng tuyển nhận được",
+      "interviews": "Phỏng vấn",
+      "hired": "Đã tuyển",
+      "jobsOpen": "{{formatted}} đang mở",
+      "averagePerDay": "trung bình {{value}} đơn/ngày",
+      "interviewsCompleted": "{{formatted}} đã hoàn thành",
+      "hiredPercent": "{{value}}% số đơn",
+      "none": "không có trong kỳ này",
+      "hints": {
+        "jobs": "Tin tuyển dụng được tạo trong kỳ này. “Đang mở” là số tin hiện đang được đăng.",
+        "hired": "Số đơn nhận được trong kỳ này mà hiện đã được tuyển, không phải số quyết định tuyển trong kỳ."
+      }
+    },
+    "pipeline": {
+      "title": "Các đơn của kỳ này hiện đang ở đâu",
+      "subtitle": "Nhận trong {{range}} · nhóm theo trạng thái hiện tại",
+      "inProgress": "đang xử lý",
+      "hired": "đã tuyển",
+      "open": "Mở danh sách đơn",
+      "ariaLabel": "Đơn ứng tuyển theo trạng thái",
+      "segmentTitle": "{{status}}: {{count}}",
+      "status": {
+        "submitted": "Đã nộp",
+        "underReview": "Đang xem xét",
+        "interviewing": "Phỏng vấn",
+        "offered": "Đã nhận offer",
+        "hired": "Đã trúng tuyển",
+        "closed": "Đã đóng, không tuyển"
+      },
+      "closedDetail": "Bị từ chối {{rejected}} · Đã rút đơn {{withdrawn}} · Đã đủ người {{positionFilled}}"
+    },
+    "weekly": {
+      "title": "Đơn ứng tuyển nhận được mỗi tuần",
+      "subtitle": "Cùng các đơn ở thanh trên, theo ngày được gửi",
+      "ariaLabel": "Đơn ứng tuyển nhận được mỗi tuần",
+      "average": "Trung bình tuần {{value}}",
+      "partialNote": "Cột sọc: {{range}} là tuần chưa đủ ngày.",
+      "viewTable": "Xem dạng bảng",
+      "viewChart": "Xem dạng biểu đồ",
+      "table": {
+        "week": "Tuần",
+        "applications": "Đơn ứng tuyển",
+        "jobs": "Tin đã đăng",
+        "interviews": "Phỏng vấn",
+        "hired": "Đã tuyển",
+        "partial_other": "tuần chưa đủ ngày ({{count}} ngày)"
+      }
+    },
+    "heatmap": {
+      "title": "Phỏng vấn diễn ra khi nào",
+      "subtitle": "Phỏng vấn bắt đầu trong {{range}}, theo ngày",
+      "open": "Mở danh sách phỏng vấn",
+      "byWeekday": "Theo thứ trong tuần",
+      "busiest": "Đông nhất:",
+      "busiestDay": {
+        "mon": "Thứ Hai",
+        "tue": "Thứ Ba",
+        "wed": "Thứ Tư",
+        "thu": "Thứ Năm",
+        "fri": "Thứ Sáu",
+        "sat": "Thứ Bảy",
+        "sun": "Chủ nhật"
+      },
+      "fewer": "Ít hơn",
+      "more": "Nhiều hơn · mỗi buổi phỏng vấn tính một lần, vào ngày bắt đầu",
+      "cell_other": "{{day}}: {{count}} buổi phỏng vấn"
+    },
+    "interviewStatus": {
+      "title": "Phỏng vấn theo trạng thái hiện tại",
+      "subtitle": "Cùng các buổi phỏng vấn, đang ở trạng thái nào",
+      "open": "Mở danh sách phỏng vấn",
+      "ariaLabel": "Phỏng vấn theo trạng thái",
+      "unit_other": "buổi phỏng vấn",
+      "completedShare": "{{percent}}% đã hoàn thành",
+      "note": "Sọc: đã hủy. Mỗi buổi phỏng vấn chỉ tính một lần.",
+      "status": {
+        "scheduled": "Đã lên lịch",
+        "completed": "Hoàn thành",
+        "rescheduleRequested": "Đề xuất giờ mới",
+        "noShow": "Vắng mặt",
+        "cancelled": "Đã hủy"
+      }
+    },
+    "jobStatus": {
+      "title": "Tin đã đăng",
+      "subtitle": "Theo trạng thái hiện tại",
+      "open": "Mở danh sách tin tuyển dụng",
+      "ariaLabel": "Tin đã đăng theo trạng thái",
+      "unit": "đang mở",
+      "note": "Tin tạo trong {{range}}. Nét đứt: bản nháp, ứng viên chưa thấy.",
+      "status": {
+        "published": "Đang mở",
+        "closed": "Đã đóng",
+        "draft": "Bản nháp",
+        "archived": "Đã lưu trữ"
+      }
+    },
+    "topJobs": {
+      "title": "Tin có nhiều đơn ứng tuyển nhất",
+      "subtitle": "Top {{count}} theo số đơn nhận trong {{range}}",
+      "open": "Mở danh sách tin tuyển dụng",
+      "empty": "Không có đơn ứng tuyển nào trong kỳ này.",
+      "columns": {
+        "job": "Tin tuyển dụng",
+        "applications": "Đơn ứng tuyển",
+        "interviews": "Phỏng vấn",
+        "hired": "Đã tuyển"
+      }
+    },
+    "notices": {
+      "timeZone": {
+        "title": "Liên kết này dùng múi giờ chưa được hỗ trợ",
+        "body": "Đang hiển thị 30 ngày qua theo giờ TP. Hồ Chí Minh."
+      },
+      "dates": {
+        "title": "Liên kết này có ngày không dùng được",
+        "body": "Đang hiển thị 30 ngày qua theo giờ TP. Hồ Chí Minh."
+      },
+      "company": "Đang hiển thị {{company}}. Số liệu của công ty khác không bao giờ được hiển thị.",
+      "empty": "Không có tin nào được đăng, đơn nào được nhận hay buổi phỏng vấn nào trong {{range}}.",
+      "future": "Khoảng thời gian này chưa bắt đầu, nên mọi số liệu đều bằng 0."
+    },
+    "states": {
+      "loading": "Đang tải thống kê",
+      "updating": "Đang cập nhật… số liệu đang hiển thị là của {{time}}",
+      "updatingPeriod": "Đang cập nhật… số liệu đang hiển thị là của {{range}}, tính đến {{time}}",
+      "error": {
+        "title": "Không tải được thống kê",
+        "body": "Không hiển thị gì để số liệu ở các thời điểm khác nhau không bị lẫn vào nhau.",
+        "retry": "Thử lại"
+      },
+      "noAccess": {
+        "title": "Bạn không có quyền truy cập",
+        "body": "Bảng điều khiển dành cho HR và quản trị viên doanh nghiệp."
+      },
+      "notMember": {
+        "title": "Bạn không còn là thành viên của công ty",
+        "body": "Hãy hỏi quản trị viên công ty nếu đây là nhầm lẫn."
+      },
+      "notActive": {
+        "title": "Bảng điều khiển chưa dùng được",
+        "body": "Công ty của bạn chưa hoạt động. Hãy liên hệ bộ phận hỗ trợ ITTalent."
+      }
+    }
+  },
+  "adminDashboard": {
+    "title": "Tổng quan nền tảng",
+    "asOf": "Nền tảng tính đến {{time}}, {{date}} · không hiển thị dữ liệu tuyển dụng của doanh nghiệp",
+    "kpi": {
+      "label": "Số liệu nền tảng",
+      "accounts": "Tài khoản",
+      "newInLast30Days": "+{{formatted}} trong 30 ngày qua",
+      "activeCompanies": "Doanh nghiệp đang hoạt động",
+      "approved": "trên {{approved}} đã duyệt · {{suspended}} bị tạm ngưng",
+      "waiting": "Doanh nghiệp chờ duyệt",
+      "oldestWaiting_other": "chờ lâu nhất {{count}} ngày",
+      "nothingWaiting": "không có hồ sơ nào đang chờ"
+    },
+    "newAccounts": {
+      "title": "Tài khoản mới mỗi tuần",
+      "subtitle": "{{count}} tuần gần nhất, mọi vai trò",
+      "open": "Mở danh sách người dùng",
+      "ariaLabel": "Tài khoản mới mỗi tuần",
+      "now": "nay",
+      "pill_other": "{{count}} mới",
+      "pointTitle_other": "Tuần bắt đầu {{day}}: {{count}} tài khoản mới"
+    },
+    "byRole": {
+      "title": "Tài khoản theo vai trò",
+      "subtitle": "Toàn bộ tài khoản trên nền tảng",
+      "ariaLabel": "Tài khoản theo vai trò",
+      "unit_other": "tài khoản"
+    },
+    "roles": {
+      "candidates": "Ứng viên",
+      "hr": "HR",
+      "enterpriseAdmins": "Quản trị viên doanh nghiệp"
+    },
+    "accountStatus": {
+      "active": "Hoạt động",
+      "invited": "Đã mời",
+      "inactive": "Không hoạt động",
+      "suspended": "Bị tạm ngưng"
+    },
+    "waiting": {
+      "title": "Chờ duyệt",
+      "subtitle": "Đăng ký doanh nghiệp, cũ nhất trước",
+      "viewAll": "Xem tất cả",
+      "submitted": "Gửi ngày {{date}}",
+      "days_other": "{{count}} ngày",
+      "today": "hôm nay",
+      "empty": "Không có hồ sơ nào đang chờ duyệt."
+    },
+    "states": {
+      "noAccess": {
+        "title": "Bạn không có quyền truy cập",
+        "body": "Tổng quan nền tảng dành cho quản trị viên hệ thống."
+      },
+      "error": {
+        "title": "Không tải được tổng quan"
+      }
     }
   }
 }
