@@ -192,8 +192,19 @@ export function useMarkNotificationRead() {
 
 export function useMarkAllNotificationsRead() {
   const queryClient = useQueryClient();
-  return useMutation<MarkAllReadResponse, Error, void, { previousLists: Array<[readonly unknown[], NotificationListResponse | undefined]>; previousCount: UnreadCountResponse | undefined }>({
-    mutationFn: async () => unwrap(await patchApiV1NotificationsReadAll(), "Couldn't mark all notifications as read."),
+  return useMutation<
+    MarkAllReadResponse,
+    Error,
+    { before?: string } | void,
+    { previousLists: Array<[readonly unknown[], NotificationListResponse | undefined]>; previousCount: UnreadCountResponse | undefined }
+  >({
+    mutationFn: async (variables) =>
+      unwrap(
+        await patchApiV1NotificationsReadAll({
+          query: variables?.before ? { before: variables.before } : undefined,
+        }),
+        "Couldn't mark all notifications as read.",
+      ),
     onError: (_err, _variables, context) => {
       if (context?.previousLists) {
         for (const [key, data] of context.previousLists) {
@@ -204,7 +215,7 @@ export function useMarkAllNotificationsRead() {
         queryClient.setQueryData(notificationKeys.unreadCount(), context.previousCount);
       }
     },
-    onMutate: async () => {
+    onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: notificationKeys.all });
 
       const previousLists = queryClient.getQueriesData<NotificationListResponse>({
@@ -212,14 +223,35 @@ export function useMarkAllNotificationsRead() {
       });
       const previousCount = queryClient.getQueryData<UnreadCountResponse>(notificationKeys.unreadCount());
 
+      const cutoffDate = variables?.before ? new Date(variables.before) : null;
+      let newlyMarkedCount = 0;
+
       updateAllLists(
         queryClient,
         (items) =>
-          items.map((item) => (item.isRead ? item : { ...item, isRead: true, readAt: new Date().toISOString() })),
-        (meta) => ({ ...meta, unreadCount: 0 }),
+          items.map((item) => {
+            if (item.isRead) return item;
+            if (cutoffDate && item.createdAt && new Date(item.createdAt) > cutoffDate) {
+              return item;
+            }
+            newlyMarkedCount += 1;
+            return { ...item, isRead: true, readAt: new Date().toISOString() };
+          }),
+        (meta) => ({
+          ...meta,
+          unreadCount: cutoffDate
+            ? Math.max(0, meta.unreadCount - newlyMarkedCount)
+            : 0,
+        }),
       );
 
-      queryClient.setQueryData<UnreadCountResponse>(notificationKeys.unreadCount(), { unreadCount: 0 });
+      if (previousCount) {
+        queryClient.setQueryData<UnreadCountResponse>(notificationKeys.unreadCount(), {
+          unreadCount: cutoffDate
+            ? Math.max(0, previousCount.unreadCount - newlyMarkedCount)
+            : 0,
+        });
+      }
 
       return { previousCount, previousLists };
     },

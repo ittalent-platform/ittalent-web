@@ -277,6 +277,9 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       await user.click(confirmBtn);
 
       expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledTimes(1);
+      expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledWith({
+        query: { before: expect.any(String) },
+      });
     });
 
     it("uses singular wording when 1 unread notification is marked as read", async () => {

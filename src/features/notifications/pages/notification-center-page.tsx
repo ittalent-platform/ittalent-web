@@ -53,6 +53,7 @@ export function NotificationCenterPage() {
   const { showToast } = useToast();
   const [showMarkAllDialog, setShowMarkAllDialog] = useState(false);
   const [capturedMarkAllCount, setCapturedMarkAllCount] = useState<number | null>(null);
+  const [capturedMarkAllCutoff, setCapturedMarkAllCutoff] = useState<string | null>(null);
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [capturedDeleteCount, setCapturedDeleteCount] = useState<number | null>(null);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<NotificationItem | null>(null);
@@ -168,31 +169,38 @@ export function NotificationCenterPage() {
   const handleOpenMarkAllDialog = () => {
     if (unreadCount > 0 && !markAllReadMutation.isPending) {
       setCapturedMarkAllCount(unreadCount);
+      setCapturedMarkAllCutoff(new Date().toISOString());
       setShowMarkAllDialog(true);
     }
   };
 
   const handleConfirmMarkAllAsRead = () => {
     const targetCount = capturedMarkAllCount ?? unreadCount;
+    const cutoff = capturedMarkAllCutoff ?? undefined;
     if (targetCount > 0 && !markAllReadMutation.isPending) {
-      markAllReadMutation.mutate(undefined, {
-        onSuccess: () => {
-          setShowMarkAllDialog(false);
-          setCapturedMarkAllCount(null);
+      markAllReadMutation.mutate(
+        { before: cutoff },
+        {
+          onSuccess: () => {
+            setShowMarkAllDialog(false);
+            setCapturedMarkAllCount(null);
+            setCapturedMarkAllCutoff(null);
+          },
+          onError: () => {
+            setShowMarkAllDialog(false);
+            setCapturedMarkAllCount(null);
+            setCapturedMarkAllCutoff(null);
+            showToast({
+              title: "",
+              message: t("notifications.markAllError", {
+                count: targetCount,
+                defaultValue: `Nothing was marked as read. Something went wrong on our side. You still have ${targetCount} unread notifications.`,
+              }),
+              tone: "error",
+            });
+          },
         },
-        onError: () => {
-          setShowMarkAllDialog(false);
-          setCapturedMarkAllCount(null);
-          showToast({
-            title: "",
-            message: t("notifications.markAllError", {
-              count: targetCount,
-              defaultValue: `Nothing was marked as read. Something went wrong on our side. You still have ${targetCount} unread notifications.`,
-            }),
-            tone: "error",
-          });
-        },
-      });
+      );
     }
   };
 
@@ -585,6 +593,7 @@ export function NotificationCenterPage() {
           setShowMarkAllDialog(open);
           if (!open) {
             setCapturedMarkAllCount(null);
+            setCapturedMarkAllCutoff(null);
           }
         }}
         open={showMarkAllDialog}

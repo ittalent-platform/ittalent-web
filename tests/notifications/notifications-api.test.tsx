@@ -256,6 +256,30 @@ describe("Notifications API & React Query Layer", () => {
       expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalled();
       expect(queryClient.getQueryData(notificationKeys.unreadCount())).toEqual({ unreadCount: 0 });
     });
+
+    it("calls read-all API with cutoff timestamp and keeps newer notifications unread", async () => {
+      const cutoff = "2026-10-24T10:00:00.000Z";
+      queryClient.setQueryData(notificationKeys.unreadCount(), { unreadCount: 2 });
+
+      vi.mocked(api.patchApiV1NotificationsReadAll).mockResolvedValueOnce({
+        data: {
+          message: "All notifications marked as read",
+          unreadCount: 1,
+          updatedCount: 1,
+        },
+        response: new Response(null, { status: 200 }),
+      });
+
+      const { result } = renderHook(() => useMarkAllNotificationsRead(), {
+        wrapper: createWrapper(),
+      });
+
+      await result.current.mutateAsync({ before: cutoff });
+
+      expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledWith({
+        query: { before: cutoff },
+      });
+    });
   });
 
   describe("useDeleteNotification", () => {
