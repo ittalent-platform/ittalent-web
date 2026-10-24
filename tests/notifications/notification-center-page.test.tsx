@@ -272,11 +272,32 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       ).toBeInTheDocument();
       expect(api.patchApiV1NotificationsReadAll).not.toHaveBeenCalled();
 
-      // Click confirm inside dialog
-      const confirmBtn = within(dialog).getByRole("button", { name: /mark all as read/i });
+      // Click confirm inside dialog ("Mark as read")
+      const confirmBtn = within(dialog).getByRole("button", { name: /^mark as read$/i });
       await user.click(confirmBtn);
 
       expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledTimes(1);
+    });
+
+    it("uses singular wording when 1 unread notification is marked as read", async () => {
+      const user = userEvent.setup();
+      vi.mocked(api.getApiV1NotificationsUnreadCount).mockResolvedValue({
+        data: { unreadCount: 1 },
+        response: new Response(null, { status: 200 }),
+      });
+
+      renderWithProviders(<NotificationCenterPage />);
+
+      const markAllBtn = await screen.findByRole("button", { name: /mark all as read/i });
+      await user.click(markAllBtn);
+
+      const dialog = await screen.findByRole("alertdialog");
+      expect(
+        within(dialog).getByRole("heading", { name: "Mark 1 notification as read?" }),
+      ).toBeInTheDocument();
+      expect(
+        within(dialog).getByRole("button", { name: "Mark as read" }),
+      ).toBeInTheDocument();
     });
 
     it("displays error toast when mark all as read mutation fails", async () => {
@@ -289,7 +310,7 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       await user.click(markAllBtn);
 
       const dialog = await screen.findByRole("alertdialog");
-      const confirmBtn = within(dialog).getByRole("button", { name: /mark all as read/i });
+      const confirmBtn = within(dialog).getByRole("button", { name: /^mark as read$/i });
       await user.click(confirmBtn);
 
       expect(

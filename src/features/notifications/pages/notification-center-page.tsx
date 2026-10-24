@@ -52,6 +52,7 @@ export function NotificationCenterPage() {
 
   const { showToast } = useToast();
   const [showMarkAllDialog, setShowMarkAllDialog] = useState(false);
+  const [capturedMarkAllCount, setCapturedMarkAllCount] = useState<number | null>(null);
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [capturedDeleteCount, setCapturedDeleteCount] = useState<number | null>(null);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<NotificationItem | null>(null);
@@ -166,23 +167,27 @@ export function NotificationCenterPage() {
 
   const handleOpenMarkAllDialog = () => {
     if (unreadCount > 0 && !markAllReadMutation.isPending) {
+      setCapturedMarkAllCount(unreadCount);
       setShowMarkAllDialog(true);
     }
   };
 
   const handleConfirmMarkAllAsRead = () => {
-    if (unreadCount > 0 && !markAllReadMutation.isPending) {
+    const targetCount = capturedMarkAllCount ?? unreadCount;
+    if (targetCount > 0 && !markAllReadMutation.isPending) {
       markAllReadMutation.mutate(undefined, {
         onSuccess: () => {
           setShowMarkAllDialog(false);
+          setCapturedMarkAllCount(null);
         },
         onError: () => {
           setShowMarkAllDialog(false);
+          setCapturedMarkAllCount(null);
           showToast({
             title: "",
             message: t("notifications.markAllError", {
-              count: unreadCount,
-              defaultValue: `Nothing was marked as read. Something went wrong on our side. You still have ${unreadCount} unread notifications.`,
+              count: targetCount,
+              defaultValue: `Nothing was marked as read. Something went wrong on our side. You still have ${targetCount} unread notifications.`,
             }),
             tone: "error",
           });
@@ -524,7 +529,7 @@ export function NotificationCenterPage() {
                 count: activeDeleteCount,
                 defaultValue: `Delete ${activeDeleteCount} notifications`,
               })
-            : t("notifications.deleteAllBtnCount", {
+            : t("notifications.deleteAllConfirmBtn", {
                 count: activeDeleteCount,
                 defaultValue: `Delete ${activeDeleteCount} notifications`,
               })
@@ -567,7 +572,7 @@ export function NotificationCenterPage() {
       />
 
       <ActionConfirmDialog
-        action={t("notifications.markAllAsRead", { defaultValue: "Mark as read" })}
+        action={t("notifications.markAllAsReadConfirmBtn", { defaultValue: "Mark as read" })}
         cancelLabel={t("common.cancel", { defaultValue: "Cancel" })}
         description={t("notifications.markAllAsReadConfirmDesc", {
           defaultValue:
@@ -576,11 +581,16 @@ export function NotificationCenterPage() {
         disabled={markAllReadMutation.isPending}
         icon={CheckCheck}
         onConfirm={handleConfirmMarkAllAsRead}
-        onOpenChange={setShowMarkAllDialog}
+        onOpenChange={(open) => {
+          setShowMarkAllDialog(open);
+          if (!open) {
+            setCapturedMarkAllCount(null);
+          }
+        }}
         open={showMarkAllDialog}
         title={t("notifications.markAllAsReadConfirmTitle", {
-          count: unreadCount,
-          defaultValue: `Mark ${unreadCount} notifications as read?`,
+          count: capturedMarkAllCount ?? unreadCount,
+          defaultValue: `Mark ${capturedMarkAllCount ?? unreadCount} notifications as read?`,
         })}
         variant="default"
       />

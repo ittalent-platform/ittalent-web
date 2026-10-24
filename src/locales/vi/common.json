@@ -3008,6 +3008,7 @@
     "unreadCount_other": "{{count}} chưa đọc",
     "allCaughtUp": "Đã đọc tất cả",
     "markAllAsRead": "Đánh dấu tất cả đã đọc",
+    "markAllAsReadConfirmBtn": "Đánh dấu đã đọc",
     "markAllAsReadConfirmTitle": "Đánh dấu {{count}} thông báo đã đọc?",
     "markAllAsReadConfirmDesc": "Chỉ những thông báo bạn nhìn thấy hiện tại mới được đánh dấu. Bất kỳ thông báo nào đến sau sẽ vẫn chưa đọc.",
     "markAllError": "Chưa có thông báo nào được đánh dấu đã đọc. Đã xảy ra lỗi từ phía hệ thống. Bạn vẫn còn {{count}} thông báo chưa đọc.",
