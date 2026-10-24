@@ -9,6 +9,7 @@ import {
   useCheckSavedJobQuery,
   useClearUnavailableMutation,
   useRemoveSavedJobMutation,
+  useSaveJobMutation,
   useSavedJobsQuery,
   useToggleSaveJobMutation,
 } from "@/features/applicant/saved-jobs/saved-jobs.queries";
@@ -24,13 +25,16 @@ vi.mock("@/features/applicant/saved-jobs/saved-jobs.api", () => ({
   toggleSaveJob: vi.fn(),
 }));
 
-function createWrapper() {
-  const queryClient = new QueryClient({
+function createTestClient() {
+  return new QueryClient({
     defaultOptions: {
       queries: { retry: false },
       mutations: { retry: false },
     },
   });
+}
+
+function createWrapper(queryClient: QueryClient) {
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
@@ -52,9 +56,9 @@ describe("saved-jobs queries and key factories", () => {
     expect(savedJobKeys.check("job-123")).toEqual(["saved-jobs", "check", "job-123"]);
   });
 
-  it("fetches saved jobs list through useSavedJobsQuery", async () => {
+  it("fetches saved jobs list through useSavedJobsQuery with items shape", async () => {
     const mockList: SavedJobsListResponse = {
-      data: [
+      items: [
         {
           id: "wl-1",
           jobId: "j-1",
@@ -76,12 +80,14 @@ describe("saved-jobs queries and key factories", () => {
 
     vi.mocked(savedJobsApi.getSavedJobs).mockResolvedValue(mockList);
 
+    const client = createTestClient();
     const { result } = renderHook(() => useSavedJobsQuery({ status: "available" }), {
-      wrapper: createWrapper(),
+      wrapper: createWrapper(client),
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(mockList);
+    expect(result.current.data?.items).toHaveLength(1);
     expect(savedJobsApi.getSavedJobs).toHaveBeenCalledWith({ status: "available" });
   });
 
@@ -91,13 +97,59 @@ describe("saved-jobs queries and key factories", () => {
       wishlistId: "wl-1",
     });
 
+    const client = createTestClient();
     const { result } = renderHook(() => useCheckSavedJobQuery("j-1"), {
-      wrapper: createWrapper(),
+      wrapper: createWrapper(client),
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.isSaved).toBe(true);
     expect(result.current.data?.wishlistId).toBe("wl-1");
+  });
+
+  it("saves job and updates check cache directly via useSaveJobMutation", async () => {
+    vi.mocked(savedJobsApi.saveJob).mockResolvedValue({
+      saved: true,
+      message: "Job added to wishlist successfully",
+      id: "wl-1",
+    });
+
+    const client = createTestClient();
+    const { result } = renderHook(() => useSaveJobMutation(), {
+      wrapper: createWrapper(client),
+    });
+
+    result.current.mutate("j-1");
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(savedJobsApi.saveJob).toHaveBeenCalledWith("j-1");
+    expect(client.getQueryData(savedJobKeys.check("j-1"))).toEqual({
+      isSaved: true,
+      wishlistId: "wl-1",
+    });
+  });
+
+  it("removes a saved job and updates check cache via useRemoveSavedJobMutation", async () => {
+    vi.mocked(savedJobsApi.removeSavedJob).mockResolvedValue({
+      removed: true,
+      message: "Job removed from wishlist",
+    });
+
+    const client = createTestClient();
+    client.setQueryData(savedJobKeys.check("j-1"), { isSaved: true, wishlistId: "wl-1" });
+
+    const { result } = renderHook(() => useRemoveSavedJobMutation(), {
+      wrapper: createWrapper(client),
+    });
+
+    result.current.mutate("j-1");
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(savedJobsApi.removeSavedJob).toHaveBeenCalledWith("j-1");
+    expect(client.getQueryData(savedJobKeys.check("j-1"))).toEqual({
+      isSaved: false,
+      wishlistId: null,
+    });
   });
 
   it("toggles saved job status via useToggleSaveJobMutation", async () => {
@@ -107,30 +159,19 @@ describe("saved-jobs queries and key factories", () => {
       id: "wl-1",
     });
 
+    const client = createTestClient();
     const { result } = renderHook(() => useToggleSaveJobMutation(), {
-      wrapper: createWrapper(),
+      wrapper: createWrapper(client),
     });
 
     result.current.mutate("j-1");
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(savedJobsApi.toggleSaveJob).toHaveBeenCalledWith("j-1");
-  });
-
-  it("removes a saved job via useRemoveSavedJobMutation", async () => {
-    vi.mocked(savedJobsApi.removeSavedJob).mockResolvedValue({
-      removed: true,
-      message: "Job removed from wishlist",
+    expect(client.getQueryData(savedJobKeys.check("j-1"))).toEqual({
+      isSaved: true,
+      wishlistId: "wl-1",
     });
-
-    const { result } = renderHook(() => useRemoveSavedJobMutation(), {
-      wrapper: createWrapper(),
-    });
-
-    result.current.mutate("j-1");
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(savedJobsApi.removeSavedJob).toHaveBeenCalledWith("j-1");
   });
 
   it("clears unavailable saved jobs via useClearUnavailableMutation", async () => {
@@ -139,8 +180,9 @@ describe("saved-jobs queries and key factories", () => {
       message: "Unavailable saved jobs cleared successfully",
     });
 
+    const client = createTestClient();
     const { result } = renderHook(() => useClearUnavailableMutation(), {
-      wrapper: createWrapper(),
+      wrapper: createWrapper(client),
     });
 
     result.current.mutate();

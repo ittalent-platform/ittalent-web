@@ -1,4 +1,12 @@
-import { client } from "@/api/client";
+import {
+  deleteApiV1MeWishlistById,
+  deleteApiV1MeWishlistJobsByJobId,
+  deleteApiV1MeWishlistUnavailable,
+  getApiV1MeWishlist,
+  getApiV1MeWishlistJobsByJobId,
+  postApiV1MeWishlist,
+  postApiV1MeWishlistToggle,
+} from "@/api/generated";
 import { unwrap } from "@/api/request-error";
 import type {
   SavedJobsListResponse,
@@ -13,8 +21,7 @@ import type {
 export async function getSavedJobs(
   params: SavedJobsQueryParams = {},
 ): Promise<SavedJobsListResponse> {
-  const result = await client.get<{ 200: SavedJobsListResponse }>({
-    url: "/api/v1/me/wishlist",
+  const result = await getApiV1MeWishlist({
     query: {
       ...(params.page ? { page: params.page } : {}),
       ...(params.limit ? { limit: params.limit } : {}),
@@ -29,8 +36,8 @@ export async function getSavedJobs(
 export async function checkJobSaved(
   jobId: string,
 ): Promise<WishlistCheckResponse> {
-  const result = await client.get<{ 200: WishlistCheckResponse }>({
-    url: `/api/v1/me/wishlist/jobs/${jobId}`,
+  const result = await getApiV1MeWishlistJobsByJobId({
+    path: { jobId },
   });
   return unwrap(result, "Could not check job saved status.");
 }
@@ -38,8 +45,7 @@ export async function checkJobSaved(
 export async function saveJob(
   jobId: string,
 ): Promise<WishlistSaveResponse> {
-  const result = await client.post<{ 200: WishlistSaveResponse; 201: WishlistSaveResponse }>({
-    url: "/api/v1/me/wishlist",
+  const result = await postApiV1MeWishlist({
     body: { jobId },
   });
   return unwrap(result, "Could not save job to wishlist.");
@@ -48,8 +54,7 @@ export async function saveJob(
 export async function toggleSaveJob(
   jobId: string,
 ): Promise<WishlistToggleResponse> {
-  const result = await client.post<{ 200: WishlistToggleResponse }>({
-    url: "/api/v1/me/wishlist/toggle",
+  const result = await postApiV1MeWishlistToggle({
     body: { jobId },
   });
   return unwrap(result, "Could not toggle saved job status.");
@@ -58,8 +63,8 @@ export async function toggleSaveJob(
 export async function removeSavedJob(
   jobId: string,
 ): Promise<WishlistDeleteResponse> {
-  const result = await client.delete<{ 200: WishlistDeleteResponse }>({
-    url: `/api/v1/me/wishlist/jobs/${jobId}`,
+  const result = await deleteApiV1MeWishlistJobsByJobId({
+    path: { jobId },
   });
   return unwrap(result, "Could not remove job from saved jobs.");
 }
@@ -67,15 +72,13 @@ export async function removeSavedJob(
 export async function removeSavedJobById(
   id: string,
 ): Promise<WishlistDeleteResponse> {
-  const result = await client.delete<{ 200: WishlistDeleteResponse }>({
-    url: `/api/v1/me/wishlist/${id}`,
+  const result = await deleteApiV1MeWishlistById({
+    path: { id },
   });
   return unwrap(result, "Could not remove saved job.");
 }
 
 export async function clearUnavailableSavedJobs(): Promise<WishlistBulkDeleteResponse> {
-  const result = await client.delete<{ 200: WishlistBulkDeleteResponse }>({
-    url: "/api/v1/me/wishlist/unavailable",
-  });
+  const result = await deleteApiV1MeWishlistUnavailable();
   return unwrap(result, "Could not clear unavailable jobs.");
 }
