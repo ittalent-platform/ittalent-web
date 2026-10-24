@@ -1616,7 +1616,7 @@ export type UnreadCountResponse = {
 
 export type MarkAllReadResponse = {
     updatedCount: number;
-    unreadCount: 0;
+    unreadCount: number;
     message: string;
 };
 
@@ -5013,7 +5013,9 @@ export type GetApiV1NotificationsUnreadCountResponse = GetApiV1NotificationsUnre
 export type PatchApiV1NotificationsReadAllData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        before?: string;
+    };
     url: '/api/v1/notifications/read-all';
 };
 

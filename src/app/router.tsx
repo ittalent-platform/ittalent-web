@@ -159,6 +159,11 @@ const ApplicationDetailPage = lazy(() =>
     (m) => ({ default: m.ApplicationDetailPage }),
   ),
 );
+const NotificationCenterPage = lazy(() =>
+  import("@/features/notifications/pages/notification-center-page").then(
+    (m) => ({ default: m.NotificationCenterPage }),
+  ),
+);
 const SavedJobsPage = lazy(() =>
   import("@/features/applicant/saved-jobs/saved-jobs-page").then((m) => ({
     default: m.SavedJobsPage,
@@ -241,6 +246,7 @@ export const appRoutes = [
         children: [
           {
             element: <CandidateAccountLayout />,
+            handle: { hideFooter: true },
             children: [
               { path: "documents", element: <DocumentsPage /> },
               { path: "profile", element: <ProfilePage /> },
@@ -252,6 +258,8 @@ export const appRoutes = [
               },
               { path: "saved-jobs", element: <SavedJobsPage /> },
               { path: "certificates", element: <CertificatesPage /> },
+              { path: "notifications", element: <NotificationCenterPage /> },
+              { path: "account/notifications", element: <Navigate replace to="/notifications" /> },
             ],
           },
         ],

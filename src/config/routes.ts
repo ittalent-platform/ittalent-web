@@ -11,6 +11,8 @@ export function profilePasswordPathForRole(role?: string): string {
   return `${profilePathForRole(role)}/password`;
 }
 export const CERTIFICATES_PATH = "/certificates";
+export const NOTIFICATIONS_PATH = "/notifications";
+export const ACCOUNT_NOTIFICATIONS_PATH = "/account/notifications";
 export const RECRUITER_JOB_POSTINGS_PATH = "/recruiter/job-postings";
 export const RECRUITER_APPLICATIONS_PATH = "/recruiter/applications";
 export const RECRUITER_INTERVIEWS_PATH = "/recruiter/interviews";

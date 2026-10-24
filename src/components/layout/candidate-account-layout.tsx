@@ -1,6 +1,7 @@
 import {
   Award,
   Bookmark,
+  Bell,
   Briefcase,
   FileText,
   UserRound,
@@ -9,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router";
 
+import { NOTIFICATIONS_PATH } from "@/config/routes";
 import { cn } from "@/lib/utils";
 import { PROFILE_PATH } from "@/config/routes";
 
@@ -41,6 +43,10 @@ const ACCOUNT_NAV: AccountNavGroup[] = [
       { icon: Award, labelKey: "accountNav.certificates", to: "/certificates" },
     ],
     labelKey: "accountNav.myProfile",
+  },
+  {
+    items: [{ icon: Bell, labelKey: "accountNav.notifications", to: NOTIFICATIONS_PATH }],
+    labelKey: "accountNav.account",
   },
 ];
 

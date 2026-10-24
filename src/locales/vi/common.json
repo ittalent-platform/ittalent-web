@@ -3144,8 +3144,10 @@
     "unreadCount_other": "{{count}} chưa đọc",
     "allCaughtUp": "Đã đọc tất cả",
     "markAllAsRead": "Đánh dấu tất cả đã đọc",
+    "markAllAsReadConfirmBtn": "Đánh dấu đã đọc",
     "markAllAsReadConfirmTitle": "Đánh dấu {{count}} thông báo đã đọc?",
     "markAllAsReadConfirmDesc": "Chỉ những thông báo bạn nhìn thấy hiện tại mới được đánh dấu. Bất kỳ thông báo nào đến sau sẽ vẫn chưa đọc.",
+    "markAllError": "Chưa có thông báo nào được đánh dấu đã đọc. Đã xảy ra lỗi từ phía hệ thống. Bạn vẫn còn {{count}} thông báo chưa đọc.",
     "moreActions": "Thao tác khác",
     "deleteAll": "Xóa tất cả…",
     "deleteAllConfirmTitle": "Xóa {{count}} thông báo?",
@@ -3189,6 +3191,11 @@
       "allCaughtUpDesc": "Không có thông báo chưa đọc. Các thông báo cũ hơn nằm ở mục Tất cả.",
       "noAnnouncements": "Chưa có thông báo chung",
       "noAnnouncementsDesc": "Tin tức và cập nhật từ ITTalent sẽ hiển thị tại đây."
+    },
+    "error": {
+      "loadTitle": "Không thể tải thông báo",
+      "loadDesc": "Đã xảy ra sự cố từ phía máy chủ. Thông báo của bạn vẫn an toàn; vui lòng thử lại sau giây lát.",
+      "olderFailed": "Không tải được các thông báo cũ hơn."
     },
     "errors": {
       "unauthenticatedTitle": "Đăng nhập để xem thông báo của bạn",
