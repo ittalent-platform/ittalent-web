@@ -106,6 +106,7 @@ export type UserDto = {
     createdAt?: string;
     updatedAt?: string;
     version?: number;
+    avatarUrl?: string | null;
 };
 
 export type VerifyEmailQuery = {
@@ -170,8 +171,8 @@ export type ChangePasswordRequest = {
 export type ChangePasswordResponse = {
     success: true;
     message: string;
-    data?: {
-        [key: string]: unknown;
+    data: {
+        tokens: RefreshTokenResponse;
     };
 };
 
@@ -1535,6 +1536,43 @@ export type RecruiterApplicantCompanyHistoryResponse = {
     }>;
 };
 
+export type MyProfile = {
+    id: string;
+    email: string;
+    username: string;
+    fullName: string | null;
+    phone: string | null;
+    avatarUrl: string | null;
+    role: string;
+    status: string;
+    emailVerified: boolean;
+    enterpriseId: string | null;
+    statusReason?: string | null;
+    statusUpdatedAt?: string | null;
+    statusUpdatedBy?: string | null;
+    enterpriseName?: string | null;
+    invitation?: {
+        status: 'pending' | 'accepted' | 'revoked' | 'cancelled' | 'expired';
+        deliveryStatus: 'pending' | 'sent' | 'failed';
+        expiresAt: string;
+        sentAt?: string | null;
+    } | null;
+    createdAt?: string;
+    updatedAt?: string;
+    version?: number;
+    hasPassword: boolean;
+};
+
+export type UpdateMyProfile = {
+    fullName?: string;
+    phone?: string | null;
+    expectedVersion?: number;
+};
+
+export type MyAvatarUpload = {
+    avatar: Blob | File;
+};
+
 export type NotificationItemDto = {
     id: string;
     title: string;
@@ -1910,6 +1948,10 @@ export type PostApiV1AuthChangePasswordErrors = {
      * Authentication required
      */
     401: unknown;
+    /**
+     * Too many password change attempts
+     */
+    429: unknown;
 };
 
 export type PostApiV1AuthChangePasswordResponses = {
@@ -4762,6 +4804,107 @@ export type GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses = {
 };
 
 export type GetApiV1RecruiterApplicationsByIdCompanyHistoryResponse = GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses[keyof GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses];
+
+export type GetMyProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/profile';
+};
+
+export type GetMyProfileErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Profile not found
+     */
+    404: unknown;
+};
+
+export type GetMyProfileResponses = {
+    /**
+     * Current profile
+     */
+    200: MyProfile;
+};
+
+export type GetMyProfileResponse = GetMyProfileResponses[keyof GetMyProfileResponses];
+
+export type UpdateMyProfileData = {
+    body: UpdateMyProfile;
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/profile';
+};
+
+export type UpdateMyProfileErrors = {
+    /**
+     * Invalid input
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Profile not found
+     */
+    404: unknown;
+    /**
+     * VERSION_CONFLICT
+     */
+    409: unknown;
+};
+
+export type UpdateMyProfileResponses = {
+    /**
+     * Updated profile
+     */
+    200: MyProfile;
+};
+
+export type UpdateMyProfileResponse = UpdateMyProfileResponses[keyof UpdateMyProfileResponses];
+
+export type UploadMyAvatarData = {
+    body: MyAvatarUpload;
+    path?: never;
+    query?: never;
+    url: '/api/v1/me/profile/avatar';
+};
+
+export type UploadMyAvatarErrors = {
+    /**
+     * Invalid input
+     */
+    400: unknown;
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Profile not found
+     */
+    404: unknown;
+    /**
+     * Storage unavailable
+     */
+    502: unknown;
+    /**
+     * Storage not configured
+     */
+    503: unknown;
+};
+
+export type UploadMyAvatarResponses = {
+    /**
+     * Updated profile
+     */
+    200: MyProfile;
+};
+
+export type UploadMyAvatarResponse = UploadMyAvatarResponses[keyof UploadMyAvatarResponses];
 
 export type DeleteApiV1NotificationsData = {
     body?: never;

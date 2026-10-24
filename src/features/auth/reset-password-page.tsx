@@ -18,7 +18,7 @@ import { forgotPasswordPath } from "./password-reset";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { StatusPanel } from "@/components/common/status-panel";
 import { Button } from "@/components/ui/button";
-import { getPasswordRules } from "./password-rules";
+import { getPasswordRules } from "@/lib/password-rules";
 import { PasswordField } from "./password-field";
 import { AuthCardPage, AuthFormHeader, AuthStatusCard } from "./auth-status-card";
 import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS } from "./auth-status.constants";
