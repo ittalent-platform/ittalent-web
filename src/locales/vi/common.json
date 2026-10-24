@@ -37,7 +37,7 @@
     },
     "dialog": {
       "signInTitle": "Đăng nhập để lưu việc làm",
-      "signInDescription": "Các việc làm đã lưu được bảo mật cho tài khoản ứng viên của bạn. Bạn sẽ quay lại việc làm này sau khi đăng nhập.",
+      "signInDescription": "Các việc làm đã lưu được bảo mật cho tài khoản ứng viên của bạn. Đăng nhập để quay lại ngay việc làm này.",
       "createAccountAction": "Tạo tài khoản",
       "signInAction": "Đăng nhập"
     },
@@ -50,8 +50,8 @@
       "undo": "Hoàn tác",
       "errorSaveTitle": "Không thể lưu việc làm",
       "errorRemoveTitle": "Không thể bỏ lưu việc làm",
-      "errorSaveFallback": "Không thể lưu việc làm vào danh sách. Vui lòng thử lại.",
-      "errorRemoveFallback": "Không thể bỏ việc làm khỏi danh sách đã lưu. Vui lòng thử lại."
+      "errorSaveFallback": "Không thể lưu việc làm. Vui lòng thử lại.",
+      "errorRemoveFallback": "Không thể bỏ lưu việc làm. Vui lòng thử lại."
     }
   },
   "certificates": {

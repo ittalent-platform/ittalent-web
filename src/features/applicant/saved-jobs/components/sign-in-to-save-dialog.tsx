@@ -35,7 +35,7 @@ export function SignInToSaveDialog({ open, onOpenChange }: SignInToSaveDialogPro
             <AlertDialogDescription className="text-sm leading-relaxed text-mkt-ink-2">
               {t(
                 "savedJobs.dialog.signInDescription",
-                "Saved jobs are private to your candidate account. You’ll come back to this job after signing in.",
+                "Saved jobs are private to your candidate account. Sign in to return directly to this job.",
               )}
             </AlertDialogDescription>
           </div>

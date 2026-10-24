@@ -37,7 +37,7 @@
     },
     "dialog": {
       "signInTitle": "Sign in to save jobs",
-      "signInDescription": "Saved jobs are private to your candidate account. You’ll come back to this job after signing in.",
+      "signInDescription": "Saved jobs are private to your candidate account. Sign in to return directly to this job.",
       "createAccountAction": "Create an account",
       "signInAction": "Sign in"
     },
@@ -50,8 +50,8 @@
       "undo": "Undo",
       "errorSaveTitle": "Couldn't save job",
       "errorRemoveTitle": "Couldn't remove job",
-      "errorSaveFallback": "Unable to save job to bookmarks.",
-      "errorRemoveFallback": "Unable to remove job from saved jobs."
+      "errorSaveFallback": "Couldn't save. Try again",
+      "errorRemoveFallback": "Couldn't remove. Try again"
     }
   },
   "certificates": {

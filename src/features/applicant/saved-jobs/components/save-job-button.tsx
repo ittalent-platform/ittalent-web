@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
-import { requestErrorMessage } from "@/api/request-error";
+import { requestErrorMessage, requestStatus } from "@/api/request-error";
 import { useSession } from "@/auth/use-session";
 import { useToast } from "@/components/toast/toast-provider";
 import { cn } from "@/lib/utils";
@@ -22,6 +22,14 @@ export type SaveJobButtonProps = {
   onSaveSuccess?: () => void;
   onRemoveSuccess?: () => void;
 };
+
+function resolveToastErrorMessage(error: unknown, fallback: string): string {
+  const status = requestStatus(error);
+  if (typeof status === "number" && status >= 400 && status < 500) {
+    return requestErrorMessage(error, fallback);
+  }
+  return fallback;
+}
 
 export function SaveJobButton({
   jobId,
@@ -81,9 +89,9 @@ export function SaveJobButton({
                     showToast({
                       tone: "error",
                       title: t("savedJobs.toast.errorSaveTitle", "Couldn't save job"),
-                      message: requestErrorMessage(
+                      message: resolveToastErrorMessage(
                         error,
-                        t("savedJobs.toast.errorSaveFallback", "Unable to save job to bookmarks."),
+                        t("savedJobs.toast.errorSaveFallback", "Couldn't save. Try again"),
                       ),
                     });
                   },
@@ -96,9 +104,9 @@ export function SaveJobButton({
           showToast({
             tone: "error",
             title: t("savedJobs.toast.errorRemoveTitle", "Couldn't remove job"),
-            message: requestErrorMessage(
+            message: resolveToastErrorMessage(
               error,
-              t("savedJobs.toast.errorRemoveFallback", "Unable to remove job from saved jobs."),
+              t("savedJobs.toast.errorRemoveFallback", "Couldn't remove. Try again"),
             ),
           });
         },
@@ -123,9 +131,9 @@ export function SaveJobButton({
           showToast({
             tone: "error",
             title: t("savedJobs.toast.errorSaveTitle", "Couldn't save job"),
-            message: requestErrorMessage(
+            message: resolveToastErrorMessage(
               error,
-              t("savedJobs.toast.errorSaveFallback", "Unable to save job to bookmarks."),
+              t("savedJobs.toast.errorSaveFallback", "Couldn't save. Try again"),
             ),
           });
         },

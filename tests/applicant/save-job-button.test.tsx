@@ -86,7 +86,7 @@ describe("SaveJobButton", () => {
 
     expect(await screen.findByText("Sign in to save jobs")).toBeInTheDocument();
     expect(
-      screen.getByText("Saved jobs are private to your candidate account. You’ll come back to this job after signing in."),
+      screen.getByText("Saved jobs are private to your candidate account. Sign in to return directly to this job."),
     ).toBeInTheDocument();
 
     const signInLink = screen.getByRole("link", { name: "Sign in" });
@@ -162,14 +162,15 @@ describe("SaveJobButton", () => {
     });
   });
 
-  it("shows error toast when save fails", async () => {
+  it("shows server message for 4xx errors (e.g. job closed)", async () => {
     vi.mocked(sessionHook.useSession).mockReturnValue({
       data: { user: { id: "u-1", role: "user" } },
     } as never);
     vi.mocked(savedJobsApi.checkJobSaved).mockResolvedValue({ isSaved: false });
-    vi.mocked(savedJobsApi.saveJob).mockRejectedValue(
-      new Error("This job is no longer open, so it can't be saved"),
-    );
+    const clientError = Object.assign(new Error("This job is no longer open, so it can't be saved"), {
+      status: 400,
+    });
+    vi.mocked(savedJobsApi.saveJob).mockRejectedValue(clientError);
 
     renderWithClient(<SaveJobButton jobId="job-1" />);
 
@@ -182,6 +183,32 @@ describe("SaveJobButton", () => {
           tone: "error",
           title: "Couldn't save job",
           message: "This job is no longer open, so it can't be saved",
+        }),
+      );
+    });
+  });
+
+  it("shows friendly fallback message for 5xx server errors", async () => {
+    vi.mocked(sessionHook.useSession).mockReturnValue({
+      data: { user: { id: "u-1", role: "user" } },
+    } as never);
+    vi.mocked(savedJobsApi.checkJobSaved).mockResolvedValue({ isSaved: false });
+    const serverError = Object.assign(new Error("Database is down"), {
+      status: 500,
+    });
+    vi.mocked(savedJobsApi.saveJob).mockRejectedValue(serverError);
+
+    renderWithClient(<SaveJobButton jobId="job-1" />);
+
+    const button = screen.getByRole("button", { name: /save/i });
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tone: "error",
+          title: "Couldn't save job",
+          message: "Couldn't save. Try again",
         }),
       );
     });
