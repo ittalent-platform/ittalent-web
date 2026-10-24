@@ -35,7 +35,7 @@ export function PipelineCard({ data }: { data: CompanyDashboardResponse }) {
             <div className="text-[12px] text-muted-foreground">{t("dashboard.pipeline.inProgress")}</div>
           </div>
           <div>
-            <div className="itt-display text-[22px] leading-tight font-semibold text-(--dash-pipe-hired) tabular-nums">{formatCount(model.hired, language)}</div>
+            <div className="itt-display text-[22px] leading-tight font-semibold text-(--dash-pipe-hired-text) tabular-nums">{formatCount(model.hired, language)}</div>
             <div className="text-[12px] text-muted-foreground">{t("dashboard.pipeline.hired")}</div>
           </div>
           <CardLink to={RECRUITER_APPLICATIONS_PATH}>{t("dashboard.pipeline.open")}</CardLink>

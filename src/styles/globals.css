@@ -138,6 +138,7 @@
   --dash-pipe-interviewing: #f2470c;
   --dash-pipe-offered: #c2380a;
   --dash-pipe-hired: #7a2406;
+  --dash-pipe-hired-text: #7a2406;
   --dash-heat-1: #fde0d2;
   --dash-heat-2: #f9a37c;
   --dash-heat-3: #f2470c;
@@ -161,6 +162,10 @@
 }
 
 .dark {
+  /* Neutral status and faint text: without these the light values (dark grey) stay on a dark card. Same values as .candidate-root.dark. */
+  --status-neutral-bg: #2e2e32;
+  --status-neutral-fg: #c2c2c6;
+  --slate-faint: #9a9a9f;
   --background: oklch(0.1448 0 0);
   --foreground: oklch(0.9551 0 0);
   --card: oklch(0.1822 0 0);
@@ -232,6 +237,7 @@
   --dash-pipe-interviewing: #f2470c;
   --dash-pipe-offered: #c2380a;
   --dash-pipe-hired: #8f2904;
+  --dash-pipe-hired-text: #ff8a5c;
   --dash-heat-1: #4a2316;
   --dash-heat-2: #8f3a1c;
   --dash-heat-3: #f2470c;
