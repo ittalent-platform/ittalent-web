@@ -5,7 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
-import { HTTP_TOO_MANY_REQUESTS } from "@/api/http-status";
+import { HTTP_TOO_MANY_REQUESTS, HTTP_UNAUTHORIZED } from "@/api/http-status";
 import { requestCode, requestStatus } from "@/api/request-error";
 import { InlineBanner } from "@/components/common/inline-banner";
 import { InlineErrorAlert } from "@/components/common/inline-error-alert";
@@ -29,6 +29,9 @@ const PASSWORD_POLICY_ERROR_CODES = new Set([
   "INVALID_NEW_PASSWORD",
   "PASSWORD_POLICY_INVALID",
 ]);
+const PASSWORD_CONFIRMATION_ERROR_CODE = "PASSWORD_CONFIRMATION_INVALID";
+const SESSION_REVOKED_ERROR_CODE = "SESSION_REVOKED";
+const CURRENT_CREDENTIAL_ERROR_CODE = "CURRENT_CREDENTIAL_INVALID";
 
 export function ChangePasswordPanel({
   hasPassword,
@@ -46,6 +49,10 @@ export function ChangePasswordPanel({
       currentPassword: z.string().min(1, t("myProfile.currentRequired")),
       newPassword: strongPasswordSchema,
       confirmPassword: z.string().min(1, t("myProfile.confirmRequired")),
+    })
+    .refine((value) => value.currentPassword !== value.newPassword, {
+      path: ["newPassword"],
+      message: t("myProfile.passwordSameAsCurrent"),
     })
     .refine((value) => value.newPassword === value.confirmPassword, {
       path: ["confirmPassword"],
@@ -107,10 +114,22 @@ export function ChangePasswordPanel({
           message: t("myProfile.passwordPolicyRejected"),
           type: "server",
         });
+      } else if (code === PASSWORD_CONFIRMATION_ERROR_CODE) {
+        form.setError("confirmPassword", {
+          message: t("myProfile.passwordMismatch"),
+          type: "server",
+        });
       } else if (code === "ACCOUNT_HAS_NO_PASSWORD") {
         setError(t("myProfile.socialAccount"));
-      } else {
+      } else if (
+        requestStatus(failure) === HTTP_UNAUTHORIZED ||
+        code === SESSION_REVOKED_ERROR_CODE
+      ) {
+        setError(t("myProfile.passwordSessionExpired"));
+      } else if (code === CURRENT_CREDENTIAL_ERROR_CODE) {
         setError(t("myProfile.passwordIncorrect"));
+      } else {
+        setError(t("myProfile.passwordFailed"));
       }
     }
   }

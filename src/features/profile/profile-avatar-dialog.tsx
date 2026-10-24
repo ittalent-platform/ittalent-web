@@ -16,6 +16,7 @@ import { requestErrorMessage } from "@/api/request-error";
 
 import {
   AVATAR_ACCEPT,
+  AVATAR_MAX_BYTES,
   AVATAR_TYPES,
 } from "./profile.constants";
 
@@ -58,6 +59,10 @@ export function AvatarUploadDialog({ onOpenChange, onUpload, open }: AvatarUploa
     if (!candidate) return;
     if (candidate.size === 0) {
       setError(t("myProfile.avatarEmpty"));
+      return;
+    }
+    if (candidate.size > AVATAR_MAX_BYTES) {
+      setError(t("myProfile.avatarTooLarge"));
       return;
     }
     if (!AVATAR_TYPES.includes(candidate.type as (typeof AVATAR_TYPES)[number])) {
@@ -136,7 +141,14 @@ export function AvatarUploadDialog({ onOpenChange, onUpload, open }: AvatarUploa
               <div className="flex min-w-0 flex-col gap-3">
                 <p className="text-[12px] font-bold tracking-[0.05em] text-muted-foreground">{t("myProfile.avatarPreview")}</p>
                 <div className="flex items-center gap-3">
-                  {[48, 32, 24].map((size) => <div className="shrink-0 overflow-hidden rounded-full bg-muted" key={size} style={{ height: size, width: size }}><img alt="" className="size-full object-cover" draggable={false} src={preview} /></div>)}
+                  {["size-12", "size-8", "size-6"].map((size) => (
+                    <div
+                      className={`shrink-0 overflow-hidden rounded-full bg-muted ${size}`}
+                      key={size}
+                    >
+                      <img alt="" className="size-full object-cover" draggable={false} src={preview} />
+                    </div>
+                  ))}
                 </div>
                 <p className="truncate text-[13px] text-muted-foreground">{file?.name}</p>
               </div>

@@ -20,7 +20,7 @@ export function FormFieldMessage({ children, error }: { children?: ReactNode; er
  * Label, control and one line below it: the error when there is one, otherwise the hint (Authentication design).
  * `labelExtra` sits at the right end of the label row, e.g. "Forgot password?"; `labelAddon` follows the label, e.g. a "Changed" pill.
  */
-export function FormField({ children, className, error, hint, htmlFor, label, labelAddon, labelExtra, required }: { children: ReactNode; className?: string; error?: ReactNode; hint?: ReactNode; htmlFor: string; label: ReactNode; labelAddon?: ReactNode; labelExtra?: ReactNode; required?: boolean }) {
+export function FormField({ children, className, error, hint, htmlFor, label, labelAddon, labelExtra, messageId, required }: { children: ReactNode; className?: string; error?: ReactNode; hint?: ReactNode; htmlFor: string; label: ReactNode; labelAddon?: ReactNode; labelExtra?: ReactNode; messageId?: string; required?: boolean }) {
   return (
     <div className={cn("flex min-w-0 flex-col gap-2", className)}>
       <div className="flex items-baseline justify-between gap-3">
@@ -34,11 +34,11 @@ export function FormField({ children, className, error, hint, htmlFor, label, la
       </div>
       {children}
       {error ? (
-        <p className="text-[12.5px] leading-normal text-danger" role="alert">
+        <p className="text-[12.5px] leading-normal text-danger" id={messageId} role="alert">
           {error}
         </p>
       ) : hint ? (
-        <p className="text-[12.5px] leading-normal text-muted-foreground">{hint}</p>
+        <p className="text-[12.5px] leading-normal text-muted-foreground" id={messageId}>{hint}</p>
       ) : null}
     </div>
   );

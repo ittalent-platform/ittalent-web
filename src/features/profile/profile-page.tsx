@@ -567,10 +567,12 @@ function ProfileDetails({
                 hint={t("myProfile.nameHint")}
                 htmlFor="profile-name"
                 label={t("myProfile.fullName")}
+                messageId="profile-name-message"
                 required
               >
                 <Input
                   aria-invalid={Boolean(form.formState.errors.fullName)}
+                  aria-describedby="profile-name-message"
                   id="profile-name"
                   {...form.register("fullName")}
                 />
@@ -580,9 +582,11 @@ function ProfileDetails({
                 hint={t("myProfile.phoneHint")}
                 htmlFor="profile-phone"
                 label={t("myProfile.phone")}
+                messageId="profile-phone-message"
               >
                 <Input
                   aria-invalid={Boolean(form.formState.errors.phone)}
+                  aria-describedby="profile-phone-message"
                   id="profile-phone"
                   inputMode="tel"
                   placeholder={t("myProfile.phonePlaceholder")}

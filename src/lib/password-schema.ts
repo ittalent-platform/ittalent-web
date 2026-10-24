@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { PASSWORD_ALLOWED_SPECIAL_CHARACTERS } from "./password-rules";
 import { validationMessage } from "./validation-message";
 
 export const passwordMessage = validationMessage(
@@ -13,4 +14,9 @@ export const strongPasswordSchema = z
   .regex(/[a-z]/, validationMessage("auth.validation.passwordLowercase"))
   .regex(/[A-Z]/, validationMessage("auth.validation.passwordUppercase"))
   .regex(/[0-9]/, validationMessage("auth.validation.passwordNumber"))
-  .regex(/[^A-Za-z0-9]/, validationMessage("auth.validation.passwordSpecial"));
+  .regex(
+    /[!@#$%^&*]/,
+    validationMessage("auth.validation.passwordSpecial", {
+      characters: PASSWORD_ALLOWED_SPECIAL_CHARACTERS,
+    }),
+  );

@@ -354,6 +354,14 @@ export const appRoutes = [
             path: "company-profile/edit",
             element: <RecruiterEditCompanyProfilePage />,
           },
+          {
+            path: "profile/edit",
+            element: <Navigate replace to="/recruiter/company-profile/edit" />,
+          },
+          {
+            path: "profile",
+            element: <Navigate replace to="/recruiter/company-profile" />,
+          },
         ],
       },
     ],

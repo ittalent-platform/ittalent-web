@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ToastProvider } from "@/components/toast/toast-provider";
 import { ProfilePage } from "@/features/profile/profile-page";
+import { AVATAR_MAX_BYTES } from "@/features/profile/profile.constants";
 import en from "@/locales/en/common.json";
 import viLocale from "@/locales/vi/common.json";
 
@@ -296,6 +297,21 @@ describe("ProfilePage", () => {
       target: { files: [new File([], "avatar.png", { type: "image/png" })] },
     });
     expect(screen.getByRole("alert")).toHaveTextContent("This file is empty");
+
+    fireEvent.change(screen.getByLabelText("Choose image"), {
+      target: {
+        files: [
+          new File(
+            [new Uint8Array(AVATAR_MAX_BYTES + 1)],
+            "avatar.png",
+            { type: "image/png" },
+          ),
+        ],
+      },
+    });
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Choose an image no larger than 5 MB.",
+    );
   });
 
   it("previews the selected file and uploads it only after Save", async () => {
@@ -352,11 +368,16 @@ describe("ProfilePage", () => {
     expect(mocks.changePassword().mutateAsync).not.toHaveBeenCalled();
   });
 
-  it("uses a generic credential error and a distinct rate-limit error", async () => {
+  it("uses a credential error only for the backend credential code and a distinct rate-limit error", async () => {
     const user = userEvent.setup();
     mocks.changePassword.mockReturnValue({
       isPending: false,
-      mutateAsync: vi.fn().mockRejectedValue(Object.assign(new Error("wrong"), { status: 400 })),
+      mutateAsync: vi.fn().mockRejectedValue(
+        Object.assign(new Error("wrong"), {
+          code: "CURRENT_CREDENTIAL_INVALID",
+          status: 400,
+        }),
+      ),
     });
     const first = renderProfile("/profile/password");
     await user.type(screen.getByLabelText(/Current password/), "Wrong123!");
@@ -376,6 +397,36 @@ describe("ProfilePage", () => {
     await user.type(screen.getByLabelText(/Confirm new password/), "New123!a");
     await user.click(screen.getByRole("button", { name: "Change password" }));
     expect(await screen.findByText(/too many password attempts/i)).toBeInTheDocument();
+  });
+
+  it("does not submit the current password as the new password and keeps unknown errors generic", async () => {
+    const user = userEvent.setup();
+    renderProfile("/profile/password");
+    await user.type(screen.getByLabelText(/Current password/), "Same123!a");
+    await user.type(screen.getByLabelText(/^New password/), "Same123!a");
+    await user.type(screen.getByLabelText(/Confirm new password/), "Same123!a");
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+    expect(
+      await screen.findByText(/differs from your current password/i),
+    ).toBeInTheDocument();
+    expect(mocks.changePassword().mutateAsync).not.toHaveBeenCalled();
+  });
+
+  it("does not report a network failure as an incorrect current password", async () => {
+    const user = userEvent.setup();
+    mocks.changePassword.mockReturnValue({
+      isPending: false,
+      mutateAsync: vi.fn().mockRejectedValue(new Error("offline")),
+    });
+    renderProfile("/profile/password");
+    await user.type(screen.getByLabelText(/Current password/), "Old123!a");
+    await user.type(screen.getByLabelText(/^New password/), "New123!a");
+    await user.type(screen.getByLabelText(/Confirm new password/), "New123!a");
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+    expect(await screen.findByText(/Unable to change your password/i)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/could not verify your current credentials/i),
+    ).not.toBeInTheDocument();
   });
 
   it("handles passwordless accounts and stays on an authenticated profile after success", async () => {

@@ -39,11 +39,13 @@ export function PasswordField({
       htmlFor={id}
       label={label}
       labelExtra={labelExtra}
+      messageId={`${id}-message`}
       required={required}
     >
       <div className="relative">
         <Input
           aria-invalid={Boolean(error)}
+          aria-describedby={error || hint ? `${id}-message` : undefined}
           className={cn("pr-12", inputClassName)}
           id={id}
           placeholder={t("auth.password.placeholder")}
