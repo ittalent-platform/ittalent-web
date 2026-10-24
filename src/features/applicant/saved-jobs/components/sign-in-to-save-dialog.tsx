@@ -14,12 +14,19 @@ import { Button } from "@/components/ui/button";
 export type SignInToSaveDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  redirectTo?: string;
 };
 
-export function SignInToSaveDialog({ open, onOpenChange }: SignInToSaveDialogProps) {
+export function SignInToSaveDialog({
+  open,
+  onOpenChange,
+  redirectTo,
+}: SignInToSaveDialogProps) {
   const { t } = useTranslation();
   const location = useLocation();
-  const currentPath = encodeURIComponent(`${location.pathname}${location.search}`);
+  const currentPath = encodeURIComponent(
+    redirectTo || `${location.pathname}${location.search}`,
+  );
 
   return (
     <AlertDialog onOpenChange={onOpenChange} open={open}>

@@ -19,6 +19,7 @@ export type SaveJobButtonProps = {
   jobTitle?: string;
   variant?: "pill" | "icon";
   className?: string;
+  redirectTo?: string;
   onSaveSuccess?: () => void;
   onRemoveSuccess?: () => void;
 };
@@ -36,6 +37,7 @@ export function SaveJobButton({
   jobTitle,
   variant = "pill",
   className,
+  redirectTo,
   onSaveSuccess,
   onRemoveSuccess,
 }: SaveJobButtonProps) {
@@ -214,10 +216,10 @@ export function SaveJobButton({
           aria-label={ariaLabel}
           aria-pressed={isSaved}
           className={cn(
-            "inline-flex size-9 select-none items-center justify-center rounded-full border transition-colors",
+            "relative inline-flex size-10 shrink-0 select-none items-center justify-center rounded-full border transition-colors",
             isSaved
               ? "border-mkt-accent-border bg-mkt-accent-soft text-mkt-brand hover:bg-mkt-accent-soft/80"
-              : "border-transparent text-mkt-muted hover:border-mkt-line hover:bg-white hover:text-mkt-ink",
+              : "border-mkt-line-strong bg-white text-mkt-ink-2 hover:border-mkt-line hover:bg-mkt-chip",
             isPending && "cursor-wait opacity-80",
             className,
           )}
@@ -227,16 +229,20 @@ export function SaveJobButton({
           type="button"
         >
           {isPending ? (
-            <Loader2 aria-hidden="true" className="size-4 animate-spin text-mkt-muted" />
+            <Loader2 aria-hidden="true" className="size-[18px] animate-spin text-mkt-muted" />
           ) : isSaved ? (
-            <Heart aria-hidden="true" className="size-4 fill-mkt-brand stroke-mkt-brand" />
+            <Heart aria-hidden="true" className="size-[18px] fill-mkt-brand stroke-mkt-brand" />
           ) : (
-            <Heart aria-hidden="true" className="size-4 fill-none stroke-current" />
+            <Heart aria-hidden="true" className="size-[18px] fill-none stroke-current" />
           )}
         </button>
       )}
 
-      <SignInToSaveDialog onOpenChange={setSignInOpen} open={signInOpen} />
+      <SignInToSaveDialog
+        onOpenChange={setSignInOpen}
+        open={signInOpen}
+        redirectTo={redirectTo}
+      />
     </>
   );
 }
