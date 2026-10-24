@@ -13,11 +13,46 @@
     "label": "Mục tài khoản",
     "jobSearch": "Tìm việc",
     "myApplications": "Đơn ứng tuyển của tôi",
+    "savedJobs": "Việc đã lưu",
     "myProfile": "Hồ sơ của tôi",
     "documents": "Tài liệu",
     "certificates": "Chứng chỉ",
     "account": "Tài khoản",
     "notifications": "Thông báo"
+  },
+  "savedJobs": {
+    "title": "Việc đã lưu",
+    "subtitle": "Xem lại, theo dõi và quản lý các cơ hội IT bạn đã lưu.",
+    "loadingTitle": "Không gian làm việc việc đã lưu",
+    "loadingDescription": "Danh sách việc đã lưu đã sẵn sàng. Giao diện quản lý thẻ việc làm và bộ lọc chi tiết sẽ xuất hiện ở đây.",
+    "button": {
+      "save": "Lưu",
+      "saved": "Đã lưu",
+      "saving": "Đang lưu…",
+      "ariaSave": "Lưu {{title}}",
+      "ariaSaved": "Đã lưu. Bỏ lưu {{title}} khỏi danh sách",
+      "tooltipSave": "Lưu việc làm",
+      "tooltipRemove": "Nhấp để bỏ lưu việc làm",
+      "staffDisabled": "Tính năng lưu việc làm chỉ dành cho tài khoản ứng viên"
+    },
+    "dialog": {
+      "signInTitle": "Đăng nhập để lưu việc làm",
+      "signInDescription": "Các việc làm đã lưu được bảo mật cho tài khoản ứng viên của bạn. Đăng nhập để quay lại ngay việc làm này.",
+      "createAccountAction": "Tạo tài khoản",
+      "signInAction": "Đăng nhập"
+    },
+    "toast": {
+      "savedTitle": "Đã lưu việc làm",
+      "savedMessage": "Đã lưu việc làm vào danh sách của bạn.",
+      "viewSavedJobs": "Xem việc đã lưu",
+      "removedTitle": "Đã bỏ lưu việc làm",
+      "removedMessage": "Đã bỏ việc làm khỏi danh sách lưu của bạn.",
+      "undo": "Hoàn tác",
+      "errorSaveTitle": "Không thể lưu việc làm",
+      "errorRemoveTitle": "Không thể bỏ lưu việc làm",
+      "errorSaveFallback": "Không thể lưu việc làm. Vui lòng thử lại.",
+      "errorRemoveFallback": "Không thể bỏ lưu việc làm. Vui lòng thử lại."
+    }
   },
   "certificates": {
     "title": "Chứng chỉ",

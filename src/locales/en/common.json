@@ -13,11 +13,46 @@
     "label": "Account sections",
     "jobSearch": "Job search",
     "myApplications": "My applications",
+    "savedJobs": "Saved jobs",
     "myProfile": "My profile",
     "documents": "Documents",
     "certificates": "Certificates",
     "account": "Account",
     "notifications": "Notifications"
+  },
+  "savedJobs": {
+    "title": "Saved jobs",
+    "subtitle": "Review, track and manage your saved IT opportunities.",
+    "loadingTitle": "Saved jobs workspace",
+    "loadingDescription": "Your saved jobs list is ready. Detailed card management and filters will appear here.",
+    "button": {
+      "save": "Save",
+      "saved": "Saved",
+      "saving": "Saving…",
+      "ariaSave": "Save {{title}}",
+      "ariaSaved": "Saved. Remove {{title}} from saved jobs",
+      "tooltipSave": "Save job",
+      "tooltipRemove": "Click to remove from saved jobs",
+      "staffDisabled": "Saving jobs is for candidate accounts"
+    },
+    "dialog": {
+      "signInTitle": "Sign in to save jobs",
+      "signInDescription": "Saved jobs are private to your candidate account. Sign in to return directly to this job.",
+      "createAccountAction": "Create an account",
+      "signInAction": "Sign in"
+    },
+    "toast": {
+      "savedTitle": "Job saved",
+      "savedMessage": "Job saved to your bookmarks.",
+      "viewSavedJobs": "View saved jobs",
+      "removedTitle": "Removed from saved jobs",
+      "removedMessage": "Job removed from your bookmarks.",
+      "undo": "Undo",
+      "errorSaveTitle": "Couldn't save job",
+      "errorRemoveTitle": "Couldn't remove job",
+      "errorSaveFallback": "Couldn't save. Try again",
+      "errorRemoveFallback": "Couldn't remove. Try again"
+    }
   },
   "certificates": {
     "title": "Certificates",
