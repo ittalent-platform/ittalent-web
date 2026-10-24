@@ -168,8 +168,11 @@ export function NotificationCenterPage() {
 
   const handleOpenMarkAllDialog = () => {
     if (unreadCount > 0 && !markAllReadMutation.isPending) {
+      // Use newest server-side timestamp from loaded items to avoid client clock skew issues
+      const newestServerCutoff =
+        items.find((item) => Boolean(item.createdAt))?.createdAt ?? new Date().toISOString();
       setCapturedMarkAllCount(unreadCount);
-      setCapturedMarkAllCutoff(new Date().toISOString());
+      setCapturedMarkAllCutoff(newestServerCutoff);
       setShowMarkAllDialog(true);
     }
   };

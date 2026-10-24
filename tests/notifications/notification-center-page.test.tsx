@@ -278,7 +278,7 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
 
       expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledTimes(1);
       expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledWith({
-        query: { before: expect.any(String) },
+        query: { before: sampleNotifications[0].createdAt },
       });
     });
 
