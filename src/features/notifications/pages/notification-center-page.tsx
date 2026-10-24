@@ -269,10 +269,8 @@ export function NotificationCenterPage() {
   };
 
   const handleSelectItem = (item: NotificationItem) => {
+    // NotificationItemRow already marks an unread row read before it calls onSelect
     if (item.type === "system_announcement") {
-      if (!item.isRead && item.id) {
-        handleMarkRead(item.id);
-      }
       setSelectedAnnouncement(item);
     }
   };

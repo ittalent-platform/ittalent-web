@@ -447,7 +447,8 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       });
       await user.click(announceRow);
 
-      // Verify patchApiV1NotificationsByIdRead was called to mark as read
+      // Verify patchApiV1NotificationsByIdRead was called to mark as read exactly once
+      expect(api.patchApiV1NotificationsByIdRead).toHaveBeenCalledTimes(1);
       expect(api.patchApiV1NotificationsByIdRead).toHaveBeenCalledWith({
         path: { id: "notif-3" },
       });
