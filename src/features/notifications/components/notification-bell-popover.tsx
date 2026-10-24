@@ -38,7 +38,7 @@ export interface NotificationBellPopoverProps {
  */
 export function NotificationBellPopover({
   className,
-  viewAllHref = "/account/notifications",
+  viewAllHref = "/notifications",
   unreadCountOverride,
 }: NotificationBellPopoverProps) {
   const { t } = useTranslation();

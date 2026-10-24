@@ -11,6 +11,7 @@ import {
   NotificationBadge,
   NotificationBellPopover,
   NotificationRowMini,
+  NotificationTypeIcon,
 } from "@/features/notifications";
 import type { NotificationItem } from "@/features/notifications/types";
 
@@ -77,6 +78,20 @@ describe("Notification Bell & Popover Component Suite", () => {
         unreadCount: 3,
       },
       response: new Response(null, { status: 200 }),
+    });
+  });
+
+  describe("NotificationTypeIcon", () => {
+    it("renders ember-wash and text-fg-link for system_announcement", () => {
+      const { container } = render(<NotificationTypeIcon type="system_announcement" />);
+      const iconSpan = container.querySelector("span");
+      expect(iconSpan).toHaveClass("bg-ember-wash", "text-fg-link");
+    });
+
+    it("renders blue styling for interview notifications", () => {
+      const { container } = render(<NotificationTypeIcon type="interview_scheduled" />);
+      const iconSpan = container.querySelector("span");
+      expect(iconSpan).toHaveClass("bg-mkt-blue-bg", "text-mkt-blue-fg");
     });
   });
 
@@ -178,7 +193,7 @@ describe("Notification Bell & Popover Component Suite", () => {
       expect(screen.getByRole("tab", { name: /unread/i })).toBeInTheDocument();
       expect(screen.getByRole("link", { name: /view all notifications/i })).toHaveAttribute(
         "href",
-        "/account/notifications",
+        "/notifications",
       );
     });
 
