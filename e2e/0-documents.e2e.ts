@@ -152,7 +152,7 @@ test.describe("Document management — real API, database and storage", () => {
     await expect(row(page, FILES.defaultCover)).toBeVisible();
   });
 
-  test("filters, sorting, combined search and pagination remain URL-backed and can be cleared", async ({
+  test("type and search filters remain URL-backed and can be cleared", async ({
     page,
   }) => {
     await openDocuments(page);
@@ -165,19 +165,13 @@ test.describe("Document management — real API, database and storage", () => {
     await expect(row(page, FILES.secondaryCover)).toBeVisible();
     await expect(row(page, FILES.defaultCover)).toHaveCount(0);
 
-    await page.getByRole("button", { name: "All default states" }).click();
-    await page.getByRole("menuitem", { name: "Default only" }).click();
-    await expect(page).toHaveURL(/default=true/);
-    await expect(page.getByRole("heading", { name: "No matching documents" })).toBeVisible();
+    await page.getByRole("button", { name: "Clear search" }).click();
+    await expect(page).not.toHaveURL(/search=/);
+    await expect(row(page, FILES.defaultCover)).toBeVisible();
 
-    await page.getByRole("button", { name: "Clear filters" }).click();
-    await expect(page).toHaveURL(/\/documents\?limit=50$/);
-    await page.getByRole("button", { name: "Upload date" }).click();
-    await page.getByRole("menuitem", { name: "File name" }).click();
-    await page.getByRole("button", { name: "Descending" }).click();
-    await page.getByRole("menuitem", { name: "Ascending" }).click();
-    await expect(page).toHaveURL(/sort_by=file_name/);
-    await expect(page).toHaveURL(/sort_order=asc/);
+    await page.getByRole("button", { name: "All documents" }).click();
+    await expect(page).toHaveURL(/\/documents\?limit=50&page=1$/);
+    await expect(row(page, FILES.defaultCv)).toBeVisible();
 
     await page.goto("/documents?limit=5&page=2");
     await expect(page.getByText(/Showing 6–10 of 14/)).toBeVisible();

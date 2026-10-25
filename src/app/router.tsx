@@ -9,6 +9,7 @@ import { AppLayout } from "@/components/layout/admin-layout";
 import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
+import { EMAIL_VERIFICATION_PATH } from "@/config/routes";
 import { HomePage } from "@/features/public-site/home/home-page";
 
 const LoginPage = lazy(() =>
@@ -233,7 +234,7 @@ export const appRoutes = [
   // The confirmation email links here (APP_BASE_URL/enterprise-registration/verify?token=...).
   { path: "/enterprise-registration/verify", element: <RedirectKeepingSearch to="/register-company" /> },
   { path: "/enterprise-registration/invitation", element: <AcceptRegistrationInvitationPage /> },
-  { path: "/verify-email", element: <EmailVerificationPage /> },
+  { path: EMAIL_VERIFICATION_PATH, element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
   { path: "/accept-invitation", element: <AcceptInvitationPage /> },

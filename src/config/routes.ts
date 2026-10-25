@@ -1,5 +1,6 @@
 /** Route paths shared by layout chrome and feature code, so neither hardcodes a URL. */
 export const APPLICATIONS_PATH = "/my-applications";
+export const EMAIL_VERIFICATION_PATH = "/verify-email";
 export const PROFILE_PATH = "/profile";
 export function profilePathForRole(role?: string): string {
   if (role === "admin") return "/admin/profile";

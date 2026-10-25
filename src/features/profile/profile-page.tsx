@@ -26,7 +26,7 @@ import {
   HTTP_NOT_FOUND,
   HTTP_UNAUTHORIZED,
 } from "@/api/http-status";
-import { requestStatus } from "@/api/request-error";
+import { requestCode, requestStatus } from "@/api/request-error";
 import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { PageHeader } from "@/components/common/admin-page-header";
 import { DetailRow } from "@/components/common/detail-row";
@@ -41,6 +41,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EMAIL_VERIFICATION_PATH } from "@/config/routes";
 import { cn } from "@/lib/utils";
 
 import { AvatarUploadDialog } from "./profile-avatar-dialog";
@@ -296,7 +297,9 @@ function ProfileLoadError({
   onSignIn: () => void;
 }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const status = requestStatus(error);
+  const code = requestCode(error);
 
   if (status === HTTP_UNAUTHORIZED) {
     return (
@@ -310,6 +313,40 @@ function ProfileLoadError({
     );
   }
   if (status === HTTP_FORBIDDEN) {
+    if (code === "EMAIL_NOT_VERIFIED") {
+      return (
+        <ProfileStatePage>
+          <ErrorState
+            description={t("myProfile.emailVerificationDescription")}
+            secondaryAction={{
+              label: t("myProfile.verifyEmail"),
+              onClick: () => navigate(EMAIL_VERIFICATION_PATH),
+            }}
+            title={t("myProfile.emailVerificationTitle")}
+          />
+        </ProfileStatePage>
+      );
+    }
+    if (code === "ACCOUNT_SUSPENDED" || code === "ACCOUNT_BLOCKED") {
+      return (
+        <ProfileStatePage>
+          <ErrorState
+            description={t("myProfile.blockedDescription")}
+            title={t("myProfile.blockedTitle")}
+          />
+        </ProfileStatePage>
+      );
+    }
+    if (code === "ACCOUNT_INACTIVE") {
+      return (
+        <ProfileStatePage>
+          <ErrorState
+            description={t("myProfile.actionsUnavailableDescription")}
+            title={t("myProfile.actionsUnavailable")}
+          />
+        </ProfileStatePage>
+      );
+    }
     return (
       <ProfileStatePage>
         <ErrorState

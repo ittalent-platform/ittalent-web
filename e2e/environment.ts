@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 export const E2E_BACKEND_PORT = 3101;
 export const E2E_WEB_PORT = 5174;
 export const E2E_STORAGE_PORT = 3201;
@@ -7,7 +9,9 @@ export const E2E_STORAGE_URL = `http://127.0.0.1:${E2E_STORAGE_PORT}`;
 export const E2E_MONGODB_URI =
   process.env.E2E_MONGODB_URI ??
   "mongodb://127.0.0.1:27017/ittalent_myapps_e2e?replicaSet=rs0&directConnection=true";
-export const E2E_BACKEND_DIR = "../ittalent-backend-cv";
+export const E2E_BACKEND_DIR = fileURLToPath(
+  new URL("../../ittalent-backend/", import.meta.url),
+);
 export const E2E_ACCESS_SECRET = "document-e2e-access-secret-32-characters";
 export const E2E_REFRESH_SECRET = "document-e2e-refresh-secret-32-characters";
 

@@ -63,6 +63,7 @@ function renderProfile(initialPath = "/profile") {
       { path: "/profile/password", element: <ProfilePage /> },
       { path: "/other", element: <h1>Other page</h1> },
       { path: "/login", element: <h1>Sign in page</h1> },
+      { path: "/verify-email", element: <h1>Verify email page</h1> },
     ],
     { initialEntries: [initialPath] },
   );
@@ -268,12 +269,43 @@ describe("ProfilePage", () => {
     expect(screen.getByText(/incomplete profile response/i)).toBeInTheDocument();
   });
 
-  it("renders unauthenticated, suspended, and unverified basic-read states without stale success UI", () => {
+  it("renders unauthenticated, account-state, and unverified basic-read states without stale success UI", async () => {
     mocks.profile.mockReturnValue(profileResult({ data: undefined, error: Object.assign(new Error("auth"), { status: 401 }), isError: true }));
     const unauthenticated = renderProfile();
     expect(screen.getByText(/session is no longer available/i)).toBeInTheDocument();
     expect(screen.queryByText("My Name")).not.toBeInTheDocument();
     unauthenticated.unmount();
+
+    const user = userEvent.setup();
+    mocks.profile.mockReturnValue(profileResult({
+      data: undefined,
+      error: Object.assign(new Error("verify"), { code: "EMAIL_NOT_VERIFIED", status: 403 }),
+      isError: true,
+    }));
+    const unverified = renderProfile();
+    expect(screen.getByText("Verify your email")).toBeInTheDocument();
+    expect(screen.queryByText(/Contact support/i)).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Verify email" }));
+    expect(await screen.findByRole("heading", { name: "Verify email page" })).toBeInTheDocument();
+    unverified.unmount();
+
+    mocks.profile.mockReturnValue(profileResult({
+      data: undefined,
+      error: Object.assign(new Error("blocked"), { code: "ACCOUNT_BLOCKED", status: 403 }),
+      isError: true,
+    }));
+    const blocked = renderProfile();
+    expect(screen.getByText("Your account is blocked")).toBeInTheDocument();
+    blocked.unmount();
+
+    mocks.profile.mockReturnValue(profileResult({
+      data: undefined,
+      error: Object.assign(new Error("inactive"), { code: "ACCOUNT_INACTIVE", status: 403 }),
+      isError: true,
+    }));
+    const inactive = renderProfile();
+    expect(screen.getByText("Profile changes are unavailable")).toBeInTheDocument();
+    inactive.unmount();
 
     mocks.profile.mockReturnValue(profileResult({ data: { ...fixture, status: "suspended" } }));
     const suspended = renderProfile();
