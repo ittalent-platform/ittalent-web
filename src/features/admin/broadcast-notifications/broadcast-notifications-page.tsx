@@ -19,12 +19,14 @@ import { useListParams } from "@/hooks/use-list-params";
 import { useUrlSearchInput } from "@/hooks/use-url-search-input";
 
 import { BroadcastDetailDialog } from "./broadcast-detail-drawer";
+import { BroadcastFilterChips } from "./broadcast-filter-chips";
 import {
   DEFAULT_PAGE_SIZE,
   useBroadcastsListQuery,
   useCancelScheduleMutation,
   useDispatchBroadcastMutation,
 } from "./broadcast-notifications.queries";
+import type { BroadcastFormValues } from "./broadcast-notifications.schemas";
 import { BroadcastNotificationsTable } from "./broadcast-notifications-table";
 import { BroadcastNotificationsToolbar } from "./broadcast-notifications-toolbar";
 import type { BroadcastNotificationDto } from "./broadcast-notifications.types";
@@ -58,6 +60,7 @@ export function BroadcastNotificationsPage() {
 
   // Dialog and drawer state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [duplicateData, setDuplicateData] = useState<Partial<BroadcastFormValues> | null>(null);
   const [selectedBroadcast, setSelectedBroadcast] = useState<BroadcastNotificationDto | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -144,6 +147,20 @@ export function BroadcastNotificationsPage() {
   function handleDelete(item: BroadcastNotificationDto) {
     setSelectedBroadcast(item);
     setIsDeleteOpen(true);
+  }
+
+  function handleDuplicate(item: BroadcastNotificationDto) {
+    setDuplicateData({
+      action_label: item.actionLabel || "",
+      action_url: item.actionUrl || "",
+      category: item.category,
+      channels: item.channels,
+      content: item.content,
+      priority: item.priority,
+      target_audience: item.targetAudience,
+      title: `${item.title} (Copy)`,
+    });
+    setIsCreateOpen(true);
   }
 
   async function executeDispatch(item: BroadcastNotificationDto) {
@@ -253,13 +270,38 @@ export function BroadcastNotificationsPage() {
         audience={audience}
         fromDate={fromDate}
         onAudienceChange={setAudience}
-        onCreateClick={() => setIsCreateOpen(true)}
+        onCreateClick={() => {
+          setDuplicateData(null);
+          setIsCreateOpen(true);
+        }}
         onFromDateChange={setFromDate}
         onPriorityChange={setPriority}
         onResetFilters={handleResetFilters}
         onSearchChange={setSearchText}
         onStatusChange={setStatus}
         onToDateChange={setToDate}
+        priority={priority}
+        search={searchText}
+        status={status}
+        toDate={toDate}
+      />
+
+      {/* Active Filter Chips */}
+      <BroadcastFilterChips
+        audience={audience}
+        fromDate={fromDate}
+        onClearAll={handleResetFilters}
+        onClearAudience={() => setAudience("all")}
+        onClearDateRange={() => {
+          setFromDate("");
+          setToDate("");
+        }}
+        onClearPriority={() => setPriority("all")}
+        onClearSearch={() => {
+          setSearchText("");
+          commitSearch("");
+        }}
+        onClearStatus={() => setStatus("all")}
         priority={priority}
         search={searchText}
         status={status}
@@ -282,6 +324,7 @@ export function BroadcastNotificationsPage() {
           onClearFilters={handleResetFilters}
           onDelete={handleDelete}
           onDispatchNow={(item) => setConfirmDispatch(item)}
+          onDuplicate={handleDuplicate}
           onEdit={handleEdit}
           onSchedule={handleSchedule}
           onSort={handleSort}
@@ -307,7 +350,11 @@ export function BroadcastNotificationsPage() {
 
       {/* Create Dialog */}
       <CreateBroadcastDialog
-        onOpenChange={setIsCreateOpen}
+        initialValues={duplicateData}
+        onOpenChange={(next) => {
+          if (!next) setDuplicateData(null);
+          setIsCreateOpen(next);
+        }}
         open={isCreateOpen}
       />
 
@@ -331,6 +378,7 @@ export function BroadcastNotificationsPage() {
         onCancelSchedule={(item) => setConfirmCancelSchedule(item)}
         onDelete={handleDelete}
         onDispatchNow={(item) => setConfirmDispatch(item)}
+        onDuplicate={handleDuplicate}
         onEdit={handleEdit}
         onOpenChange={setIsDetailOpen}
         onSchedule={handleSchedule}

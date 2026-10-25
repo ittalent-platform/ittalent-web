@@ -1750,7 +1750,26 @@
       "confirmReschedule": "Xác nhận lên lịch lại",
       "dispatchNow": "Phát ngay",
       "cancelSchedule": "Hủy lịch phát",
-      "archive": "Lưu trữ"
+      "archive": "Lưu trữ",
+      "duplicate": "Nhân bản"
+    },
+    "filterChips": {
+      "activeFilters": "Bộ lọc đang kích hoạt",
+      "search": "Tìm kiếm",
+      "status": "Trạng thái",
+      "audience": "Đối tượng",
+      "priority": "Mức độ ưu tiên",
+      "date": "Thời gian",
+      "clearAll": "Xóa tất cả",
+      "removeFilter": "Bỏ bộ lọc {{filter}}"
+    },
+    "history": {
+      "title": "Lịch sử thông báo",
+      "created": "Tạo bản nháp thông báo",
+      "updated": "Cập nhật nội dung thông báo",
+      "scheduled": "Đã lên lịch gửi lúc {{time}}",
+      "dispatched": "Đã phát tới {{count}} người nhận",
+      "cancelled": "Đã hủy lịch phát"
     },
     "toolbar": {
       "searchPlaceholder": "Tìm kiếm theo tiêu đề thông báo...",

@@ -1768,7 +1768,26 @@
       "confirmReschedule": "Confirm Reschedule",
       "dispatchNow": "Dispatch Now",
       "cancelSchedule": "Cancel Schedule",
-      "archive": "Archive"
+      "archive": "Archive",
+      "duplicate": "Duplicate"
+    },
+    "filterChips": {
+      "activeFilters": "Active filters",
+      "search": "Search",
+      "status": "Status",
+      "audience": "Audience",
+      "priority": "Priority",
+      "date": "Date",
+      "clearAll": "Clear all",
+      "removeFilter": "Remove {{filter}} filter"
+    },
+    "history": {
+      "title": "Announcement History",
+      "created": "Created announcement draft",
+      "updated": "Updated announcement details",
+      "scheduled": "Scheduled dispatch for {{time}}",
+      "dispatched": "Dispatched to {{count}} recipients",
+      "cancelled": "Scheduled dispatch cancelled"
     },
     "toolbar": {
       "searchPlaceholder": "Search by announcement title...",

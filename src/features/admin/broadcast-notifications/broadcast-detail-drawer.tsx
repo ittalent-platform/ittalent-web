@@ -3,6 +3,7 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Copy,
   ExternalLink,
   Pencil,
   Radio,
@@ -38,6 +39,7 @@ type BroadcastDetailDialogProps = {
   onCancelSchedule?: (broadcast: BroadcastNotificationDto) => void;
   onDelete: (broadcast: BroadcastNotificationDto) => void;
   onDispatchNow: (broadcast: BroadcastNotificationDto) => void;
+  onDuplicate?: (broadcast: BroadcastNotificationDto) => void;
   onEdit: (broadcast: BroadcastNotificationDto) => void;
   onOpenChange: (open: boolean) => void;
   onSchedule: (broadcast: BroadcastNotificationDto) => void;
@@ -49,6 +51,7 @@ export function BroadcastDetailDialog({
   onCancelSchedule,
   onDelete,
   onDispatchNow,
+  onDuplicate,
   onEdit,
   onOpenChange,
   onSchedule,
@@ -238,6 +241,101 @@ export function BroadcastDetailDialog({
               </div>
             </div>
           </div>
+
+          {/* Section 4: History Timeline */}
+          <div className="space-y-2">
+            <span className="text-xs font-semibold text-muted-foreground">
+              {t("adminBroadcasts.history.title")}
+            </span>
+            <div className="rounded-xl border border-border bg-card p-3.5">
+              <ol className="relative ml-2 space-y-3.5 border-l border-border pl-4">
+                {[
+                  {
+                    description:
+                      data.sender?.fullName ||
+                      data.sender?.email ||
+                      t("adminBroadcasts.detail.systemAdmin"),
+                    id: "created",
+                    label: t("adminBroadcasts.history.created"),
+                    time: formatDateTimeIct(data.createdAt),
+                    tone: "neutral" as const,
+                  },
+                  ...(data.updatedAt && data.updatedAt !== data.createdAt
+                    ? [
+                        {
+                          id: "updated",
+                          label: t("adminBroadcasts.history.updated"),
+                          time: formatDateTimeIct(data.updatedAt),
+                          tone: "neutral" as const,
+                        },
+                      ]
+                    : []),
+                  ...(data.scheduledAt
+                    ? [
+                        {
+                          id: "scheduled",
+                          label: t("adminBroadcasts.history.scheduled", {
+                            time: formatDateTimeIct(data.scheduledAt),
+                          }),
+                          time: formatDateTimeIct(data.scheduledAt),
+                          tone: "warning" as const,
+                        },
+                      ]
+                    : []),
+                  ...(data.sentAt
+                    ? [
+                        {
+                          description: `${data.deliveryMetrics.readCount} / ${data.deliveryMetrics.deliveredCount} ${t("adminBroadcasts.table.read")}`,
+                          id: "dispatched",
+                          label: t("adminBroadcasts.history.dispatched", {
+                            count: data.deliveryMetrics.deliveredCount,
+                          }),
+                          time: formatDateTimeIct(data.sentAt),
+                          tone: "success" as const,
+                        },
+                      ]
+                    : []),
+                  ...(data.status === "Cancelled"
+                    ? [
+                        {
+                          id: "cancelled",
+                          label: t("adminBroadcasts.history.cancelled"),
+                          time: formatDateTimeIct(data.updatedAt || data.createdAt),
+                          tone: "error" as const,
+                        },
+                      ]
+                    : []),
+                ].map((entry) => (
+                  <li className="relative" key={entry.id}>
+                    <span
+                      className={`absolute -left-[21px] top-1 size-2.5 rounded-full ring-4 ring-card ${
+                        entry.tone === "success"
+                          ? "bg-(--status-success-fg)"
+                          : entry.tone === "warning"
+                            ? "bg-(--status-warning-fg)"
+                            : entry.tone === "error"
+                              ? "bg-destructive"
+                              : "bg-muted-foreground"
+                      }`}
+                    />
+                    <div className="flex flex-wrap items-baseline justify-between gap-1">
+                      <span className="text-xs font-semibold text-foreground">
+                        {entry.label}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        {entry.time}
+                      </span>
+                    </div>
+                    {entry.description ? (
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {entry.description}
+                      </p>
+                    ) : null}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
         </div>
 
         <DialogFooter className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-muted/20 px-6 py-3.5">
@@ -342,6 +440,21 @@ export function BroadcastDetailDialog({
                   {t("adminBroadcasts.actions.dispatchNow")}
                 </Button>
               </>
+            ) : null}
+
+            {onDuplicate ? (
+              <Button
+                className={DIALOG_BUTTON_CLASS}
+                onClick={() => {
+                  onOpenChange(false);
+                  onDuplicate(data);
+                }}
+                type="button"
+                variant="outline"
+              >
+                <Copy className="size-4" />
+                {t("adminBroadcasts.actions.duplicate")}
+              </Button>
             ) : null}
 
             <Button

@@ -283,5 +283,74 @@ describe('Broadcast Notifications Feature Tests (UC 01 - UC 07)', () => {
     expect(await screen.findByText(/publish to all users now\?/i)).toBeInTheDocument();
     expect(screen.getByText(/the announcement will be broadcast immediately/i)).toBeInTheDocument();
   });
+
+  it('renders history timeline in detail dialog and offers duplicate action', () => {
+    vi.spyOn(broadcastQueries, 'useBroadcastsListQuery').mockReturnValue({
+      data: {
+        items: [mockBroadcast1],
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        summary: { total: 1, drafts: 0, scheduled: 0, sent: 1 },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof broadcastQueries.useBroadcastsListQuery>);
+
+    vi.spyOn(broadcastQueries, 'useBroadcastDetailQuery').mockReturnValue({
+      data: mockBroadcast1,
+      isLoading: false,
+    } as unknown as ReturnType<typeof broadcastQueries.useBroadcastDetailQuery>);
+
+    renderWithClient(<BroadcastNotificationsPage />);
+
+    // Open detail dialog
+    fireEvent.click(screen.getByText('Platform Maintenance Notice'));
+
+    // Check History timeline presence
+    expect(screen.getByText(/announcement history/i)).toBeInTheDocument();
+    expect(screen.getByText(/created announcement draft/i)).toBeInTheDocument();
+    expect(screen.getByText(/dispatched to 1500 recipients/i)).toBeInTheDocument();
+
+    // Check Duplicate button
+    const duplicateBtn = screen.getByRole('button', { name: /duplicate/i });
+    expect(duplicateBtn).toBeInTheDocument();
+
+    // Click Duplicate -> should open Create Broadcast dialog prefilled with Copy
+    fireEvent.click(duplicateBtn);
+    expect(screen.getByDisplayValue('Platform Maintenance Notice (Copy)')).toBeInTheDocument();
+    expect(screen.getByDisplayValue(mockBroadcast1.content)).toBeInTheDocument();
+  });
+
+  it('renders active filter chips when filters are applied and clears on Clear All', () => {
+    vi.spyOn(broadcastQueries, 'useBroadcastsListQuery').mockReturnValue({
+      data: {
+        items: [mockBroadcast1],
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        summary: { total: 1, drafts: 0, scheduled: 0, sent: 1 },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof broadcastQueries.useBroadcastsListQuery>);
+
+    renderWithClient(<BroadcastNotificationsPage />);
+
+    // Type search
+    const searchInput = screen.getByPlaceholderText(/search by announcement title/i);
+    fireEvent.change(searchInput, { target: { value: 'Maintenance' } });
+
+    // Active filter chip should appear
+    expect(screen.getByText(/active filters/i)).toBeInTheDocument();
+    expect(screen.getByText(/search: "maintenance"/i)).toBeInTheDocument();
+
+    // Clear all filters
+    const clearAllBtn = screen.getByRole('button', { name: /clear all/i });
+    fireEvent.click(clearAllBtn);
+
+    expect(screen.queryByText(/search: "maintenance"/i)).toBeNull();
+  });
 });
+
 

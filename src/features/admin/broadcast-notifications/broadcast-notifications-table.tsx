@@ -1,6 +1,7 @@
 import {
   Archive,
   Calendar,
+  Copy,
   Eye,
   MoreVertical,
   Pencil,
@@ -33,6 +34,7 @@ type BroadcastNotificationsTableProps = {
   onClearFilters: () => void;
   onDelete: (item: BroadcastNotificationDto) => void;
   onDispatchNow: (item: BroadcastNotificationDto) => void;
+  onDuplicate?: (item: BroadcastNotificationDto) => void;
   onEdit: (item: BroadcastNotificationDto) => void;
   onSchedule: (item: BroadcastNotificationDto) => void;
   onSort?: (field: "createdAt" | "scheduled_at" | "title" | "status") => void;
@@ -49,6 +51,7 @@ export function BroadcastNotificationsTable({
   onClearFilters,
   onDelete,
   onDispatchNow,
+  onDuplicate,
   onEdit,
   onSchedule,
   onSort,
@@ -164,6 +167,16 @@ export function BroadcastNotificationsTable({
                 <Eye className="size-4" />
                 {t("adminBroadcasts.table.viewDetails")}
               </DropdownMenuItem>
+
+              {onDuplicate ? (
+                <DropdownMenuItem
+                  className="gap-2.5 text-[13px]"
+                  onSelect={() => onDuplicate(item)}
+                >
+                  <Copy className="size-4" />
+                  {t("adminBroadcasts.actions.duplicate")}
+                </DropdownMenuItem>
+              ) : null}
 
               {item.status === "Draft" ? (
                 <>

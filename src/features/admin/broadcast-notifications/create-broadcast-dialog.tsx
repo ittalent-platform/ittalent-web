@@ -28,6 +28,7 @@ import {
 } from "./broadcast-notifications.schemas";
 
 type CreateBroadcastDialogProps = {
+  initialValues?: Partial<BroadcastFormValues> | null;
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
@@ -43,7 +44,8 @@ const DEFAULT_VALUES: BroadcastFormValues = {
   title: "",
 };
 
-export function CreateBroadcastDialog({
+function CreateBroadcastDialogContent({
+  initialValues,
   onOpenChange,
   open,
 }: CreateBroadcastDialogProps) {
@@ -55,16 +57,14 @@ export function CreateBroadcastDialog({
     useState<BroadcastFormValues | null>(null);
 
   const form = useForm<BroadcastFormValues>({
-    defaultValues: DEFAULT_VALUES,
+    defaultValues: {
+      ...DEFAULT_VALUES,
+      ...(initialValues ?? {}),
+    },
     resolver: zodResolver(broadcastFormSchema),
   });
 
   function handleClose(next: boolean) {
-    if (!next) {
-      form.reset(DEFAULT_VALUES);
-      setSubmitError(null);
-      setPendingPublishValues(null);
-    }
     onOpenChange(next);
   }
 
@@ -189,5 +189,14 @@ export function CreateBroadcastDialog({
         />
       ) : null}
     </>
+  );
+}
+
+export function CreateBroadcastDialog(props: CreateBroadcastDialogProps) {
+  return (
+    <CreateBroadcastDialogContent
+      {...props}
+      key={props.open ? (props.initialValues?.title ?? "new") : "closed"}
+    />
   );
 }
