@@ -193,7 +193,7 @@ export type ChangePasswordResponse = {
 export type ChangePasswordError = {
     success: false;
     message: string;
-    code: 'CURRENT_CREDENTIAL_INVALID' | 'AUTHENTICATION_REQUIRED' | 'INVALID_AUTHENTICATION_TOKEN' | 'PASSWORD_POLICY_INVALID' | 'PASSWORD_CONFIRMATION_INVALID' | 'ACCOUNT_HAS_NO_PASSWORD' | 'EMAIL_NOT_VERIFIED' | 'ACCOUNT_INACTIVE' | 'ACCOUNT_SUSPENDED' | 'ACCOUNT_BLOCKED' | 'SESSION_REVOKED' | 'RATE_LIMITED' | 'VALIDATION_ERROR';
+    code: 'CURRENT_CREDENTIAL_INVALID' | 'AUTHENTICATION_REQUIRED' | 'INVALID_AUTHENTICATION_TOKEN' | 'PASSWORD_POLICY_INVALID' | 'PASSWORD_CONFIRMATION_INVALID' | 'PASSWORD_UNCHANGED' | 'ACCOUNT_HAS_NO_PASSWORD' | 'EMAIL_NOT_VERIFIED' | 'ACCOUNT_INACTIVE' | 'ACCOUNT_SUSPENDED' | 'ACCOUNT_BLOCKED' | 'SESSION_REVOKED' | 'RATE_LIMITED' | 'VALIDATION_ERROR';
 };
 
 export type Document = {
@@ -2292,7 +2292,7 @@ export type PostApiV1AuthChangePasswordData = {
 
 export type PostApiV1AuthChangePasswordErrors = {
     /**
-     * Current credential invalid, no local credential, password policy invalid, or confirmation mismatch
+     * Current credential invalid, no local credential, password policy invalid, password unchanged, or confirmation mismatch
      */
     400: ChangePasswordError;
     /**
@@ -5904,7 +5904,7 @@ export type GetMyProfileErrors = {
     /**
      * Profile not found
      */
-    404: unknown;
+    404: MyProfileError;
 };
 
 export type GetMyProfileError = GetMyProfileErrors[keyof GetMyProfileErrors];
@@ -5941,7 +5941,7 @@ export type UpdateMyProfileErrors = {
     /**
      * Profile not found
      */
-    404: unknown;
+    404: MyProfileError;
     /**
      * Profile version conflict (`VERSION_CONFLICT`)
      */
@@ -5982,15 +5982,15 @@ export type UploadMyAvatarErrors = {
     /**
      * Profile not found
      */
-    404: unknown;
+    404: MyProfileError;
     /**
      * Storage unavailable
      */
-    502: unknown;
+    502: MyProfileError;
     /**
      * Storage not configured
      */
-    503: unknown;
+    503: MyProfileError;
 };
 
 export type UploadMyAvatarError = UploadMyAvatarErrors[keyof UploadMyAvatarErrors];

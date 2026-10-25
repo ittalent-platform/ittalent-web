@@ -92,6 +92,18 @@ function buildUpdatePayload(
   return changed ? payload : null;
 }
 
+function buildSubmitPayload(
+  profile: FullMyProfile,
+  values: DetailsForm,
+): UpdateMyProfile | null {
+  const changed = buildUpdatePayload(profile, values);
+  if (changed) return changed;
+  if (typeof profile.version !== "number") return null;
+
+  // A forced form submit still lets the server verify the profile version.
+  return { expectedVersion: profile.version, phone: normalizePhone(values.phone) };
+}
+
 function hasBaseProjection(profile: MyProfile): boolean {
   return (
     (profile.access === "basic" || profile.access === "full") &&
@@ -462,7 +474,7 @@ function ProfileDetails({
   }
 
   async function save(valuesToSave: DetailsForm) {
-    const nextPayload = buildUpdatePayload(profile, valuesToSave);
+    const nextPayload = buildSubmitPayload(profile, valuesToSave);
     if (!nextPayload) return;
     setSaveError(null);
     try {

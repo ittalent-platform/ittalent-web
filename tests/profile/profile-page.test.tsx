@@ -187,7 +187,7 @@ describe("ProfilePage", () => {
     );
   });
 
-  it("does not send a no-op update", async () => {
+  it("keeps no-op Save disabled but includes the version if the form is submitted anyway", async () => {
     renderProfile();
     const user = await beginEditing();
     const save = screen.getByRole("button", { name: "Save changes" });
@@ -195,7 +195,13 @@ describe("ProfilePage", () => {
     await user.clear(screen.getByLabelText(/Full name/));
     await user.type(screen.getByLabelText(/Full name/), "  My Name  ");
     expect(save).toBeDisabled();
-    expect(mocks.update().mutateAsync).not.toHaveBeenCalled();
+    fireEvent.submit(save.closest("form")!);
+    await waitFor(() =>
+      expect(mocks.update().mutateAsync).toHaveBeenCalledWith({
+        expectedVersion: 7,
+        phone: "0901234567",
+      }),
+    );
   });
 
   it("requires a fresh profile projection after a 409 conflict", async () => {
@@ -410,6 +416,46 @@ describe("ProfilePage", () => {
       await screen.findByText(/differs from your current password/i),
     ).toBeInTheDocument();
     expect(mocks.changePassword().mutateAsync).not.toHaveBeenCalled();
+  });
+
+  it("maps a server-side unchanged-password response to the new-password field", async () => {
+    const user = userEvent.setup();
+    mocks.changePassword.mockReturnValue({
+      isPending: false,
+      mutateAsync: vi.fn().mockRejectedValue(
+        Object.assign(new Error("unchanged"), { code: "PASSWORD_UNCHANGED", status: 400 }),
+      ),
+    });
+    renderProfile("/profile/password");
+    await user.type(screen.getByLabelText(/Current password/), "Old123!a");
+    await user.type(screen.getByLabelText(/^New password/), "New123!a");
+    await user.type(screen.getByLabelText(/Confirm new password/), "New123!a");
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+    expect(await screen.findByText(/differs from your current password/i)).toBeInTheDocument();
+  });
+
+  it("expires local credentials when the password-change session is revoked", async () => {
+    const user = userEvent.setup();
+    const expired = vi.fn();
+    window.addEventListener("auth:session-expired", expired);
+    localStorage.setItem("ittalent_access_token", "old-access");
+    localStorage.setItem("ittalent_refresh_token", "old-refresh");
+    mocks.changePassword.mockReturnValue({
+      isPending: false,
+      mutateAsync: vi.fn().mockRejectedValue(
+        Object.assign(new Error("revoked"), { code: "SESSION_REVOKED", status: 401 }),
+      ),
+    });
+    renderProfile("/profile/password");
+    await user.type(screen.getByLabelText(/Current password/), "Old123!a");
+    await user.type(screen.getByLabelText(/^New password/), "New123!a");
+    await user.type(screen.getByLabelText(/Confirm new password/), "New123!a");
+    await user.click(screen.getByRole("button", { name: "Change password" }));
+    expect(await screen.findByText(/session is no longer current/i)).toBeInTheDocument();
+    expect(expired).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem("ittalent_access_token")).toBeNull();
+    expect(localStorage.getItem("ittalent_refresh_token")).toBeNull();
+    window.removeEventListener("auth:session-expired", expired);
   });
 
   it("does not report a network failure as an incorrect current password", async () => {

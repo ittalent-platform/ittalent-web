@@ -5,6 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import { expireSession } from "@/api/client";
 import { HTTP_TOO_MANY_REQUESTS, HTTP_UNAUTHORIZED } from "@/api/http-status";
 import { requestCode, requestStatus } from "@/api/request-error";
 import { InlineBanner } from "@/components/common/inline-banner";
@@ -30,6 +31,7 @@ const PASSWORD_POLICY_ERROR_CODES = new Set([
   "PASSWORD_POLICY_INVALID",
 ]);
 const PASSWORD_CONFIRMATION_ERROR_CODE = "PASSWORD_CONFIRMATION_INVALID";
+const PASSWORD_UNCHANGED_ERROR_CODE = "PASSWORD_UNCHANGED";
 const SESSION_REVOKED_ERROR_CODE = "SESSION_REVOKED";
 const CURRENT_CREDENTIAL_ERROR_CODE = "CURRENT_CREDENTIAL_INVALID";
 
@@ -119,12 +121,18 @@ export function ChangePasswordPanel({
           message: t("myProfile.passwordMismatch"),
           type: "server",
         });
+      } else if (code === PASSWORD_UNCHANGED_ERROR_CODE) {
+        form.setError("newPassword", {
+          message: t("myProfile.passwordSameAsCurrent"),
+          type: "server",
+        });
       } else if (code === "ACCOUNT_HAS_NO_PASSWORD") {
         setError(t("myProfile.socialAccount"));
       } else if (
         requestStatus(failure) === HTTP_UNAUTHORIZED ||
         code === SESSION_REVOKED_ERROR_CODE
       ) {
+        expireSession();
         setError(t("myProfile.passwordSessionExpired"));
       } else if (code === CURRENT_CREDENTIAL_ERROR_CODE) {
         setError(t("myProfile.passwordIncorrect"));
