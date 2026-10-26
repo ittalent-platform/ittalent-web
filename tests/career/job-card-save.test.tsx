@@ -133,6 +133,12 @@ describe("Marketplace JobCard Save Button Integration", () => {
       "href",
       "/login?next=%2Fcareer%2Ffrontend-developer-react",
     );
+
+    const dialogContent = screen.getByRole("alertdialog");
+    const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
+    const stopPropagationSpy = vi.spyOn(clickEvent, "stopPropagation");
+    dialogContent.dispatchEvent(clickEvent);
+    expect(stopPropagationSpy).toHaveBeenCalled();
   });
 
   it("does not render heart icon on job card for staff / recruiter accounts", async () => {
