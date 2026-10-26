@@ -711,7 +711,7 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       expect(await screen.findByText("Interview scheduled")).toBeInTheDocument();
     });
 
-    it("renders 'Browse jobs' CTA button in 'All' tab empty state linking to /jobs", async () => {
+    it("renders 'Browse jobs' CTA button in 'All' tab empty state linking to /career", async () => {
       vi.mocked(api.getApiV1Notifications).mockResolvedValue({
         data: {
           hasNext: false,
@@ -730,7 +730,7 @@ describe("NotificationCenterPage & NotificationItemRow Suite", () => {
       expect(await screen.findByText("No notifications yet")).toBeInTheDocument();
       const browseBtn = screen.getByRole("link", { name: /browse jobs/i });
       expect(browseBtn).toBeInTheDocument();
-      expect(browseBtn).toHaveAttribute("href", "/jobs");
+      expect(browseBtn).toHaveAttribute("href", "/career");
     });
   });
 });

@@ -59,7 +59,7 @@ export function NotificationTypeIcon({ type, className }: NotificationTypeIconPr
         <span
           aria-hidden="true"
           className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-danger-bg text-danger",
+            "flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-ember-wash text-fg-link",
             className,
           )}
         >
