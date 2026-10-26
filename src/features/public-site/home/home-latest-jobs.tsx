@@ -20,6 +20,7 @@ import { useHomeData, type HomeJob } from "./home.queries";
 import { LogoTile } from "@/components/common/logo-tile";
 import { cn } from "@/lib/utils";
 import { PILL_SECONDARY, SECTION_EYEBROW, SECTION_TITLE } from "@/features/public-site/shared/market-styles";
+import { SaveJobButton } from "@/features/applicant/saved-jobs/components/save-job-button";
 
 const chip =
   "flex h-6 items-center rounded-full bg-mkt-chip px-2.5 text-[12px] font-semibold text-mkt-ink-2";
@@ -47,17 +48,23 @@ function JobCard({ job }: { job: HomeJob }) {
           name={job.companyName}
           seed={job.enterpriseId}
         />
-        <span className="flex grow flex-col gap-0.5">
+        <span className="flex min-w-0 grow flex-col gap-0.5">
           <Link
-            className="text-[13.5px] font-semibold text-mkt-ink hover:text-mkt-accent-hover"
+            className="truncate text-[13.5px] font-semibold text-mkt-ink hover:text-mkt-accent-hover"
             to={`${ENTERPRISES_PATH}/${job.enterpriseId}`}
           >
             {job.companyName}
           </Link>
-          <span className="text-[12.5px] text-mkt-muted">
+          <span className="truncate text-[12.5px] text-mkt-muted">
             {job.location ?? t("home.latest.anywhere")}
           </span>
         </span>
+        <SaveJobButton
+          jobId={job.id}
+          jobTitle={job.title}
+          redirectTo={`${CAREER_PATH}/${job.slug || job.id}`}
+          variant="icon"
+        />
       </div>
       <Link
         className="itt-display text-[18px] font-semibold leading-[1.3] text-mkt-ink hover:text-mkt-accent-hover"
