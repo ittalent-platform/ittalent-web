@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { formatDateDMY, postedAgo } from "@/features/public-site/career/career-format";
 import { cn } from "@/lib/utils";
-import type { SavedJobItem } from "../saved-jobs.types";
+import type { SavedJobItem } from "@/features/applicant/saved-jobs/saved-jobs.types";
 
 export type UnavailableJobCardProps = {
   item: SavedJobItem;

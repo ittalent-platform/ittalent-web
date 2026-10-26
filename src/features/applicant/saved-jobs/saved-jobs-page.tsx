@@ -42,10 +42,15 @@ export function SavedJobsPage() {
       ? debouncedSearch.trim()
       : debouncedSearch.slice(0, MAX_SEARCH_LENGTH).trim();
 
-  // Reset page whenever search or filter tab changes
-  React.useEffect(() => {
+  const handleTabChange = (tab: SavedJobsFilterTab) => {
+    setActiveTab(tab);
     setPage(1);
-  }, [activeTab, normalizedQuery]);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    setPage(1);
+  };
 
   // Tab counts
   const allCountQuery = useSavedJobsQuery({ status: "all", limit: 1 });
@@ -92,7 +97,7 @@ export function SavedJobsPage() {
 
           showToast({
             tone: "success",
-            title: t("savedJobs.toast.removedTitle", "Removed from saved jobs."),
+            title: t("savedJobs.toast.removedTitle", "Removed from saved jobs"),
             message: "",
             action: {
               label: t("savedJobs.toast.undo", "Undo"),
@@ -150,7 +155,7 @@ export function SavedJobsPage() {
           setTargetUnavailableJob(null);
           showToast({
             tone: "success",
-            title: t("savedJobs.toast.removedTitle", "Removed from saved jobs."),
+            title: t("savedJobs.toast.removedTitle", "Removed from saved jobs"),
             message: "",
           });
         },
@@ -213,8 +218,8 @@ export function SavedJobsPage() {
       <SavedJobsToolbar
         activeTab={activeTab}
         counts={counts}
-        onSearchChange={setSearchQuery}
-        onTabChange={setActiveTab}
+        onSearchChange={handleSearchChange}
+        onTabChange={handleTabChange}
         searchQuery={searchQuery}
       />
 
@@ -263,17 +268,17 @@ export function SavedJobsPage() {
       ) : items.length === 0 ? (
         normalizedQuery ? (
           <SavedJobsEmptyState
-            onClearSearch={() => setSearchQuery("")}
+            onClearSearch={() => handleSearchChange("")}
             searchQuery={normalizedQuery}
             type="search"
           />
         ) : activeTab === "unavailable" && counts.unavailable === 0 ? (
-          <AllAvailableBanner onShowAll={() => setActiveTab("all")} />
+          <AllAvailableBanner onShowAll={() => handleTabChange("all")} />
         ) : counts.all === 0 ? (
           <SavedJobsEmptyState type="empty" />
         ) : (
           <SavedJobsEmptyState
-            onClearSearch={() => setActiveTab("all")}
+            onClearSearch={() => handleTabChange("all")}
             type="search"
           />
         )
