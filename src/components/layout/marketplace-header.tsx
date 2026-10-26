@@ -95,13 +95,15 @@ export function MarketplaceHeader({ dark = false }: { dark?: boolean }) {
 
       {session ? (
         <div className="flex items-center gap-3">
-          <NotificationBell
-            className={
-              dark
-                ? "border-white/[0.28] bg-transparent text-white hover:bg-white/10"
-                : undefined
-            }
-          />
+          {session.user.role === "user" ? (
+            <NotificationBell
+              className={
+                dark
+                  ? "border-white/[0.28] bg-transparent text-white hover:bg-white/10"
+                  : undefined
+              }
+            />
+          ) : null}
           <UserMenu variant="pill" />
         </div>
       ) : (

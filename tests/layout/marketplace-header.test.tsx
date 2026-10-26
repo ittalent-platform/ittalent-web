@@ -56,14 +56,14 @@ describe("MarketplaceHeader", () => {
     expect(screen.queryByRole("button", { name: /notifications/i })).not.toBeInTheDocument();
   });
 
-  it("renders NotificationBell and UserMenu when user is authenticated", async () => {
+  it("renders NotificationBell and UserMenu when candidate (user role) is authenticated", () => {
     vi.spyOn(useSessionModule, "useSession").mockReturnValue({
       data: {
         user: {
           id: "cand-1",
           email: "candidate@example.com",
           username: "candidate",
-          role: "candidate",
+          role: "user",
           status: "active",
         },
       },
@@ -76,5 +76,51 @@ describe("MarketplaceHeader", () => {
 
     expect(screen.queryByRole("link", { name: /sign in/i })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /notifications/i })).toBeInTheDocument();
+  });
+
+  it("renders UserMenu but omits NotificationBell when admin is authenticated", () => {
+    vi.spyOn(useSessionModule, "useSession").mockReturnValue({
+      data: {
+        user: {
+          id: "admin-1",
+          email: "admin@example.com",
+          username: "admin",
+          role: "admin",
+          status: "active",
+        },
+      },
+      isPending: false,
+      logout: vi.fn(),
+      refetch: vi.fn(),
+    });
+
+    renderHeader();
+
+    expect(screen.queryByRole("link", { name: /sign in/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /notifications/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /admin/i })).toBeInTheDocument();
+  });
+
+  it("renders UserMenu but omits NotificationBell when recruiter is authenticated", () => {
+    vi.spyOn(useSessionModule, "useSession").mockReturnValue({
+      data: {
+        user: {
+          id: "recruiter-1",
+          email: "recruiter@example.com",
+          username: "recruiter",
+          role: "recruiter",
+          status: "active",
+        },
+      },
+      isPending: false,
+      logout: vi.fn(),
+      refetch: vi.fn(),
+    });
+
+    renderHeader();
+
+    expect(screen.queryByRole("link", { name: /sign in/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /notifications/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /recruiter/i })).toBeInTheDocument();
   });
 });
