@@ -5,12 +5,13 @@ import {
   CalendarDays,
   ClipboardCheck,
   Inbox,
+  LayoutDashboard,
   PanelLeftClose,
   Users,
   X,
 } from "lucide-react";
 
-import { ADMIN_BROADCASTS_PATH, RECRUITER_APPLICATIONS_PATH, RECRUITER_COMPANY_PROFILE_PATH, RECRUITER_EMPLOYEES_PATH, RECRUITER_INTERVIEWS_PATH, RECRUITER_JOB_POSTINGS_PATH } from "@/config/routes";
+import { ADMIN_BROADCASTS_PATH, ADMIN_DASHBOARD_PATH, RECRUITER_APPLICATIONS_PATH, RECRUITER_COMPANY_PROFILE_PATH, RECRUITER_DASHBOARD_PATH, RECRUITER_EMPLOYEES_PATH, RECRUITER_INTERVIEWS_PATH, RECRUITER_JOB_POSTINGS_PATH } from "@/config/routes";
 import { SidebarNavList } from "./sidebar-nav-list";
 import { BrandLogo } from "./brand-logo";
 import { UserMenu } from "./user-menu";
@@ -38,6 +39,7 @@ import { useEnterpriseRegistrationsListQuery } from "@/features/enterprise-regis
 // ] as const;
 
 const adminNavItems = [
+  { end: false, icon: LayoutDashboard, labelKey: "sidebar.dashboard", to: ADMIN_DASHBOARD_PATH },
   { end: false, icon: Users, labelKey: "sidebar.users", to: "/admin/users" },
   { end: false, icon: ClipboardCheck, labelKey: "sidebar.registrations", to: "/admin/registrations" },
   { end: false, icon: Building2, labelKey: "sidebar.enterprises", to: "/admin/enterprises" },
@@ -45,6 +47,7 @@ const adminNavItems = [
 ] as const;
 
 const recruiterNavItems = [
+  { end: false, icon: LayoutDashboard, labelKey: "sidebar.dashboard", to: RECRUITER_DASHBOARD_PATH },
   { end: false, icon: BriefcaseBusiness, labelKey: "sidebar.jobPostings", to: RECRUITER_JOB_POSTINGS_PATH },
   { end: false, icon: Inbox, labelKey: "sidebar.applications", to: RECRUITER_APPLICATIONS_PATH },
   { end: false, icon: CalendarDays, labelKey: "sidebar.interviews", to: RECRUITER_INTERVIEWS_PATH },

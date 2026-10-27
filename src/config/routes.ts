@@ -7,6 +7,18 @@ export const ACCOUNT_NOTIFICATIONS_PATH = "/account/notifications";
 export const RECRUITER_JOB_POSTINGS_PATH = "/recruiter/job-postings";
 export const RECRUITER_APPLICATIONS_PATH = "/recruiter/applications";
 export const RECRUITER_INTERVIEWS_PATH = "/recruiter/interviews";
+/** Statistics of the HR / enterprise admin's own company, and the platform overview of a system admin. */
+export const RECRUITER_DASHBOARD_PATH = "/recruiter/dashboard";
+export const ADMIN_DASHBOARD_PATH = "/admin/dashboard";
+export const ADMIN_REGISTRATIONS_PATH = "/admin/registrations";
+
+export function recruiterJobPostingPath(jobPostingId: string): string {
+  return `${RECRUITER_JOB_POSTINGS_PATH}/${jobPostingId}`;
+}
+
+export function adminRegistrationPath(registrationId: string): string {
+  return `${ADMIN_REGISTRATIONS_PATH}/${registrationId}`;
+}
 
 export function recruiterApplicationPath(applicationId: string): string {
   return `${RECRUITER_APPLICATIONS_PATH}/${applicationId}`;

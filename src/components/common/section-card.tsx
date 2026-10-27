@@ -19,7 +19,7 @@ export function SectionCard({ actions, children, className, description, id, tit
   return (
     <section aria-labelledby={title ? headingId : undefined} className={cn("surface-card flex min-w-0 flex-col gap-[18px] p-[22px]", className)} id={id}>
       {title ? (
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
           <div className="flex min-w-0 flex-col gap-1">
             <h2 className="text-[15px] font-bold text-foreground" id={headingId}>{title}</h2>
             {description ? <p className="m-0 text-[13px] text-muted-foreground">{description}</p> : null}
