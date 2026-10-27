@@ -14,16 +14,26 @@ import { Button } from "@/components/ui/button";
 export type SignInToSaveDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  redirectTo?: string;
 };
 
-export function SignInToSaveDialog({ open, onOpenChange }: SignInToSaveDialogProps) {
+export function SignInToSaveDialog({
+  open,
+  onOpenChange,
+  redirectTo,
+}: SignInToSaveDialogProps) {
   const { t } = useTranslation();
   const location = useLocation();
-  const currentPath = encodeURIComponent(`${location.pathname}${location.search}`);
+  const currentPath = encodeURIComponent(
+    redirectTo || `${location.pathname}${location.search}`,
+  );
 
   return (
     <AlertDialog onOpenChange={onOpenChange} open={open}>
-      <AlertDialogContent className="max-w-[480px] gap-0 overflow-hidden rounded-2xl p-0 shadow-2xl">
+      <AlertDialogContent
+        className="max-w-[480px] gap-0 overflow-hidden rounded-2xl p-0 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex flex-col gap-4 p-6 sm:p-7">
           <div className="grid size-11 place-items-center rounded-xl bg-mkt-accent-tint text-mkt-accent">
             <Bookmark aria-hidden="true" className="size-5" />

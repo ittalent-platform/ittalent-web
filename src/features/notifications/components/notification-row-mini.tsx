@@ -29,7 +29,7 @@ export function NotificationRowMini({
   const isUnread = !item.isRead;
   const timeFormatted = formatNotificationRelativeTime(item.createdAt, i18n.language);
 
-  const targetUrl = item.actionUrl || "/account/notifications";
+  const targetUrl = item.actionUrl || "/notifications";
 
   return (
     <div

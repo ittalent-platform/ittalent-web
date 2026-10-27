@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Outlet, useMatches } from "react-router";
 
 import { BrandLogo } from "./brand-logo";
 import { MarketplaceFooter } from "./marketplace-footer";
@@ -7,8 +7,15 @@ import { NotificationBell } from "./notification-bell";
 import { UserMenu } from "./user-menu";
 import { CANDIDATE_NAV_ITEMS } from "./candidate-layout.constants";
 
+type RouteHandle = {
+  hideFooter?: boolean;
+};
+
 /** Applicant-facing shell (DESIGN.md "Applicant and public marketplace"): 74px white header over a canvas page. */
 export function CandidateLayout() {
+  const matches = useMatches();
+  const hideFooter = matches.some((match) => (match.handle as RouteHandle | undefined)?.hideFooter);
+
   return (
     <div className="itt-root candidate-root flex min-h-screen flex-col bg-canvas text-foreground">
       <header className="sticky top-0 z-(--z-header) border-b border-border bg-card">
@@ -25,7 +32,7 @@ export function CandidateLayout() {
       <main className="mx-auto flex w-full max-w-[1328px] flex-1 flex-col gap-5 px-4 pb-12 pt-8 sm:px-6">
         <Outlet />
       </main>
-      <MarketplaceFooter />
+      {!hideFooter && <MarketplaceFooter />}
     </div>
   );
 }

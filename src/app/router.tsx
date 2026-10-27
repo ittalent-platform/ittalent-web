@@ -87,6 +87,11 @@ const AdminJobPostingDetailPage = lazy(() =>
     default: m.JobPostingDetailPage,
   })),
 );
+const BroadcastNotificationsPage = lazy(() =>
+  import("@/features/admin/broadcast-notifications").then((m) => ({
+    default: m.BroadcastNotificationsPage,
+  })),
+);
 const RecruiterJobPostingsPage = lazy(() =>
   import("@/features/recruiter/job-postings/job-postings-pages").then((m) => ({
     default: m.RecruiterJobPostingsPage,
@@ -166,6 +171,11 @@ const ApplicationsPage = lazy(() =>
 const ApplicationDetailPage = lazy(() =>
   import("@/features/applicant/applications/application-detail-page").then(
     (m) => ({ default: m.ApplicationDetailPage }),
+  ),
+);
+const NotificationCenterPage = lazy(() =>
+  import("@/features/notifications/pages/notification-center-page").then(
+    (m) => ({ default: m.NotificationCenterPage }),
   ),
 );
 const SavedJobsPage = lazy(() =>
@@ -250,6 +260,7 @@ export const appRoutes = [
         children: [
           {
             element: <CandidateAccountLayout />,
+            handle: { hideFooter: true },
             children: [
               { path: "documents", element: <DocumentsPage /> },
               { path: "my-applications", element: <ApplicationsPage /> },
@@ -259,6 +270,8 @@ export const appRoutes = [
               },
               { path: "saved-jobs", element: <SavedJobsPage /> },
               { path: "certificates", element: <CertificatesPage /> },
+              { path: "notifications", element: <NotificationCenterPage /> },
+              { path: "account/notifications", element: <Navigate replace to="/notifications" /> },
             ],
           },
         ],
@@ -296,6 +309,10 @@ export const appRoutes = [
           {
             path: "job-postings/:jobPostingId",
             element: <AdminJobPostingDetailPage />,
+          },
+          {
+            path: "broadcast-notifications",
+            element: <BroadcastNotificationsPage />,
           },
         ],
       },

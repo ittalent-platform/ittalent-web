@@ -9,11 +9,13 @@ import {
   tabToNotificationQuery,
   useDeleteAllNotifications,
   useDeleteNotification,
+  useInfiniteNotificationsQuery,
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
   useNotificationsQuery,
   useUnreadCountQuery,
 } from "@/features/notifications";
+import { formatAnnouncementDateTime } from "@/features/notifications/notifications.format";
 
 vi.mock("@/api/generated", () => ({
   deleteApiV1Notifications: vi.fn(),
@@ -94,6 +96,77 @@ describe("Notifications API & React Query Layer", () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(result.current.data).toEqual(mockResponse);
       expect(api.getApiV1Notifications).toHaveBeenCalledWith({ query: { limit: 20, page: 1 } });
+    });
+  });
+
+  describe("useInfiniteNotificationsQuery", () => {
+    it("fetches first page and advances with fetchNextPage", async () => {
+      const page1Response = {
+        items: [
+          {
+            category: "info" as const,
+            createdAt: "2026-10-22T10:00:00Z",
+            id: "notif-1",
+            isRead: false,
+            message: "Notification 1",
+            title: "Title 1",
+            type: "account_alert" as const,
+          },
+        ],
+        limit: 10,
+        page: 1,
+        total: 20,
+        totalPages: 2,
+        unreadCount: 1,
+      };
+
+      const page2Response = {
+        items: [
+          {
+            category: "info" as const,
+            createdAt: "2026-10-22T09:00:00Z",
+            id: "notif-2",
+            isRead: true,
+            message: "Notification 2",
+            title: "Title 2",
+            type: "account_alert" as const,
+          },
+        ],
+        limit: 10,
+        page: 2,
+        total: 20,
+        totalPages: 2,
+        unreadCount: 1,
+      };
+
+      vi.mocked(api.getApiV1Notifications)
+        .mockResolvedValueOnce({
+          data: page1Response,
+          response: new Response(null, { status: 200 }),
+        })
+        .mockResolvedValueOnce({
+          data: page2Response,
+          response: new Response(null, { status: 200 }),
+        });
+
+      const { result } = renderHook(() => useInfiniteNotificationsQuery({ limit: 10 }), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+      expect(result.current.data?.pages).toHaveLength(1);
+      expect(result.current.hasNextPage).toBe(true);
+
+      await result.current.fetchNextPage();
+
+      await waitFor(() => expect(result.current.data?.pages).toHaveLength(2));
+      expect(result.current.hasNextPage).toBe(false);
+      expect(api.getApiV1Notifications).toHaveBeenNthCalledWith(1, {
+        query: { limit: 10, page: 1 },
+      });
+      expect(api.getApiV1Notifications).toHaveBeenNthCalledWith(2, {
+        query: { limit: 10, page: 2 },
+      });
     });
   });
 
@@ -183,6 +256,30 @@ describe("Notifications API & React Query Layer", () => {
       expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalled();
       expect(queryClient.getQueryData(notificationKeys.unreadCount())).toEqual({ unreadCount: 0 });
     });
+
+    it("calls read-all API with cutoff timestamp and keeps newer notifications unread", async () => {
+      const cutoff = "2026-10-24T10:00:00.000Z";
+      queryClient.setQueryData(notificationKeys.unreadCount(), { unreadCount: 2 });
+
+      vi.mocked(api.patchApiV1NotificationsReadAll).mockResolvedValueOnce({
+        data: {
+          message: "All notifications marked as read",
+          unreadCount: 1,
+          updatedCount: 1,
+        },
+        response: new Response(null, { status: 200 }),
+      });
+
+      const { result } = renderHook(() => useMarkAllNotificationsRead(), {
+        wrapper: createWrapper(),
+      });
+
+      await result.current.mutateAsync({ before: cutoff });
+
+      expect(api.patchApiV1NotificationsReadAll).toHaveBeenCalledWith({
+        query: { before: cutoff },
+      });
+    });
   });
 
   describe("useDeleteNotification", () => {
@@ -240,6 +337,19 @@ describe("Notifications API & React Query Layer", () => {
 
       expect(api.deleteApiV1Notifications).toHaveBeenCalled();
       expect(queryClient.getQueryData(notificationKeys.unreadCount())).toEqual({ unreadCount: 0 });
+    });
+  });
+
+  describe("formatAnnouncementDateTime", () => {
+    it("formats announcement date strictly in Vietnam ICT timezone", () => {
+      // 2026-10-23T23:30:00Z is 2026-10-24 06:30 in ICT (GMT+7)
+      const lateUtcIso = "2026-10-23T23:30:00Z";
+      expect(formatAnnouncementDateTime(lateUtcIso, "en")).toBe("24 Oct 2026, 06:30");
+      expect(formatAnnouncementDateTime(lateUtcIso, "vi")).toMatch(/24 (thg|tháng) 10 2026, 06:30/i);
+
+      // 2026-10-23T16:59:00Z is 2026-10-23 23:59 in ICT (GMT+7)
+      const nearMidnightIso = "2026-10-23T16:59:00Z";
+      expect(formatAnnouncementDateTime(nearMidnightIso, "en")).toBe("23 Oct 2026, 23:59");
     });
   });
 });

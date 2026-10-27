@@ -57,3 +57,25 @@ export function formatNotificationRelativeTime(
 
   return `${day} ${month} ${date.getFullYear()}`;
 }
+
+/**
+ * Formats a timestamp for the announcement modal dialog (e.g. "11 Oct 2026, 09:40").
+ */
+export function formatAnnouncementDateTime(
+  value: string | Date | undefined,
+  locale = "en",
+): string {
+  if (!value) return "—";
+  const date = typeof value === "string" ? new Date(value) : value;
+  if (Number.isNaN(date.getTime())) return "—";
+  const isVi = locale.startsWith("vi");
+  // Every part in Vietnam time, so the day never disagrees with the time next to it.
+  const ict = (locales: string, options: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat(locales, { ...options, timeZone: "Asia/Ho_Chi_Minh" }).format(date);
+  const day = ict("en-GB", { day: "numeric" });
+  const month = ict(isVi ? "vi-VN" : "en-GB", { month: "short" });
+  const year = ict("en-GB", { year: "numeric" });
+  const timeStr = formatTimeIct(date.toISOString());
+  return `${day} ${month} ${year}, ${timeStr}`;
+}
+
