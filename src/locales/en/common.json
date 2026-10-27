@@ -2007,6 +2007,7 @@
       "name": "Document",
       "type": "Type",
       "uploaded": "Uploaded",
+      "size": "Size",
       "actions": "Actions"
     },
     "view": "View",

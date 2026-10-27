@@ -1986,6 +1986,7 @@
       "name": "Tài liệu",
       "type": "Loại",
       "uploaded": "Ngày tải lên",
+      "size": "Kích thước",
       "actions": "Thao tác"
     },
     "view": "Xem",

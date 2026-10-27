@@ -6,6 +6,15 @@ export const DOCUMENT_ACCEPT = ".pdf,.doc,.docx";
 
 export const DOCUMENT_TABS = ["all", "cv", "cover_letter"] as const;
 
+export function formatDocumentFileSize(size: number): string {
+  if (size < 1024) return `${size} B`;
+
+  const kilobytes = size / 1024;
+  if (kilobytes < 1024) return `${kilobytes.toFixed(1).replace(".0", "")} KB`;
+
+  return `${(kilobytes / 1024).toFixed(1).replace(".0", "")} MB`;
+}
+
 /** Returns the i18n key (under `documents.errors`) of the first problem with the file, or null when it is acceptable. */
 export function documentFileErrorKey(file: File) {
   // Browsers report unreliable MIME types, so only the extension is checked here; the server verifies the content.

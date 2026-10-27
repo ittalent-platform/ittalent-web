@@ -1,10 +1,11 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useLocation } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { PaginatedDocuments } from "@/api/generated/types.gen";
 import { DocumentsPage } from "@/features/documents/documents-page";
 import * as documentQueries from "@/features/documents/documents.queries";
+import { formatDocumentFileSize } from "@/lib/document-files";
 
 vi.mock("@/features/documents/documents.queries", () => ({
   downloadDocument: vi.fn(),
@@ -58,8 +59,14 @@ function renderPage(initial = "/documents") {
   return render(
     <MemoryRouter initialEntries={[initial]}>
       <DocumentsPage />
+      <LocationDisplay />
     </MemoryRouter>,
   );
+}
+
+function LocationDisplay() {
+  const location = useLocation();
+  return <output aria-label="Current URL">{location.pathname}{location.search}</output>;
 }
 
 describe("DocumentsPage", () => {
@@ -107,6 +114,76 @@ describe("DocumentsPage", () => {
     );
     expect(screen.getByText("backend-resume.pdf")).toBeInTheDocument();
     expect(screen.getByText("Default")).toBeInTheDocument();
+  });
+
+  it("formats document sizes from bytes through megabytes", () => {
+    expect(formatDocumentFileSize(0)).toBe("0 B");
+    expect(formatDocumentFileSize(128)).toBe("128 B");
+    expect(formatDocumentFileSize(1280)).toBe("1.3 KB");
+    expect(formatDocumentFileSize(3.5 * 1024 * 1024)).toBe("3.5 MB");
+  });
+
+  it("shows formatted file sizes in the table", () => {
+    renderPage();
+
+    expect(screen.getByRole("columnheader", { name: "Size" })).toBeInTheDocument();
+    expect(screen.getByText("128 B")).toBeInTheDocument();
+    expect(screen.getByText("256 B")).toBeInTheDocument();
+  });
+
+  it("uses valid sort values from the URL", async () => {
+    renderPage("/documents?sort_by=file_name&sort_order=asc");
+
+    await waitFor(() =>
+      expect(documentQueries.useDocuments).toHaveBeenLastCalledWith({
+        limit: 10,
+        page: 1,
+        sort_by: "file_name",
+        sort_order: "asc",
+      }),
+    );
+  });
+
+  it("updates sort in the URL and resets pagination", async () => {
+    renderPage("/documents?page=2&limit=20&search=resume&type=cv&sort_order=asc");
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Sort documents" }));
+    fireEvent.click(screen.getByRole("option", { name: "File name" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("status", { name: "Current URL" })).toHaveTextContent(
+        "/documents?page=1&limit=20&search=resume&type=cv&sort_order=asc&sort_by=file_name",
+      ),
+    );
+    fireEvent.click(screen.getByRole("combobox", { name: "Sort order" }));
+    fireEvent.click(screen.getByRole("option", { name: "Descending" }));
+
+    await waitFor(() =>
+      expect(screen.getByRole("status", { name: "Current URL" })).toHaveTextContent(
+        "/documents?page=1&limit=20&search=resume&type=cv&sort_order=desc&sort_by=file_name",
+      ),
+    );
+    expect(documentQueries.useDocuments).toHaveBeenLastCalledWith({
+      limit: 20,
+      page: 1,
+      search: "resume",
+      sort_by: "file_name",
+      sort_order: "desc",
+      type: "cv",
+    });
+  });
+
+  it("falls back to the default sort for invalid URL values", async () => {
+    renderPage("/documents?sort_by=owner&sort_order=sideways");
+
+    await waitFor(() =>
+      expect(documentQueries.useDocuments).toHaveBeenLastCalledWith({
+        limit: 10,
+        page: 1,
+        sort_by: "created_at",
+        sort_order: "desc",
+      }),
+    );
   });
 
   it("sets a non-default document as the default", () => {

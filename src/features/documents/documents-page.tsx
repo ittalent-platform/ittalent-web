@@ -28,6 +28,7 @@ import {
   DOCUMENT_TABS,
   MAX_DOCUMENT_MB,
   documentFileErrorKey,
+  formatDocumentFileSize,
 } from "@/lib/document-files";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,8 @@ import {
   DOCUMENT_DEFAULT_SORT,
   DOCUMENT_LIST_DEFAULT_LIMIT,
   DOCUMENT_LIST_PARAMS,
+  DOCUMENT_SORT_FIELDS,
+  DOCUMENT_SORT_ORDERS,
   DOCUMENT_TYPES,
   OBJECT_URL_REVOKE_DELAY_MS,
 } from "./documents.constants";
@@ -80,13 +83,23 @@ export function DocumentsPage() {
       DOCUMENT_TYPES,
       searchParams.get(DOCUMENT_LIST_PARAMS.type),
     ) ?? ALL_DOCUMENTS;
+  const sortBy =
+    selectedValue(
+      DOCUMENT_SORT_FIELDS,
+      searchParams.get(DOCUMENT_LIST_PARAMS.sortBy),
+    ) ?? DOCUMENT_DEFAULT_SORT.by;
+  const sortOrder =
+    selectedValue(
+      DOCUMENT_SORT_ORDERS,
+      searchParams.get(DOCUMENT_LIST_PARAMS.sortOrder),
+    ) ?? DOCUMENT_DEFAULT_SORT.order;
   const normalizedSearch = debouncedSearch.trim();
 
   const query = useDocuments({
     page,
     limit,
-    sort_by: DOCUMENT_DEFAULT_SORT.by,
-    sort_order: DOCUMENT_DEFAULT_SORT.order,
+    sort_by: sortBy,
+    sort_order: sortOrder,
     ...(normalizedSearch ? { search: normalizedSearch } : {}),
     ...(listType === ALL_DOCUMENTS ? {} : { type: listType }),
   });
@@ -290,30 +303,80 @@ export function DocumentsPage() {
         type="file"
       />
 
-      <div
-        aria-label={t("documents.typeLabel")}
-        className="flex flex-wrap gap-2"
-        role="group"
-      >
-        {DOCUMENT_TABS.map((value) => (
-          <Button
-            aria-pressed={listType === value}
-            className="h-9 px-4 text-[13.5px] font-semibold"
-            key={value}
-            onClick={() =>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div
+          aria-label={t("documents.typeLabel")}
+          className="flex flex-wrap gap-2"
+          role="group"
+        >
+          {DOCUMENT_TABS.map((value) => (
+            <Button
+              aria-pressed={listType === value}
+              className="h-9 px-4 text-[13.5px] font-semibold"
+              key={value}
+              onClick={() =>
+                setMany({
+                  page: "1",
+                  [DOCUMENT_LIST_PARAMS.type]:
+                    value === ALL_DOCUMENTS ? null : value,
+                })
+              }
+              shape="pill"
+              type="button"
+              variant={listType === value ? "default" : "outline"}
+            >
+              {t(`documents.tabs.${value}`)}
+            </Button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Select
+            onValueChange={(value) =>
               setMany({
                 page: "1",
-                [DOCUMENT_LIST_PARAMS.type]:
-                  value === ALL_DOCUMENTS ? null : value,
+                [DOCUMENT_LIST_PARAMS.sortBy]: value,
               })
             }
-            shape="pill"
-            type="button"
-            variant={listType === value ? "default" : "outline"}
+            value={sortBy}
           >
-            {t(`documents.tabs.${value}`)}
-          </Button>
-        ))}
+            <SelectTrigger
+              aria-label={t("documents.sort.label")}
+              className="h-9 w-40 text-[13.5px]"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DOCUMENT_SORT_FIELDS.map((value) => (
+                <SelectItem key={value} value={value}>
+                  {t(`documents.sort.${value}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            onValueChange={(value) =>
+              setMany({
+                page: "1",
+                [DOCUMENT_LIST_PARAMS.sortOrder]: value,
+              })
+            }
+            value={sortOrder}
+          >
+            <SelectTrigger
+              aria-label={t("documents.sort.order")}
+              className="h-9 w-36 text-[13.5px]"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DOCUMENT_SORT_ORDERS.map((value) => (
+                <SelectItem key={value} value={value}>
+                  {t(`documents.sort.${value}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {query.isError ? (
@@ -353,6 +416,12 @@ export function DocumentsPage() {
                 key: "created",
                 header: t("documents.columns.uploaded"),
                 cell: (row) => formatDate(row.createdAt),
+              },
+              {
+                key: "size",
+                header: t("documents.columns.size"),
+                className: "w-24 whitespace-nowrap text-right",
+                cell: (row) => formatDocumentFileSize(row.size),
               },
               {
                 key: "actions",
