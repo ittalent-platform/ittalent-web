@@ -1,5 +1,6 @@
 /** Route paths shared by layout chrome and feature code, so neither hardcodes a URL. */
 export const APPLICATIONS_PATH = "/my-applications";
+export const SAVED_JOBS_PATH = "/saved-jobs";
 export const CERTIFICATES_PATH = "/certificates";
 export const NOTIFICATIONS_PATH = "/notifications";
 export const ACCOUNT_NOTIFICATIONS_PATH = "/account/notifications";

@@ -2,7 +2,7 @@ import { Award, Bell, Bookmark, Briefcase, FileText, type LucideIcon } from "luc
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router";
 
-import { NOTIFICATIONS_PATH } from "@/config/routes";
+import { APPLICATIONS_PATH, NOTIFICATIONS_PATH, SAVED_JOBS_PATH } from "@/config/routes";
 import { cn } from "@/lib/utils";
 
 type AccountNavGroup = { labelKey: string; items: Array<{ icon: LucideIcon; labelKey: string; to: string }> };
@@ -11,8 +11,8 @@ type AccountNavGroup = { labelKey: string; items: Array<{ icon: LucideIcon; labe
 const ACCOUNT_NAV: AccountNavGroup[] = [
   {
     items: [
-      { icon: Briefcase, labelKey: "accountNav.myApplications", to: "/my-applications" },
-      { icon: Bookmark, labelKey: "accountNav.savedJobs", to: "/saved-jobs" },
+      { icon: Briefcase, labelKey: "accountNav.myApplications", to: APPLICATIONS_PATH },
+      { icon: Bookmark, labelKey: "accountNav.savedJobs", to: SAVED_JOBS_PATH },
     ],
     labelKey: "accountNav.jobSearch",
   },
