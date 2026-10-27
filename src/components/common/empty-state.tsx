@@ -16,7 +16,15 @@ type EmptyStateProps = {
   icon?: LucideIcon;
   secondaryAction?: EmptyStateAction;
   title: string;
-  tone?: "accent" | "neutral";
+  tone?: "accent" | "danger" | "neutral" | "warning";
+};
+
+// Icon disc colours; "danger" and "warning" tint the disc for outcomes the reader must notice (a load failure, a suspended company).
+const TONE_CLASS: Record<NonNullable<EmptyStateProps["tone"]>, string> = {
+  accent: "bg-(--primary-100) text-primary",
+  danger: "bg-(--status-error-bg) text-(--status-error-fg)",
+  neutral: "bg-muted text-(--status-disabled-fg)",
+  warning: "bg-(--status-warning-bg) text-(--status-warning-fg)",
 };
 
 export function EmptyState({
@@ -32,14 +40,7 @@ export function EmptyState({
   return (
     <div className="flex min-h-[270px] flex-col items-center justify-center px-6 py-12 text-center">
       {Icon ? (
-        <div
-          className={cn(
-            "grid size-12 place-items-center rounded-full",
-            tone === "accent"
-              ? "bg-(--primary-100) text-primary"
-              : "bg-muted text-(--status-disabled-fg)",
-          )}
-        >
+        <div className={cn("grid size-12 place-items-center rounded-full", TONE_CLASS[tone])}>
           <Icon className="size-7" />
         </div>
       ) : null}

@@ -83,7 +83,8 @@ Before creating a component, look in `components/ui`, `components/common`, `comp
 | Search + filters row | `ListToolbar` + `FilterSelect` / `FilterMultiSelect` + `ViewToggle` |
 | Filter trigger with a muted "Label:" prefix | `prefixedFilterTrigger` (`common/prefixed-filter-trigger`) as `FilterSelect`'s `renderTrigger` |
 | Table / pagination / skeleton | `ui/table`, `ui/pagination`, `TableSkeletonRows` |
-| Empty, error, inline notice | `EmptyState`, `ErrorState`, `Callout`, `InlineBanner` |
+| Empty, error, inline notice | `EmptyState`, `ErrorState`, `Callout`, `InlineBanner` (`EmptyState` tones: `neutral`, `accent`, `warning`, `danger`) |
+| Statistics screens: big numbers, trend, donut / gauge, legend, "Open …" link | `KpiStrip`, `Sparkline`, `RingChart`, `ChartLegend`, `CardLink` (`common/`, colours via `chart-tone` and the `--dash-*` tokens) |
 | Confirm dialog (any tone, optional body) | `ActionConfirmDialog` |
 | Centred outcome (icon disc, title, text, actions, note) | `StatusPanel` inside `AuthStatusCard` |
 | Label / value lines | `DetailRow` (`layout="grid"` on detail pages) |

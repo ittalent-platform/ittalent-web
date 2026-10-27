@@ -39,6 +39,8 @@ export type DatePickerProps = {
   "aria-invalid"?: boolean;
   className?: string;
   clearable?: boolean;
+  /** How the chosen day reads in the field; defaults to `dd/mm/yyyy`. */
+  formatValue?: (value: string) => string;
   id?: string;
   /** Latest selectable date, `YYYY-MM-DD`. */
   max?: string;
@@ -60,6 +62,7 @@ export function DatePicker({
   "aria-invalid": invalid,
   className,
   clearable = false,
+  formatValue,
   id,
   max,
   min,
@@ -119,7 +122,7 @@ export function DatePicker({
           type="button"
         >
           <span className={cn("truncate", !selected && "text-muted-foreground")}>
-            {selected ? display(selected) : (placeholder ?? t("datePicker.placeholder"))}
+            {selected ? (formatValue ? formatValue(toIso(selected)) : display(selected)) : (placeholder ?? t("datePicker.placeholder"))}
           </span>
           <CalendarDays aria-hidden className="size-4 shrink-0 text-muted-foreground" />
         </button>

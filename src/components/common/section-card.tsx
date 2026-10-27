@@ -36,7 +36,7 @@ export function SectionCard({
       id={id}
     >
       {title ? (
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
           <div className="flex min-w-0 flex-col gap-1">
             <h2
               className={cn(
