@@ -61,6 +61,7 @@ export const STATUS_TONES: Record<ApplicationStatus, { badge: string; text: stri
   hired: { badge: "bg-(--status-success-bg) text-(--status-success-fg)", text: "text-(--status-success-fg)", dot: "bg-(--status-success-fg)", border: "border-t-(--status-success-fg)", ring: "ring-(--status-success-fg)/40" },
   rejected: { badge: "bg-(--status-error-bg) text-(--status-error-fg)", text: "text-(--status-error-fg)", dot: "bg-(--status-error-fg)", border: "border-t-(--status-error-fg)", ring: "ring-(--status-error-fg)/40" },
   withdrawn: { badge: "bg-(--status-neutral-bg) text-muted-foreground", text: "text-muted-foreground", dot: "bg-muted-foreground", border: "border-t-muted-foreground", ring: "ring-muted-foreground/40" },
+  position_filled: { badge: "bg-(--status-neutral-bg) text-muted-foreground", text: "text-muted-foreground", dot: "bg-muted-foreground", border: "border-t-muted-foreground", ring: "ring-muted-foreground/40" },
 };
 
 // Only an interview asks the candidate to act, so it is the one "next step" set in a status colour.
@@ -74,6 +75,7 @@ export const TIMELINE_TONES: Record<ApplicationStatus, TimelineTone> = {
   hired: "success",
   rejected: "error",
   withdrawn: "neutral",
+  position_filled: "neutral",
 };
 
 export function isWithdrawable(status: ApplicationStatus): boolean {

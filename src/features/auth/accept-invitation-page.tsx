@@ -17,7 +17,7 @@ import { AUTH_FULL_ACTION_CLASS } from "./auth-status.constants";
 import { AuthCardPage, AuthFormHeader, AuthStatusCard } from "./auth-status-card";
 import { acceptAccountInvitation, previewAccountInvitation } from "./invitation.queries";
 import { PasswordField } from "./password-field";
-import { PASSWORD_RULES } from "./password-rules";
+import { PASSWORD_RULES } from "@/lib/password-rules";
 import { strongPasswordSchema } from "./password-schema";
 import { HTTP_BAD_REQUEST, HTTP_CONFLICT, HTTP_GONE } from "@/api/http-status";
 import { KeyValueBox } from "@/components/common/key-value-box";

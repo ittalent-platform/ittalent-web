@@ -9,11 +9,13 @@ import { AppLayout } from "@/components/layout/admin-layout";
 import { MarketplaceLayout } from "@/components/layout/marketplace-layout";
 import { CandidateLayout } from "@/components/layout/candidate-layout";
 import { LoadingScreen } from "@/components/common/loading-screen";
+import { EMAIL_VERIFICATION_PATH } from "@/config/routes";
 import { HomePage } from "@/features/public-site/home/home-page";
 
 const LoginPage = lazy(() =>
   import("@/features/auth/login-page").then((m) => ({ default: m.LoginPage })),
 );
+const ProfilePage = lazy(() => import("@/features/profile/profile-page").then((m) => ({ default: m.ProfilePage })));
 const RegisterPage = lazy(() =>
   import("@/features/auth/register-page").then((m) => ({
     default: m.RegisterPage,
@@ -247,7 +249,7 @@ export const appRoutes = [
   // The confirmation email links here (APP_BASE_URL/enterprise-registration/verify?token=...).
   { path: "/enterprise-registration/verify", element: <RedirectKeepingSearch to="/register-company" /> },
   { path: "/enterprise-registration/invitation", element: <AcceptRegistrationInvitationPage /> },
-  { path: "/verify-email", element: <EmailVerificationPage /> },
+  { path: EMAIL_VERIFICATION_PATH, element: <EmailVerificationPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
   { path: "/accept-invitation", element: <AcceptInvitationPage /> },
@@ -263,6 +265,8 @@ export const appRoutes = [
             handle: { hideFooter: true },
             children: [
               { path: "documents", element: <DocumentsPage /> },
+              { path: "profile", element: <ProfilePage /> },
+              { path: "profile/password", element: <ProfilePage /> },
               { path: "my-applications", element: <ApplicationsPage /> },
               {
                 path: "my-applications/:id",
@@ -288,6 +292,8 @@ export const appRoutes = [
           { index: true, element: <Navigate replace to="/admin/users" /> },
           { path: "dashboard", element: <AdminDashboardPage /> },
           { path: "users", element: <UsersPage /> },
+          { path: "profile", element: <ProfilePage /> },
+          { path: "profile/password", element: <ProfilePage /> },
           { path: "users/:userId", element: <AdminUserDetailPage /> },
           { path: "users/:userId/history", element: <AdminUserHistoryPage /> },
           { path: "enterprises", element: <EnterprisesPage /> },
@@ -331,6 +337,8 @@ export const appRoutes = [
           },
           { path: "dashboard", element: <RecruiterDashboardPage /> },
           { path: "job-postings", element: <RecruiterJobPostingsPage /> },
+          { path: "my-profile", element: <ProfilePage /> },
+          { path: "my-profile/password", element: <ProfilePage /> },
           {
             element: <ProtectedRoute requiredRoles={JOB_POSTING_WRITER_ROLES} />,
             children: [
@@ -363,10 +371,18 @@ export const appRoutes = [
             path: "employees/:employeeId",
             element: <RecruiterEmployeeDetailPage />,
           },
-          { path: "profile", element: <RecruiterCompanyProfilePage /> },
+          { path: "company-profile", element: <RecruiterCompanyProfilePage /> },
+          {
+            path: "company-profile/edit",
+            element: <RecruiterEditCompanyProfilePage />,
+          },
           {
             path: "profile/edit",
-            element: <RecruiterEditCompanyProfilePage />,
+            element: <Navigate replace to="/recruiter/company-profile/edit" />,
+          },
+          {
+            path: "profile",
+            element: <Navigate replace to="/recruiter/company-profile" />,
           },
         ],
       },

@@ -37,6 +37,14 @@ export function setStoredTokens(tokens: AuthTokens | null): void {
   localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
 }
 
+export function expireSession(): void {
+  setStoredTokens(null);
+  if (typeof window !== "undefined") {
+    sessionStorage.removeItem("ittalent_user");
+    window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
+  }
+}
+
 let refreshPromise: Promise<string | null> | null = null;
 
 export async function refreshAuthTokens(): Promise<string | null> {
@@ -58,10 +66,7 @@ export async function refreshAuthTokens(): Promise<string | null> {
     });
 
     if (!res.ok) {
-      setStoredTokens(null);
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
-      }
+      expireSession();
       return null;
     }
 
@@ -74,16 +79,10 @@ export async function refreshAuthTokens(): Promise<string | null> {
       return newTokens.accessToken;
     }
 
-    setStoredTokens(null);
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
-    }
+    expireSession();
     return null;
   } catch {
-    setStoredTokens(null);
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT));
-    }
+    expireSession();
     return null;
   } finally {
     refreshPromise = null;

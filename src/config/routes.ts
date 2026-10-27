@@ -1,6 +1,17 @@
 /** Route paths shared by layout chrome and feature code, so neither hardcodes a URL. */
 export const APPLICATIONS_PATH = "/my-applications";
 export const SAVED_JOBS_PATH = "/saved-jobs";
+export const EMAIL_VERIFICATION_PATH = "/verify-email";
+export const PROFILE_PATH = "/profile";
+export function profilePathForRole(role?: string): string {
+  if (role === "admin") return "/admin/profile";
+  if (role === "recruiter" || role === "enterprise_admin") return "/recruiter/my-profile";
+  return PROFILE_PATH;
+}
+
+export function profilePasswordPathForRole(role?: string): string {
+  return `${profilePathForRole(role)}/password`;
+}
 export const CERTIFICATES_PATH = "/certificates";
 export const NOTIFICATIONS_PATH = "/notifications";
 export const ACCOUNT_NOTIFICATIONS_PATH = "/account/notifications";
@@ -55,7 +66,7 @@ export function recruiterEmployeeDetailPath(employeeId: string): string {
 }
 
 /** Recruiter company profile management (UC 17 - UC 19). */
-export const RECRUITER_COMPANY_PROFILE_PATH = "/recruiter/profile";
+export const RECRUITER_COMPANY_PROFILE_PATH = "/recruiter/company-profile";
 
 export function recruiterCompanyProfileEditPath(): string {
   return `${RECRUITER_COMPANY_PROFILE_PATH}/edit`;

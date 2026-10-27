@@ -1,14 +1,14 @@
 import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getApiV1Enterprises,
-  getApiV1UsersById,
+  getUserById,
   getApiV1UsersByIdInvitation,
   getApiV1UsersByIdHistory,
   patchApiV1UsersById,
   patchApiV1UsersByIdEmergencySuspension,
   patchApiV1UsersByIdInvitation,
   patchApiV1UsersByIdRole,
-  patchApiV1UsersByIdStatus,
+  updateUserStatus,
   postApiV1UsersByIdEmailChangeRequests,
   postApiV1Users,
   postApiV1UsersByIdInvitationDeliveries,
@@ -18,6 +18,7 @@ import { unwrap } from "@/api/request-error";
 import type {
   CancelInvitationRequest,
   CreateAdminUserRequest,
+  CreateAdminUserResponse,
   EmergencyUserSuspensionRequest,
   GetApiV1UsersByIdHistoryData,
   PatchApiV1UsersByIdData,
@@ -57,6 +58,12 @@ export const DEFAULT_PAGE_SIZE = 10;
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
 
 export type AccountListResponse = { items: UserDto[]; total: number; page: number; limit: number; totalPages: number };
+
+export function isCreateAdminUserResponse(
+  response: UserDto | CreateAdminUserResponse,
+): response is CreateAdminUserResponse {
+  return "user" in response;
+}
 
 export function useUsersListQuery(params: UsersListParams) {
   const { enabled = true, limit = DEFAULT_PAGE_SIZE, ...queryParams } = params;
@@ -110,7 +117,9 @@ export function useCreateUserMutation() {
     mutationFn: async (body: CreateAdminUserRequest) => {
       return unwrap(await postApiV1Users({ body }), "Unable to create the account");
     },
-    onSuccess: ({ user }) => {
+    onSuccess: (response) => {
+      if (!isCreateAdminUserResponse(response)) return;
+      const { user } = response;
       queryClient.setQueryData(usersKeys.detail(user.id), user);
       void queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
     },
@@ -185,7 +194,7 @@ function useAccountMutation<TBody>(
 
 export function useUpdateUserStatusMutation() {
   return useAccountMutation<UpdateUserStatusRequest>(async (id, body) => {
-    return unwrap(await patchApiV1UsersByIdStatus({ path: { id }, body }), "Unable to change account status");
+    return unwrap(await updateUserStatus({ path: { id }, body }), "Unable to change account status");
   });
 }
 
@@ -234,7 +243,7 @@ export function useUserDetailQuery(userId: string | undefined) {
     enabled: Boolean(userId),
     queryKey: usersKeys.detail(userId ?? ""),
     queryFn: async () => {
-      const result = await getApiV1UsersById({ path: { id: userId as string } });
+      const result = await getUserById({ path: { id: userId as string } });
 
       if (result.error || !result.data) {
         throw Object.assign((result.error as object) ?? new Error("User not found"), {

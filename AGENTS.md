@@ -79,6 +79,7 @@ Before creating a component, look in `components/ui`, `components/common`, `comp
 | Need | Use |
 |---|---|
 | Page title + description + actions | `PageHeader` (`common/admin-page-header`) |
+| Password input with visibility toggle | `PasswordField` (`common/password-field`) |
 | Search + filters row | `ListToolbar` + `FilterSelect` / `FilterMultiSelect` + `ViewToggle` |
 | Filter trigger with a muted "Label:" prefix | `prefixedFilterTrigger` (`common/prefixed-filter-trigger`) as `FilterSelect`'s `renderTrigger` |
 | Table / pagination / skeleton | `ui/table`, `ui/pagination`, `TableSkeletonRows` |

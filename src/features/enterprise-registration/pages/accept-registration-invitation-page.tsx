@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { AUTH_FULL_ACTION_CLASS } from "@/features/auth/auth-status.constants";
 import { AuthCardPage, AuthFormHeader, AuthStatusCard } from "@/features/auth/auth-status-card";
 import { PasswordField } from "@/features/auth/password-field";
-import { PASSWORD_RULES } from "@/features/auth/password-rules";
+import { PASSWORD_RULES } from "@/lib/password-rules";
 import { cn } from "@/lib/utils";
 import { Circle, Check as CheckIcon, X } from "lucide-react";
 

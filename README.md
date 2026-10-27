@@ -139,8 +139,8 @@ cp .env.example .env
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
-| `VITE_API_URL` | Base URL of the backend API service | `http://localhost:3000` |
-| `OPENAPI_URL` | *(Optional)* Override URL for fetching OpenAPI spec | `http://localhost:3001/openapi.json` |
+| `VITE_API_URL` | Base URL of the backend API service | `http://localhost:3001` |
+| `OPENAPI_URL` | *(Optional)* OpenAPI schema input (URL or file path) | `./openapi.json` |
 
 ### Development Server
 
@@ -178,14 +178,14 @@ npm run preview
 | `npm run test` | `vitest run` | Runs all unit and component tests with Vitest |
 | `npm run lint` | `eslint .` | Runs ESLint across all source files |
 | `npm run format` | `prettier --write .` | Formats all code files with Prettier |
-| `npm run generate:client` | `openapi-ts` | Regenerates the API client from the running backend OpenAPI |
+| `npm run generate:client` | `openapi-ts` | Regenerates the API client from the checked-in OpenAPI snapshot |
 | `npm run preview` | `vite preview` | Serves the production build locally for verification |
 
 ---
 
 ## 🔄 API Client Generation
 
-My Applications local development: start the backend from the sibling `ittalent-backend` repo on port `3001`, use `VITE_API_URL=http://localhost:3001` (the default in `.env.example`), and run `npm run dev`. The candidate demo credentials are in the backend README. The `/my-applications` route is available after signing in. The list, detail, history and PATCH withdrawal call the backend via the generated SDK. Regenerate using `npm run generate:client` while the backend is running (or set `OPENAPI_URL` to another live contract URL). The old checked-in `openapi.json` is a legacy snapshot, not the source for new SDK generation; it declares an admin users list not yet declared by the new backend. The existing admin list query uses the shared client until that endpoint is implemented in the backend contract.
+My Applications local development: start the backend from the sibling `ittalent-backend` repo on port `3001`, use `VITE_API_URL=http://localhost:3001` (the default in `.env.example`), and run `npm run dev`. The candidate demo credentials are in the backend README. The `/my-applications` route is available after signing in. The list, detail, history and PATCH withdrawal call the backend via the generated SDK.
 
 The project uses [@hey-api/openapi-ts](https://heyapi.dev/) to generate type-safe API clients directly from the OpenAPI specification:
 
@@ -193,11 +193,11 @@ The project uses [@hey-api/openapi-ts](https://heyapi.dev/) to generate type-saf
 npm run generate:client
 ```
 
-- Schema source: `http://localhost:3001/openapi.json` (override with `OPENAPI_URL`)
+- Schema source: checked-in `openapi.json` (override with `OPENAPI_URL`, for example `http://localhost:3001/openapi.json`)
 - Output directory: `src/api/generated/`
 - Configuration file: `openapi-ts.config.ts`
 
-Whenever backend API contracts change, start the backend and rerun this script. The checked-in `openapi.json` is retained as a legacy snapshot, not the active generator input.
+Whenever backend API contracts change, first refresh the checked-in `openapi.json` from the backend's OpenAPI document, then rerun this script. Keeping the source snapshot in the repository makes generated-client changes reproducible without requiring a running backend.
 
 ---
 

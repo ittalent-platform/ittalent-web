@@ -1,6 +1,8 @@
 import { createRequire } from "node:module";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 
-import { backendEnv } from "./environment";
+import { backendEnv, E2E_BACKEND_DIR } from "./environment";
 import { JOB_POSTING_ACCOUNTS, JOB_POSTING_E2E } from "./job-posting-data";
 import { PASSWORD } from "./support";
 
@@ -9,11 +11,15 @@ type BcryptModule = {
 };
 
 const requireFromBackend = createRequire(
-  new URL("../../ittalent-backend-cv/package.json", import.meta.url),
+  join(E2E_BACKEND_DIR, "package.json"),
 );
 const bcrypt = requireFromBackend("bcryptjs") as BcryptModule;
 const DAY_MS = 86_400_000;
 const BCRYPT_ROUNDS = 10;
+
+function backendModuleUrl(path: string): string {
+  return pathToFileURL(join(E2E_BACKEND_DIR, path)).href;
+}
 
 /**
  * Rebuilds only the Enterprise Admin Job Posting namespace inside the dedicated
@@ -29,12 +35,12 @@ export async function seedEnterpriseAdminJobPostings(): Promise<void> {
     jobModule,
     userModule,
   ] = await Promise.all([
-    import("../../ittalent-backend-cv/src/config/db.ts"),
-    import("../../ittalent-backend-cv/src/models/account.model.ts"),
-    import("../../ittalent-backend-cv/src/models/enterprise.model.ts"),
-    import("../../ittalent-backend-cv/src/models/job-posting-audit.model.ts"),
-    import("../../ittalent-backend-cv/src/models/job-posting.model.ts"),
-    import("../../ittalent-backend-cv/src/models/user.model.ts"),
+    import(backendModuleUrl("src/config/db.ts")),
+    import(backendModuleUrl("src/models/account.model.ts")),
+    import(backendModuleUrl("src/models/enterprise.model.ts")),
+    import(backendModuleUrl("src/models/job-posting-audit.model.ts")),
+    import(backendModuleUrl("src/models/job-posting.model.ts")),
+    import(backendModuleUrl("src/models/user.model.ts")),
   ]);
   const { connectDatabase, disconnectDatabase } = databaseModule;
   const { Account } = accountModule;

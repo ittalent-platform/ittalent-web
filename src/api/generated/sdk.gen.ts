@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteApiV1DocumentsByIdData, DeleteApiV1DocumentsByIdErrors, DeleteApiV1DocumentsByIdResponses, DeleteApiV1EnterprisesByEnterpriseIdData, DeleteApiV1EnterprisesByEnterpriseIdErrors, DeleteApiV1EnterprisesByEnterpriseIdResponses, DeleteApiV1InterviewsByIdData, DeleteApiV1InterviewsByIdErrors, DeleteApiV1InterviewsByIdResponses, DeleteApiV1JobPostingsByIdData, DeleteApiV1JobPostingsByIdErrors, DeleteApiV1JobPostingsByIdResponses, DeleteApiV1MeCertificateLinksByIdData, DeleteApiV1MeCertificateLinksByIdErrors, DeleteApiV1MeCertificateLinksByIdResponses, DeleteApiV1MeWishlistByIdData, DeleteApiV1MeWishlistByIdErrors, DeleteApiV1MeWishlistByIdResponses, DeleteApiV1MeWishlistJobsByJobIdData, DeleteApiV1MeWishlistJobsByJobIdErrors, DeleteApiV1MeWishlistJobsByJobIdResponses, DeleteApiV1MeWishlistUnavailableData, DeleteApiV1MeWishlistUnavailableErrors, DeleteApiV1MeWishlistUnavailableResponses, DeleteApiV1NotificationsByIdData, DeleteApiV1NotificationsByIdErrors, DeleteApiV1NotificationsByIdResponses, DeleteApiV1NotificationsData, DeleteApiV1NotificationsDevicesByTokenData, DeleteApiV1NotificationsDevicesByTokenErrors, DeleteApiV1NotificationsDevicesByTokenResponses, DeleteApiV1NotificationsErrors, DeleteApiV1NotificationsResponses, GetApiV1AdminDocumentsData, GetApiV1AdminDocumentsErrors, GetApiV1AdminDocumentsResponses, GetApiV1AdminJobPostingsData, GetApiV1AdminJobPostingsErrors, GetApiV1AdminJobPostingsResponses, GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1DashboardCompanyData, GetApiV1DashboardCompanyErrors, GetApiV1DashboardCompanyResponses, GetApiV1DashboardPlatformData, GetApiV1DashboardPlatformErrors, GetApiV1DashboardPlatformResponses, GetApiV1DocumentsByIdDownloadData, GetApiV1DocumentsByIdDownloadErrors, GetApiV1DocumentsByIdDownloadResponses, GetApiV1DocumentsByIdPreviewData, GetApiV1DocumentsByIdPreviewErrors, GetApiV1DocumentsByIdPreviewResponses, GetApiV1DocumentsData, GetApiV1DocumentsErrors, GetApiV1DocumentsResponses, GetApiV1EnterpriseRegistrationsByIdData, GetApiV1EnterpriseRegistrationsByIdErrors, GetApiV1EnterpriseRegistrationsByIdResponses, GetApiV1EnterpriseRegistrationsData, GetApiV1EnterpriseRegistrationsErrors, GetApiV1EnterpriseRegistrationsResponses, GetApiV1EnterpriseRegistrationsVerifyEmailData, GetApiV1EnterpriseRegistrationsVerifyEmailErrors, GetApiV1EnterpriseRegistrationsVerifyEmailResponses, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesMyProfileData, GetApiV1EnterprisesMyProfileErrors, GetApiV1EnterprisesMyProfileResponses, GetApiV1EnterprisesResponses, GetApiV1InterviewsApplicationsData, GetApiV1InterviewsApplicationsErrors, GetApiV1InterviewsApplicationsResponses, GetApiV1InterviewsByIdData, GetApiV1InterviewsByIdErrors, GetApiV1InterviewsByIdResponses, GetApiV1InterviewsCalendarData, GetApiV1InterviewsCalendarErrors, GetApiV1InterviewsCalendarResponses, GetApiV1InterviewsData, GetApiV1InterviewsErrors, GetApiV1InterviewsInterviewersData, GetApiV1InterviewsInterviewersErrors, GetApiV1InterviewsInterviewersResponses, GetApiV1InterviewsResponses, GetApiV1JobPostingsByIdData, GetApiV1JobPostingsByIdErrors, GetApiV1JobPostingsByIdHistoryData, GetApiV1JobPostingsByIdHistoryErrors, GetApiV1JobPostingsByIdHistoryResponses, GetApiV1JobPostingsByIdPublicData, GetApiV1JobPostingsByIdPublicErrors, GetApiV1JobPostingsByIdPublicResponses, GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsData, GetApiV1JobPostingsErrors, GetApiV1JobPostingsResponses, GetApiV1MeApplicationsByIdData, GetApiV1MeApplicationsByIdErrors, GetApiV1MeApplicationsByIdHistoryData, GetApiV1MeApplicationsByIdHistoryErrors, GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsData, GetApiV1MeApplicationsErrors, GetApiV1MeApplicationsResponses, GetApiV1MeCertificateLinksData, GetApiV1MeCertificateLinksErrors, GetApiV1MeCertificateLinksResponses, GetApiV1MeWishlistData, GetApiV1MeWishlistErrors, GetApiV1MeWishlistJobsByJobIdData, GetApiV1MeWishlistJobsByJobIdErrors, GetApiV1MeWishlistJobsByJobIdResponses, GetApiV1MeWishlistResponses, GetApiV1NotificationsData, GetApiV1NotificationsErrors, GetApiV1NotificationsResponses, GetApiV1NotificationsStreamData, GetApiV1NotificationsStreamErrors, GetApiV1NotificationsStreamResponse, GetApiV1NotificationsStreamResponses, GetApiV1NotificationsUnreadCountData, GetApiV1NotificationsUnreadCountErrors, GetApiV1NotificationsUnreadCountResponses, GetApiV1RecruiterApplicationsByIdCompanyHistoryData, GetApiV1RecruiterApplicationsByIdCompanyHistoryErrors, GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses, GetApiV1RecruiterApplicationsByIdCvData, GetApiV1RecruiterApplicationsByIdCvErrors, GetApiV1RecruiterApplicationsByIdCvResponses, GetApiV1RecruiterApplicationsByIdData, GetApiV1RecruiterApplicationsByIdErrors, GetApiV1RecruiterApplicationsByIdNotesData, GetApiV1RecruiterApplicationsByIdNotesErrors, GetApiV1RecruiterApplicationsByIdNotesResponses, GetApiV1RecruiterApplicationsByIdResponses, GetApiV1RecruiterApplicationsData, GetApiV1RecruiterApplicationsErrors, GetApiV1RecruiterApplicationsResponses, GetApiV1RecruiterJobPostingsData, GetApiV1RecruiterJobPostingsErrors, GetApiV1RecruiterJobPostingsResponses, GetApiV1UserInvitationsPreviewData, GetApiV1UserInvitationsPreviewErrors, GetApiV1UserInvitationsPreviewResponses, GetApiV1UsersByIdData, GetApiV1UsersByIdErrors, GetApiV1UsersByIdHistoryData, GetApiV1UsersByIdHistoryErrors, GetApiV1UsersByIdHistoryResponses, GetApiV1UsersByIdInvitationData, GetApiV1UsersByIdInvitationErrors, GetApiV1UsersByIdInvitationResponses, GetApiV1UsersByIdResponses, GetApiV1UsersData, GetApiV1UsersErrors, GetApiV1UsersResponses, GetHealthData, GetHealthResponses, PatchApiV1DocumentsByIdDefaultData, PatchApiV1DocumentsByIdDefaultErrors, PatchApiV1DocumentsByIdDefaultResponses, PatchApiV1EnterpriseRegistrationsByIdDraftData, PatchApiV1EnterpriseRegistrationsByIdDraftErrors, PatchApiV1EnterpriseRegistrationsByIdDraftResponses, PatchApiV1EnterprisesByEnterpriseIdData, PatchApiV1EnterprisesByEnterpriseIdErrors, PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdStatusData, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1InterviewsByIdData, PatchApiV1InterviewsByIdErrors, PatchApiV1InterviewsByIdResponses, PatchApiV1InterviewsByIdStatusData, PatchApiV1InterviewsByIdStatusErrors, PatchApiV1InterviewsByIdStatusResponses, PatchApiV1JobPostingsByIdArchiveData, PatchApiV1JobPostingsByIdArchiveErrors, PatchApiV1JobPostingsByIdArchiveResponses, PatchApiV1JobPostingsByIdCloseData, PatchApiV1JobPostingsByIdCloseErrors, PatchApiV1JobPostingsByIdCloseResponses, PatchApiV1JobPostingsByIdData, PatchApiV1JobPostingsByIdErrors, PatchApiV1JobPostingsByIdReopenData, PatchApiV1JobPostingsByIdReopenErrors, PatchApiV1JobPostingsByIdReopenResponses, PatchApiV1JobPostingsByIdResponses, PatchApiV1JobPostingsByIdRestoreData, PatchApiV1JobPostingsByIdRestoreErrors, PatchApiV1JobPostingsByIdRestoreResponses, PatchApiV1MeApplicationsByIdWithdrawData, PatchApiV1MeApplicationsByIdWithdrawErrors, PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1MeCertificateLinksByIdData, PatchApiV1MeCertificateLinksByIdErrors, PatchApiV1MeCertificateLinksByIdResponses, PatchApiV1MeWishlistJobsByJobIdToggleData, PatchApiV1MeWishlistJobsByJobIdToggleErrors, PatchApiV1MeWishlistJobsByJobIdToggleResponses, PatchApiV1NotificationsByIdReadData, PatchApiV1NotificationsByIdReadErrors, PatchApiV1NotificationsByIdReadResponses, PatchApiV1NotificationsReadAllData, PatchApiV1NotificationsReadAllErrors, PatchApiV1NotificationsReadAllResponses, PatchApiV1RecruiterApplicationsByIdStatusData, PatchApiV1RecruiterApplicationsByIdStatusErrors, PatchApiV1RecruiterApplicationsByIdStatusResponses, PatchApiV1UsersByIdData, PatchApiV1UsersByIdEmergencySuspensionData, PatchApiV1UsersByIdEmergencySuspensionErrors, PatchApiV1UsersByIdEmergencySuspensionResponses, PatchApiV1UsersByIdErrors, PatchApiV1UsersByIdInvitationData, PatchApiV1UsersByIdInvitationErrors, PatchApiV1UsersByIdInvitationResponses, PatchApiV1UsersByIdResponses, PatchApiV1UsersByIdRoleData, PatchApiV1UsersByIdRoleErrors, PatchApiV1UsersByIdRoleResponses, PatchApiV1UsersByIdStatusData, PatchApiV1UsersByIdStatusErrors, PatchApiV1UsersByIdStatusResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses, PostApiV1DocumentsData, PostApiV1DocumentsErrors, PostApiV1DocumentsResponses, PostApiV1EnterpriseRegistrationsByIdDecisionData, PostApiV1EnterpriseRegistrationsByIdDecisionErrors, PostApiV1EnterpriseRegistrationsByIdDecisionResponses, PostApiV1EnterpriseRegistrationsByIdDocumentsData, PostApiV1EnterpriseRegistrationsByIdDocumentsErrors, PostApiV1EnterpriseRegistrationsByIdDocumentsResponses, PostApiV1EnterpriseRegistrationsByIdSubmitData, PostApiV1EnterpriseRegistrationsByIdSubmitErrors, PostApiV1EnterpriseRegistrationsByIdSubmitResponses, PostApiV1EnterpriseRegistrationsInvitationsAcceptData, PostApiV1EnterpriseRegistrationsInvitationsAcceptErrors, PostApiV1EnterpriseRegistrationsInvitationsAcceptResponses, PostApiV1EnterpriseRegistrationsStartData, PostApiV1EnterpriseRegistrationsStartErrors, PostApiV1EnterpriseRegistrationsStartResponses, PostApiV1EnterprisesData, PostApiV1EnterprisesErrors, PostApiV1EnterprisesResponses, PostApiV1InterviewsData, PostApiV1InterviewsErrors, PostApiV1InterviewsResponses, PostApiV1JobPostingsData, PostApiV1JobPostingsErrors, PostApiV1JobPostingsResponses, PostApiV1MeApplicationsData, PostApiV1MeApplicationsErrors, PostApiV1MeApplicationsResponses, PostApiV1MeCertificateLinksData, PostApiV1MeCertificateLinksErrors, PostApiV1MeCertificateLinksResponses, PostApiV1MeWishlistData, PostApiV1MeWishlistErrors, PostApiV1MeWishlistResponses, PostApiV1MeWishlistToggleData, PostApiV1MeWishlistToggleErrors, PostApiV1MeWishlistToggleResponses, PostApiV1NotificationsDevicesData, PostApiV1NotificationsDevicesErrors, PostApiV1NotificationsDevicesResponses, PostApiV1RecruiterApplicationsByIdNotesData, PostApiV1RecruiterApplicationsByIdNotesErrors, PostApiV1RecruiterApplicationsByIdNotesResponses, PostApiV1UserEmailChangesConfirmData, PostApiV1UserEmailChangesConfirmErrors, PostApiV1UserEmailChangesConfirmResponses, PostApiV1UserInvitationsAcceptData, PostApiV1UserInvitationsAcceptErrors, PostApiV1UserInvitationsAcceptResponses, PostApiV1UsersByIdEmailChangeRequestsData, PostApiV1UsersByIdEmailChangeRequestsErrors, PostApiV1UsersByIdEmailChangeRequestsResponses, PostApiV1UsersByIdInvitationDeliveriesData, PostApiV1UsersByIdInvitationDeliveriesErrors, PostApiV1UsersByIdInvitationDeliveriesResponses, PostApiV1UsersData, PostApiV1UsersErrors, PostApiV1UsersResponses } from './types.gen';
+import type { DeleteApiV1BroadcastNotificationsByIdData, DeleteApiV1BroadcastNotificationsByIdErrors, DeleteApiV1BroadcastNotificationsByIdResponses, DeleteApiV1DocumentsByIdData, DeleteApiV1DocumentsByIdErrors, DeleteApiV1DocumentsByIdResponses, DeleteApiV1EnterprisesByEnterpriseIdData, DeleteApiV1EnterprisesByEnterpriseIdErrors, DeleteApiV1EnterprisesByEnterpriseIdResponses, DeleteApiV1InterviewsByIdData, DeleteApiV1InterviewsByIdErrors, DeleteApiV1InterviewsByIdResponses, DeleteApiV1JobPostingsByIdData, DeleteApiV1JobPostingsByIdErrors, DeleteApiV1JobPostingsByIdResponses, DeleteApiV1MeCertificateLinksByIdData, DeleteApiV1MeCertificateLinksByIdErrors, DeleteApiV1MeCertificateLinksByIdResponses, DeleteApiV1MePortfolioLinksByIdData, DeleteApiV1MePortfolioLinksByIdErrors, DeleteApiV1MePortfolioLinksByIdResponses, DeleteApiV1MeWishlistByIdData, DeleteApiV1MeWishlistByIdErrors, DeleteApiV1MeWishlistByIdResponses, DeleteApiV1MeWishlistJobsByJobIdData, DeleteApiV1MeWishlistJobsByJobIdErrors, DeleteApiV1MeWishlistJobsByJobIdResponses, DeleteApiV1MeWishlistUnavailableData, DeleteApiV1MeWishlistUnavailableErrors, DeleteApiV1MeWishlistUnavailableResponses, DeleteApiV1NotificationsByIdData, DeleteApiV1NotificationsByIdErrors, DeleteApiV1NotificationsByIdResponses, DeleteApiV1NotificationsData, DeleteApiV1NotificationsDevicesByTokenData, DeleteApiV1NotificationsDevicesByTokenErrors, DeleteApiV1NotificationsDevicesByTokenResponses, DeleteApiV1NotificationsErrors, DeleteApiV1NotificationsResponses, GetApiV1AdminJobPostingsData, GetApiV1AdminJobPostingsErrors, GetApiV1AdminJobPostingsResponses, GetApiV1AuthMeData, GetApiV1AuthMeErrors, GetApiV1AuthMeResponses, GetApiV1AuthResetPasswordData, GetApiV1AuthResetPasswordErrors, GetApiV1AuthResetPasswordResponses, GetApiV1AuthVerifyEmailData, GetApiV1BroadcastNotificationsByIdData, GetApiV1BroadcastNotificationsByIdErrors, GetApiV1BroadcastNotificationsByIdResponses, GetApiV1BroadcastNotificationsData, GetApiV1BroadcastNotificationsErrors, GetApiV1BroadcastNotificationsResponses, GetApiV1DashboardCompanyData, GetApiV1DashboardCompanyErrors, GetApiV1DashboardCompanyResponses, GetApiV1DashboardPlatformData, GetApiV1DashboardPlatformErrors, GetApiV1DashboardPlatformResponses, GetApiV1DocumentsByIdDownloadData, GetApiV1DocumentsByIdDownloadErrors, GetApiV1DocumentsByIdDownloadResponses, GetApiV1DocumentsByIdPreviewData, GetApiV1DocumentsByIdPreviewErrors, GetApiV1DocumentsByIdPreviewResponses, GetApiV1DocumentsData, GetApiV1DocumentsErrors, GetApiV1DocumentsResponses, GetApiV1EnterpriseRegistrationsByIdData, GetApiV1EnterpriseRegistrationsByIdErrors, GetApiV1EnterpriseRegistrationsByIdResponses, GetApiV1EnterpriseRegistrationsData, GetApiV1EnterpriseRegistrationsErrors, GetApiV1EnterpriseRegistrationsResponses, GetApiV1EnterpriseRegistrationsVerifyEmailData, GetApiV1EnterpriseRegistrationsVerifyEmailErrors, GetApiV1EnterpriseRegistrationsVerifyEmailResponses, GetApiV1EnterprisesByEnterpriseIdData, GetApiV1EnterprisesByEnterpriseIdErrors, GetApiV1EnterprisesByEnterpriseIdResponses, GetApiV1EnterprisesData, GetApiV1EnterprisesErrors, GetApiV1EnterprisesMyProfileData, GetApiV1EnterprisesMyProfileErrors, GetApiV1EnterprisesMyProfileResponses, GetApiV1EnterprisesResponses, GetApiV1InterviewsApplicationsData, GetApiV1InterviewsApplicationsErrors, GetApiV1InterviewsApplicationsResponses, GetApiV1InterviewsByIdData, GetApiV1InterviewsByIdErrors, GetApiV1InterviewsByIdResponses, GetApiV1InterviewsCalendarData, GetApiV1InterviewsCalendarErrors, GetApiV1InterviewsCalendarResponses, GetApiV1InterviewsData, GetApiV1InterviewsErrors, GetApiV1InterviewsInterviewersData, GetApiV1InterviewsInterviewersErrors, GetApiV1InterviewsInterviewersResponses, GetApiV1InterviewsResponses, GetApiV1JobPostingsByIdData, GetApiV1JobPostingsByIdErrors, GetApiV1JobPostingsByIdHistoryData, GetApiV1JobPostingsByIdHistoryErrors, GetApiV1JobPostingsByIdHistoryResponses, GetApiV1JobPostingsByIdPublicData, GetApiV1JobPostingsByIdPublicErrors, GetApiV1JobPostingsByIdPublicResponses, GetApiV1JobPostingsByIdResponses, GetApiV1JobPostingsData, GetApiV1JobPostingsErrors, GetApiV1JobPostingsResponses, GetApiV1MeApplicationsByIdData, GetApiV1MeApplicationsByIdErrors, GetApiV1MeApplicationsByIdHistoryData, GetApiV1MeApplicationsByIdHistoryErrors, GetApiV1MeApplicationsByIdHistoryResponses, GetApiV1MeApplicationsByIdResponses, GetApiV1MeApplicationsData, GetApiV1MeApplicationsErrors, GetApiV1MeApplicationsResponses, GetApiV1MeCertificateLinksData, GetApiV1MeCertificateLinksErrors, GetApiV1MeCertificateLinksResponses, GetApiV1MePortfolioLinksData, GetApiV1MePortfolioLinksErrors, GetApiV1MePortfolioLinksResponses, GetApiV1MeWishlistData, GetApiV1MeWishlistErrors, GetApiV1MeWishlistJobsByJobIdData, GetApiV1MeWishlistJobsByJobIdErrors, GetApiV1MeWishlistJobsByJobIdResponses, GetApiV1MeWishlistResponses, GetApiV1NotificationsData, GetApiV1NotificationsErrors, GetApiV1NotificationsResponses, GetApiV1NotificationsStreamData, GetApiV1NotificationsStreamErrors, GetApiV1NotificationsStreamResponse, GetApiV1NotificationsStreamResponses, GetApiV1NotificationsUnreadCountData, GetApiV1NotificationsUnreadCountErrors, GetApiV1NotificationsUnreadCountResponses, GetApiV1RecruiterApplicationsByIdCompanyHistoryData, GetApiV1RecruiterApplicationsByIdCompanyHistoryErrors, GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses, GetApiV1RecruiterApplicationsByIdCvData, GetApiV1RecruiterApplicationsByIdCvErrors, GetApiV1RecruiterApplicationsByIdCvResponses, GetApiV1RecruiterApplicationsByIdData, GetApiV1RecruiterApplicationsByIdErrors, GetApiV1RecruiterApplicationsByIdNotesData, GetApiV1RecruiterApplicationsByIdNotesErrors, GetApiV1RecruiterApplicationsByIdNotesResponses, GetApiV1RecruiterApplicationsByIdResponses, GetApiV1RecruiterApplicationsData, GetApiV1RecruiterApplicationsErrors, GetApiV1RecruiterApplicationsResponses, GetApiV1RecruiterJobPostingsData, GetApiV1RecruiterJobPostingsErrors, GetApiV1RecruiterJobPostingsResponses, GetApiV1UserInvitationsPreviewData, GetApiV1UserInvitationsPreviewErrors, GetApiV1UserInvitationsPreviewResponses, GetApiV1UsersByIdHistoryData, GetApiV1UsersByIdHistoryErrors, GetApiV1UsersByIdHistoryResponses, GetApiV1UsersByIdInvitationData, GetApiV1UsersByIdInvitationErrors, GetApiV1UsersByIdInvitationResponses, GetHealthData, GetHealthResponses, GetMyProfileData, GetMyProfileErrors, GetMyProfileResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, ListUsersData, ListUsersErrors, ListUsersResponses, PatchApiV1BroadcastNotificationsByIdCancelScheduleData, PatchApiV1BroadcastNotificationsByIdCancelScheduleErrors, PatchApiV1BroadcastNotificationsByIdCancelScheduleResponses, PatchApiV1BroadcastNotificationsByIdData, PatchApiV1BroadcastNotificationsByIdDispatchData, PatchApiV1BroadcastNotificationsByIdDispatchErrors, PatchApiV1BroadcastNotificationsByIdDispatchResponses, PatchApiV1BroadcastNotificationsByIdErrors, PatchApiV1BroadcastNotificationsByIdResponses, PatchApiV1BroadcastNotificationsByIdScheduleData, PatchApiV1BroadcastNotificationsByIdScheduleErrors, PatchApiV1BroadcastNotificationsByIdScheduleResponses, PatchApiV1DocumentsByIdDefaultData, PatchApiV1DocumentsByIdDefaultErrors, PatchApiV1DocumentsByIdDefaultResponses, PatchApiV1EnterpriseRegistrationsByIdDraftData, PatchApiV1EnterpriseRegistrationsByIdDraftErrors, PatchApiV1EnterpriseRegistrationsByIdDraftResponses, PatchApiV1EnterprisesByEnterpriseIdData, PatchApiV1EnterprisesByEnterpriseIdErrors, PatchApiV1EnterprisesByEnterpriseIdResponses, PatchApiV1EnterprisesByEnterpriseIdStatusData, PatchApiV1EnterprisesByEnterpriseIdStatusErrors, PatchApiV1EnterprisesByEnterpriseIdStatusResponses, PatchApiV1InterviewsByIdData, PatchApiV1InterviewsByIdErrors, PatchApiV1InterviewsByIdRescheduleRequestData, PatchApiV1InterviewsByIdRescheduleRequestErrors, PatchApiV1InterviewsByIdRescheduleRequestResponses, PatchApiV1InterviewsByIdResponses, PatchApiV1InterviewsByIdStatusData, PatchApiV1InterviewsByIdStatusErrors, PatchApiV1InterviewsByIdStatusResponses, PatchApiV1JobPostingsByIdArchiveData, PatchApiV1JobPostingsByIdArchiveErrors, PatchApiV1JobPostingsByIdArchiveResponses, PatchApiV1JobPostingsByIdCloseData, PatchApiV1JobPostingsByIdCloseErrors, PatchApiV1JobPostingsByIdCloseResponses, PatchApiV1JobPostingsByIdData, PatchApiV1JobPostingsByIdErrors, PatchApiV1JobPostingsByIdReopenData, PatchApiV1JobPostingsByIdReopenErrors, PatchApiV1JobPostingsByIdReopenResponses, PatchApiV1JobPostingsByIdResponses, PatchApiV1JobPostingsByIdRestoreData, PatchApiV1JobPostingsByIdRestoreErrors, PatchApiV1JobPostingsByIdRestoreResponses, PatchApiV1MeApplicationsByIdWithdrawData, PatchApiV1MeApplicationsByIdWithdrawErrors, PatchApiV1MeApplicationsByIdWithdrawResponses, PatchApiV1MeCertificateLinksByIdData, PatchApiV1MeCertificateLinksByIdErrors, PatchApiV1MeCertificateLinksByIdResponses, PatchApiV1MeWishlistJobsByJobIdToggleData, PatchApiV1MeWishlistJobsByJobIdToggleErrors, PatchApiV1MeWishlistJobsByJobIdToggleResponses, PatchApiV1NotificationsByIdReadData, PatchApiV1NotificationsByIdReadErrors, PatchApiV1NotificationsByIdReadResponses, PatchApiV1NotificationsReadAllData, PatchApiV1NotificationsReadAllErrors, PatchApiV1NotificationsReadAllResponses, PatchApiV1RecruiterApplicationsByIdStatusData, PatchApiV1RecruiterApplicationsByIdStatusErrors, PatchApiV1RecruiterApplicationsByIdStatusResponses, PatchApiV1UsersByIdData, PatchApiV1UsersByIdEmergencySuspensionData, PatchApiV1UsersByIdEmergencySuspensionErrors, PatchApiV1UsersByIdEmergencySuspensionResponses, PatchApiV1UsersByIdErrors, PatchApiV1UsersByIdInvitationData, PatchApiV1UsersByIdInvitationErrors, PatchApiV1UsersByIdInvitationResponses, PatchApiV1UsersByIdResponses, PatchApiV1UsersByIdRoleData, PatchApiV1UsersByIdRoleErrors, PatchApiV1UsersByIdRoleResponses, PostApiV1AuthChangePasswordData, PostApiV1AuthChangePasswordErrors, PostApiV1AuthChangePasswordResponses, PostApiV1AuthForgotPasswordData, PostApiV1AuthForgotPasswordErrors, PostApiV1AuthForgotPasswordResponses, PostApiV1AuthLoginData, PostApiV1AuthLoginErrors, PostApiV1AuthLoginResponses, PostApiV1AuthRefreshData, PostApiV1AuthRefreshErrors, PostApiV1AuthRefreshResponses, PostApiV1AuthRegisterData, PostApiV1AuthRegisterErrors, PostApiV1AuthRegisterResponses, PostApiV1AuthResendVerificationEmailData, PostApiV1AuthResendVerificationEmailErrors, PostApiV1AuthResendVerificationEmailResponses, PostApiV1AuthResetPasswordData, PostApiV1AuthResetPasswordErrors, PostApiV1AuthResetPasswordResponses, PostApiV1BroadcastNotificationsData, PostApiV1BroadcastNotificationsErrors, PostApiV1BroadcastNotificationsResponses, PostApiV1DocumentsData, PostApiV1DocumentsErrors, PostApiV1DocumentsResponses, PostApiV1EnterpriseRegistrationsByIdDecisionData, PostApiV1EnterpriseRegistrationsByIdDecisionErrors, PostApiV1EnterpriseRegistrationsByIdDecisionResponses, PostApiV1EnterpriseRegistrationsByIdDocumentsData, PostApiV1EnterpriseRegistrationsByIdDocumentsErrors, PostApiV1EnterpriseRegistrationsByIdDocumentsResponses, PostApiV1EnterpriseRegistrationsByIdSubmitData, PostApiV1EnterpriseRegistrationsByIdSubmitErrors, PostApiV1EnterpriseRegistrationsByIdSubmitResponses, PostApiV1EnterpriseRegistrationsInvitationsAcceptData, PostApiV1EnterpriseRegistrationsInvitationsAcceptErrors, PostApiV1EnterpriseRegistrationsInvitationsAcceptResponses, PostApiV1EnterpriseRegistrationsStartData, PostApiV1EnterpriseRegistrationsStartErrors, PostApiV1EnterpriseRegistrationsStartResponses, PostApiV1EnterprisesData, PostApiV1EnterprisesErrors, PostApiV1EnterprisesResponses, PostApiV1InterviewsData, PostApiV1InterviewsErrors, PostApiV1InterviewsResponses, PostApiV1JobPostingsData, PostApiV1JobPostingsErrors, PostApiV1JobPostingsResponses, PostApiV1MeApplicationsData, PostApiV1MeApplicationsErrors, PostApiV1MeApplicationsResponses, PostApiV1MeCertificateLinksData, PostApiV1MeCertificateLinksErrors, PostApiV1MeCertificateLinksResponses, PostApiV1MePortfolioLinksData, PostApiV1MePortfolioLinksErrors, PostApiV1MePortfolioLinksResponses, PostApiV1MeWishlistData, PostApiV1MeWishlistErrors, PostApiV1MeWishlistResponses, PostApiV1MeWishlistToggleData, PostApiV1MeWishlistToggleErrors, PostApiV1MeWishlistToggleResponses, PostApiV1NotificationsDevicesData, PostApiV1NotificationsDevicesErrors, PostApiV1NotificationsDevicesResponses, PostApiV1RecruiterApplicationsByIdNotesData, PostApiV1RecruiterApplicationsByIdNotesErrors, PostApiV1RecruiterApplicationsByIdNotesResponses, PostApiV1UserEmailChangesConfirmData, PostApiV1UserEmailChangesConfirmErrors, PostApiV1UserEmailChangesConfirmResponses, PostApiV1UserInvitationsAcceptData, PostApiV1UserInvitationsAcceptErrors, PostApiV1UserInvitationsAcceptResponses, PostApiV1UsersByIdEmailChangeRequestsData, PostApiV1UsersByIdEmailChangeRequestsErrors, PostApiV1UsersByIdEmailChangeRequestsResponses, PostApiV1UsersByIdInvitationDeliveriesData, PostApiV1UsersByIdInvitationDeliveriesErrors, PostApiV1UsersByIdInvitationDeliveriesResponses, PostApiV1UsersData, PostApiV1UsersErrors, PostApiV1UsersResponses, UpdateMyProfileData, UpdateMyProfileErrors, UpdateMyProfileResponses, UpdateUserStatusData, UpdateUserStatusErrors, UpdateUserStatusResponses, UploadMyAvatarData, UploadMyAvatarErrors, UploadMyAvatarResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -116,6 +116,8 @@ export const postApiV1AuthResetPassword = <ThrowOnError extends boolean = false>
 
 /**
  * Change account password while authenticated
+ *
+ * Requires currentPassword, newPassword, and matching confirmation. The server applies the fixed policy of revoking other sessions by incrementing authVersion while returning replacement tokens that keep the current session usable. Client session-control flags are rejected.
  */
 export const postApiV1AuthChangePassword = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1AuthChangePasswordData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1AuthChangePasswordResponses, PostApiV1AuthChangePasswordErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -151,11 +153,40 @@ export const postApiV1Documents = <ThrowOnError extends boolean = false>(options
 });
 
 /**
- * List all CVs and cover letters for administrators
+ * Download an owned active document
  */
-export const getApiV1AdminDocuments = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AdminDocumentsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1AdminDocumentsResponses, GetApiV1AdminDocumentsErrors, ThrowOnError>({
+export const getApiV1DocumentsByIdDownload = <ThrowOnError extends boolean = false>(options: Options<GetApiV1DocumentsByIdDownloadData, ThrowOnError>) => (options.client ?? client).get<GetApiV1DocumentsByIdDownloadResponses, GetApiV1DocumentsByIdDownloadErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/admin/documents',
+    url: '/api/v1/documents/{id}/download',
+    ...options
+});
+
+/**
+ * Preview an owned active document
+ */
+export const getApiV1DocumentsByIdPreview = <ThrowOnError extends boolean = false>(options: Options<GetApiV1DocumentsByIdPreviewData, ThrowOnError>) => (options.client ?? client).get<GetApiV1DocumentsByIdPreviewResponses, GetApiV1DocumentsByIdPreviewErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/documents/{id}/preview',
+    ...options
+});
+
+/**
+ * Set an owned active document as the default for its type
+ */
+export const patchApiV1DocumentsByIdDefault = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1DocumentsByIdDefaultData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1DocumentsByIdDefaultResponses, PatchApiV1DocumentsByIdDefaultErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/documents/{id}/default',
+    ...options
+});
+
+/**
+ * Soft-delete an owned active document
+ *
+ * Deletion is blocked while any application references the document. Deleting a default promotes the newest remaining active document of the same type.
+ */
+export const deleteApiV1DocumentsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1DocumentsByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1DocumentsByIdResponses, DeleteApiV1DocumentsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/documents/{id}',
     ...options
 });
 
@@ -182,7 +213,7 @@ export const postApiV1JobPostings = <ThrowOnError extends boolean = false>(optio
 /**
  * Get a published, still-open job posting (public)
  *
- * Not found for drafts, archived or expired postings, postings being deleted and postings of enterprises that are not Active.
+ * The path takes the posting id or its slug. Not found for drafts, archived or expired postings, postings being deleted and postings of enterprises that are not Active.
  */
 export const getApiV1JobPostingsByIdPublic = <ThrowOnError extends boolean = false>(options: Options<GetApiV1JobPostingsByIdPublicData, ThrowOnError>) => (options.client ?? client).get<GetApiV1JobPostingsByIdPublicResponses, GetApiV1JobPostingsByIdPublicErrors, ThrowOnError>({ url: '/api/v1/job-postings/{id}/public', ...options });
 
@@ -289,18 +320,46 @@ export const getApiV1JobPostingsByIdHistory = <ThrowOnError extends boolean = fa
 });
 
 /**
- * List user accounts
- *
- * System Administrator only (UC-USER-01). Newest first (createdAt desc, id desc). `search` matches username or email as literal, case-insensitive text. Only allow-listed fields are returned.
+ * Change a company account role between HR and Enterprise Administrator
  */
-export const getApiV1Users = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UsersData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1UsersResponses, GetApiV1UsersErrors, ThrowOnError>({
+export const patchApiV1UsersByIdRole = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdRoleData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdRoleResponses, PatchApiV1UsersByIdRoleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/role',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Urgently suspend an account with a required audit reason
+ */
+export const patchApiV1UsersByIdEmergencySuspension = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdEmergencySuspensionData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdEmergencySuspensionResponses, PatchApiV1UsersByIdEmergencySuspensionErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/emergency-suspension',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List and search employee accounts
+ *
+ * Retrieves paginated recruiter accounts. Scoped to caller enterprise for enterprise admins and recruiters, or global for system admins (UC-13, UC-16).
+ */
+export const listUsers = <ThrowOnError extends boolean = false>(options?: Options<ListUsersData, ThrowOnError>) => (options?.client ?? client).get<ListUsersResponses, ListUsersErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/users',
     ...options
 });
 
 /**
- * Create a Candidate, HR or Enterprise Administrator account and send an invitation
+ * Create an account
+ *
+ * System Administrators create a Candidate, HR or Enterprise Administrator account and send an invitation. Enterprise Administrators create a recruiter account under their own company.
  */
 export const postApiV1Users = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UsersData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UsersResponses, PostApiV1UsersErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -313,24 +372,122 @@ export const postApiV1Users = <ThrowOnError extends boolean = false>(options: Op
 });
 
 /**
- * Get user by ID
+ * Update employee account status
  *
- * System Administrator only (UC-USER-02). Own-profile reads use GET /auth/me.
+ * Suspends or activates an employee account with audit logging (UC-12). Self-suspension is blocked.
  */
-export const getApiV1UsersById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdResponses, GetApiV1UsersByIdErrors, ThrowOnError>({
+export const updateUserStatus = <ThrowOnError extends boolean = false>(options: Options<UpdateUserStatusData, ThrowOnError>) => (options.client ?? client).patch<UpdateUserStatusResponses, UpdateUserStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get employee by ID
+ *
+ * Retrieves employee details with tenancy boundary verification (UC-14).
+ */
+export const getUserById = <ThrowOnError extends boolean = false>(options: Options<GetUserByIdData, ThrowOnError>) => (options.client ?? client).get<GetUserByIdResponses, GetUserByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/users/{id}',
     ...options
 });
 
 /**
- * Edit a user account
+ * Update employee information
  *
- * System Administrator only. Updates only fullName and phone using expectedVersion; null or an empty phone clears the stored number. Role and email changes use separate flows.
+ * System administrators update accounts globally. Enterprise administrators can update recruiter accounts in their enterprise; recruiters can update only their own profile. Email is immutable and writes require expectedVersion.
  */
 export const patchApiV1UsersById = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdResponses, PatchApiV1UsersByIdErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/users/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Read the latest invitation status for an account
+ */
+export const getApiV1UsersByIdInvitation = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdInvitationData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdInvitationResponses, GetApiV1UsersByIdInvitationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/invitation',
+    ...options
+});
+
+/**
+ * Cancel an invitation for an account that has not activated
+ */
+export const patchApiV1UsersByIdInvitation = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdInvitationData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdInvitationResponses, PatchApiV1UsersByIdInvitationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/invitation',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Preview the account and company named by an invitation token
+ */
+export const getApiV1UserInvitationsPreview = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UserInvitationsPreviewData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UserInvitationsPreviewResponses, GetApiV1UserInvitationsPreviewErrors, ThrowOnError>({ url: '/api/v1/user-invitations/preview', ...options });
+
+/**
+ * Send a replacement invitation for an unaccepted account
+ */
+export const postApiV1UsersByIdInvitationDeliveries = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UsersByIdInvitationDeliveriesData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UsersByIdInvitationDeliveriesResponses, PostApiV1UsersByIdInvitationDeliveriesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/invitation-deliveries',
+    ...options
+});
+
+/**
+ * Accept a new-account invitation and set a password
+ */
+export const postApiV1UserInvitationsAccept = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UserInvitationsAcceptData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UserInvitationsAcceptResponses, PostApiV1UserInvitationsAcceptErrors, ThrowOnError>({
+    url: '/api/v1/user-invitations/accept',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Read safe paginated user account history
+ */
+export const getApiV1UsersByIdHistory = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdHistoryData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdHistoryResponses, GetApiV1UsersByIdHistoryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/history',
+    ...options
+});
+
+/**
+ * Request a user email change; the account owner must confirm it
+ */
+export const postApiV1UsersByIdEmailChangeRequests = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UsersByIdEmailChangeRequestsData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UsersByIdEmailChangeRequestsResponses, PostApiV1UsersByIdEmailChangeRequestsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/users/{id}/email-change-requests',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Confirm a requested email change as the account owner
+ */
+export const postApiV1UserEmailChangesConfirm = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UserEmailChangesConfirmData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UserEmailChangesConfirmResponses, PostApiV1UserEmailChangesConfirmErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/user-email-changes/confirm',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -594,6 +751,187 @@ export const patchApiV1MeApplicationsByIdWithdraw = <ThrowOnError extends boolea
 });
 
 /**
+ * List the current Candidate’s private certificate links
+ */
+export const getApiV1MeCertificateLinks = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1MeCertificateLinksData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1MeCertificateLinksResponses, GetApiV1MeCertificateLinksErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/certificate-links',
+    ...options
+});
+
+/**
+ * Create a private certificate link for the current Candidate
+ */
+export const postApiV1MeCertificateLinks = <ThrowOnError extends boolean = false>(options: Options<PostApiV1MeCertificateLinksData, ThrowOnError>) => (options.client ?? client).post<PostApiV1MeCertificateLinksResponses, PostApiV1MeCertificateLinksErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/certificate-links',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete an owned certificate link
+ *
+ * Applications already sent keep their own copy of the certificate.
+ */
+export const deleteApiV1MeCertificateLinksById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1MeCertificateLinksByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1MeCertificateLinksByIdResponses, DeleteApiV1MeCertificateLinksByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/certificate-links/{id}',
+    ...options
+});
+
+/**
+ * Update an owned certificate link or its "suggest on apply" flag
+ *
+ * Metadata changes bump the version; a suggested-only change keeps it. Applications already sent keep their own copy.
+ */
+export const patchApiV1MeCertificateLinksById = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1MeCertificateLinksByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1MeCertificateLinksByIdResponses, PatchApiV1MeCertificateLinksByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/certificate-links/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List the current Candidate’s private portfolio links
+ */
+export const getApiV1MePortfolioLinks = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1MePortfolioLinksData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1MePortfolioLinksResponses, GetApiV1MePortfolioLinksErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/portfolio-links',
+    ...options
+});
+
+/**
+ * Create a private portfolio link for the current Candidate
+ */
+export const postApiV1MePortfolioLinks = <ThrowOnError extends boolean = false>(options: Options<PostApiV1MePortfolioLinksData, ThrowOnError>) => (options.client ?? client).post<PostApiV1MePortfolioLinksResponses, PostApiV1MePortfolioLinksErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/portfolio-links',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete an owned portfolio link
+ *
+ * Removes only the platform reference, not the external content.
+ */
+export const deleteApiV1MePortfolioLinksById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1MePortfolioLinksByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1MePortfolioLinksByIdResponses, DeleteApiV1MePortfolioLinksByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/portfolio-links/{id}',
+    ...options
+});
+
+/**
+ * View applicant application list (with search, filter, and board counts)
+ *
+ * Recruiter and Enterprise Admin only. Returns paginated applicant applications submitted to job postings owned by the caller's enterprise. Supports keyword search across applicant name/email, job title, or application ID, multi-status filters, document type filters, and submission date ranges.
+ */
+export const getApiV1RecruiterApplications = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1RecruiterApplicationsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1RecruiterApplicationsResponses, GetApiV1RecruiterApplicationsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/recruiter/applications',
+    ...options
+});
+
+/**
+ * View applicant application detail
+ *
+ * Recruiter and Enterprise Admin only. Returns comprehensive candidate application details including job context snapshot, candidate profile, submitted documents, interview history, notes, and full status audit timeline. Returns opaque 404 if application not found or belongs to another company.
+ */
+export const getApiV1RecruiterApplicationsById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1RecruiterApplicationsByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1RecruiterApplicationsByIdResponses, GetApiV1RecruiterApplicationsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/recruiter/applications/{id}',
+    ...options
+});
+
+/**
+ * Download applicant CV
+ *
+ * Recruiter and Enterprise Admin only. Delivers the attached CV file stream or metadata for candidate evaluation. Returns opaque 404 if application not found, belongs to another company, or CV deleted.
+ */
+export const getApiV1RecruiterApplicationsByIdCv = <ThrowOnError extends boolean = false>(options: Options<GetApiV1RecruiterApplicationsByIdCvData, ThrowOnError>) => (options.client ?? client).get<GetApiV1RecruiterApplicationsByIdCvResponses, GetApiV1RecruiterApplicationsByIdCvErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/recruiter/applications/{id}/cv',
+    ...options
+});
+
+/**
+ * List internal recruiter notes for application
+ *
+ * Recruiter and Enterprise Admin only. Returns chronological internal notes recorded by hiring team members for this candidate application. Enforces strict enterprise data isolation (opaque 404).
+ */
+export const getApiV1RecruiterApplicationsByIdNotes = <ThrowOnError extends boolean = false>(options: Options<GetApiV1RecruiterApplicationsByIdNotesData, ThrowOnError>) => (options.client ?? client).get<GetApiV1RecruiterApplicationsByIdNotesResponses, GetApiV1RecruiterApplicationsByIdNotesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/recruiter/applications/{id}/notes',
+    ...options
+});
+
+/**
+ * Add internal recruiter note to application
+ *
+ * Recruiter and Enterprise Admin only. Appends an internal note visible to hiring team members for the specified application. Author attribution is securely derived from the authenticated recruiter session. Enforces strict enterprise data isolation (opaque 404).
+ */
+export const postApiV1RecruiterApplicationsByIdNotes = <ThrowOnError extends boolean = false>(options: Options<PostApiV1RecruiterApplicationsByIdNotesData, ThrowOnError>) => (options.client ?? client).post<PostApiV1RecruiterApplicationsByIdNotesResponses, PostApiV1RecruiterApplicationsByIdNotesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/recruiter/applications/{id}/notes',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update applicant application status workflow
+ *
+ * Recruiter and Enterprise Admin only. Advances application through hiring stages (under_review, interviewing, offered, hired) or rejects (rejected). Enforces forward progression (BR-17), interview prerequisites (BR-37), vacancy limit checks (BR-18, EX5), auto-closing job posting and cascading position_filled when final opening is filled, and logs audit history (BR-24). Enforces strict enterprise data isolation (opaque 404).
+ */
+export const patchApiV1RecruiterApplicationsByIdStatus = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1RecruiterApplicationsByIdStatusData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1RecruiterApplicationsByIdStatusResponses, PatchApiV1RecruiterApplicationsByIdStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/recruiter/applications/{id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * View candidate cross-job application history for company
+ *
+ * Recruiter and Enterprise Admin only. Returns chronological history of all applications submitted by the candidate across all job postings published by the caller's enterprise. Enforces strict multi-tenant candidate data privacy (submissions to competitor companies remain hidden). Indicates if candidate is a first-time applicant (UC-S2-AA-07, BR-06).
+ */
+export const getApiV1RecruiterApplicationsByIdCompanyHistory = <ThrowOnError extends boolean = false>(options: Options<GetApiV1RecruiterApplicationsByIdCompanyHistoryData, ThrowOnError>) => (options.client ?? client).get<GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses, GetApiV1RecruiterApplicationsByIdCompanyHistoryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/recruiter/applications/{id}/company-history',
+    ...options
+});
+
+/**
+ * Request a different interview time
+ *
+ * Applicant only. The caller must own the interview application. A scheduled interview becomes `reschedule_requested` and stores the proposed time and reason. A second request or any other current status returns 409.
+ */
+export const patchApiV1InterviewsByIdRescheduleRequest = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1InterviewsByIdRescheduleRequestData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1InterviewsByIdRescheduleRequestResponses, PatchApiV1InterviewsByIdRescheduleRequestErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/interviews/{id}/reschedule-request',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * List interviews (List view) with search, filters, sorting and pagination
  *
  * Recruiter only: every interview of the recruiter's enterprise. Filters: `status` (one value or a comma-separated list), `mode`, `jobId`, `applicationId`, `interviewerId`, `from`/`to` on the start time, and `search` on the applicant or interviewer name/email and the job title. Sorted by start time, earliest first, by default.
@@ -705,295 +1043,24 @@ export const patchApiV1InterviewsByIdStatus = <ThrowOnError extends boolean = fa
 });
 
 /**
- * Change a company account role between HR and Enterprise Administrator
- */
-export const patchApiV1UsersByIdRole = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdRoleData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdRoleResponses, PatchApiV1UsersByIdRoleErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/role',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Urgently suspend an account with a required audit reason
- */
-export const patchApiV1UsersByIdEmergencySuspension = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdEmergencySuspensionData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdEmergencySuspensionResponses, PatchApiV1UsersByIdEmergencySuspensionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/emergency-suspension',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Suspend or reopen a user account
- */
-export const patchApiV1UsersByIdStatus = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdStatusData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdStatusResponses, PatchApiV1UsersByIdStatusErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/status',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Read the latest invitation status for an account
- */
-export const getApiV1UsersByIdInvitation = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdInvitationData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdInvitationResponses, GetApiV1UsersByIdInvitationErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/invitation',
-    ...options
-});
-
-/**
- * Cancel an invitation for an account that has not activated
- */
-export const patchApiV1UsersByIdInvitation = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1UsersByIdInvitationData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1UsersByIdInvitationResponses, PatchApiV1UsersByIdInvitationErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/invitation',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Preview the account and company named by an invitation token
- */
-export const getApiV1UserInvitationsPreview = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UserInvitationsPreviewData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UserInvitationsPreviewResponses, GetApiV1UserInvitationsPreviewErrors, ThrowOnError>({ url: '/api/v1/user-invitations/preview', ...options });
-
-/**
- * Send a replacement invitation for an unaccepted account
- */
-export const postApiV1UsersByIdInvitationDeliveries = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UsersByIdInvitationDeliveriesData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UsersByIdInvitationDeliveriesResponses, PostApiV1UsersByIdInvitationDeliveriesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/invitation-deliveries',
-    ...options
-});
-
-/**
- * Accept a new-account invitation and set a password
- */
-export const postApiV1UserInvitationsAccept = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UserInvitationsAcceptData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UserInvitationsAcceptResponses, PostApiV1UserInvitationsAcceptErrors, ThrowOnError>({
-    url: '/api/v1/user-invitations/accept',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Read safe paginated user account history
- */
-export const getApiV1UsersByIdHistory = <ThrowOnError extends boolean = false>(options: Options<GetApiV1UsersByIdHistoryData, ThrowOnError>) => (options.client ?? client).get<GetApiV1UsersByIdHistoryResponses, GetApiV1UsersByIdHistoryErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/history',
-    ...options
-});
-
-/**
- * Request a user email change; the account owner must confirm it
- */
-export const postApiV1UsersByIdEmailChangeRequests = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UsersByIdEmailChangeRequestsData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UsersByIdEmailChangeRequestsResponses, PostApiV1UsersByIdEmailChangeRequestsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/users/{id}/email-change-requests',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Confirm a requested email change as the account owner
- */
-export const postApiV1UserEmailChangesConfirm = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UserEmailChangesConfirmData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UserEmailChangesConfirmResponses, PostApiV1UserEmailChangesConfirmErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/user-email-changes/confirm',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * List the current Candidate’s private certificate links
- */
-export const getApiV1MeCertificateLinks = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1MeCertificateLinksData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1MeCertificateLinksResponses, GetApiV1MeCertificateLinksErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/me/certificate-links',
-    ...options
-});
-
-/**
- * Create a private certificate link for the current Candidate
- */
-export const postApiV1MeCertificateLinks = <ThrowOnError extends boolean = false>(options: Options<PostApiV1MeCertificateLinksData, ThrowOnError>) => (options.client ?? client).post<PostApiV1MeCertificateLinksResponses, PostApiV1MeCertificateLinksErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/me/certificate-links',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Delete an owned certificate link
+ * Statistics of the caller's company for one period
  *
- * Applications already sent keep their own copy of the certificate.
+ * HR (`recruiter`) and `enterprise_admin`. The company is always the caller's own; there is no company parameter. Every date is a whole calendar day in Vietnam time (UTC+7) and `to` is included. A preset ends yesterday; `custom` needs `from` and `to` (at most 366 days, and it may reach into the future, which counts as zero). Applications are counted by the day they were received, jobs by the day they were created and interviews by the day they start; each is grouped by the status it has now. The response is one document built in a single request: it is complete or it is an error, never partial.
  */
-export const deleteApiV1MeCertificateLinksById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1MeCertificateLinksByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1MeCertificateLinksByIdResponses, DeleteApiV1MeCertificateLinksByIdErrors, ThrowOnError>({
+export const getApiV1DashboardCompany = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1DashboardCompanyData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1DashboardCompanyResponses, GetApiV1DashboardCompanyErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/me/certificate-links/{id}',
+    url: '/api/v1/dashboard/company',
     ...options
 });
 
 /**
- * Update an owned certificate link or its "suggest on apply" flag
+ * Overview of the platform
  *
- * Metadata changes bump the version; a suggested-only change keeps it. Applications already sent keep their own copy.
+ * System admin only. Accounts by role and status, new accounts per week, companies and the sign-ups waiting for review. It never contains a company's jobs, applications or interviews.
  */
-export const patchApiV1MeCertificateLinksById = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1MeCertificateLinksByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1MeCertificateLinksByIdResponses, PatchApiV1MeCertificateLinksByIdErrors, ThrowOnError>({
+export const getApiV1DashboardPlatform = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1DashboardPlatformData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1DashboardPlatformResponses, GetApiV1DashboardPlatformErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/me/certificate-links/{id}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Download an owned active document
- */
-export const getApiV1DocumentsByIdDownload = <ThrowOnError extends boolean = false>(options: Options<GetApiV1DocumentsByIdDownloadData, ThrowOnError>) => (options.client ?? client).get<GetApiV1DocumentsByIdDownloadResponses, GetApiV1DocumentsByIdDownloadErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/documents/{id}/download',
-    ...options
-});
-
-/**
- * Preview an owned active document
- */
-export const getApiV1DocumentsByIdPreview = <ThrowOnError extends boolean = false>(options: Options<GetApiV1DocumentsByIdPreviewData, ThrowOnError>) => (options.client ?? client).get<GetApiV1DocumentsByIdPreviewResponses, GetApiV1DocumentsByIdPreviewErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/documents/{id}/preview',
-    ...options
-});
-
-/**
- * Set an owned active document as the default for its type
- */
-export const patchApiV1DocumentsByIdDefault = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1DocumentsByIdDefaultData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1DocumentsByIdDefaultResponses, PatchApiV1DocumentsByIdDefaultErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/documents/{id}/default',
-    ...options
-});
-
-/**
- * Soft-delete an owned active document
- *
- * Deletion is blocked while any application references the document. Deleting a default promotes the newest remaining active document of the same type.
- */
-export const deleteApiV1DocumentsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1DocumentsByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1DocumentsByIdResponses, DeleteApiV1DocumentsByIdErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/documents/{id}',
-    ...options
-});
-
-/**
- * View applicant application list (with search, filter, and board counts)
- *
- * Recruiter and Enterprise Admin only. Returns paginated applicant applications submitted to job postings owned by the caller's enterprise. Supports keyword search across applicant name/email, job title, or application ID, multi-status filters, document type filters, and submission date ranges.
- */
-export const getApiV1RecruiterApplications = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1RecruiterApplicationsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1RecruiterApplicationsResponses, GetApiV1RecruiterApplicationsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/recruiter/applications',
-    ...options
-});
-
-/**
- * View applicant application detail
- *
- * Recruiter and Enterprise Admin only. Returns comprehensive candidate application details including job context snapshot, candidate profile, submitted documents, interview history, notes, and full status audit timeline. Returns opaque 404 if application not found or belongs to another company.
- */
-export const getApiV1RecruiterApplicationsById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1RecruiterApplicationsByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1RecruiterApplicationsByIdResponses, GetApiV1RecruiterApplicationsByIdErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/recruiter/applications/{id}',
-    ...options
-});
-
-/**
- * Download applicant CV
- *
- * Recruiter and Enterprise Admin only. Delivers the attached CV file stream or metadata for candidate evaluation. Returns opaque 404 if application not found, belongs to another company, or CV deleted.
- */
-export const getApiV1RecruiterApplicationsByIdCv = <ThrowOnError extends boolean = false>(options: Options<GetApiV1RecruiterApplicationsByIdCvData, ThrowOnError>) => (options.client ?? client).get<GetApiV1RecruiterApplicationsByIdCvResponses, GetApiV1RecruiterApplicationsByIdCvErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/recruiter/applications/{id}/cv',
-    ...options
-});
-
-/**
- * List internal recruiter notes for application
- *
- * Recruiter and Enterprise Admin only. Returns chronological internal notes recorded by hiring team members for this candidate application. Enforces strict enterprise data isolation (opaque 404).
- */
-export const getApiV1RecruiterApplicationsByIdNotes = <ThrowOnError extends boolean = false>(options: Options<GetApiV1RecruiterApplicationsByIdNotesData, ThrowOnError>) => (options.client ?? client).get<GetApiV1RecruiterApplicationsByIdNotesResponses, GetApiV1RecruiterApplicationsByIdNotesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/recruiter/applications/{id}/notes',
-    ...options
-});
-
-/**
- * Add internal recruiter note to application
- *
- * Recruiter and Enterprise Admin only. Appends an internal note visible to hiring team members for the specified application. Author attribution is securely derived from the authenticated recruiter session. Enforces strict enterprise data isolation (opaque 404).
- */
-export const postApiV1RecruiterApplicationsByIdNotes = <ThrowOnError extends boolean = false>(options: Options<PostApiV1RecruiterApplicationsByIdNotesData, ThrowOnError>) => (options.client ?? client).post<PostApiV1RecruiterApplicationsByIdNotesResponses, PostApiV1RecruiterApplicationsByIdNotesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/recruiter/applications/{id}/notes',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Update applicant application status workflow
- *
- * Recruiter and Enterprise Admin only. Advances application through hiring stages (under_review, interviewing, offered, hired) or rejects (rejected). Enforces forward progression (BR-17), interview prerequisites (BR-37), vacancy limit checks (BR-18, EX5), auto-closing job posting and cascading position_filled when final opening is filled, and logs audit history (BR-24). Enforces strict enterprise data isolation (opaque 404).
- */
-export const patchApiV1RecruiterApplicationsByIdStatus = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1RecruiterApplicationsByIdStatusData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1RecruiterApplicationsByIdStatusResponses, PatchApiV1RecruiterApplicationsByIdStatusErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/recruiter/applications/{id}/status',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * View candidate cross-job application history for company
- *
- * Recruiter and Enterprise Admin only. Returns chronological history of all applications submitted by the candidate across all job postings published by the caller's enterprise. Enforces strict multi-tenant candidate data privacy (submissions to competitor companies remain hidden). Indicates if candidate is a first-time applicant (UC-S2-AA-07, BR-06).
- */
-export const getApiV1RecruiterApplicationsByIdCompanyHistory = <ThrowOnError extends boolean = false>(options: Options<GetApiV1RecruiterApplicationsByIdCompanyHistoryData, ThrowOnError>) => (options.client ?? client).get<GetApiV1RecruiterApplicationsByIdCompanyHistoryResponses, GetApiV1RecruiterApplicationsByIdCompanyHistoryErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/recruiter/applications/{id}/company-history',
+    url: '/api/v1/dashboard/platform',
     ...options
 });
 
@@ -1044,7 +1111,7 @@ export const getApiV1NotificationsUnreadCount = <ThrowOnError extends boolean = 
 /**
  * Mark all notifications as read (UC-S2-NOTI-02)
  *
- * Marks all unread notifications belonging to authenticated user as read.
+ * Marks all unread notifications belonging to authenticated user as read, optionally before a cutoff timestamp.
  */
 export const patchApiV1NotificationsReadAll = <ThrowOnError extends boolean = false>(options?: Options<PatchApiV1NotificationsReadAllData, ThrowOnError>) => (options?.client ?? client).patch<PatchApiV1NotificationsReadAllResponses, PatchApiV1NotificationsReadAllErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
@@ -1101,25 +1168,145 @@ export const deleteApiV1NotificationsDevicesByToken = <ThrowOnError extends bool
 });
 
 /**
- * Statistics of the caller's company for one period
+ * View list, filter and search broadcast notifications (UC-02 / UC-07)
  *
- * HR (`recruiter`) and `enterprise_admin`. The company is always the caller's own; there is no company parameter. Every date is a whole calendar day in Vietnam time (UTC+7) and `to` is included. A preset ends yesterday; `custom` needs `from` and `to` (at most 366 days, and it may reach into the future, which counts as zero). Applications are counted by the day they were received, jobs by the day they were created and interviews by the day they start; each is grouped by the status it has now. The response is one document built in a single request: it is complete or it is an error, never partial.
+ * Retrieves paginated broadcast announcements with multi-criteria filtering by keyword, audience, priority, status, and date range.
  */
-export const getApiV1DashboardCompany = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1DashboardCompanyData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1DashboardCompanyResponses, GetApiV1DashboardCompanyErrors, ThrowOnError>({
+export const getApiV1BroadcastNotifications = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1BroadcastNotificationsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1BroadcastNotificationsResponses, GetApiV1BroadcastNotificationsErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/dashboard/company',
+    url: '/api/v1/broadcast-notifications',
     ...options
 });
 
 /**
- * Overview of the platform
+ * Create a broadcast notification (UC-01)
  *
- * System admin only. Accounts by role and status, new accounts per week, companies and the sign-ups waiting for review. It never contains a company's jobs, applications or interviews.
+ * Composes a new broadcast notification. When is_draft is false, dispatches the notification to targeted audiences immediately.
  */
-export const getApiV1DashboardPlatform = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1DashboardPlatformData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1DashboardPlatformResponses, GetApiV1DashboardPlatformErrors, ThrowOnError>({
+export const postApiV1BroadcastNotifications = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1BroadcastNotificationsData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1BroadcastNotificationsResponses, PostApiV1BroadcastNotificationsErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/dashboard/platform',
+    url: '/api/v1/broadcast-notifications',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers
+    }
+});
+
+/**
+ * Delete a broadcast notification (UC-06)
+ *
+ * Removes a draft/scheduled broadcast or archives a sent broadcast from active directory.
+ */
+export const deleteApiV1BroadcastNotificationsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1BroadcastNotificationsByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1BroadcastNotificationsByIdResponses, DeleteApiV1BroadcastNotificationsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/broadcast-notifications/{id}',
     ...options
+});
+
+/**
+ * View broadcast notification detail (UC-03)
+ *
+ * Inspects complete details of a broadcast notification including live delivery reach and read metrics.
+ */
+export const getApiV1BroadcastNotificationsById = <ThrowOnError extends boolean = false>(options: Options<GetApiV1BroadcastNotificationsByIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1BroadcastNotificationsByIdResponses, GetApiV1BroadcastNotificationsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/broadcast-notifications/{id}',
+    ...options
+});
+
+/**
+ * Update broadcast notification information (UC-05)
+ *
+ * Modifies text, category, audience, priority, or action link of an un-dispatched (Draft or Scheduled) broadcast.
+ */
+export const patchApiV1BroadcastNotificationsById = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1BroadcastNotificationsByIdData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1BroadcastNotificationsByIdResponses, PatchApiV1BroadcastNotificationsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/broadcast-notifications/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Schedule broadcast notification (UC-04)
+ *
+ * Schedules a broadcast notification for automatic dispatch at a designated future date and time (minimum 15 minutes ahead).
+ */
+export const patchApiV1BroadcastNotificationsByIdSchedule = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1BroadcastNotificationsByIdScheduleData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1BroadcastNotificationsByIdScheduleResponses, PatchApiV1BroadcastNotificationsByIdScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/broadcast-notifications/{id}/schedule',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Cancel scheduled broadcast dispatch
+ *
+ * Cancels scheduled execution and reverts broadcast status to Draft.
+ */
+export const patchApiV1BroadcastNotificationsByIdCancelSchedule = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1BroadcastNotificationsByIdCancelScheduleData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1BroadcastNotificationsByIdCancelScheduleResponses, PatchApiV1BroadcastNotificationsByIdCancelScheduleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/broadcast-notifications/{id}/cancel-schedule',
+    ...options
+});
+
+/**
+ * Dispatch broadcast notification immediately
+ *
+ * Triggers immediate dispatch of a draft or scheduled broadcast announcement.
+ */
+export const patchApiV1BroadcastNotificationsByIdDispatch = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1BroadcastNotificationsByIdDispatchData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1BroadcastNotificationsByIdDispatchResponses, PatchApiV1BroadcastNotificationsByIdDispatchErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/broadcast-notifications/{id}/dispatch',
+    ...options
+});
+
+/**
+ * Read the shared self profile for an authenticated role
+ *
+ * Candidate maps to role `user` and may receive the explicit `basic` projection during the email-verification grace window. Verified Active users with the existing `user`, `admin`, `recruiter`, `enterprise_admin`, or `applicant` role receive the `full` projection. Suspended and blocked accounts are denied.
+ */
+export const getMyProfile = <ThrowOnError extends boolean = false>(options?: Options<GetMyProfileData, ThrowOnError>) => (options?.client ?? client).get<GetMyProfileResponses, GetMyProfileErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/profile',
+    ...options
+});
+
+/**
+ * Update fullName or phone on the shared self profile
+ *
+ * Requires the current persisted account to be verified and Active. `expectedVersion` is mandatory. A normalized no-op returns the existing persisted projection without incrementing the version or writing an audit event.
+ */
+export const updateMyProfile = <ThrowOnError extends boolean = false>(options: Options<UpdateMyProfileData, ThrowOnError>) => (options.client ?? client).patch<UpdateMyProfileResponses, UpdateMyProfileErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/profile',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Replace the validated owned avatar for the shared self profile
+ *
+ * Requires a verified Active persisted account. The server decodes and re-encodes one JPEG, PNG, or WebP image under deployment-configured safety bounds. Provider details and an exact product-facing byte ceiling are not part of this contract.
+ */
+export const uploadMyAvatar = <ThrowOnError extends boolean = false>(options: Options<UploadMyAvatarData, ThrowOnError>) => (options.client ?? client).patch<UploadMyAvatarResponses, UploadMyAvatarErrors, ThrowOnError>({
+    ...formDataBodySerializer,
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/me/profile/avatar',
+    ...options,
+    headers: {
+        'Content-Type': null,
+        ...options.headers
+    }
 });
 
 /**
