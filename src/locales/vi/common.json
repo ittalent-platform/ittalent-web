@@ -728,7 +728,8 @@
     "companyProfile": "Hồ sơ công ty",
     "collapse": "Thu gọn thanh bên",
     "closeMenu": "Đóng menu",
-    "interviews": "Phỏng vấn"
+    "interviews": "Phỏng vấn",
+    "broadcasts": "Thông báo hệ thống"
   },
   "jobPostings": {
     "title": "Tin tuyển dụng",
@@ -1758,6 +1759,202 @@
         "description": "Chia sẻ về sứ mệnh, sản phẩm cốt lõi và định hướng công ty...",
         "statusReason": "Ghi chú tuỳ chọn cho nhật ký kiểm toán..."
       }
+    }
+  },
+  "adminBroadcasts": {
+    "page": {
+      "title": "Thông báo hệ thống",
+      "description": "Soạn thảo, lên lịch và phát thông báo tới ứng viên, nhà tuyển dụng và quản trị viên doanh nghiệp."
+    },
+    "stats": {
+      "total": "Tổng chiến dịch",
+      "drafts": "Bản nháp",
+      "scheduled": "Đã lên lịch",
+      "sent": "Đã phát / Đã gửi"
+    },
+    "toolbar": {
+      "searchPlaceholder": "Tìm kiếm thông báo theo tiêu đề hoặc nội dung...",
+      "statusAll": "Trạng thái: Tất cả",
+      "audienceAll": "Đối tượng: Tất cả",
+      "priorityAll": "Mức ưu tiên: Tất cả",
+      "fromDatePlaceholder": "Từ ngày",
+      "toDatePlaceholder": "Đến ngày",
+      "resetFilters": "Đặt lại bộ lọc",
+      "clearFilters": "Xóa bộ lọc"
+    },
+    "table": {
+      "announcement": "Thông báo",
+      "targetAudience": "Đối tượng nhận",
+      "priority": "Mức ưu tiên",
+      "status": "Trạng thái",
+      "scheduleSent": "Lịch phát / Đã gửi",
+      "engagement": "Tương tác",
+      "read": "đã xem",
+      "actions": "Thao tác",
+      "actionsAria": "Thao tác cho {{title}}",
+      "viewDetails": "Xem chi tiết",
+      "emptyTitle": "Chưa có chiến dịch thông báo nào",
+      "emptyDescription": "Tạo thông báo đầu tiên của bạn để truyền đạt thông tin cập nhật hoặc bảo trì tới người dùng.",
+      "noMatchesTitle": "Không tìm thấy thông báo phù hợp",
+      "noMatchesDescription": "Không có thông báo nào khớp với tiêu chí tìm kiếm. Hãy thử điều chỉnh từ khóa hoặc bộ lọc."
+    },
+    "status": {
+      "Draft": "Bản nháp",
+      "Scheduled": "Đã lên lịch",
+      "Sent": "Đã gửi",
+      "Cancelled": "Đã hủy"
+    },
+    "priority": {
+      "Low": "Thấp",
+      "Normal": "Bình thường",
+      "High": "Cao",
+      "Urgent": "Khẩn cấp"
+    },
+    "category": {
+      "System Maintenance": "Bảo trì hệ thống",
+      "Feature Update": "Cập nhật tính năng",
+      "Policy Update": "Cập nhật chính sách",
+      "Event Announcement": "Thông báo sự kiện",
+      "Security Alert": "Cảnh báo bảo mật"
+    },
+    "audience": {
+      "All Users": "Tất cả người dùng",
+      "Applicants only": "Chỉ ứng viên",
+      "Recruiters only": "Chỉ nhà tuyển dụng",
+      "Enterprise Admins": "Quản trị viên doanh nghiệp"
+    },
+    "channel": {
+      "inApp": "Hộp thư ứng dụng",
+      "emailDigest": "Bản tin Email"
+    },
+    "actions": {
+      "create": "Tạo thông báo",
+      "saveDraft": "Lưu bản nháp",
+      "publishBroadcast": "Phát thông báo",
+      "schedule": "Lên lịch phát",
+      "confirmSchedule": "Xác nhận lên lịch",
+      "reschedule": "Lên lịch lại",
+      "confirmReschedule": "Xác nhận lên lịch lại",
+      "dispatchNow": "Phát ngay",
+      "cancelSchedule": "Hủy lịch phát",
+      "archive": "Lưu trữ",
+      "duplicate": "Nhân bản"
+    },
+    "filterChips": {
+      "activeFilters": "Bộ lọc đang kích hoạt",
+      "search": "Tìm kiếm",
+      "status": "Trạng thái",
+      "audience": "Đối tượng",
+      "priority": "Mức độ ưu tiên",
+      "date": "Thời gian",
+      "clearAll": "Xóa tất cả",
+      "removeFilter": "Bỏ bộ lọc {{filter}}"
+    },
+    "history": {
+      "title": "Lịch sử thông báo",
+      "created": "Tạo bản nháp thông báo",
+      "updated": "Cập nhật nội dung thông báo",
+      "scheduled": "Đã lên lịch gửi lúc {{time}}",
+      "dispatched": "Đã phát tới {{count}} người nhận",
+      "cancelled": "Đã hủy lịch phát"
+    },
+    "toolbar": {
+      "searchPlaceholder": "Tìm kiếm theo tiêu đề thông báo...",
+      "statusAll": "Tất cả trạng thái",
+      "audienceAll": "Tất cả đối tượng",
+      "priorityAll": "Tất cả mức ưu tiên",
+      "fromDatePlaceholder": "Từ ngày",
+      "toDatePlaceholder": "Đến ngày",
+      "resetFilters": "Đặt lại bộ lọc",
+      "clearFilters": "Xóa tất cả bộ lọc",
+      "invalidDateRange": "'Từ ngày' phải trước hoặc bằng 'Đến ngày'"
+    },
+    "dialog": {
+      "createTitle": "Tạo thông báo hệ thống",
+      "createDescription": "Soạn thông báo để gửi tới người dùng. Bạn có thể phát ngay lập tức hoặc lưu bản nháp.",
+      "editTitle": "Chỉnh sửa thông báo hệ thống",
+      "editDescription": "Cập nhật nội dung thông báo, đối tượng nhận hoặc mức độ ưu tiên.",
+      "scheduleTitle": "Lên lịch phát thông báo",
+      "scheduleDescription": "Chọn ngày và giờ tương lai để hệ thống tự động phát thông báo \"{{title}}\".",
+      "rescheduleTitle": "Lên lịch lại phát thông báo",
+      "rescheduleDescription": "Chọn ngày và giờ mới để hệ thống tự động phát thông báo \"{{title}}\".",
+      "deleteTitle": "Xóa thông báo hệ thống",
+      "deleteConfirmMessage": "Bạn có chắc chắn muốn xóa thông báo \"{{title}}\" không?",
+      "deleteNotice": "Hành động này không thể hoàn tác và sẽ xóa vĩnh viễn thông báo nháp/đã lên lịch này.",
+      "deleteSentNotice": "Thông báo này đã được gửi tới người dùng và sẽ được lưu trữ khỏi bảng điều khiển quản trị.",
+      "archiveTitle": "Lưu trữ thông báo hệ thống",
+      "archiveConfirmMessage": "Bạn có chắc chắn muốn lưu trữ thông báo đã gửi \"{{title}}\" không?",
+      "publishConfirmTitle": "Phát thông báo tới {{audience}} ngay bây giờ?",
+      "publishConfirmDescription": "Thông báo sẽ được phát ngay lập tức tới tất cả người nhận. Nội dung và đối tượng nhận không thể thay đổi sau khi phát.",
+      "dispatchNowTitle": "Phát thông báo ngay lập tức?",
+      "dispatchNowConfirm": "Bạn có chắc chắn muốn phát \"{{title}}\" tới đối tượng {{audience}} ngay bây giờ không? Hành động này không thể hoàn tác.",
+      "cancelScheduleTitle": "Hủy lịch phát thông báo?",
+      "cancelScheduleConfirm": "Bạn có muốn hủy lịch phát thông báo \"{{title}}\" và đưa về bản nháp không?"
+    },
+    "form": {
+      "title": "Tiêu đề",
+      "titlePlaceholder": "vd: Lịch bảo trì nâng cấp hệ thống định kỳ",
+      "titleHint": "{{count}} / 150 ký tự (tối thiểu 5)",
+      "content": "Nội dung thông báo",
+      "contentPlaceholder": "Nhập nội dung chi tiết thông báo tại đây...",
+      "contentHint": "{{count}} / 2000 ký tự (tối thiểu 10)",
+      "category": "Danh mục",
+      "selectCategory": "Chọn danh mục",
+      "targetAudience": "Đối tượng nhận",
+      "selectAudience": "Chọn đối tượng",
+      "priority": "Mức ưu tiên",
+      "selectPriority": "Chọn mức ưu tiên",
+      "actionUrl": "Đường dẫn liên kết (Tùy chọn)",
+      "actionUrlHint": "Địa chỉ web hợp lệ (bắt buộc bắt đầu bằng http:// hoặc https://)",
+      "actionLabel": "Nhãn nút liên kết (Tùy chọn)",
+      "actionLabelPlaceholder": "vd: Tìm hiểu thêm, Xem trạng thái",
+      "actionLabelHint": "Tối đa 50 ký tự",
+      "deliveryChannels": "Kênh truyền tải",
+      "mandatory": "Bắt buộc"
+    },
+    "detail": {
+      "messageContent": "Nội dung & Xem trước",
+      "visitLink": "Mở liên kết",
+      "unsafeUrlBlocked": "Liên kết bị chặn vì lý do bảo mật (chỉ cho phép http/https)",
+      "distributionDetails": "Thông tin phân phối & Người gửi",
+      "targetAudience": "Đối tượng nhận",
+      "createdBy": "Người tạo",
+      "systemAdmin": "Quản trị viên hệ thống",
+      "createdAt": "Thời gian tạo",
+      "sentAt": "Thời gian phát",
+      "scheduledFor": "Dự kiến phát lúc",
+      "analyticsTitle": "Phân tích gửi nhận & Tương tác",
+      "targeted": "Mục tiêu",
+      "delivered": "Đã phát",
+      "readReceipts": "Đã xem",
+      "openRate": "Tỷ lệ xem"
+    },
+    "schedule": {
+      "dateLabel": "Ngày phát",
+      "timeLabel": "Giờ phát",
+      "timezoneHint": "Giờ chuẩn Việt Nam (ICT / Asia/Ho_Chi_Minh)",
+      "advanceNotice": "Thời gian lên lịch phải cách thời điểm hiện tại ít nhất 15 phút.",
+      "dispatchesIn": "Sẽ phát sau ~{{time}}"
+    },
+    "toast": {
+      "createdDraftTitle": "Đã lưu bản nháp",
+      "createdDraftMessage": "Thông báo hệ thống đã được lưu thành bản nháp.",
+      "createdSentTitle": "Đã phát thông báo",
+      "createdSentMessage": "Thông báo hệ thống đã được gửi thành công tới người dùng.",
+      "updatedTitle": "Đã cập nhật thông báo",
+      "updatedMessage": "Các thay đổi của thông báo hệ thống đã được lưu.",
+      "deletedTitle": "Đã xóa thông báo",
+      "deletedMessage": "Đã xóa thông báo hệ thống \"{{title}}\".",
+      "archivedTitle": "Đã lưu trữ thông báo",
+      "archivedMessage": "Đã lưu trữ thông báo hệ thống \"{{title}}\".",
+      "scheduledTitle": "Đã lên lịch thông báo",
+      "scheduledMessage": "Thông báo \"{{title}}\" đã được lên lịch phát thành công.",
+      "rescheduledTitle": "Đã lên lịch lại",
+      "rescheduledMessage": "Thông báo \"{{title}}\" đã được lên lịch lại thành công.",
+      "dispatchedTitle": "Đã phát thông báo",
+      "dispatchedMessage": "Thông báo \"{{title}}\" đã được phát ngay lập tức.",
+      "cancelScheduleTitle": "Đã hủy lịch phát",
+      "cancelScheduleMessage": "Đã hủy lịch phát cho \"{{title}}\" và chuyển về bản nháp."
     }
   },
   "home": {

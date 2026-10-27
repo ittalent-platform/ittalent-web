@@ -202,6 +202,25 @@
   --logo-4: #f2470c;
   --logo-5: #b42318;
   --logo-6: #6941c6;
+  --status-neutral-bg: #2e2e32;
+  --status-neutral-fg: #c2c2c6;
+  --status-info-bg: #1a2540;
+  --status-info-fg: #93b2ee;
+  --status-info-border: #283a60;
+  --status-blocked-bg: #2a2140;
+  --status-blocked-fg: #b9a2f0;
+  --status-warning-bg: #33260f;
+  --status-warning-fg: #f3b562;
+  --status-warning-border: #5a4420;
+  --status-success-bg: #16301f;
+  --status-success-fg: #6fd39b;
+  --status-success-border: #24503a;
+  --status-toast-accent: #4ade80;
+  --status-error-bg: #381a17;
+  --status-error-fg: #f4a399;
+  --status-error-border: #5a2a25;
+  --danger-bg: #381a17;
+  --danger-fg: #f4a399;
 }
 
 @theme inline {
