@@ -21,7 +21,8 @@
     "documents": "Documents",
     "certificates": "Certificates",
     "account": "Account",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "myReports": "My reports"
   },
   "myProfile": {
     "title": "Profile",
@@ -876,7 +877,8 @@
     "closeMenu": "Close menu",
     "interviews": "Interviews",
     "dashboard": "Dashboard",
-    "broadcasts": "Broadcast notifications"
+    "broadcasts": "Broadcast notifications",
+    "reports": "Violation reports"
   },
   "jobPostings": {
     "title": "Job postings",

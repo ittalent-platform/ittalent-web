@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   Briefcase,
@@ -8,6 +8,7 @@ import {
   Lock,
   MapPin,
   RefreshCw,
+  ShieldAlert,
   TrendingUp,
   TriangleAlert,
   Users,
@@ -21,6 +22,7 @@ import { requestStatus } from "@/api/request-error";
 
 import { ApplyButton } from "./apply-button";
 import { SaveJobButton } from "@/features/applicant/saved-jobs/components/save-job-button";
+import { ReportViolationDialog } from "@/features/reports";
 import {
   loadEnterprise,
   loadEnterpriseOpenJobs,
@@ -119,6 +121,7 @@ export function CareerJobPage() {
   const location = useLocation();
   const { slug } = useParams();
   const { data: session } = useSession();
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
 
   const { data, error, isError, isLoading, refetch } = useQuery({
     queryKey: publicKeys.job(slug),
@@ -377,12 +380,21 @@ export function CareerJobPage() {
               ) : null}
             </div>
           </div>
-          <div className="relative shrink-0">
+          <div className="relative flex shrink-0 items-center gap-2">
             <SaveJobButton
               jobId={job._id}
               jobTitle={job.title}
               variant="pill"
             />
+            <button
+              type="button"
+              onClick={() => setIsReportDialogOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-mkt-line bg-white px-3.5 py-1.5 text-xs font-semibold text-mkt-ink transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+              title="Báo cáo vi phạm"
+            >
+              <ShieldAlert className="size-3.5 text-red-500" />
+              <span>Báo cáo</span>
+            </button>
           </div>
         </div>
       </section>
@@ -610,6 +622,15 @@ export function CareerJobPage() {
           </div>
         </section>
       ) : null}
+
+      <ReportViolationDialog
+        open={isReportDialogOpen}
+        onOpenChange={setIsReportDialogOpen}
+        targetType="job"
+        targetId={job._id}
+        targetTitle={job.title}
+        targetLink={typeof window !== "undefined" ? window.location.href : undefined}
+      />
     </PageShell>
   );
 }

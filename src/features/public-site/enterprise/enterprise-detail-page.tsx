@@ -6,6 +6,7 @@ import {
   Globe,
   MapPin,
   RefreshCw,
+  ShieldAlert,
   TriangleAlert,
   Users,
 } from "lucide-react";
@@ -16,6 +17,7 @@ import { useSession } from "@/auth/use-session";
 import { HTTP_NOT_FOUND } from "@/api/http-status";
 import { requestStatus } from "@/api/request-error";
 import { cn } from "@/lib/utils";
+import { ReportViolationDialog } from "@/features/reports";
 import {
   EMPLOYMENT_LABELS,
   formatDeadline,
@@ -152,6 +154,7 @@ export function EnterpriseDetailPage() {
   const { id } = useParams();
   const { data: session } = useSession();
   const [tab, setTab] = useState<"about" | "open-jobs">("about");
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const tabClickLockUntil = useRef(0);
 
   const {
@@ -345,15 +348,26 @@ export function EnterpriseDetailPage() {
               </div>
             ) : null}
           </div>
-          {jobCount > 0 ? (
+          <div className="mb-1 flex items-center gap-2">
+            {jobCount > 0 ? (
+              <button
+                className="flex h-11 items-center gap-2 rounded-full bg-mkt-accent px-[22px] text-sm font-semibold text-white hover:bg-mkt-accent-hover"
+                onClick={() => jumpTo("open-jobs")}
+                type="button"
+              >
+                See {jobCount} open {jobCount === 1 ? "job" : "jobs"}
+              </button>
+            ) : null}
             <button
-              className="mb-1 flex h-11 items-center gap-2 rounded-full bg-mkt-accent px-[22px] text-sm font-semibold text-white hover:bg-mkt-accent-hover"
-              onClick={() => jumpTo("open-jobs")}
               type="button"
+              onClick={() => setIsReportDialogOpen(true)}
+              className="inline-flex h-11 items-center gap-1.5 rounded-full border border-mkt-line bg-white px-4 text-xs font-semibold text-mkt-ink transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+              title="Báo cáo vi phạm"
             >
-              See {jobCount} open {jobCount === 1 ? "job" : "jobs"}
+              <ShieldAlert className="size-4 text-red-500" />
+              <span>Báo cáo</span>
             </button>
-          ) : null}
+          </div>
         </div>
 
         <CompanyTabs
@@ -571,6 +585,15 @@ export function EnterpriseDetailPage() {
           ) : null}
         </aside>
       </div>
+
+      <ReportViolationDialog
+        open={isReportDialogOpen}
+        onOpenChange={setIsReportDialogOpen}
+        targetType="enterprise"
+        targetId={enterprise.id}
+        targetTitle={enterprise.name}
+        targetLink={typeof window !== "undefined" ? window.location.href : undefined}
+      />
     </main>
   );
 }
