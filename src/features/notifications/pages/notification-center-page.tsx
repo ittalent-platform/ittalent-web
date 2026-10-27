@@ -497,7 +497,7 @@ export function NotificationCenterPage() {
                   })}
                 </span>
                 <Button asChild className="mt-3 w-fit font-semibold" variant="outline">
-                  <Link to="/jobs">{t("notifications.actions.browseJobs", { defaultValue: "Browse jobs" })}</Link>
+                  <Link to="/career">{t("notifications.actions.browseJobs", { defaultValue: "Browse jobs" })}</Link>
                 </Button>
               </>
             )}

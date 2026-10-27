@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Award, BriefcaseBusiness, ChevronDown, FileText, LockKeyhole, LogOut, UserRound, Users } from "lucide-react";
+import { Award, Bookmark, BriefcaseBusiness, ChevronDown, FileText, LockKeyhole, LogOut, UserRound, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/toast/toast-provider";
 import { getLogoutSuccessToast } from "@/features/auth/logout-toast";
-import { APPLICATIONS_PATH, profilePasswordPathForRole, profilePathForRole } from "@/config/routes";
+import { APPLICATIONS_PATH, SAVED_JOBS_PATH, profilePasswordPathForRole, profilePathForRole } from "@/config/routes";
 import { cn } from "@/lib/utils";
 import { PersonAvatar } from "@/components/common/person-avatar";
 
@@ -135,6 +135,7 @@ export function UserMenu({ collapsed = false, compactOnMobile = false, variant =
           </DropdownMenuItem>
         ) : null}
         {user?.role === "user" ? <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate(APPLICATIONS_PATH)}><BriefcaseBusiness className="size-4" />{t("applications.title")}</DropdownMenuItem> : null}
+        {user?.role === "user" ? <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate(SAVED_JOBS_PATH)}><Bookmark className="size-4" />{t("savedJobs.title")}</DropdownMenuItem> : null}
         {user?.role === "user" ? <DropdownMenuItem className="gap-2.5 px-4 py-2.5 text-sm cursor-pointer" onSelect={() => navigate("/certificates")}><Award className="size-4" />{t("certificates.title")}</DropdownMenuItem> : null}
 
         <DropdownMenuItem

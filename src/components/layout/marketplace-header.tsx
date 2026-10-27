@@ -5,6 +5,7 @@ import { slideKey, useSlidingIndicator } from "@/hooks/use-sliding-indicator";
 import { cn } from "@/lib/utils";
 
 import { LogoMark } from "./brand-logo";
+import { NotificationBell } from "./notification-bell";
 import { UserMenu } from "./user-menu";
 
 const navItem =
@@ -93,7 +94,16 @@ export function MarketplaceHeader({ dark = false }: { dark?: boolean }) {
       />
 
       {session ? (
-        <div className="w-auto shrink-0">
+        <div className="flex items-center gap-3">
+          {session.user.role === "user" ? (
+            <NotificationBell
+              className={
+                dark
+                  ? "border-white/[0.28] bg-transparent text-white hover:bg-white/10"
+                  : undefined
+              }
+            />
+          ) : null}
           <UserMenu variant="pill" />
         </div>
       ) : (

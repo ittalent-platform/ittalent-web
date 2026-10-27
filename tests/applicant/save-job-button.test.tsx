@@ -225,4 +225,27 @@ describe("SaveJobButton", () => {
     expect(button).toHaveAttribute("title", "Saving jobs is for candidate accounts");
     expect(button).toHaveClass("cursor-not-allowed");
   });
+
+  it("renders icon variant with 40x40 size and forwards custom redirectTo on guest click", () => {
+    vi.mocked(sessionHook.useSession).mockReturnValue({ data: null } as never);
+
+    renderWithClient(
+      <SaveJobButton
+        jobId="job-42"
+        redirectTo="/career/software-engineer-go"
+        variant="icon"
+      />,
+    );
+
+    const iconButton = screen.getByRole("button", { name: /save/i });
+    expect(iconButton).toHaveClass("size-10");
+
+    fireEvent.click(iconButton);
+
+    const signInLink = screen.getByRole("link", { name: /sign in/i });
+    expect(signInLink).toHaveAttribute(
+      "href",
+      "/login?next=%2Fcareer%2Fsoftware-engineer-go",
+    );
+  });
 });

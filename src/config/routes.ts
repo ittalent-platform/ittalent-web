@@ -1,5 +1,6 @@
 /** Route paths shared by layout chrome and feature code, so neither hardcodes a URL. */
 export const APPLICATIONS_PATH = "/my-applications";
+export const SAVED_JOBS_PATH = "/saved-jobs";
 export const EMAIL_VERIFICATION_PATH = "/verify-email";
 export const PROFILE_PATH = "/profile";
 export function profilePathForRole(role?: string): string {
@@ -41,6 +42,9 @@ export function adminUserPath(userId: string): string {
 export function adminEnterprisePath(enterpriseId: string): string {
   return `/admin/enterprises/${enterpriseId}`;
 }
+
+/** Admin broadcast notifications management (UC 01 - UC 07). */
+export const ADMIN_BROADCASTS_PATH = "/admin/broadcast-notifications";
 
 /** Recruiter employee accounts management (UC 10 - UC 16). */
 export const RECRUITER_EMPLOYEES_PATH = "/recruiter/employees";

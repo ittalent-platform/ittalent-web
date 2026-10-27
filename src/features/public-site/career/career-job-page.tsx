@@ -20,6 +20,7 @@ import { HTTP_NOT_FOUND } from "@/api/http-status";
 import { requestStatus } from "@/api/request-error";
 
 import { ApplyButton } from "./apply-button";
+import { SaveJobButton } from "@/features/applicant/saved-jobs/components/save-job-button";
 import {
   loadEnterprise,
   loadEnterpriseOpenJobs,
@@ -375,6 +376,13 @@ export function CareerJobPage() {
                 </Fact>
               ) : null}
             </div>
+          </div>
+          <div className="relative shrink-0">
+            <SaveJobButton
+              jobId={job._id}
+              jobTitle={job.title}
+              variant="pill"
+            />
           </div>
         </div>
       </section>

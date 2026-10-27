@@ -33,7 +33,12 @@ function AlertDialogOverlay({ className, ...props }: React.ComponentProps<typeof
 function AlertDialogContent({ className, onOverlayClick, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Content> & { onOverlayClick?: () => void }) {
   return (
     <AlertDialogPortal>
-      <AlertDialogOverlay onClick={onOverlayClick} />
+      <AlertDialogOverlay
+        onClick={(e) => {
+          e.stopPropagation();
+          onOverlayClick?.();
+        }}
+      />
       <AlertDialogPrimitive.Content
         data-slot="alert-dialog-content"
         className={cn(

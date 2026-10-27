@@ -1,8 +1,10 @@
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ToastProvider } from "@/components/toast/toast-provider";
 import { HomePage } from "@/features/public-site/home/home-page";
 import type {
   HomeData,
@@ -67,13 +69,24 @@ function Where() {
 }
 
 function renderHome() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
   return render(
-    <MemoryRouter initialEntries={["/"]}>
-      <Routes>
-        <Route element={<HomePage />} path="/" />
-        <Route element={<Where />} path="/career" />
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>
+        <MemoryRouter initialEntries={["/"]}>
+          <Routes>
+            <Route element={<HomePage />} path="/" />
+            <Route element={<Where />} path="/career" />
+          </Routes>
+        </MemoryRouter>
+      </ToastProvider>
+    </QueryClientProvider>,
   );
 }
 

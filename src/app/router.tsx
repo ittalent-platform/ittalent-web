@@ -79,6 +79,11 @@ const AdminJobPostingDetailPage = lazy(() =>
     default: m.JobPostingDetailPage,
   })),
 );
+const BroadcastNotificationsPage = lazy(() =>
+  import("@/features/admin/broadcast-notifications").then((m) => ({
+    default: m.BroadcastNotificationsPage,
+  })),
+);
 const RecruiterJobPostingsPage = lazy(() =>
   import("@/features/recruiter/job-postings/job-postings-pages").then((m) => ({
     default: m.RecruiterJobPostingsPage,
@@ -299,6 +304,10 @@ export const appRoutes = [
           {
             path: "job-postings/:jobPostingId",
             element: <AdminJobPostingDetailPage />,
+          },
+          {
+            path: "broadcast-notifications",
+            element: <BroadcastNotificationsPage />,
           },
         ],
       },
