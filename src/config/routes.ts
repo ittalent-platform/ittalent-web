@@ -76,6 +76,10 @@ export function recruiterCompanyProfileEditPath(): string {
 export const MY_REPORTS_PATH = "/my-reports";
 export const ADMIN_REPORTS_PATH = "/admin/reports";
 
+export function myReportDetailPath(reportId: string): string {
+  return `${MY_REPORTS_PATH}/${reportId}`;
+}
+
 export function adminReportDetailPath(reportId: string): string {
   return `${ADMIN_REPORTS_PATH}/${reportId}`;
 }

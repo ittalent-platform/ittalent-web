@@ -1,26 +1,24 @@
-import { useState } from 'react';
-import {
-  CheckCircle2,
-  Eye,
-  Search,
-} from 'lucide-react';
+import { useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
+import { Briefcase, Building2, MoreHorizontal, User, Eye, UserCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
+import { useListParams } from '@/hooks/use-list-params';
+import { adminReportDetailPath } from '@/config/routes';
 import { AdminPageHeader } from '@/components/common/admin-page-header';
-import { TableSurface } from '@/components/common/data-table';
 import { EmptyState } from '@/components/common/empty-state';
 import { ErrorState } from '@/components/common/error-state';
-import { KpiStrip } from '@/components/common/kpi-strip';
-import { Badge } from '@/components/ui/badge';
+import { ListToolbar } from '@/components/common/list-toolbar';
+import { FilterSelect } from '@/components/ui/filter-select';
+import { prefixedFilterTrigger } from '@/components/common/prefixed-filter-trigger';
+import { NumberedPagination } from '@/components/common/numbered-pagination';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Pagination } from '@/components/ui/pagination';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -29,308 +27,336 @@ import {
   TableHeaderCell,
   TableHeaderRow,
   TableRow,
+  TableSkeletonRows,
 } from '@/components/ui/table';
-import { AdminInvestigationWorkspace } from '@/features/reports/components/admin-investigation-workspace';
 import {
-  REPORT_REASON_CATEGORIES,
-  REPORT_STATUS_CONFIG,
-  REPORT_TARGET_TYPE_LABELS,
+  REPORT_STATUS_BADGE_CLASS,
+  REPORT_REASONS,
 } from '@/features/reports/reports.constants';
-import { useAdminReportsQuery } from '@/features/reports/reports.queries';
-import type { AdminReportDto } from '@/features/reports/reports.types';
+import {
+  useAdminReportsQuery,
+  useClaimReportTicketMutation,
+} from '@/features/reports/reports.queries';
+import type { AdminReportItem } from '@/features/reports/reports.types';
+
+function TargetIcon({ type }: { type?: string }) {
+  if (type === 'company' || type === 'enterprise') {
+    return <Building2 className="size-4 text-muted-foreground" aria-hidden="true" />;
+  }
+  if (type === 'user') {
+    return <User className="size-4 text-muted-foreground" aria-hidden="true" />;
+  }
+  return <Briefcase className="size-4 text-muted-foreground" aria-hidden="true" />;
+}
 
 export function AdminReportsPage() {
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [statusFilter, setStatusFilter] = useState('pending');
-  const [targetTypeFilter, setTargetTypeFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [selectedReportForWorkspace, setSelectedReportForWorkspace] = useState<AdminReportDto | null>(null);
+  const { page, limit, search, debouncedSearch, set } = useListParams({ defaultLimit: 10 });
+
+  const statusParam = searchParams.get('status') || 'open';
+  const reasonParam = searchParams.get('reason') || 'all';
+  const typeParam = searchParams.get('type') || 'all';
+  const submittedParam = searchParams.get('submitted') || 'all';
 
   const { data, isLoading, isError, refetch } = useAdminReportsQuery({
     page,
     limit,
-    status: statusFilter,
-    target_type: targetTypeFilter,
-    category: categoryFilter,
-    search: debouncedSearch || undefined,
+    status: statusParam,
+    category: reasonParam,
+    target_type: typeParam,
+    search: debouncedSearch,
   });
 
+  const claimMutation = useClaimReportTicketMutation();
+
   const reports = data?.items ?? [];
-  const kpis = data?.kpis ?? {
-    total: 0,
-    pending: 0,
-    reviewing: 0,
-    resolved: 0,
-    rejected: 0,
-    withdrawn: 0,
+  const total = data?.total ?? 0;
+  const totalPages = data?.totalPages ?? 1;
+
+  const formatDate = (isoString?: string) => {
+    if (!isoString) return '';
+    try {
+      const d = new Date(isoString);
+      return new Intl.DateTimeFormat(i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(d);
+    } catch {
+      return isoString;
+    }
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setDebouncedSearch(searchTerm);
-    setPage(1);
-  };
+  const statusOptions = useMemo(
+    () => [
+      { label: t('reports.tabs.open'), value: 'open' },
+      { label: t('reports.filters.all'), value: 'all' },
+      { label: t('reports.statuses.pending'), value: 'pending' },
+      { label: t('reports.statuses.reviewing'), value: 'reviewing' },
+      { label: t('reports.statuses.resolved'), value: 'resolved' },
+      { label: t('reports.statuses.rejected'), value: 'rejected' },
+      { label: t('reports.statuses.withdrawn'), value: 'withdrawn' },
+      { label: t('reports.tabs.closed'), value: 'closed' },
+    ],
+    [t],
+  );
 
-  const statusFilterTabs = [
-    { key: 'pending', label: 'Chờ xử lý' },
-    { key: 'reviewing', label: 'Đang điều tra' },
-    { key: 'resolved', label: 'Đã giải quyết' },
-    { key: 'rejected', label: 'Đã bác bỏ' },
-    { key: 'withdrawn', label: 'Đã rút lại' },
-    { key: 'all', label: 'Tất cả vé' },
-  ];
+  const reasonOptions = useMemo(
+    () => [
+      { label: t('reports.filters.all'), value: 'all' },
+      ...REPORT_REASONS.map((r) => ({
+        label: t(`reports.reasons.${r}`),
+        value: r,
+      })),
+    ],
+    [t],
+  );
+
+  const typeOptions = useMemo(
+    () => [
+      { label: t('reports.filters.all'), value: 'all' },
+      { label: t('reports.targetTypes.job'), value: 'job' },
+      { label: t('reports.targetTypes.company'), value: 'company' },
+      { label: t('reports.targetTypes.user'), value: 'user' },
+    ],
+    [t],
+  );
+
+  const submittedOptions = useMemo(
+    () => [
+      { label: t('reports.filters.anyTime'), value: 'all' },
+      { label: t('reports.filters.today'), value: 'today' },
+      { label: t('reports.filters.past7Days'), value: '7d' },
+      { label: t('reports.filters.past30Days'), value: '30d' },
+    ],
+    [t],
+  );
+
+  const handleClaim = async (item: AdminReportItem, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    try {
+      await claimMutation.mutateAsync(item.id);
+      navigate(adminReportDetailPath(item.reference || item.ticket_id || item.id));
+    } catch {
+      // Invalidation handles toast / error
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-7xl">
-      {/* Standard Admin Page Header */}
+    <div className="flex flex-col gap-5 w-full pb-16">
+      {/* Admin Page Header */}
       <AdminPageHeader
-        title="Báo cáo vi phạm"
-        description="Hàng đợi kiểm duyệt, điều tra và thi hành chế tài đối với các vi phạm an toàn nền tảng."
+        title={t('reports.adminReports')}
+        description={t('reports.adminDescription')}
       />
 
-      {/* Official Design System KPI Strip */}
-      <KpiStrip
-        label="Thống kê hàng đợi kiểm duyệt"
-        items={[
-          {
-            key: 'pending',
-            label: 'Chờ tiếp nhận',
-            value: String(kpis.pending),
-            note: 'Ưu tiên xử lý trong 24h',
-          },
-          {
-            key: 'reviewing',
-            label: 'Đang điều tra',
-            value: String(kpis.reviewing),
-            note: 'Admin đã nhận hồ sơ',
-          },
-          {
-            key: 'resolved',
-            label: 'Đã giải quyết',
-            value: String(kpis.resolved),
-            note: 'Đã thi hành chế tài',
-          },
-          {
-            key: 'total',
-            label: 'Tổng số hồ sơ',
-            value: String(kpis.total),
-            note: 'Bao gồm cả từ chối & rút',
-          },
-        ]}
-      />
+      {/* Filters Toolbar */}
+      <ListToolbar
+        search={search}
+        onSearchChange={(val) => set('search', val)}
+        searchPlaceholder={t('reports.searchAdminPlaceholder')}
+      >
+        <div className="flex flex-wrap items-center gap-2.5">
+          <FilterSelect
+            value={statusParam}
+            onChange={(val) => set('status', val === 'open' ? null : val)}
+            options={statusOptions}
+            renderTrigger={prefixedFilterTrigger(t('reports.filters.statusPrefix'))}
+          />
 
-      {/* Filter and Search Toolbar */}
-      <div className="flex flex-col gap-3 bg-card p-4 rounded-xl border border-border shadow-2xs">
-        {/* Status Tabs */}
-        <div className="p-1 rounded-xl bg-sand-subtle/80 border border-border flex items-center gap-1 overflow-x-auto scrollbar-none w-fit">
-          {statusFilterTabs.map((tab) => (
-            <Button
-              key={tab.key}
-              variant={statusFilter === tab.key ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => {
-                setStatusFilter(tab.key);
-                setPage(1);
-              }}
-              className="rounded-lg text-xs font-semibold shrink-0 h-8 px-3.5 transition-colors"
-            >
-              {tab.label}
-            </Button>
-          ))}
+          <FilterSelect
+            value={reasonParam}
+            onChange={(val) => set('reason', val === 'all' ? null : val)}
+            options={reasonOptions}
+            renderTrigger={prefixedFilterTrigger(t('reports.filters.reasonPrefix'))}
+          />
+
+          <FilterSelect
+            value={typeParam}
+            onChange={(val) => set('type', val === 'all' ? null : val)}
+            options={typeOptions}
+            renderTrigger={prefixedFilterTrigger(t('reports.filters.typePrefix'))}
+          />
+
+          <FilterSelect
+            value={submittedParam}
+            onChange={(val) => set('submitted', val === 'all' ? null : val)}
+            options={submittedOptions}
+            renderTrigger={prefixedFilterTrigger(t('reports.filters.submittedPrefix'))}
+          />
         </div>
+      </ListToolbar>
 
-        {/* Search & Filter Dropdowns */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <form onSubmit={handleSearchSubmit} className="relative min-w-[240px] flex-1">
-            <Search className="size-4 absolute left-3 top-2.5 text-muted-foreground" />
-            <Input
-              placeholder="Tìm theo mã vé, tên đối tượng, người báo cáo..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-9 text-[13px]"
-            />
-          </form>
-
-          {/* Target Type Filter */}
-          <Select
-            value={targetTypeFilter}
-            onValueChange={(val) => {
-              setTargetTypeFilter(val);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="h-9 text-[13px] w-[150px]">
-              <SelectValue placeholder="Đối tượng" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Mọi đối tượng</SelectItem>
-              <SelectItem value="job">Tin tuyển dụng</SelectItem>
-              <SelectItem value="enterprise">Doanh nghiệp</SelectItem>
-              <SelectItem value="user">Người dùng</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Category Filter */}
-          <Select
-            value={categoryFilter}
-            onValueChange={(val) => {
-              setCategoryFilter(val);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="h-9 text-[13px] w-[170px]">
-              <SelectValue placeholder="Danh mục vi phạm" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Mọi danh mục</SelectItem>
-              {REPORT_REASON_CATEGORIES.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value}>
-                  {cat.defaultLabel}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      {/* Subheader summary */}
+      <div className="text-xs text-muted-foreground font-medium">
+        {statusParam === 'open'
+          ? t('reports.summaryOpen', { count: total })
+          : t('reports.summaryAll', { count: total })}
       </div>
 
-      {/* Reports Data Table */}
-      {isLoading ? (
-        <div className="py-20 flex flex-col items-center justify-center gap-3 text-muted-foreground">
-          <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-medium">Đang tải danh sách kiểm duyệt...</span>
-        </div>
-      ) : isError ? (
-        <ErrorState
-          description="Không thể tải dữ liệu vi phạm. Vui lòng thử lại sau."
-          onRetry={() => refetch()}
-        />
-      ) : reports.length === 0 ? (
-        <EmptyState
-          icon={CheckCircle2}
-          title="Không có báo cáo nào phù hợp"
-          description="Hàng đợi kiểm duyệt hiện tại không có báo cáo nào với bộ lọc đã chọn."
-        />
-      ) : (
-        <div className="flex flex-col gap-4">
-          <TableSurface>
-            <Table>
-              <TableHead>
-                <TableHeaderRow className="hover:bg-transparent">
-                  <TableHeaderCell className="w-[120px] font-semibold text-xs">MÃ VÉ</TableHeaderCell>
-                  <TableHeaderCell className="min-w-[200px] font-semibold text-xs">ĐỐI TƯỢNG BỊ TỐ CÁO</TableHeaderCell>
-                  <TableHeaderCell className="font-semibold text-xs">NGƯỜI BÁO CÁO</TableHeaderCell>
-                  <TableHeaderCell className="font-semibold text-xs">DANH MỤC</TableHeaderCell>
-                  <TableHeaderCell className="font-semibold text-xs">NGÀY GỬI</TableHeaderCell>
-                  <TableHeaderCell className="font-semibold text-xs">TRẠNG THÁI</TableHeaderCell>
-                  <TableHeaderCell className="text-right font-semibold text-xs w-[120px]">THAO TÁC</TableHeaderCell>
-                </TableHeaderRow>
-              </TableHead>
-              <TableBody>
-                {reports.map((report) => {
-                  const statusCfg = REPORT_STATUS_CONFIG[report.status] || {
-                    label: report.status,
-                    className: '',
-                  };
-                  const reasonCfg = REPORT_REASON_CATEGORIES.find((c) => c.value === report.reason_category);
+      {/* Table Surface */}
+      <div className="rounded-2xl border border-line bg-surface overflow-hidden">
+        {isError ? (
+          <div className="p-8">
+            <ErrorState
+              title={t('common.errorLoadingData', { defaultValue: 'Unable to load report queue' })}
+              description={t('common.retryPrompt', { defaultValue: 'Please check your connection and try again.' })}
+              onRetry={() => void refetch()}
+            />
+          </div>
+        ) : (
+          <Table>
+            <TableHead>
+              <TableHeaderRow className="bg-surface-readonly border-b border-line-muted">
+                <TableHeaderCell className="font-bold text-[11.5px] uppercase tracking-[0.06em] text-slate-subtle pl-5 py-3">
+                  {t('reports.columns.reported')}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[190px] font-bold text-[11.5px] uppercase tracking-[0.06em] text-slate-subtle py-3">
+                  {t('reports.columns.reason')}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[160px] font-bold text-[11.5px] uppercase tracking-[0.06em] text-slate-subtle py-3">
+                  {t('reports.columns.submitted')}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[120px] font-bold text-[11.5px] uppercase tracking-[0.06em] text-slate-subtle py-3">
+                  {t('reports.columns.status')}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[140px] font-bold text-[11.5px] uppercase tracking-[0.06em] text-slate-subtle py-3">
+                  {t('reports.columns.reviewer')}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[48px] pr-4 py-3" />
+              </TableHeaderRow>
+            </TableHead>
+
+            <TableBody>
+              {isLoading ? (
+                <TableSkeletonRows columns={6} rows={5} />
+              ) : reports.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 px-4">
+                    <EmptyState
+                      title={t('reports.empty.adminTitle')}
+                      description={t('reports.empty.adminDescription')}
+                    />
+                  </td>
+                </tr>
+              ) : (
+                reports.map((item) => {
+                  const targetRef = item.reference || item.ticket_id || item.id;
+                  const reasonLabel = t(`reports.reasons.${item.reason}`, { defaultValue: item.reason });
+                  const statusLabel = t(`reports.statuses.${item.status}`, { defaultValue: item.status });
+                  const badgeClass = REPORT_STATUS_BADGE_CLASS[item.status] || 'bg-muted text-foreground';
+                  const canClaim = item.status === 'pending' || !item.reviewer;
 
                   return (
-                    <TableRow key={report.id} className="hover:bg-muted/30 transition-colors">
-                      {/* Ticket ID */}
-                      <TableCell className="font-mono text-xs font-semibold text-foreground">
-                        #{report.ticket_id}
-                      </TableCell>
-
-                      {/* Target Entity */}
-                      <TableCell>
-                        <div className="flex flex-col gap-0.5 max-w-[240px]">
-                          <span className="text-[10.5px] font-bold text-muted-foreground uppercase tracking-wider">
-                            {REPORT_TARGET_TYPE_LABELS[report.target_type]}
-                          </span>
-                          <span className="font-semibold text-foreground text-[13.5px] truncate">
-                            {report.target_title}
-                          </span>
+                    <TableRow
+                      key={item.id}
+                      className="cursor-pointer hover:bg-surface-subtle transition-colors group"
+                      onClick={() => navigate(adminReportDetailPath(targetRef))}
+                    >
+                      <TableCell className="pl-5 py-3.5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="size-9 rounded-lg bg-surface-subtle border border-line flex items-center justify-center shrink-0">
+                            <TargetIcon type={item.target_type} />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-semibold text-[14px] text-foreground truncate group-hover:text-primary transition-colors">
+                              {item.target_title || t('common.untitled', { defaultValue: 'Untitled' })}
+                            </span>
+                            <span className="text-xs text-muted-foreground truncate">
+                              <span className="font-mono">{targetRef}</span> ·{' '}
+                              {t(`reports.targetTypes.${item.target_type}`, { defaultValue: item.target_type })}
+                            </span>
+                          </div>
                         </div>
                       </TableCell>
 
-                      {/* Reporter */}
-                      <TableCell>
-                        <div className="flex flex-col gap-0.5 max-w-[160px] text-xs">
-                          <span className="font-medium text-foreground truncate">
-                            {report.reporter.full_name || report.reporter.username || 'Ẩn danh'}
-                          </span>
-                          <span className="text-[11px] text-muted-foreground truncate">
-                            {report.reporter.email}
-                          </span>
-                        </div>
+                      <TableCell className="py-3.5 text-[13.5px] text-foreground">
+                        {reasonLabel}
                       </TableCell>
 
-                      {/* Category */}
-                      <TableCell>
-                        <span className="text-xs text-foreground font-medium">
-                          {reasonCfg?.defaultLabel ?? report.reason_category}
+                      <TableCell className="py-3.5 text-[13px] text-muted-foreground whitespace-nowrap">
+                        {formatDate(item.submittedAt || item.createdAt)}
+                      </TableCell>
+
+                      <TableCell className="py-3.5">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${badgeClass}`}>
+                          {statusLabel}
                         </span>
                       </TableCell>
 
-                      {/* Date */}
-                      <TableCell className="text-xs text-muted-foreground">
-                        {new Date(report.createdAt).toLocaleDateString('vi-VN')}
+                      <TableCell className="py-3.5 text-[13px] text-muted-foreground">
+                        {item.reviewer || (
+                          <span className="text-slate-subtle italic">
+                            {t('reports.detail.notClaimed')}
+                          </span>
+                        )}
                       </TableCell>
 
-                      {/* Status */}
-                      <TableCell>
-                        <Badge variant="neutral" className={`font-semibold text-xs ${statusCfg.className}`}>
-                          {statusCfg.label}
-                        </Badge>
-                      </TableCell>
+                      <TableCell
+                        className="py-3.5 pr-4 text-right"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="size-8 text-muted-foreground hover:text-foreground"
+                              aria-label="Actions"
+                            >
+                              <MoreHorizontal className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem onClick={() => navigate(adminReportDetailPath(targetRef))}>
+                              <Eye className="size-4 mr-2" />
+                              <span>{t('reports.actions.open')}</span>
+                            </DropdownMenuItem>
 
-                      {/* Action */}
-                      <TableCell className="text-right">
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => setSelectedReportForWorkspace(report)}
-                          className="h-8 px-3 text-xs font-semibold gap-1"
-                        >
-                          <Eye className="size-3.5" />
-                          <span>{report.status === 'pending' || report.status === 'reviewing' ? 'Xử lý' : 'Chi tiết'}</span>
-                        </Button>
+                            {canClaim && (
+                              <DropdownMenuItem
+                                onClick={(e) => handleClaim(item, e)}
+                                className="text-primary focus:text-primary"
+                              >
+                                <UserCheck className="size-4 mr-2" />
+                                <span>{t('reports.actions.claimToReview')}</span>
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   );
-                })}
-              </TableBody>
-            </Table>
-          </TableSurface>
+                })
+              )}
+            </TableBody>
+          </Table>
+        )}
 
-          {data && data.total > limit && (
-            <div className="flex justify-end pt-2">
-              <Pagination
-                page={page}
-                totalPages={data.totalPages}
-                total={data.total}
-                limit={limit}
-                onPageChange={(p) => setPage(p)}
-                onLimitChange={(l) => {
-                  setLimit(l);
-                  setPage(1);
-                }}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Admin Investigation Workspace Dialog */}
-      <AdminInvestigationWorkspace
-        report={selectedReportForWorkspace}
-        open={Boolean(selectedReportForWorkspace)}
-        onOpenChange={(open) => !open && setSelectedReportForWorkspace(null)}
-        onSuccess={() => refetch()}
-      />
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-5 py-3.5 border-t border-line bg-surface">
+            <span className="text-xs text-muted-foreground">
+              {t('pagination.showing', {
+                start: (page - 1) * limit + 1,
+                end: Math.min(page * limit, total),
+                total,
+                defaultValue: `Showing ${page} of ${totalPages}`,
+              })}
+            </span>
+            <NumberedPagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={(p) => set('page', String(p))}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

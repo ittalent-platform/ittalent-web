@@ -8,13 +8,14 @@ import {
   Lock,
   MapPin,
   RefreshCw,
-  ShieldAlert,
+  Flag,
   TrendingUp,
   TriangleAlert,
   Users,
 } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
 import { HTTP_NOT_FOUND } from "@/api/http-status";
@@ -22,7 +23,7 @@ import { requestStatus } from "@/api/request-error";
 
 import { ApplyButton } from "./apply-button";
 import { SaveJobButton } from "@/features/applicant/saved-jobs/components/save-job-button";
-import { ReportViolationDialog } from "@/features/reports";
+import { ReportViolationDialog } from "@/components/common/report-violation-dialog";
 import {
   loadEnterprise,
   loadEnterpriseOpenJobs,
@@ -117,6 +118,7 @@ function PageShell({ children }: { children: ReactNode }) {
 const MORE_JOBS_SHOWN = 3;
 
 export function CareerJobPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { slug } = useParams();
@@ -380,21 +382,12 @@ export function CareerJobPage() {
               ) : null}
             </div>
           </div>
-          <div className="relative flex shrink-0 items-center gap-2">
+          <div className="relative flex shrink-0">
             <SaveJobButton
               jobId={job._id}
               jobTitle={job.title}
               variant="pill"
             />
-            <button
-              type="button"
-              onClick={() => setIsReportDialogOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-mkt-line bg-white px-3.5 py-1.5 text-xs font-semibold text-mkt-ink transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
-              title="Báo cáo vi phạm"
-            >
-              <ShieldAlert className="size-3.5 text-red-500" />
-              <span>Báo cáo</span>
-            </button>
           </div>
         </div>
       </section>
@@ -519,6 +512,14 @@ export function CareerJobPage() {
                   </p>
                 </>
               )}
+              <button
+                type="button"
+                onClick={() => setIsReportDialogOpen(true)}
+                className="self-center inline-flex items-center gap-1.5 text-[13px] font-semibold text-mkt-muted hover:text-mkt-ink transition-colors pt-2"
+              >
+                <Flag aria-hidden="true" className="size-3.5" />
+                <span>{t("reports.reportThisJob")}</span>
+              </button>
             </div>
           </section>
 
@@ -629,7 +630,7 @@ export function CareerJobPage() {
         targetType="job"
         targetId={job._id}
         targetTitle={job.title}
-        targetLink={typeof window !== "undefined" ? window.location.href : undefined}
+        targetSubtitle={companyName ? `Job · ${companyName}` : undefined}
       />
     </PageShell>
   );

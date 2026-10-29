@@ -1932,14 +1932,15 @@
       "sent": "Sent / Published"
     },
     "toolbar": {
-      "searchPlaceholder": "Search broadcasts by title or content...",
-      "statusAll": "Status: All",
-      "audienceAll": "Audience: All",
-      "priorityAll": "Priority: All",
+      "searchPlaceholder": "Search by announcement title...",
+      "statusAll": "All Statuses",
+      "audienceAll": "All Audiences",
+      "priorityAll": "All Priorities",
       "fromDatePlaceholder": "From date",
       "toDatePlaceholder": "To date",
-      "resetFilters": "Reset filters",
-      "clearFilters": "Clear Filters"
+      "resetFilters": "Reset Filters",
+      "clearFilters": "Clear all filters",
+      "invalidDateRange": "'From' must be on or before 'To'"
     },
     "table": {
       "announcement": "Announcement",
@@ -2016,17 +2017,6 @@
       "scheduled": "Scheduled dispatch for {{time}}",
       "dispatched": "Dispatched to {{count}} recipients",
       "cancelled": "Scheduled dispatch cancelled"
-    },
-    "toolbar": {
-      "searchPlaceholder": "Search by announcement title...",
-      "statusAll": "All Statuses",
-      "audienceAll": "All Audiences",
-      "priorityAll": "All Priorities",
-      "fromDatePlaceholder": "From date",
-      "toDatePlaceholder": "To date",
-      "resetFilters": "Reset Filters",
-      "clearFilters": "Clear all filters",
-      "invalidDateRange": "'From' must be on or before 'To'"
     },
     "dialog": {
       "createTitle": "Create Broadcast Notification",
@@ -3778,6 +3768,185 @@
       "error": {
         "title": "The overview didn’t load"
       }
+    }
+  },
+  "reports": {
+    "reportThisJob": "Report this job",
+    "reportThisCompany": "Report this company",
+    "reportThisUser": "Report this user",
+    "myReports": "My reports",
+    "adminReports": "Reports",
+    "adminDescription": "Reports from candidates about jobs, companies and users. Reporter names aren’t shown.",
+    "titleJob": "Report this job",
+    "titleCompany": "Report this company",
+    "titleUser": "Report this user",
+    "whatsWrong": "What’s wrong?",
+    "tellUsWhatHappened": "Tell us what happened",
+    "statementPlaceholder": "Describe what’s misleading, fraudulent or inaccurate...",
+    "addFiles": "Add files (optional)",
+    "filesHelper": "Up to 5 files · PNG, JPG, PDF up to 5 MB each",
+    "privacyLine": "Your name and contact details aren’t shared with the company.",
+    "cancel": "Cancel",
+    "sendReport": "Send report",
+    "sending": "Sending...",
+    "signInPromptTitle": "Sign in to report",
+    "signInPromptBody": "You need to be signed in as a candidate to report a job or company. We keep your report private.",
+    "signIn": "Sign in",
+    "receivedTitle": "Report received",
+    "receivedBody": "Thanks for telling us. Your reference is {{reference}}. You can follow it in My reports.",
+    "backToJob": "Back to the job",
+    "backToCompany": "Back to the company",
+    "viewMyReports": "View my reports",
+    "searchPlaceholder": "Search reported name or reference",
+    "searchAdminPlaceholder": "Search report number or reported name",
+    "itemUnavailable": "This item is no longer available on ITTalent.",
+    "reasons": {
+      "scam_or_fraud": "Scam or fraud",
+      "misleading_information": "Misleading information",
+      "discrimination": "Discrimination",
+      "inappropriate_content": "Inappropriate content",
+      "something_else": "Something else"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "reviewing": "Reviewing",
+      "resolved": "Resolved",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn"
+    },
+    "targetTypes": {
+      "job": "Job",
+      "company": "Company",
+      "enterprise": "Company",
+      "user": "User"
+    },
+    "tabs": {
+      "all": "All",
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "columns": {
+      "reported": "REPORTED",
+      "reason": "REASON",
+      "submitted": "SUBMITTED",
+      "status": "STATUS",
+      "reviewer": "REVIEWER",
+      "actions": "ACTIONS"
+    },
+    "actions": {
+      "view": "View",
+      "open": "Open",
+      "claimToReview": "Claim to review",
+      "withdraw": "Withdraw report…",
+      "hide": "Hide from my history…"
+    },
+    "empty": {
+      "allTitle": "No reports yet",
+      "allDescription": "Reports you submit about jobs, companies or profiles will appear here.",
+      "openTitle": "No open reports",
+      "openDescription": "You don’t have any reports currently under investigation.",
+      "closedTitle": "No closed reports",
+      "closedDescription": "Resolved, rejected or withdrawn reports will appear here.",
+      "adminTitle": "No reports found",
+      "adminDescription": "No reports match the current filters or search query."
+    },
+    "summaryOpen": "{{count}} open reports · newest first",
+    "summaryAll": "{{count}} reports · newest first",
+    "timeline": {
+      "submitted": "Submitted",
+      "underReview": "Under review",
+      "claimedBy": "Claimed by {{name}}",
+      "finalizedAs": "Finalized as {{status}}"
+    },
+    "detail": {
+      "reportAbout": "Report about {{target}}",
+      "referenceSubmitted": "Reference {{reference}} · submitted {{date}}",
+      "referenceAssigned": "Reference {{reference}} · assigned to {{reviewer}}",
+      "referenceUnassigned": "Reference {{reference}} · not claimed",
+      "targetReportHeader": "{{type}} report · {{target}}",
+      "reportCardTitle": "Report",
+      "reportedItem": "Reported {{type}}",
+      "verdict": "Verdict: {{status}}",
+      "messageToReporterLabel": "Message to reporter:",
+      "internalNoteLabel": "Internal note:",
+      "view": "View",
+      "responseFromPlatform": "Response from ITTalent",
+      "whatYouReported": "What you reported",
+      "whatsWrongLabel": "What’s wrong",
+      "whatHappenedLabel": "What happened",
+      "filesLabel": "Files",
+      "noFiles": "No files added.",
+      "statusRailTitle": "STATUS",
+      "historyRailTitle": "HISTORY",
+      "waitingForReview": "Waiting for review",
+      "waitingForReviewDesc": "Review times vary; we don’t promise a date. You’ll get a notification when the status changes.",
+      "reviewedAndClosed": "Reviewed and closed",
+      "reportClosedDesc": "This report is closed.",
+      "withdrawnDesc": "You withdrew it. This report is closed.",
+      "waitingForReviewer": "Waiting for a reviewer",
+      "waitingForReviewerDesc": "Claim it to start the review. Only one admin can hold it.",
+      "assignedToYou": "assigned to you",
+      "notClaimed": "not claimed",
+      "claimSuccess": "Ticket claimed for investigation",
+      "resolveSuccess": "Report resolved and finalized",
+      "readOnlyNotice": "Opening a report never claims it or changes anything.",
+      "evidenceCardTitle": "Evidence",
+      "evidencePrivateLinkNotice": "Opens in a new tab with a private, short-lived link.",
+      "decisionCardTitle": "Decision",
+      "resolveTitle": "Resolve",
+      "resolveSubtitle": "Close the report. Nothing changes on the job.",
+      "rejectTitle": "Reject",
+      "rejectSubtitle": "No violation found. Nothing changes on the job.",
+      "enforcementUnavailableTitle": "Actions on the job · not available",
+      "enforcementUnavailableDesc": "Take down, warn or suspend need an approved action matrix. Use the existing job or account pages if a separate rule allows it.",
+      "messageToReporter": "Message to the reporter",
+      "messageToReporterHint": "Shown in the reporter’s My reports.",
+      "messageToReporterPlaceholder": "We reviewed the job and closed your report. Thank you for telling us.",
+      "internalNote": "Internal note",
+      "internalNoteHint": "Never shown to the reporter.",
+      "internalNotePlaceholder": "Only reviewers see this",
+      "release": "Release",
+      "finalizeDecision": "Finalize decision…",
+      "finalizeModalTitleResolve": "Finalize as Resolved?",
+      "finalizeModalTitleReject": "Finalize as Rejected?",
+      "finalizeModalBody": "The decision can’t be changed afterwards. The reporter sees your message; the job stays as it is.",
+      "confirmFinalize": "Finalize"
+    },
+    "withdrawDialog": {
+      "title": "Withdraw report?",
+      "body": "Review will be stopped. ITTalent keeps a record for safety, but no further action will be taken.",
+      "reasonOptional": "Reason for withdrawal (optional)",
+      "reasonPlaceholder": "Why are you withdrawing this report?",
+      "confirm": "Withdraw report",
+      "success": "Report withdrawn. Review stopped and record kept."
+    },
+    "hideDialog": {
+      "title": "Hide from my history?",
+      "body": "This removes the report from your list and counts. ITTalent still keeps the report for compliance.",
+      "confirm": "Hide from my history",
+      "success": "Hidden from your history. ITTalent still keeps the report."
+    },
+    "filters": {
+      "statusPrefix": "Status",
+      "reasonPrefix": "Reason",
+      "typePrefix": "Type",
+      "submittedPrefix": "Submitted",
+      "all": "All",
+      "anyTime": "Any time",
+      "today": "Today",
+      "past7Days": "Past 7 days",
+      "past30Days": "Past 30 days"
+    },
+    "errors": {
+      "reasonRequired": "Choose what’s wrong.",
+      "statementRequired": "Tell us what happened.",
+      "statementTooLong": "Statement cannot exceed 2000 characters.",
+      "fileTooLarge": "File exceeds maximum size of 5 MB.",
+      "tooManyFiles": "Maximum of 5 files allowed.",
+      "internalNotesMin": "Internal notes must be at least 5 characters.",
+      "internalNotesMax": "Internal notes cannot exceed 1000 characters.",
+      "messageToReporterMin": "Message to reporter must be at least 10 characters.",
+      "messageToReporterMax": "Message to reporter cannot exceed 500 characters."
     }
   }
 }

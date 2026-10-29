@@ -1,19 +1,21 @@
-import { useState } from 'react';
-import {
-  Eye,
-  Shield,
-  Trash2,
-  Undo2,
-} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
+import { Briefcase, Building2, MoreHorizontal, User, Eye, Undo2, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-import { PageHeader } from '@/components/common/admin-page-header';
-import { TableSurface } from '@/components/common/data-table';
+import { useListParams } from '@/hooks/use-list-params';
+import { myReportDetailPath } from '@/config/routes';
 import { EmptyState } from '@/components/common/empty-state';
 import { ErrorState } from '@/components/common/error-state';
-import { KpiStrip } from '@/components/common/kpi-strip';
-import { Badge } from '@/components/ui/badge';
+import { SearchInput } from '@/components/common/search-input';
+import { NumberedPagination } from '@/components/common/numbered-pagination';
 import { Button } from '@/components/ui/button';
-import { Pagination } from '@/components/ui/pagination';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -22,281 +24,315 @@ import {
   TableHeaderCell,
   TableHeaderRow,
   TableRow,
+  TableSkeletonRows,
 } from '@/components/ui/table';
-import { DeleteReportDialog } from '@/features/reports/components/delete-report-dialog';
-import { MyReportDetailDialog } from '@/features/reports/components/my-report-detail-dialog';
-import { WithdrawReportDialog } from '@/features/reports/components/withdraw-report-dialog';
 import {
-  REPORT_REASON_CATEGORIES,
-  REPORT_STATUS_CONFIG,
-  REPORT_TARGET_TYPE_LABELS,
+  REPORT_STATUS_BADGE_CLASS,
+  CLOSED_REPORT_STATUSES,
+  type ReportCandidateTab,
 } from '@/features/reports/reports.constants';
 import { useMyReportsQuery } from '@/features/reports/reports.queries';
-import type { ReportDto } from '@/features/reports/reports.types';
+import type { ReportItemResponse } from '@/features/reports/reports.types';
+import { WithdrawReportDialog } from '@/features/reports/components/withdraw-report-dialog';
+import { HideReportDialog } from '@/features/reports/components/hide-report-dialog';
+
+function TargetIcon({ type }: { type?: string }) {
+  if (type === 'company' || type === 'enterprise') {
+    return <Building2 className="size-4 text-muted-foreground" aria-hidden="true" />;
+  }
+  if (type === 'user') {
+    return <User className="size-4 text-muted-foreground" aria-hidden="true" />;
+  }
+  return <Briefcase className="size-4 text-muted-foreground" aria-hidden="true" />;
+}
 
 export function MyReportsPage() {
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [selectedReportForDetail, setSelectedReportForDetail] = useState<ReportDto | null>(null);
-  const [selectedReportForWithdraw, setSelectedReportForWithdraw] = useState<ReportDto | null>(null);
-  const [selectedReportForDelete, setSelectedReportForDelete] = useState<ReportDto | null>(null);
+  const { page, limit, search, debouncedSearch, set } = useListParams({ defaultLimit: 10 });
+  const rawTab = searchParams.get('tab');
+  const activeTab: ReportCandidateTab = rawTab === 'open' || rawTab === 'closed' ? rawTab : 'all';
+
+  const [withdrawTarget, setWithdrawTarget] = useState<ReportItemResponse | null>(null);
+  const [hideTarget, setHideTarget] = useState<ReportItemResponse | null>(null);
 
   const { data, isLoading, isError, refetch } = useMyReportsQuery({
     page,
     limit,
-    status: statusFilter,
+    status: activeTab,
+    search: debouncedSearch,
   });
 
   const reports = data?.items ?? [];
-  const kpis = data?.kpis ?? {
-    total: 0,
-    pending: 0,
-    reviewing: 0,
-    resolved: 0,
-    rejected: 0,
-    withdrawn: 0,
+  const countsAll = data?.counts?.all ?? 0;
+  const countsOpen = data?.counts?.open ?? 0;
+  const countsClosed = data?.counts?.closed ?? 0;
+  const totalPages = data?.totalPages ?? 1;
+
+  const formatDate = (isoString?: string) => {
+    if (!isoString) return '';
+    try {
+      const d = new Date(isoString);
+      return new Intl.DateTimeFormat(i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }).format(d);
+    } catch {
+      return isoString;
+    }
   };
 
-  const statusFilterTabs = [
-    { key: 'all', label: 'Tất cả báo cáo' },
-    { key: 'pending', label: 'Chờ duyệt' },
-    { key: 'reviewing', label: 'Đang điều tra' },
-    { key: 'resolved', label: 'Đã giải quyết' },
-    { key: 'withdrawn', label: 'Đã rút lại' },
-    { key: 'rejected', label: 'Đã từ chối' },
-  ];
+  const tabsConfig = useMemo(
+    () => [
+      { key: 'all' as const, label: t('reports.tabs.all'), count: countsAll },
+      { key: 'open' as const, label: t('reports.tabs.open'), count: countsOpen },
+      { key: 'closed' as const, label: t('reports.tabs.closed'), count: countsClosed },
+    ],
+    [countsAll, countsOpen, countsClosed, t],
+  );
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-7xl">
-      {/* Standard Page Header */}
-      <PageHeader
-        title="Báo cáo của tôi"
-        description="Theo dõi tiến độ xác minh và kết quả xử lý các báo cáo vi phạm bạn đã gửi trên hệ thống."
-      />
-
-      {/* Official Design System KPI Strip */}
-      <KpiStrip
-        label="Thống kê báo cáo của bạn"
-        items={[
-          {
-            key: 'total',
-            label: 'Tổng báo cáo',
-            value: String(kpis.total),
-            note: 'Tất cả vi phạm đã gửi',
-          },
-          {
-            key: 'pending',
-            label: 'Chờ kiểm duyệt',
-            value: String(kpis.pending),
-            note: 'Đang xếp hàng xác minh',
-          },
-          {
-            key: 'reviewing',
-            label: 'Đang điều tra',
-            value: String(kpis.reviewing),
-            note: 'Chuyên viên đang xử lý',
-          },
-          {
-            key: 'resolved',
-            label: 'Đã giải quyết',
-            value: String(kpis.resolved),
-            note: 'Đã áp dụng biện pháp xử lý',
-          },
-        ]}
-      />
-
-      {/* Filter Tabs Toolbar */}
-      <div className="p-1.5 rounded-xl border border-border bg-card shadow-2xs flex items-center gap-1 overflow-x-auto scrollbar-none">
-        {statusFilterTabs.map((tab) => (
-          <Button
-            key={tab.key}
-            variant={statusFilter === tab.key ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => {
-              setStatusFilter(tab.key);
-              setPage(1);
-            }}
-            className="rounded-lg text-xs font-semibold shrink-0 h-8 px-4 transition-colors"
-          >
-            {tab.label}
-          </Button>
-        ))}
+    <div className="flex flex-col gap-5 w-full max-w-6xl pb-12">
+      {/* Page Title */}
+      <div>
+        <h1 className="font-heading text-2xl font-bold text-foreground">
+          {t('reports.myReports')}
+        </h1>
       </div>
 
-      {/* Reports Table or States */}
-      {isLoading ? (
-        <div className="py-20 flex flex-col items-center justify-center gap-3 text-muted-foreground">
-          <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-medium">Đang tải lịch sử báo cáo...</span>
+      {/* Toolbar: Search (Left) + 3 Tabs (Right) */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="w-full sm:w-80">
+          <SearchInput
+            value={search}
+            onChange={(val) => set('search', val)}
+            placeholder={t('reports.searchPlaceholder')}
+            className="h-10 text-[13.5px]"
+          />
         </div>
-      ) : isError ? (
-        <ErrorState
-          description="Không thể tải danh sách báo cáo. Vui lòng thử lại sau."
-          onRetry={() => refetch()}
-        />
-      ) : reports.length === 0 ? (
-        <EmptyState
-          icon={Shield}
-          title="Bạn chưa có báo cáo vi phạm nào"
-          description="Khi phát hiện các tin tuyển dụng lừa đảo, thu phí hoặc doanh nghiệp giả mạo, hãy bấm nút Báo cáo để gửi yêu cầu kiểm tra."
-        />
-      ) : (
-        <div className="flex flex-col gap-4">
-          <TableSurface>
-            <Table>
-              <TableHead>
-                <TableHeaderRow className="hover:bg-transparent">
-                  <TableHeaderCell className="w-[130px] font-semibold text-xs">MÃ VÉ</TableHeaderCell>
-                  <TableHeaderCell className="min-w-[200px] font-semibold text-xs">ĐỐI TƯỢNG BỊ BÁO CÁO</TableHeaderCell>
-                  <TableHeaderCell className="font-semibold text-xs">DANH MỤC</TableHeaderCell>
-                  <TableHeaderCell className="font-semibold text-xs">NGÀY GỬI</TableHeaderCell>
-                  <TableHeaderCell className="font-semibold text-xs">TRẠNG THÁI</TableHeaderCell>
-                  <TableHeaderCell className="text-right font-semibold text-xs w-[140px]">THAO TÁC</TableHeaderCell>
-                </TableHeaderRow>
-              </TableHead>
-              <TableBody>
-                {reports.map((report) => {
-                  const statusCfg = REPORT_STATUS_CONFIG[report.status] || {
-                    label: report.status,
-                    className: '',
-                  };
-                  const reasonCfg = REPORT_REASON_CATEGORIES.find((c) => c.value === report.reason_category);
 
-                  const canWithdraw = report.status === 'pending';
-                  const canDelete =
-                    report.status === 'resolved' ||
-                    report.status === 'rejected' ||
-                    report.status === 'withdrawn';
+        <div role="tablist" aria-label="Status" className="flex items-center gap-2 self-start sm:self-auto">
+          {tabsConfig.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => set('tab', tab.key === 'all' ? null : tab.key)}
+                className={`h-9 px-3.5 inline-flex items-center gap-1.5 rounded-full text-[13px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                  isActive
+                    ? 'bg-primary/10 text-primary border border-primary'
+                    : 'bg-background text-muted-foreground border border-line hover:bg-surface-subtle hover:text-foreground'
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span className={`text-xs ${isActive ? 'text-primary' : 'text-slate-subtle'}`}>
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Content Table Surface */}
+      <div className="rounded-2xl border border-line bg-surface overflow-hidden">
+        {isError ? (
+          <div className="p-8">
+            <ErrorState
+              title={t('common.errorLoadingData', { defaultValue: 'Unable to load reports' })}
+              description={t('common.retryPrompt', { defaultValue: 'Please check your connection and try again.' })}
+              onRetry={() => void refetch()}
+            />
+          </div>
+        ) : (
+          <Table>
+            <TableHead>
+              <TableHeaderRow className="bg-surface-readonly border-b border-line-muted">
+                <TableHeaderCell className="font-bold text-[11.5px] uppercase tracking-[0.06em] text-slate-subtle pl-5 py-3">
+                  {t('reports.columns.reported')}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[190px] font-bold text-[11.5px] uppercase tracking-[0.06em] text-slate-subtle py-3">
+                  {t('reports.columns.reason')}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[130px] font-bold text-[11.5px] uppercase tracking-[0.06em] text-slate-subtle py-3">
+                  {t('reports.columns.submitted')}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[120px] font-bold text-[11.5px] uppercase tracking-[0.06em] text-slate-subtle py-3">
+                  {t('reports.columns.status')}
+                </TableHeaderCell>
+                <TableHeaderCell className="w-[48px] pr-4 py-3" />
+              </TableHeaderRow>
+            </TableHead>
+
+            <TableBody>
+              {isLoading ? (
+                <TableSkeletonRows columns={5} rows={5} />
+              ) : reports.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-12 px-4">
+                    <EmptyState
+                      title={
+                        debouncedSearch
+                          ? t('reports.empty.adminTitle')
+                          : activeTab === 'open'
+                            ? t('reports.empty.openTitle')
+                            : activeTab === 'closed'
+                              ? t('reports.empty.closedTitle')
+                              : t('reports.empty.allTitle')
+                      }
+                      description={
+                        debouncedSearch
+                          ? t('reports.empty.adminDescription')
+                          : activeTab === 'open'
+                            ? t('reports.empty.openDescription')
+                            : activeTab === 'closed'
+                              ? t('reports.empty.closedDescription')
+                              : t('reports.empty.allDescription')
+                      }
+                    />
+                  </td>
+                </tr>
+              ) : (
+                reports.map((item) => {
+                  const targetRef = item.reference || item.id;
+                  const canWithdraw = item.status === 'pending';
+                  const canHide = CLOSED_REPORT_STATUSES.includes(item.status);
+                  const reasonLabel = t(`reports.reasons.${item.reason}`, { defaultValue: item.reason });
+                  const statusLabel = t(`reports.statuses.${item.status}`, { defaultValue: item.status });
+                  const badgeClass = REPORT_STATUS_BADGE_CLASS[item.status] || 'bg-muted text-foreground';
+
+                  const targetType = item.target?.type ?? item.target_type ?? 'job';
+                  const targetTitle = item.target?.title ?? item.target_title ?? t('common.untitled', { defaultValue: 'Untitled' });
+                  const targetSubtitle = item.target?.subtitle;
 
                   return (
-                    <TableRow key={report.id} className="hover:bg-muted/30 transition-colors">
-                      {/* Ticket ID */}
-                      <TableCell className="font-mono text-xs font-semibold text-foreground">
-                        #{report.ticket_id}
-                      </TableCell>
-
-                      {/* Target Entity */}
-                      <TableCell>
-                        <div className="flex flex-col gap-0.5 max-w-[260px]">
-                          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                            {REPORT_TARGET_TYPE_LABELS[report.target_type]}
-                          </span>
-                          <span className="font-semibold text-foreground text-[13.5px] truncate">
-                            {report.target_title}
-                          </span>
+                    <TableRow
+                      key={item.id}
+                      className="cursor-pointer hover:bg-surface-subtle transition-colors group"
+                      onClick={() => navigate(myReportDetailPath(targetRef))}
+                    >
+                      <TableCell className="pl-5 py-3.5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="size-9 rounded-lg bg-surface-subtle border border-line flex items-center justify-center shrink-0">
+                            <TargetIcon type={targetType} />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-semibold text-[14px] text-foreground truncate group-hover:text-primary transition-colors">
+                              {targetTitle}
+                            </span>
+                            <span className="text-xs text-muted-foreground truncate">
+                              {t(`reports.targetTypes.${targetType}`, { defaultValue: targetType })}
+                              {targetSubtitle ? ` · ${targetSubtitle}` : ''}
+                            </span>
+                          </div>
                         </div>
                       </TableCell>
 
-                      {/* Reason Category */}
-                      <TableCell>
-                        <span className="text-xs text-foreground font-medium">
-                          {reasonCfg?.defaultLabel ?? report.reason_category}
+                      <TableCell className="py-3.5 text-[13.5px] text-foreground">
+                        {reasonLabel}
+                      </TableCell>
+
+                      <TableCell className="py-3.5 text-[13px] text-muted-foreground whitespace-nowrap">
+                        {formatDate(item.createdAt)}
+                      </TableCell>
+
+                      <TableCell className="py-3.5">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${badgeClass}`}>
+                          {statusLabel}
                         </span>
                       </TableCell>
 
-                      {/* Date */}
-                      <TableCell className="text-xs text-muted-foreground">
-                        {new Date(report.createdAt).toLocaleDateString('vi-VN')}
-                      </TableCell>
-
-                      {/* Status Badge */}
-                      <TableCell>
-                        <Badge variant="neutral" className={`font-semibold text-xs ${statusCfg.className}`}>
-                          {statusCfg.label}
-                        </Badge>
-                      </TableCell>
-
-                      {/* Actions */}
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedReportForDetail(report)}
-                            className="h-8 px-2.5 text-xs font-semibold gap-1 text-foreground hover:bg-muted"
-                            title="Xem chi tiết & tiến độ"
-                          >
-                            <Eye className="size-3.5" />
-                            <span>Chi tiết</span>
-                          </Button>
-
-                          {canWithdraw && (
+                      <TableCell
+                        className="py-3.5 pr-4 text-right"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
                             <Button
+                              type="button"
                               variant="ghost"
-                              size="sm"
-                              onClick={() => setSelectedReportForWithdraw(report)}
-                              className="h-8 px-2 text-xs font-medium text-amber-600 hover:text-amber-700 hover:bg-amber-500/10"
-                              title="Rút lại báo cáo"
+                              size="icon"
+                              className="size-8 text-muted-foreground hover:text-foreground"
+                              aria-label="Actions"
                             >
-                              <Undo2 className="size-3.5" />
+                              <MoreHorizontal className="size-4" />
                             </Button>
-                          )}
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => navigate(myReportDetailPath(targetRef))}>
+                              <Eye className="size-4 mr-2" />
+                              <span>{t('reports.actions.view')}</span>
+                            </DropdownMenuItem>
 
-                          {canDelete && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setSelectedReportForDelete(report)}
-                              className="h-8 px-2 text-xs font-medium text-destructive hover:bg-destructive/10"
-                              title="Xóa khỏi lịch sử"
-                            >
-                              <Trash2 className="size-3.5" />
-                            </Button>
-                          )}
-                        </div>
+                            {canWithdraw && (
+                              <DropdownMenuItem
+                                variant="warning"
+                                onClick={() => setWithdrawTarget(item)}
+                              >
+                                <Undo2 className="size-4 mr-2" />
+                                <span>{t('reports.actions.withdraw')}</span>
+                              </DropdownMenuItem>
+                            )}
+
+                            {canHide && (
+                              <DropdownMenuItem
+                                onClick={() => setHideTarget(item)}
+                                className="text-muted-foreground focus:text-foreground"
+                              >
+                                <EyeOff className="size-4 mr-2" />
+                                <span>{t('reports.actions.hide')}</span>
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   );
-                })}
-              </TableBody>
-            </Table>
-          </TableSurface>
+                })
+              )}
+            </TableBody>
+          </Table>
+        )}
 
-          {data && data.total > limit && (
-            <div className="flex justify-end pt-2">
-              <Pagination
-                page={page}
-                totalPages={data.totalPages}
-                total={data.total}
-                limit={limit}
-                onPageChange={(p) => setPage(p)}
-                onLimitChange={(l) => {
-                  setLimit(l);
-                  setPage(1);
-                }}
-              />
-            </div>
-          )}
-        </div>
-      )}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-5 py-3.5 border-t border-line bg-surface">
+            <span className="text-xs text-muted-foreground">
+              {t('pagination.showing', {
+                start: (page - 1) * limit + 1,
+                end: Math.min(page * limit, data?.total ?? 0),
+                total: data?.total ?? 0,
+                defaultValue: `Showing ${page} of ${totalPages}`,
+              })}
+            </span>
+            <NumberedPagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={(p) => set('page', String(p))}
+            />
+          </div>
+        )}
+      </div>
 
-      {/* Modals & Dialogs */}
-      <MyReportDetailDialog
-        report={selectedReportForDetail}
-        open={Boolean(selectedReportForDetail)}
-        onOpenChange={(open) => !open && setSelectedReportForDetail(null)}
-        onWithdrawClick={(rep) => {
-          setSelectedReportForDetail(null);
-          setSelectedReportForWithdraw(rep);
-        }}
-        onDeleteClick={(rep) => {
-          setSelectedReportForDetail(null);
-          setSelectedReportForDelete(rep);
-        }}
-      />
-
+      {/* Withdraw Modal */}
       <WithdrawReportDialog
-        report={selectedReportForWithdraw}
-        open={Boolean(selectedReportForWithdraw)}
-        onOpenChange={(open) => !open && setSelectedReportForWithdraw(null)}
+        open={Boolean(withdrawTarget)}
+        onOpenChange={(isOpen) => !isOpen && setWithdrawTarget(null)}
+        report={withdrawTarget}
+        onSuccess={() => setWithdrawTarget(null)}
       />
 
-      <DeleteReportDialog
-        report={selectedReportForDelete}
-        open={Boolean(selectedReportForDelete)}
-        onOpenChange={(open) => !open && setSelectedReportForDelete(null)}
+      {/* Hide Modal */}
+      <HideReportDialog
+        open={Boolean(hideTarget)}
+        onOpenChange={(isOpen) => !isOpen && setHideTarget(null)}
+        report={hideTarget}
+        onSuccess={() => setHideTarget(null)}
       />
     </div>
   );

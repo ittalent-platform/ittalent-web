@@ -3,21 +3,22 @@ import {
   ArrowLeft,
   Building,
   Building2,
+  Flag,
   Globe,
   MapPin,
   RefreshCw,
-  ShieldAlert,
   TriangleAlert,
   Users,
 } from "lucide-react";
 import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
 import { HTTP_NOT_FOUND } from "@/api/http-status";
 import { requestStatus } from "@/api/request-error";
 import { cn } from "@/lib/utils";
-import { ReportViolationDialog } from "@/features/reports";
+import { ReportViolationDialog } from "@/components/common/report-violation-dialog";
 import {
   EMPLOYMENT_LABELS,
   formatDeadline,
@@ -151,6 +152,7 @@ function CompanyTabs({
 }
 
 export function EnterpriseDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const { data: session } = useSession();
   const [tab, setTab] = useState<"about" | "open-jobs">("about");
@@ -361,11 +363,11 @@ export function EnterpriseDetailPage() {
             <button
               type="button"
               onClick={() => setIsReportDialogOpen(true)}
-              className="inline-flex h-11 items-center gap-1.5 rounded-full border border-mkt-line bg-white px-4 text-xs font-semibold text-mkt-ink transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
-              title="Báo cáo vi phạm"
+              className="inline-flex h-11 items-center gap-1.5 rounded-full border border-mkt-line bg-white px-4 text-xs font-semibold text-mkt-ink transition-colors hover:bg-mkt-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              title={t("reports.reportThisCompany")}
             >
-              <ShieldAlert className="size-4 text-red-500" />
-              <span>Báo cáo</span>
+              <Flag className="size-3.5 text-mkt-muted" aria-hidden="true" />
+              <span>{t("reports.reportThisCompany")}</span>
             </button>
           </div>
         </div>
@@ -589,10 +591,10 @@ export function EnterpriseDetailPage() {
       <ReportViolationDialog
         open={isReportDialogOpen}
         onOpenChange={setIsReportDialogOpen}
-        targetType="enterprise"
+        targetType="company"
         targetId={enterprise.id}
         targetTitle={enterprise.name}
-        targetLink={typeof window !== "undefined" ? window.location.href : undefined}
+        targetSubtitle={enterprise.industry || undefined}
       />
     </main>
   );

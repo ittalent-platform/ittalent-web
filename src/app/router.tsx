@@ -99,9 +99,19 @@ const MyReportsPage = lazy(() =>
     default: m.MyReportsPage,
   })),
 );
+const MyReportDetailPage = lazy(() =>
+  import("@/features/reports").then((m) => ({
+    default: m.MyReportDetailPage,
+  })),
+);
 const AdminReportsPage = lazy(() =>
   import("@/features/reports").then((m) => ({
     default: m.AdminReportsPage,
+  })),
+);
+const AdminReportDetailPage = lazy(() =>
+  import("@/features/reports").then((m) => ({
+    default: m.AdminReportDetailPage,
   })),
 );
 const RecruiterJobPostingsPage = lazy(() =>
@@ -285,6 +295,7 @@ export const appRoutes = [
               { path: "saved-jobs", element: <SavedJobsPage /> },
               { path: "certificates", element: <CertificatesPage /> },
               { path: "my-reports", element: <MyReportsPage /> },
+              { path: "my-reports/:ref", element: <MyReportDetailPage /> },
               { path: "notifications", element: <NotificationCenterPage /> },
               { path: "account/notifications", element: <Navigate replace to="/notifications" /> },
             ],
@@ -334,6 +345,10 @@ export const appRoutes = [
           {
             path: "reports",
             element: <AdminReportsPage />,
+          },
+          {
+            path: "reports/:ref",
+            element: <AdminReportDetailPage />,
           },
         ],
       },
