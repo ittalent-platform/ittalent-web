@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3001"
+      "url": "http://localhost:3000"
     }
   ],
   "components": {
@@ -3316,6 +3316,103 @@
           "message"
         ]
       },
+      "PublicEnterpriseListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "logoUrl": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "industry": {
+                  "type": "string"
+                },
+                "companySize": {
+                  "type": "string"
+                },
+                "shortDescription": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "cities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "openRoleCount": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "logoUrl",
+                "industry",
+                "companySize",
+                "shortDescription",
+                "cities",
+                "openRoleCount"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "PublicIndustryList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "industry": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "industry",
+                "count"
+              ]
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "StartEnterpriseRegistrationRequest": {
         "type": "object",
         "properties": {
@@ -5258,6 +5355,33 @@
         ],
         "additionalProperties": false
       },
+      "UpdatePortfolioLinkRequest": {
+        "type": "object",
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
       "PortfolioLink": {
         "type": "object",
         "properties": {
@@ -5308,6 +5432,11 @@
             "minimum": 1,
             "maximum": 100,
             "default": 20
+          },
+          "keyword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
           }
         },
         "additionalProperties": false
@@ -9213,6 +9342,529 @@
           "removedCount",
           "message"
         ]
+      },
+      "CreateReportRequest": {
+        "type": "object",
+        "properties": {
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "job",
+              "company",
+              "user"
+            ]
+          },
+          "targetId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "scam_or_fraud",
+              "misleading_information",
+              "discrimination",
+              "inappropriate_content",
+              "something_else"
+            ]
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "evidenceFiles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "fileUrl": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "storageKey": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "fileName": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "mimeType": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "exclusiveMinimum": true
+                }
+              },
+              "required": [
+                "fileUrl",
+                "storageKey",
+                "fileName",
+                "mimeType",
+                "size"
+              ]
+            },
+            "maxItems": 5
+          }
+        },
+        "required": [
+          "targetType",
+          "targetId",
+          "reason",
+          "statement"
+        ],
+        "additionalProperties": false
+      },
+      "CreateReportResponse": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reference",
+          "message"
+        ]
+      },
+      "PaginatedReportsResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "reference": {
+                  "type": "string"
+                },
+                "target": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "job",
+                        "company",
+                        "user"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "subtitle": {
+                      "type": "string"
+                    },
+                    "isAvailable": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "id",
+                    "title",
+                    "subtitle",
+                    "isAvailable"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "scam_or_fraud",
+                    "misleading_information",
+                    "discrimination",
+                    "inappropriate_content",
+                    "something_else"
+                  ]
+                },
+                "reasonLabel": {
+                  "type": "string"
+                },
+                "submittedAt": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "reviewing",
+                    "resolved",
+                    "rejected",
+                    "withdrawn"
+                  ]
+                },
+                "statusLabel": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "reference",
+                "target",
+                "reason",
+                "reasonLabel",
+                "submittedAt",
+                "status",
+                "statusLabel"
+              ]
+            }
+          },
+          "counts": {
+            "type": "object",
+            "properties": {
+              "all": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "open": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "closed": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "all",
+              "open",
+              "closed"
+            ]
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 0,
+                "exclusiveMinimum": true
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "totalPages": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "page",
+              "limit",
+              "total",
+              "totalPages"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "counts",
+          "pagination"
+        ]
+      },
+      "ReportDetailResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "reviewing",
+              "resolved",
+              "rejected",
+              "withdrawn"
+            ]
+          },
+          "statusLabel": {
+            "type": "string"
+          },
+          "statusDescription": {
+            "type": "string"
+          },
+          "submittedAt": {
+            "type": "string"
+          },
+          "target": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "job",
+                  "company",
+                  "user"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "subtitle": {
+                "type": "string"
+              },
+              "isAvailable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "type",
+              "id",
+              "title",
+              "subtitle",
+              "isAvailable"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "scam_or_fraud",
+              "misleading_information",
+              "discrimination",
+              "inappropriate_content",
+              "something_else"
+            ]
+          },
+          "reasonLabel": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "fileName": {
+                  "type": "string"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "mimeType": {
+                  "type": "string"
+                },
+                "downloadUrl": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "id",
+                "fileName",
+                "size",
+                "mimeType",
+                "downloadUrl"
+              ]
+            }
+          },
+          "responseFromPlatform": {
+            "type": "string",
+            "nullable": true
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "event": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "timestamp": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "event",
+                "label",
+                "timestamp"
+              ]
+            }
+          },
+          "canWithdraw": {
+            "type": "boolean"
+          },
+          "canHide": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "status",
+          "statusLabel",
+          "statusDescription",
+          "submittedAt",
+          "target",
+          "reason",
+          "reasonLabel",
+          "statement",
+          "files",
+          "responseFromPlatform",
+          "history",
+          "canWithdraw",
+          "canHide"
+        ]
+      },
+      "ReportWithdrawResponse": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "withdrawn"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reference",
+          "status",
+          "message"
+        ]
+      },
+      "ReportHideResponse": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string"
+          },
+          "hidden": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reference",
+          "hidden",
+          "message"
+        ]
+      },
+      "ReportIdParam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "ReportsQuery": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 10
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "all",
+              "open",
+              "closed"
+            ],
+            "default": "all"
+          },
+          "search": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminResolveReportRequest": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "rejected"
+            ]
+          },
+          "action_taken": {
+            "type": "string",
+            "enum": [
+              "warning_issued",
+              "content_takedown",
+              "account_suspended",
+              "none"
+            ]
+          },
+          "internal_notes": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 1000
+          },
+          "message_to_reporter": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "decision",
+          "internal_notes",
+          "message_to_reporter"
+        ],
+        "additionalProperties": false
       }
     },
     "parameters": {}
@@ -12073,6 +12725,110 @@
         }
       }
     },
+    "/api/v1/enterprises/public": {
+      "get": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "Browse, search and filter companies (public)",
+        "description": "No sign-in needed. Only Active enterprises, each with card fields only (no contact or tax data) and the number of open roles. `keyword` matches the name, industry, city (head office or a branch), country or tech stack. `industry` and `company_size` take one value or a comma-separated list (\"Fintech,Gaming\"), and an enterprise matches any of them. `location` matches a city, district or province of the head office or a branch. Sorted by name; `total` is the live count for the chosen filters.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "keyword",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "industry",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "company_size",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "location",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated company cards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicEnterpriseListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or unsupported query parameters"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprises/public/industries": {
+      "get": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "Industries of the companies on the platform (public)",
+        "description": "Active enterprises per industry, most companies first, for the Industry filter. At most 100 industries.",
+        "responses": {
+          "200": {
+            "description": "Industries with their company counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicIndustryList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/enterprises/{enterpriseId}": {
       "get": {
         "tags": [
@@ -13498,7 +14254,8 @@
         "tags": [
           "Portfolio Links"
         ],
-        "summary": "List the current Candidate’s private portfolio links",
+        "summary": "List or search the current Candidate’s private portfolio links",
+        "description": "With `keyword`, only links whose title, URL or description contain it (case-insensitive) are returned. Stored metadata only; external pages are never fetched.",
         "security": [
           {
             "bearerAuth": []
@@ -13525,6 +14282,16 @@
             "required": false,
             "name": "limit",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "keyword",
+            "in": "query"
           }
         ],
         "responses": {
@@ -13539,7 +14306,7 @@
             }
           },
           "400": {
-            "description": "Invalid pagination"
+            "description": "Invalid pagination or search query"
           },
           "401": {
             "description": "Authentication required or session revoked"
@@ -13554,6 +14321,69 @@
       }
     },
     "/api/v1/me/portfolio-links/{id}": {
+      "patch": {
+        "tags": [
+          "Portfolio Links"
+        ],
+        "summary": "Update the title, URL or description of an owned portfolio link",
+        "description": "A field that is left out keeps its value; `description: null` or an empty string removes it. Send the version that was loaded for editing. Earlier application snapshots are not changed. An update that changes nothing, or the retry of one that already committed, returns the stored link without a new version.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePortfolioLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated portfolio link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or empty update, or unsafe URL"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active verified Candidate account required"
+          },
+          "404": {
+            "description": "Portfolio link not found or owned by someone else"
+          },
+          "409": {
+            "description": "VERSION_CONFLICT or DUPLICATE_PORTFOLIO_URL"
+          },
+          "503": {
+            "description": "Portfolio link storage unavailable"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Portfolio Links"
@@ -16428,6 +17258,498 @@
           },
           "403": {
             "description": "Removing saved jobs is for candidate accounts"
+          }
+        }
+      }
+    },
+    "/api/v1/me/reports": {
+      "post": {
+        "tags": [
+          "Reports - Applicant"
+        ],
+        "summary": "Submit a violation report against a job, company, or user",
+        "description": "Submits a violation report with statement and optional evidence files. Generates reference RPT-YYYY-NNNN and snapshots target metadata. Idempotent against double-clicks.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReportRequest"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Report submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateReportResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed or self-reporting forbidden"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Reporting is restricted to applicant accounts"
+          },
+          "404": {
+            "description": "Target entity not found"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Reports - Applicant"
+        ],
+        "summary": "List my submitted reports with status filters and search",
+        "description": "Returns paginated reports with category badge counts (all, open, closed) and dynamic target availability check.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "open",
+                "closed"
+              ],
+              "default": "all"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reports listed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedReportsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Reporting is restricted to applicant accounts"
+          }
+        }
+      }
+    },
+    "/api/v1/me/reports/{id}": {
+      "get": {
+        "tags": [
+          "Reports - Applicant"
+        ],
+        "summary": "Get report detail by ID or reference",
+        "description": "Returns complete report ticket with target snapshot, file downloads, timeline, and current resolution response.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report detail retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Reporting is restricted to applicant accounts"
+          },
+          "404": {
+            "description": "Report not found or hidden"
+          }
+        }
+      }
+    },
+    "/api/v1/me/reports/{id}/withdraw": {
+      "post": {
+        "tags": [
+          "Reports - Applicant"
+        ],
+        "summary": "Withdraw a pending report",
+        "description": "Allows applicant to withdraw report if status is strictly pending. Rejects with 409 Conflict if review has started.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report withdrawn successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportWithdrawResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Reporting is restricted to applicant accounts"
+          },
+          "404": {
+            "description": "Report not found"
+          },
+          "409": {
+            "description": "Review has already started; cannot withdraw report"
+          }
+        }
+      }
+    },
+    "/api/v1/me/reports/{id}/hide": {
+      "post": {
+        "tags": [
+          "Reports - Applicant"
+        ],
+        "summary": "Hide a closed report from my history",
+        "description": "Soft-hides a closed report (resolved, rejected, or withdrawn) from candidate list and counts. Compliance records remain preserved.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report hidden successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportHideResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Report is not closed; open reports cannot be hidden"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Reporting is restricted to applicant accounts"
+          },
+          "404": {
+            "description": "Report not found"
+          }
+        }
+      }
+    },
+    "/api/v1/reports": {
+      "get": {
+        "tags": [
+          "Reports - Admin"
+        ],
+        "summary": "View violation reports queue (Admin)",
+        "description": "Centralized administrator review queue of all submitted violation reports with KPI statistics.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "pending",
+                "reviewing",
+                "resolved",
+                "rejected",
+                "withdrawn"
+              ],
+              "default": "pending"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "job",
+                "company",
+                "user"
+              ],
+              "default": "all"
+            },
+            "required": false,
+            "name": "target_type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "scam_fraud",
+                "fee_extortion",
+                "misleading_info",
+                "offensive_content",
+                "impersonation",
+                "harassment",
+                "other"
+              ],
+              "default": "all"
+            },
+            "required": false,
+            "name": "category",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reports queue retrieved successfully"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Admin privileges required"
+          }
+        }
+      }
+    },
+    "/api/v1/reports/{id}": {
+      "get": {
+        "tags": [
+          "Reports - Admin"
+        ],
+        "summary": "View report investigation workbench (Admin)",
+        "description": "Full investigation view for administrators with reporter details and internal notes.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Investigation details retrieved successfully"
+          },
+          "403": {
+            "description": "Admin privileges required"
+          },
+          "404": {
+            "description": "Report not found"
+          }
+        }
+      }
+    },
+    "/api/v1/reports/{id}/claim": {
+      "patch": {
+        "tags": [
+          "Reports - Admin"
+        ],
+        "summary": "Claim report ticket (Admin)",
+        "description": "Assign report ticket to current administrator and advance status to reviewing.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket claimed successfully"
+          },
+          "400": {
+            "description": "Ticket cannot be claimed"
+          },
+          "403": {
+            "description": "Admin privileges required"
+          }
+        }
+      }
+    },
+    "/api/v1/reports/{id}/resolve": {
+      "patch": {
+        "tags": [
+          "Reports - Admin"
+        ],
+        "summary": "Finalize report resolution (Admin)",
+        "description": "Execute decisive resolution with atomic enforcement actions, internal notes, and reporter message.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminResolveReportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resolution finalized successfully"
+          },
+          "400": {
+            "description": "Ticket already resolved or invalid parameters"
+          },
+          "403": {
+            "description": "Admin privileges required"
           }
         }
       }

@@ -71,3 +71,15 @@ export const RECRUITER_COMPANY_PROFILE_PATH = "/recruiter/company-profile";
 export function recruiterCompanyProfileEditPath(): string {
   return `${RECRUITER_COMPANY_PROFILE_PATH}/edit`;
 }
+
+/** Reports management (UC 30 - UC 36). */
+export const MY_REPORTS_PATH = "/my-reports";
+export const ADMIN_REPORTS_PATH = "/admin/reports";
+
+export function myReportDetailPath(reportId: string): string {
+  return `${MY_REPORTS_PATH}/${reportId}`;
+}
+
+export function adminReportDetailPath(reportId: string): string {
+  return `${ADMIN_REPORTS_PATH}/${reportId}`;
+}

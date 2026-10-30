@@ -21,7 +21,8 @@
     "documents": "Tài liệu",
     "certificates": "Chứng chỉ",
     "account": "Tài khoản",
-    "notifications": "Thông báo"
+    "notifications": "Thông báo",
+    "myReports": "Báo cáo của tôi"
   },
   "myProfile": {
     "title": "Hồ sơ",
@@ -867,7 +868,8 @@
     "closeMenu": "Đóng menu",
     "interviews": "Phỏng vấn",
     "dashboard": "Bảng điều khiển",
-    "broadcasts": "Thông báo hệ thống"
+    "broadcasts": "Thông báo hệ thống",
+    "reports": "Báo cáo vi phạm"
   },
   "jobPostings": {
     "title": "Tin tuyển dụng",
@@ -1911,14 +1913,15 @@
       "sent": "Đã phát / Đã gửi"
     },
     "toolbar": {
-      "searchPlaceholder": "Tìm kiếm thông báo theo tiêu đề hoặc nội dung...",
-      "statusAll": "Trạng thái: Tất cả",
-      "audienceAll": "Đối tượng: Tất cả",
-      "priorityAll": "Mức ưu tiên: Tất cả",
+      "searchPlaceholder": "Tìm kiếm theo tiêu đề thông báo...",
+      "statusAll": "Tất cả trạng thái",
+      "audienceAll": "Tất cả đối tượng",
+      "priorityAll": "Tất cả mức ưu tiên",
       "fromDatePlaceholder": "Từ ngày",
       "toDatePlaceholder": "Đến ngày",
       "resetFilters": "Đặt lại bộ lọc",
-      "clearFilters": "Xóa bộ lọc"
+      "clearFilters": "Xóa tất cả bộ lọc",
+      "invalidDateRange": "'Từ ngày' phải trước hoặc bằng 'Đến ngày'"
     },
     "table": {
       "announcement": "Thông báo",
@@ -1995,17 +1998,6 @@
       "scheduled": "Đã lên lịch gửi lúc {{time}}",
       "dispatched": "Đã phát tới {{count}} người nhận",
       "cancelled": "Đã hủy lịch phát"
-    },
-    "toolbar": {
-      "searchPlaceholder": "Tìm kiếm theo tiêu đề thông báo...",
-      "statusAll": "Tất cả trạng thái",
-      "audienceAll": "Tất cả đối tượng",
-      "priorityAll": "Tất cả mức ưu tiên",
-      "fromDatePlaceholder": "Từ ngày",
-      "toDatePlaceholder": "Đến ngày",
-      "resetFilters": "Đặt lại bộ lọc",
-      "clearFilters": "Xóa tất cả bộ lọc",
-      "invalidDateRange": "'Từ ngày' phải trước hoặc bằng 'Đến ngày'"
     },
     "dialog": {
       "createTitle": "Tạo thông báo hệ thống",
@@ -3732,6 +3724,206 @@
       "error": {
         "title": "Không tải được tổng quan"
       }
+    }
+  },
+  "reports": {
+    "reportThisJob": "Báo cáo tin tuyển dụng",
+    "reportThisCompany": "Báo cáo doanh nghiệp",
+    "reportThisUser": "Báo cáo người dùng",
+    "myReports": "Báo cáo của tôi",
+    "adminReports": "Báo cáo vi phạm",
+    "adminDescription": "Báo cáo từ ứng viên về tin tuyển dụng, doanh nghiệp và người dùng. Danh tính người báo cáo được bảo mật.",
+    "titleJob": "Báo cáo tin tuyển dụng này",
+    "titleCompany": "Báo cáo doanh nghiệp này",
+    "titleUser": "Báo cáo người dùng này",
+    "whatsWrong": "Có vấn đề gì xảy ra?",
+    "tellUsWhatHappened": "Mô tả điều đã xảy ra",
+    "statementPlaceholder": "Mô tả chi tiết nội dung sai lệch, lừa đảo hoặc vi phạm...",
+    "addFiles": "Đính kèm tệp (không bắt buộc)",
+    "filesHelper": "Ảnh chụp màn hình hoặc tài liệu (PNG, JPG, WEBP, PDF, DOC, DOCX · tối đa 5 tệp, 5 MB mỗi tệp)",
+    "privacyLine": "Tên và thông tin liên hệ của bạn sẽ không được chia sẻ với đối tượng bị báo cáo.",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "sendReport": "Gửi báo cáo",
+    "sending": "Đang gửi...",
+    "signInPromptTitle": "Đăng nhập để báo cáo",
+    "signInPromptBody": "Bạn cần đăng nhập tài khoản ứng viên để gửi báo cáo. Danh tính của bạn luôn được bảo mật.",
+    "signIn": "Đăng nhập",
+    "candidateOnlyTitle": "Cần tài khoản ứng viên",
+    "candidateOnlyBody": "Tính năng báo cáo tin tuyển dụng và doanh nghiệp dành cho tài khoản ứng viên.",
+    "receivedTitle": "Đã nhận báo cáo",
+    "receivedBody": "Cảm ơn bạn đã phản ánh. Mã tham chiếu của bạn là {{reference}}. Bạn có thể theo dõi tiến độ trong Báo cáo của tôi.",
+    "backToJob": "Quay lại tin tuyển dụng",
+    "backToCompany": "Quay lại doanh nghiệp",
+    "viewMyReports": "Xem báo cáo của tôi",
+    "searchPlaceholder": "Tìm theo tên đối tượng hoặc mã báo cáo",
+    "searchAdminPlaceholder": "Tìm mã báo cáo hoặc tên đối tượng",
+    "itemUnavailable": "Mục này hiện không còn khả dụng trên ITTalent.",
+    "noLongerAvailable": "Không còn khả dụng",
+    "reasons": {
+      "scam_or_fraud": "Lừa đảo hoặc gian lận",
+      "misleading_information": "Thông tin sai lệch",
+      "discrimination": "Phân biệt đối xử",
+      "inappropriate_content": "Nội dung không phù hợp",
+      "something_else": "Lý do khác"
+    },
+    "statuses": {
+      "pending": "Chờ duyệt",
+      "reviewing": "Đang xử lý",
+      "resolved": "Đã giải quyết",
+      "rejected": "Đã từ chối",
+      "withdrawn": "Đã rút lại"
+    },
+    "targetTypes": {
+      "job": "Tin tuyển dụng",
+      "company": "Doanh nghiệp",
+      "enterprise": "Doanh nghiệp",
+      "user": "Người dùng"
+    },
+    "tabs": {
+      "all": "Tất cả",
+      "open": "Đang xử lý",
+      "closed": "Đã đóng"
+    },
+    "columns": {
+      "reported": "ĐỐI TƯỢNG BÁO CÁO",
+      "reason": "LÝ DO",
+      "submitted": "NGÀY GỬI",
+      "status": "TRẠNG THÁI",
+      "reviewer": "CHUYÊN VIÊN",
+      "actions": "THAO TÁC"
+    },
+    "actions": {
+      "view": "Xem chi tiết",
+      "open": "Mở hồ sơ",
+      "claimToReview": "Nhận xử lý hồ sơ",
+      "withdraw": "Rút lại báo cáo…",
+      "hide": "Ẩn khỏi lịch sử…"
+    },
+    "empty": {
+      "allTitle": "Chưa có báo cáo nào",
+      "allDescription": "Các báo cáo bạn gửi về tin tuyển dụng, doanh nghiệp hoặc hồ sơ sẽ xuất hiện ở đây.",
+      "openTitle": "Không có báo cáo đang mở",
+      "openDescription": "Hiện tại bạn không có báo cáo nào đang chờ duyệt hoặc đang xử lý.",
+      "closedTitle": "Không có báo cáo đã đóng",
+      "closedDescription": "Các báo cáo đã giải quyết, từ chối hoặc đã rút lại sẽ hiển thị ở đây.",
+      "adminTitle": "Không tìm thấy báo cáo nào",
+      "adminDescription": "Không có báo cáo nào khớp với bộ lọc hoặc từ khóa tìm kiếm hiện tại."
+    },
+    "summaryOpen_one": "{{count}} báo cáo đang mở · mới nhất trước",
+    "summaryOpen_other": "{{count}} báo cáo đang mở · mới nhất trước",
+    "summaryClosed_one": "{{count}} báo cáo đã đóng · mới nhất trước",
+    "summaryClosed_other": "{{count}} báo cáo đã đóng · mới nhất trước",
+    "summaryAll_one": "{{count}} báo cáo · mới nhất trước",
+    "summaryAll_other": "{{count}} báo cáo · mới nhất trước",
+    "timeline": {
+      "submitted": "Đã gửi",
+      "underReview": "Đang xem xét",
+      "reviewStarted": "Bắt đầu xem xét",
+      "resolved": "Đã giải quyết",
+      "rejected": "Đã từ chối",
+      "withdrawn": "Người báo cáo đã rút lại",
+      "withdrawnByYou": "Bạn đã rút lại",
+      "claimedBy": "Tiếp nhận bởi {{name}}",
+      "finalizedAs": "Đã kết luận: {{status}}"
+    },
+    "detail": {
+      "reportAbout": "Báo cáo về {{target}}",
+      "referenceSubmitted": "Mã tham chiếu {{reference}} · gửi lúc {{date}}",
+      "referenceAssigned": "Mã tham chiếu {{reference}} · tiếp nhận bởi {{reviewer}}",
+      "referenceUnassigned": "Mã tham chiếu {{reference}} · chưa có người tiếp nhận",
+      "targetReportHeader": "Báo cáo {{type}} · {{target}}",
+      "reportCardTitle": "Báo cáo",
+      "reportedItem": "{{type}} bị báo cáo",
+      "verdict": "Kết luận: {{status}}",
+      "messageToReporterLabel": "Lời nhắn gửi người báo cáo:",
+      "internalNoteLabel": "Ghi chú nội bộ:",
+      "view": "Xem",
+      "responseFromPlatform": "Phản hồi từ ITTalent",
+      "whatYouReported": "Nội dung bạn đã báo cáo",
+      "whatsWrongLabel": "Lý do báo cáo",
+      "whatHappenedLabel": "Nội dung sự việc",
+      "filesLabel": "Tệp đính kèm",
+      "noFiles": "Không có tệp đính kèm.",
+      "statusRailTitle": "TRẠNG THÁI",
+      "historyRailTitle": "LỊCH SỬ",
+      "waitingForReview": "Đang chờ duyệt",
+      "waitingForReviewDesc": "Thời gian xử lý có thể khác nhau; chúng tôi sẽ gửi thông báo khi trạng thái thay đổi.",
+      "reviewedAndClosed": "Đã xem xét và đóng",
+      "youWithdrewIt": "Bạn đã rút lại báo cáo",
+      "reportClosedDesc": "Báo cáo này đã được đóng.",
+      "withdrawnDesc": "Báo cáo này đã được đóng.",
+      "withdrawnRecordDesc": "Người báo cáo đã rút lại báo cáo này. Hồ sơ không thể nhận xử lý hoặc ra quyết định.",
+      "waitingForReviewer": "Đang chờ chuyên viên tiếp nhận",
+      "waitingForReviewerDesc": "Nhận hồ sơ để bắt đầu điều tra. Mỗi báo cáo chỉ một chuyên viên nắm giữ.",
+      "assignedToYou": "đã phân công cho bạn",
+      "notClaimed": "chưa có người nhận",
+      "claimSuccess": "Đã nhận xử lý hồ sơ",
+      "resolveSuccess": "Đã giải quyết và đóng hồ sơ",
+      "readOnlyNotice": "Mở xem báo cáo sẽ không nhận quyền xử lý hay làm thay đổi dữ liệu.",
+      "evidenceCardTitle": "Bằng chứng",
+      "evidencePrivateLinkNotice": "Mở tệp đính kèm trong tab mới.",
+      "reporterCardTitle": "Người báo cáo",
+      "reporterHiddenNotice": "Đã ẩn. Danh tính người báo cáo không hiển thị trong không gian kiểm duyệt.",
+      "decisionCardTitle": "Quyết định xử lý",
+      "resolveTitle": "Giải quyết",
+      "resolveSubtitle": "Đóng báo cáo. Không thay đổi trạng thái tin tuyển dụng/đối tượng.",
+      "rejectTitle": "Bác bỏ",
+      "rejectSubtitle": "Không phát hiện vi phạm. Không thay đổi trạng thái tin tuyển dụng/đối tượng.",
+      "enforcementUnavailableTitle": "Biện pháp chế tài trên đối tượng · Chưa kích hoạt",
+      "enforcementUnavailableDesc": "Gỡ bỏ, cảnh cáo hoặc đình chỉ cần ma trận thẩm quyền được phê duyệt. Vui lòng sử dụng trang quản trị tương ứng nếu có quy định cho phép.",
+      "messageToReporter": "Thông điệp gửi cho người báo cáo",
+      "messageToReporterHint": "Hiển thị trong mục Báo cáo của tôi của ứng viên.",
+      "messageToReporterPlaceholder": "Chúng tôi đã xem xét nội dung và đóng báo cáo của bạn. Cảm ơn bạn đã phản ánh.",
+      "internalNote": "Ghi chú nội bộ",
+      "internalNoteHint": "Chỉ chuyên viên và quản trị viên nhìn thấy.",
+      "internalNotePlaceholder": "Chỉ chuyên viên kiểm duyệt thấy thông tin này",
+      "release": "Bỏ nhận hồ sơ",
+      "releaseUnavailableHint": "Chưa hỗ trợ bỏ nhận hồ sơ đang xử lý.",
+      "finalizeDecision": "Hoàn tất quyết định…",
+      "finalizeModalTitleResolve": "Hoàn tất xử lý với quyết định: Đã giải quyết?",
+      "finalizeModalTitleReject": "Hoàn tất xử lý với quyết định: Bác bỏ?",
+      "finalizeModalBody": "Quyết định không thể thay đổi sau khi hoàn tất. Người báo cáo sẽ thấy thông điệp của bạn; đối tượng vẫn giữ nguyên.",
+      "confirmFinalize": "Xác nhận hoàn tất"
+    },
+    "withdrawDialog": {
+      "title": "Rút lại báo cáo này?",
+      "body": "Quá trình kiểm duyệt sẽ dừng lại. ITTalent vẫn lưu hồ sơ bảo đảm an toàn nhưng sẽ không xử lý thêm.",
+      "reasonOptional": "Lý do rút lại (không bắt buộc)",
+      "reasonPlaceholder": "Tại sao bạn muốn rút lại báo cáo này?",
+      "confirm": "Rút lại báo cáo",
+      "success": "Đã rút lại báo cáo. Quá trình kiểm tra đã dừng và bản ghi được lưu trữ."
+    },
+    "hideDialog": {
+      "title": "Ẩn khỏi lịch sử của bạn?",
+      "body": "Báo cáo sẽ bị xóa khỏi danh sách và thống kê của bạn. ITTalent vẫn giữ hồ sơ để tuân thủ quy định.",
+      "confirm": "Ẩn khỏi lịch sử",
+      "success": "Đã ẩn khỏi lịch sử. ITTalent vẫn lưu giữ hồ sơ."
+    },
+    "filters": {
+      "statusPrefix": "Trạng thái",
+      "reasonPrefix": "Lý do",
+      "typePrefix": "Loại",
+      "submittedPrefix": "Ngày gửi",
+      "all": "Tất cả",
+      "anyTime": "Mọi lúc",
+      "today": "Hôm nay",
+      "past7Days": "7 ngày qua",
+      "past30Days": "30 ngày qua"
+    },
+    "errors": {
+      "reasonRequired": "Vui lòng chọn lý do báo cáo.",
+      "statementRequired": "Vui lòng mô tả sự việc.",
+      "statementTooLong": "Nội dung tường trình không được vượt quá 2000 ký tự.",
+      "fileTooLarge": "Tệp vượt quá dung lượng tối đa 5 MB.",
+      "fileTooLargeNamed": "Tệp {{name}} vượt quá dung lượng tối đa 5 MB.",
+      "fileEmptyNamed": "Tệp {{name}} trống và không thể đính kèm.",
+      "fileNotAcceptedNamed": "Không thể thêm {{name}}. Vui lòng chọn ảnh chụp màn hình hoặc tài liệu.",
+      "tooManyFiles": "Chỉ được đính kèm tối đa 5 tệp.",
+      "internalNotesMin": "Ghi chú nội bộ phải có ít nhất 5 ký tự.",
+      "internalNotesMax": "Ghi chú nội bộ không được vượt quá 1000 ký tự.",
+      "messageToReporterMin": "Thông điệp cho người báo cáo phải có ít nhất 10 ký tự.",
+      "messageToReporterMax": "Thông điệp cho người báo cáo không được vượt quá 500 ký tự."
     }
   }
 }

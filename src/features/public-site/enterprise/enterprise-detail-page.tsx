@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   Building,
   Building2,
+  Flag,
   Globe,
   MapPin,
   RefreshCw,
@@ -11,11 +12,13 @@ import {
 } from "lucide-react";
 import { Link, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
 import { HTTP_NOT_FOUND } from "@/api/http-status";
 import { requestStatus } from "@/api/request-error";
 import { cn } from "@/lib/utils";
+import { ReportViolationDialog } from "@/components/common/report-violation-dialog";
 import {
   EMPLOYMENT_LABELS,
   formatDeadline,
@@ -149,9 +152,11 @@ function CompanyTabs({
 }
 
 export function EnterpriseDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const { data: session } = useSession();
   const [tab, setTab] = useState<"about" | "open-jobs">("about");
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const tabClickLockUntil = useRef(0);
 
   const {
@@ -345,15 +350,26 @@ export function EnterpriseDetailPage() {
               </div>
             ) : null}
           </div>
-          {jobCount > 0 ? (
+          <div className="mb-1 flex items-center gap-2">
+            {jobCount > 0 ? (
+              <button
+                className="flex h-11 items-center gap-2 rounded-full bg-mkt-accent px-[22px] text-sm font-semibold text-white hover:bg-mkt-accent-hover"
+                onClick={() => jumpTo("open-jobs")}
+                type="button"
+              >
+                See {jobCount} open {jobCount === 1 ? "job" : "jobs"}
+              </button>
+            ) : null}
             <button
-              className="mb-1 flex h-11 items-center gap-2 rounded-full bg-mkt-accent px-[22px] text-sm font-semibold text-white hover:bg-mkt-accent-hover"
-              onClick={() => jumpTo("open-jobs")}
               type="button"
+              onClick={() => setIsReportDialogOpen(true)}
+              className="inline-flex h-11 items-center gap-1.5 rounded-full border border-mkt-line bg-white px-4 text-xs font-semibold text-mkt-ink transition-colors hover:bg-mkt-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              title={t("reports.reportThisCompany")}
             >
-              See {jobCount} open {jobCount === 1 ? "job" : "jobs"}
+              <Flag className="size-3.5 text-mkt-muted" aria-hidden="true" />
+              <span>{t("reports.reportThisCompany")}</span>
             </button>
-          ) : null}
+          </div>
         </div>
 
         <CompanyTabs
@@ -571,6 +587,15 @@ export function EnterpriseDetailPage() {
           ) : null}
         </aside>
       </div>
+
+      <ReportViolationDialog
+        open={isReportDialogOpen}
+        onOpenChange={setIsReportDialogOpen}
+        targetType="company"
+        targetId={enterprise.id}
+        targetTitle={enterprise.name}
+        targetSubtitle={enterprise.industry || undefined}
+      />
     </main>
   );
 }
