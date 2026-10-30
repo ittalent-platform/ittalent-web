@@ -20,6 +20,7 @@
     "savedJobs": "Việc đã lưu",
     "documents": "Tài liệu",
     "certificates": "Chứng chỉ",
+    "portfolio": "Portfolio",
     "account": "Tài khoản",
     "notifications": "Thông báo"
   },
@@ -353,6 +354,104 @@
       "suggestTitle": "Chứng chỉ này đã bị xoá",
       "suggestDescription": "Chứng chỉ đã bị xoá ở tab khác nên không thể gợi ý. Danh sách của bạn đã được làm mới.",
       "ok": "OK"
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "add": "Thêm mục portfolio",
+    "opensInNewTab": "(mở trong tab mới)",
+    "notHttps": "Không phải HTTPS",
+    "noDescription": "Chưa có mô tả",
+    "version": "Phiên bản {{version}}",
+    "actionsFor": "Thao tác cho {{name}}",
+    "edit": "Sửa",
+    "openLink": "Mở liên kết",
+    "deleteMenu": "Xoá…",
+    "pageGone": {
+      "title": "Trang đó không tồn tại",
+      "description": "Đang hiển thị trang đầu tiên của portfolio."
+    },
+    "search": {
+      "placeholder": "Tìm theo tiêu đề, mô tả hoặc liên kết",
+      "tooLong": "Tối đa {{max}} ký tự.",
+      "results_other": "{{count}} kết quả cho “{{term}}”",
+      "clear": "Xoá tìm kiếm",
+      "noMatch": "Không có mục nào khớp “{{term}}”",
+      "noMatchDescription": "Thử từ khác hoặc xoá tìm kiếm."
+    },
+    "empty": {
+      "title": "Chưa có mục nào",
+      "description": "Thêm liên kết tới những sản phẩm bạn tự hào. Bạn tự chọn gửi mục nào khi ứng tuyển."
+    },
+    "errors": {
+      "loadTitle": "Không tải được portfolio",
+      "loadDescription": "Kiểm tra kết nối rồi thử lại.",
+      "retry": "Thử lại",
+      "deleteFailed": "Không xoá được mục này. Mục vẫn còn trong danh sách. Vui lòng thử lại."
+    },
+    "access": {
+      "title": "Đăng nhập lại để xem portfolio",
+      "description": "Phiên đăng nhập hoặc quyền truy cập đã thay đổi.",
+      "signIn": "Đăng nhập"
+    },
+    "toast": {
+      "added": "Đã thêm mục portfolio.",
+      "saved": "Đã lưu mục portfolio.",
+      "deleted": "Đã xoá mục portfolio. Các đơn đã gửi vẫn giữ bản sao."
+    },
+    "delete": {
+      "title": "Xoá mục này?",
+      "description": "<b>{{name}}</b> sẽ bị xoá khỏi danh sách. Website của bạn không bị ảnh hưởng.",
+      "sentNote": "Các đơn bạn đã gửi vẫn giữ bản sao.",
+      "keep": "Giữ lại",
+      "confirm": "Xoá"
+    },
+    "conflict": {
+      "title": "Mục này đã thay đổi ở nơi khác",
+      "description": {
+        "edit": "Mục đã được sửa ở tab khác. Tải bản mới nhất rồi sửa lại.",
+        "delete": "Tải bản mới nhất trước khi xoá."
+      },
+      "loadLatest": "Tải bản mới nhất"
+    },
+    "missing": {
+      "title": "Mục này không còn",
+      "description": "Có thể mục đã bị xoá. Danh sách của bạn đã được làm mới.",
+      "ok": "OK"
+    },
+    "form": {
+      "addTitle": "Thêm mục portfolio",
+      "editTitle": "Sửa mục portfolio",
+      "addDescription": "Liên kết tới sản phẩm bạn đã làm. Không có gì được tải lên hay công khai.",
+      "editDescription": "Phiên bản {{version}} · sửa lần cuối {{date}}.",
+      "privateNote": "Chỉ mình bạn thấy mục này cho đến khi bạn gửi kèm đơn ứng tuyển.",
+      "title": "Tiêu đề",
+      "titlePlaceholder": "VD: Thiết kế lại ứng dụng ngân hàng di động",
+      "url": "Liên kết",
+      "urlHint": "Website, GitHub, Behance, một case study… ITTalent không mở hay kiểm tra liên kết này.",
+      "urlChanged": "Đã đổi từ {{previous}}",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Bạn đã làm gì và kết quả ra sao?",
+      "descriptionHint": "Hiển thị dưới tiêu đề.",
+      "optional": "không bắt buộc",
+      "add": "Thêm mục",
+      "adding": "Đang thêm…",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu…",
+      "checking": {
+        "title": "Đang kiểm tra mục của bạn đã được lưu chưa…",
+        "description": "Kết nối bị gián đoạn. Đừng thêm lại vội."
+      },
+      "errors": {
+        "title": "Vui lòng nhập tiêu đề.",
+        "urlRequired": "Vui lòng nhập liên kết.",
+        "url": "Liên kết này không được phép. Dùng liên kết web bắt đầu bằng https:// (hoặc http://).",
+        "urlCredentials": "Liên kết này không được phép. Dùng liên kết web bắt đầu bằng https:// (hoặc http://), không kèm tên người dùng hay mật khẩu.",
+        "duplicate": "Bạn đã thêm liên kết này rồi.",
+        "saveFailed": "Không lưu được mục này. Chưa có gì được thêm. Vui lòng thử lại.",
+        "updateFailed": "Không cập nhật được mục này. Chưa có gì thay đổi. Vui lòng thử lại.",
+        "accessChanged": "Bạn chưa thể lưu thay đổi vì quyền truy cập tài khoản đã thay đổi. Hãy đăng nhập lại để tiếp tục."
+      }
     }
   },
   "actions": {

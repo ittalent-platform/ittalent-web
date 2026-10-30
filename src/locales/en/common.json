@@ -20,6 +20,7 @@
     "savedJobs": "Saved jobs",
     "documents": "Documents",
     "certificates": "Certificates",
+    "portfolio": "Portfolio",
     "account": "Account",
     "notifications": "Notifications"
   },
@@ -354,6 +355,105 @@
       "suggestTitle": "This certificate was deleted",
       "suggestDescription": "It was removed in another tab, so it can't be suggested. Your list has been refreshed.",
       "ok": "OK"
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "add": "Add portfolio item",
+    "opensInNewTab": "(opens in a new tab)",
+    "notHttps": "Not HTTPS",
+    "noDescription": "No description",
+    "version": "Version {{version}}",
+    "actionsFor": "Actions for {{name}}",
+    "edit": "Edit",
+    "openLink": "Open link",
+    "deleteMenu": "Delete…",
+    "pageGone": {
+      "title": "That page doesn't exist",
+      "description": "Showing the first page of your portfolio."
+    },
+    "search": {
+      "placeholder": "Search title, description or link",
+      "tooLong": "Use up to {{max}} characters.",
+      "results_one": "{{count}} result for “{{term}}”",
+      "results_other": "{{count}} results for “{{term}}”",
+      "clear": "Clear search",
+      "noMatch": "Nothing matches “{{term}}”",
+      "noMatchDescription": "Try another word, or clear the search."
+    },
+    "empty": {
+      "title": "No portfolio items yet",
+      "description": "Add links to work you're proud of. You choose which ones to send when you apply."
+    },
+    "errors": {
+      "loadTitle": "Your portfolio didn't load",
+      "loadDescription": "Check your connection and try again.",
+      "retry": "Try again",
+      "deleteFailed": "Couldn't delete the portfolio item. It's still in your list. Please try again."
+    },
+    "access": {
+      "title": "Sign in again to see your portfolio",
+      "description": "Your session or account access changed.",
+      "signIn": "Sign in"
+    },
+    "toast": {
+      "added": "Portfolio item added.",
+      "saved": "Portfolio item saved.",
+      "deleted": "Portfolio item deleted. Sent applications keep their copy."
+    },
+    "delete": {
+      "title": "Delete this portfolio item?",
+      "description": "<b>{{name}}</b> is removed from your list. Your website itself isn't touched.",
+      "sentNote": "Applications you already sent keep their copy.",
+      "keep": "Keep it",
+      "confirm": "Delete"
+    },
+    "conflict": {
+      "title": "This item changed somewhere else",
+      "description": {
+        "edit": "It was edited in another tab. Load the latest version, then make your change again.",
+        "delete": "Load the latest version before deleting it."
+      },
+      "loadLatest": "Load latest"
+    },
+    "missing": {
+      "title": "This portfolio item isn't available",
+      "description": "It may have been deleted. Your list has been refreshed.",
+      "ok": "OK"
+    },
+    "form": {
+      "addTitle": "Add portfolio item",
+      "editTitle": "Edit portfolio item",
+      "addDescription": "A link to something you made. Nothing is uploaded or made public.",
+      "editDescription": "Version {{version}} · last changed {{date}}.",
+      "privateNote": "Only you see this until you send it with an application.",
+      "title": "Title",
+      "titlePlaceholder": "e.g. Mobile banking app redesign",
+      "url": "Link",
+      "urlHint": "Your site, GitHub, Behance, a case study… ITTalent doesn't open or check it.",
+      "urlChanged": "Changed from {{previous}}",
+      "description": "Description",
+      "descriptionPlaceholder": "What did you do, and what came of it?",
+      "descriptionHint": "Shown under the title.",
+      "optional": "optional",
+      "add": "Add item",
+      "adding": "Adding…",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "checking": {
+        "title": "Checking whether your item was saved…",
+        "description": "We lost the connection. Don't add it again yet."
+      },
+      "errors": {
+        "title": "Title is required.",
+        "urlRequired": "Link is required.",
+        "url": "This link isn't allowed. Use a web link starting with https:// (or http://).",
+        "urlCredentials": "This link isn't allowed. Use a web link starting with https:// (or http://), without a username or password in it.",
+        "duplicate": "You already added this link.",
+        "saveFailed": "Couldn't save the portfolio item. Nothing was added. Please try again.",
+        "updateFailed": "Couldn't update this portfolio item. Nothing changed. Please try again.",
+        "accessChanged": "You can't save changes right now because your account access changed. Sign in again to continue."
+      }
     }
   },
   "actions": {

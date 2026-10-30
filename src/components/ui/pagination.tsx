@@ -76,7 +76,8 @@ export function PaginationControls({
 
 export type PaginationProps = {
   limit: number;
-  onLimitChange: (limit: number) => void;
+  /** Omit when the page size is fixed: the "Rows" choice is not shown. */
+  onLimitChange?: (limit: number) => void;
   onPageChange: (page: number) => void;
   page: number;
   pageSizeOptions?: readonly number[];
@@ -106,15 +107,17 @@ export function Pagination({
       <div className="flex items-center gap-4">
         <span>{t("pagination.showing", { end, start, total })}</span>
 
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">{t("pagination.rows")}</span>
-          <FilterSelect
-            onChange={(value) => onLimitChange(Number(value))}
-            options={pageSizeOptions.map((size) => ({ label: String(size), value: String(size) }))}
-            size="sm"
-            value={String(limit)}
-          />
-        </div>
+        {onLimitChange ? (
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">{t("pagination.rows")}</span>
+            <FilterSelect
+              onChange={(value) => onLimitChange(Number(value))}
+              options={pageSizeOptions.map((size) => ({ label: String(size), value: String(size) }))}
+              size="sm"
+              value={String(limit)}
+            />
+          </div>
+        ) : null}
       </div>
 
       <PaginationControls onPageChange={onPageChange} page={page} totalPages={totalPages} />
