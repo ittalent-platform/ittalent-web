@@ -67,6 +67,7 @@ export function AdminReportsPage() {
     status: statusParam,
     category: reasonParam,
     target_type: typeParam,
+    submitted: submittedParam,
     search: debouncedSearch,
   });
 
@@ -196,7 +197,9 @@ export function AdminReportsPage() {
       <div className="text-xs text-muted-foreground font-medium">
         {statusParam === 'open'
           ? t('reports.summaryOpen', { count: total })
-          : t('reports.summaryAll', { count: total })}
+          : statusParam === 'closed'
+            ? t('reports.summaryClosed', { count: total })
+            : t('reports.summaryAll', { count: total })}
       </div>
 
       {/* Table Surface */}
@@ -250,7 +253,7 @@ export function AdminReportsPage() {
                   const reasonLabel = t(`reports.reasons.${item.reason}`, { defaultValue: item.reason });
                   const statusLabel = t(`reports.statuses.${item.status}`, { defaultValue: item.status });
                   const badgeClass = REPORT_STATUS_BADGE_CLASS[item.status] || 'bg-muted text-foreground';
-                  const canClaim = item.status === 'pending' || !item.reviewer;
+                  const canClaim = item.status === 'pending';
 
                   return (
                     <TableRow

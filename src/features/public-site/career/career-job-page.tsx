@@ -630,7 +630,7 @@ export function CareerJobPage() {
         targetType="job"
         targetId={job._id}
         targetTitle={job.title}
-        targetSubtitle={companyName ? `Job · ${companyName}` : undefined}
+        targetSubtitle={companyName || undefined}
       />
     </PageShell>
   );

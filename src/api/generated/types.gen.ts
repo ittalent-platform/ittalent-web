@@ -744,6 +744,30 @@ export type EnterpriseMessageResponse = {
     message: string;
 };
 
+export type PublicEnterpriseListResponse = {
+    items: Array<{
+        id: string;
+        name: string;
+        logoUrl: string | null;
+        industry: string;
+        companySize: string;
+        shortDescription: string | null;
+        cities: Array<string>;
+        openRoleCount: number;
+    }>;
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+};
+
+export type PublicIndustryList = {
+    items: Array<{
+        industry: string;
+        count: number;
+    }>;
+};
+
 export type StartEnterpriseRegistrationRequest = {
     corporate_email: string;
     representative_name: string;
@@ -1180,6 +1204,13 @@ export type CreatePortfolioLinkRequest = {
     description?: string;
 };
 
+export type UpdatePortfolioLinkRequest = {
+    expectedVersion: number;
+    title?: string;
+    url?: string;
+    description?: string | null;
+};
+
 export type PortfolioLink = {
     id: string;
     title: string;
@@ -1193,6 +1224,7 @@ export type PortfolioLink = {
 export type PortfolioLinkListQuery = {
     page?: number;
     limit?: number;
+    keyword?: string;
 };
 
 export type PaginatedPortfolioLinks = {
@@ -2057,7 +2089,7 @@ export type WishlistBulkDeleteResponse = {
 };
 
 export type CreateReportRequest = {
-    targetType: 'job' | 'company' | 'enterprise' | 'user';
+    targetType: 'job' | 'company' | 'user';
     targetId: string;
     reason: 'scam_or_fraud' | 'misleading_information' | 'discrimination' | 'inappropriate_content' | 'something_else';
     statement: string;
@@ -2080,33 +2112,16 @@ export type PaginatedReportsResponse = {
     items: Array<{
         id: string;
         reference: string;
-        ticket_id?: string;
         target: {
-            type: 'job' | 'company' | 'enterprise' | 'user';
+            type: 'job' | 'company' | 'user';
             id: string;
             title: string;
             subtitle: string;
             isAvailable: boolean;
         };
-        target_title?: string;
-        target_type?: 'job' | 'company' | 'enterprise' | 'user';
-        target_id?: string;
-        target_link?: string | null;
-        reason: string;
-        reason_category?: string;
+        reason: 'scam_or_fraud' | 'misleading_information' | 'discrimination' | 'inappropriate_content' | 'something_else';
         reasonLabel: string;
-        title?: string;
-        description?: string;
-        statement?: string;
-        evidence_files?: Array<string>;
-        timeline?: Array<{
-            status: string;
-            timestamp: string;
-            note?: string | null;
-        }>;
         submittedAt: string;
-        createdAt?: string;
-        updatedAt?: string;
         status: 'pending' | 'reviewing' | 'resolved' | 'rejected' | 'withdrawn';
         statusLabel: string;
     }>;
@@ -2115,18 +2130,6 @@ export type PaginatedReportsResponse = {
         open: number;
         closed: number;
     };
-    kpis?: {
-        total: number;
-        pending: number;
-        reviewing: number;
-        resolved: number;
-        rejected: number;
-        withdrawn: number;
-    };
-    page?: number;
-    limit?: number;
-    total?: number;
-    totalPages?: number;
     pagination: {
         page: number;
         limit: number;
@@ -2138,34 +2141,18 @@ export type PaginatedReportsResponse = {
 export type ReportDetailResponse = {
     id: string;
     reference: string;
-    ticket_id?: string;
-    target_title?: string;
-    target_type?: 'job' | 'company' | 'enterprise' | 'user';
-    target_id?: string;
-    target_link?: string | null;
-    reason_category?: string;
-    title?: string;
-    description?: string;
-    evidence_files?: Array<string>;
-    timeline?: Array<{
-        status: string;
-        timestamp: string;
-        note?: string | null;
-    }>;
-    createdAt?: string;
-    updatedAt?: string;
     status: 'pending' | 'reviewing' | 'resolved' | 'rejected' | 'withdrawn';
     statusLabel: string;
     statusDescription: string;
     submittedAt: string;
     target: {
-        type: 'job' | 'company' | 'enterprise' | 'user';
+        type: 'job' | 'company' | 'user';
         id: string;
         title: string;
         subtitle: string;
         isAvailable: boolean;
     };
-    reason: string;
+    reason: 'scam_or_fraud' | 'misleading_information' | 'discrimination' | 'inappropriate_content' | 'something_else';
     reasonLabel: string;
     statement: string;
     files: Array<{
@@ -2176,7 +2163,6 @@ export type ReportDetailResponse = {
         downloadUrl: string;
     }>;
     responseFromPlatform: string | null;
-    message_to_reporter?: string | null;
     history: Array<{
         event: string;
         label: string;
@@ -3825,6 +3811,52 @@ export type PostApiV1EnterprisesResponses = {
 
 export type PostApiV1EnterprisesResponse = PostApiV1EnterprisesResponses[keyof PostApiV1EnterprisesResponses];
 
+export type GetApiV1EnterprisesPublicData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        limit?: number;
+        keyword?: string;
+        industry?: string;
+        company_size?: string;
+        location?: string;
+    };
+    url: '/api/v1/enterprises/public';
+};
+
+export type GetApiV1EnterprisesPublicErrors = {
+    /**
+     * Invalid or unsupported query parameters
+     */
+    400: unknown;
+};
+
+export type GetApiV1EnterprisesPublicResponses = {
+    /**
+     * Paginated company cards
+     */
+    200: PublicEnterpriseListResponse;
+};
+
+export type GetApiV1EnterprisesPublicResponse = GetApiV1EnterprisesPublicResponses[keyof GetApiV1EnterprisesPublicResponses];
+
+export type GetApiV1EnterprisesPublicIndustriesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/enterprises/public/industries';
+};
+
+export type GetApiV1EnterprisesPublicIndustriesResponses = {
+    /**
+     * Industries with their company counts
+     */
+    200: PublicIndustryList;
+};
+
+export type GetApiV1EnterprisesPublicIndustriesResponse = GetApiV1EnterprisesPublicIndustriesResponses[keyof GetApiV1EnterprisesPublicIndustriesResponses];
+
 export type DeleteApiV1EnterprisesByEnterpriseIdData = {
     body?: never;
     path: {
@@ -4675,13 +4707,14 @@ export type GetApiV1MePortfolioLinksData = {
     query?: {
         page?: number;
         limit?: number;
+        keyword?: string;
     };
     url: '/api/v1/me/portfolio-links';
 };
 
 export type GetApiV1MePortfolioLinksErrors = {
     /**
-     * Invalid pagination
+     * Invalid pagination or search query
      */
     400: unknown;
     /**
@@ -4798,6 +4831,51 @@ export type DeleteApiV1MePortfolioLinksByIdResponses = {
 };
 
 export type DeleteApiV1MePortfolioLinksByIdResponse = DeleteApiV1MePortfolioLinksByIdResponses[keyof DeleteApiV1MePortfolioLinksByIdResponses];
+
+export type PatchApiV1MePortfolioLinksByIdData = {
+    body: UpdatePortfolioLinkRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/me/portfolio-links/{id}';
+};
+
+export type PatchApiV1MePortfolioLinksByIdErrors = {
+    /**
+     * Invalid or empty update, or unsafe URL
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active verified Candidate account required
+     */
+    403: unknown;
+    /**
+     * Portfolio link not found or owned by someone else
+     */
+    404: unknown;
+    /**
+     * VERSION_CONFLICT or DUPLICATE_PORTFOLIO_URL
+     */
+    409: unknown;
+    /**
+     * Portfolio link storage unavailable
+     */
+    503: unknown;
+};
+
+export type PatchApiV1MePortfolioLinksByIdResponses = {
+    /**
+     * Updated portfolio link
+     */
+    200: PortfolioLink;
+};
+
+export type PatchApiV1MePortfolioLinksByIdResponse = PatchApiV1MePortfolioLinksByIdResponses[keyof PatchApiV1MePortfolioLinksByIdResponses];
 
 export type GetApiV1RecruiterApplicationsData = {
     body?: never;
@@ -6631,7 +6709,7 @@ export type GetApiV1ReportsData = {
         page?: number;
         limit?: number;
         status?: 'all' | 'pending' | 'reviewing' | 'resolved' | 'rejected' | 'withdrawn';
-        target_type?: 'all' | 'job' | 'company' | 'enterprise' | 'user';
+        target_type?: 'all' | 'job' | 'company' | 'user';
         category?: 'all' | 'scam_fraud' | 'fee_extortion' | 'misleading_info' | 'offensive_content' | 'impersonation' | 'harassment' | 'other';
         search?: string;
     };

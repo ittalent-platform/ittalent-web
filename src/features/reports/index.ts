@@ -3,7 +3,6 @@ export * from './reports.constants';
 export * from './reports.queries';
 export * from './components/withdraw-report-dialog';
 export * from './components/hide-report-dialog';
-export * from './components/delete-report-dialog';
 export * from './components/finalize-decision-dialog';
 export * from './pages/my-reports-page';
 export * from './pages/my-report-detail-page';

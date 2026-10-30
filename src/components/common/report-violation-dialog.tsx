@@ -2,6 +2,7 @@ import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import {
+  AlertTriangle,
   CheckCircle2,
   Lock,
   Paperclip,
@@ -10,19 +11,28 @@ import {
   X,
 } from 'lucide-react';
 
+import { client } from '@/api/client';
 import { postApiV1MeReports } from '@/api/generated/sdk.gen';
-import type { CreateReportRequest } from '@/api/generated/types.gen';
+import type {
+  PostApiV1MeReportsErrors,
+  PostApiV1MeReportsResponses,
+} from '@/api/generated/types.gen';
 import { unwrap } from '@/api/request-error';
 import { useSession } from '@/auth/use-session';
+import {
+  REPORT_EVIDENCE_ACCEPT,
+  REPORT_LIMITS,
+  REPORT_REASONS,
+  formatReportTargetSubtitle,
+  isCandidateReportRole,
+  normalizeEvidenceFileForUpload,
+  validateReportEvidenceFile,
+  type ReportReason,
+  type ReportTargetType,
+} from '@/config/reports';
 import { MY_REPORTS_PATH } from '@/config/routes';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import {
-  REPORT_LIMITS,
-  REPORT_REASONS,
-  type ReportReason,
-  type ReportTargetType,
-} from '@/features/reports/reports.constants';
 
 export interface ReportViolationDialogProps {
   open: boolean;
@@ -31,6 +41,29 @@ export interface ReportViolationDialogProps {
   targetId: string;
   targetTitle: string;
   targetSubtitle?: string;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function extractSubmittedReference(result: unknown): string | null {
+  if (!isRecord(result)) return null;
+  if (typeof result.reference === 'string' && result.reference) {
+    return result.reference;
+  }
+  if (typeof result.ticket_id === 'string' && result.ticket_id) {
+    return result.ticket_id;
+  }
+  if (isRecord(result.data)) {
+    if (typeof result.data.reference === 'string' && result.data.reference) {
+      return result.data.reference;
+    }
+    if (typeof result.data.ticket_id === 'string' && result.data.ticket_id) {
+      return result.data.ticket_id;
+    }
+  }
+  return null;
 }
 
 export function ReportViolationDialog({
@@ -50,22 +83,32 @@ export function ReportViolationDialog({
   const [selectedReason, setSelectedReason] = useState<ReportReason | ''>('');
   const [statement, setStatement] = useState('');
   const [files, setFiles] = useState<File[]>([]);
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [reasonError, setReasonError] = useState<string | null>(null);
+  const [statementError, setStatementError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedReference, setSubmittedReference] = useState<string | null>(null);
-  const [idempotencyKey, setIdempotencyKey] = useState<string>('');
+  const [idempotencyKey, setIdempotencyKey] = useState<string>(() => crypto.randomUUID());
 
   const statementId = useId();
 
+  const resetFormState = () => {
+    setSelectedReason('');
+    setStatement('');
+    setFiles([]);
+    setReasonError(null);
+    setStatementError(null);
+    setFileError(null);
+    setSubmitError(null);
+    setIsSubmitting(false);
+    setSubmittedReference(null);
+    setIdempotencyKey(crypto.randomUUID());
+  };
+
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
-      setSelectedReason('');
-      setStatement('');
-      setFiles([]);
-      setValidationError(null);
-      setIsSubmitting(false);
-      setSubmittedReference(null);
-      setIdempotencyKey(crypto.randomUUID());
+      resetFormState();
     }
     onOpenChange(nextOpen);
   };
@@ -77,64 +120,94 @@ export function ReportViolationDialog({
         ? t('reports.titleUser')
         : t('reports.titleCompany');
 
-  const defaultSubtitle =
+  const typeLabel =
     targetType === 'job'
       ? t('reports.targetTypes.job')
       : targetType === 'user'
         ? t('reports.targetTypes.user')
         : t('reports.targetTypes.company');
 
+  const formattedTargetSubtitle = formatReportTargetSubtitle({
+    subtitle: targetSubtitle,
+    typeLabel,
+  });
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
-    if (!selected.length) return;
-
-    if (files.length + selected.length > REPORT_LIMITS.MAX_FILES) {
-      setValidationError(t('reports.errors.tooManyFiles'));
-      return;
-    }
-
-    for (const file of selected) {
-      if (file.size > REPORT_LIMITS.MAX_FILE_SIZE_BYTES) {
-        setValidationError(t('reports.errors.fileTooLarge'));
-        return;
-      }
-    }
-
-    setValidationError(null);
-    setFiles((prev) => [...prev, ...selected]);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    if (!selected.length) return;
+
+    const accepted: File[] = [];
+    const errors: string[] = [];
+
+    for (const file of selected) {
+      const problem = validateReportEvidenceFile(file);
+      if (problem === 'format') {
+        errors.push(t('reports.errors.fileNotAcceptedNamed', { name: file.name }));
+        continue;
+      }
+      if (problem === 'empty') {
+        errors.push(t('reports.errors.fileEmptyNamed', { name: file.name }));
+        continue;
+      }
+      if (problem === 'size') {
+        errors.push(t('reports.errors.fileTooLargeNamed', { name: file.name }));
+        continue;
+      }
+
+      if (files.length + accepted.length >= REPORT_LIMITS.MAX_FILES) {
+        errors.push(t('reports.errors.tooManyFiles'));
+        break;
+      }
+
+      accepted.push(normalizeEvidenceFileForUpload(file));
+    }
+
+    if (accepted.length > 0) {
+      setFiles((prev) => [...prev, ...accepted]);
+    }
+    setFileError(errors.length > 0 ? errors.join(' ') : null);
   };
 
   const handleRemoveFile = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
+    setFileError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setValidationError(null);
+    setSubmitError(null);
+
+    let hasValidationError = false;
 
     if (!selectedReason) {
-      setValidationError(t('reports.errors.reasonRequired'));
-      return;
+      setReasonError(t('reports.errors.reasonRequired'));
+      hasValidationError = true;
+    } else {
+      setReasonError(null);
     }
 
     const trimmedStatement = statement.trim();
     if (!trimmedStatement) {
-      setValidationError(t('reports.errors.statementRequired'));
-      return;
+      setStatementError(t('reports.errors.statementRequired'));
+      hasValidationError = true;
+    } else if (trimmedStatement.length > REPORT_LIMITS.STATEMENT_MAX) {
+      setStatementError(t('reports.errors.statementTooLong'));
+      hasValidationError = true;
+    } else {
+      setStatementError(null);
     }
 
-    if (trimmedStatement.length > REPORT_LIMITS.STATEMENT_MAX) {
-      setValidationError(t('reports.errors.statementTooLong'));
+    if (hasValidationError || !selectedReason) {
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Backend accepts "job" | "company" | "enterprise" | "user"
       const normalizedTargetType = targetType === 'enterprise' ? 'company' : targetType;
+      const effectiveKey = idempotencyKey || crypto.randomUUID();
 
       if (files.length > 0) {
         const formData = new FormData();
@@ -142,23 +215,19 @@ export function ReportViolationDialog({
         formData.append('targetId', targetId);
         formData.append('reason', selectedReason);
         formData.append('statement', trimmedStatement);
-        formData.append('idempotencyKey', idempotencyKey);
-        files.forEach((file) => {
+        formData.append('idempotencyKey', effectiveKey);
+        for (const file of files) {
           formData.append('files', file);
-        });
+        }
 
-        const res = await postApiV1MeReports({
-          body: formData as unknown as CreateReportRequest,
+        const res = await client.post<PostApiV1MeReportsResponses, PostApiV1MeReportsErrors>({
+          security: [{ scheme: 'bearer', type: 'http' }],
+          url: '/api/v1/me/reports',
+          body: formData,
           bodySerializer: null,
-          headers: {
-            'Content-Type': null as unknown as string,
-          },
         });
         const result = unwrap(res, t('reports.errors.statementRequired'));
-        const returnedRef =
-          result.reference ||
-          (result as unknown as { data?: { reference?: string; ticket_id?: string } })?.data?.reference ||
-          (result as unknown as { data?: { reference?: string; ticket_id?: string } })?.data?.ticket_id;
+        const returnedRef = extractSubmittedReference(result);
         if (returnedRef) setSubmittedReference(returnedRef);
       } else {
         const res = await postApiV1MeReports({
@@ -167,19 +236,16 @@ export function ReportViolationDialog({
             targetId,
             reason: selectedReason,
             statement: trimmedStatement,
-            idempotencyKey,
+            idempotencyKey: effectiveKey,
           },
         });
         const result = unwrap(res, t('reports.errors.statementRequired'));
-        const returnedRef =
-          result.reference ||
-          (result as unknown as { data?: { reference?: string; ticket_id?: string } })?.data?.reference ||
-          (result as unknown as { data?: { reference?: string; ticket_id?: string } })?.data?.ticket_id;
+        const returnedRef = extractSubmittedReference(result);
         if (returnedRef) setSubmittedReference(returnedRef);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('reports.errors.statementRequired');
-      setValidationError(msg);
+      setSubmitError(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -201,10 +267,11 @@ export function ReportViolationDialog({
             {t('reports.signInPromptBody')}
           </p>
           <div className="flex gap-3 w-full justify-end pt-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               {t('reports.cancel')}
             </Button>
             <Button
+              type="button"
               className="bg-primary text-primary-foreground hover:bg-primary-hover"
               onClick={() => {
                 onOpenChange(false);
@@ -212,6 +279,30 @@ export function ReportViolationDialog({
               }}
             >
               {t('reports.signIn')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Non-candidate signed-in account (recruiter / enterprise_admin / system admin)
+  if (!isCandidateReportRole(session.user.role)) {
+    return (
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent className="max-w-[440px] p-6 text-center flex flex-col items-center gap-4">
+          <div className="size-12 rounded-full bg-(--sand) text-(--ink) flex items-center justify-center">
+            <Lock className="size-5 text-muted-foreground" aria-hidden="true" />
+          </div>
+          <DialogTitle className="itt-display text-xl font-semibold text-(--ink)">
+            {t('reports.candidateOnlyTitle')}
+          </DialogTitle>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {t('reports.candidateOnlyBody')}
+          </p>
+          <div className="flex gap-3 w-full justify-end pt-2">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              {t('reports.close')}
             </Button>
           </div>
         </DialogContent>
@@ -233,13 +324,14 @@ export function ReportViolationDialog({
           <p className="text-sm leading-relaxed text-muted-foreground">
             {t('reports.receivedBody', { reference: submittedReference })}
           </p>
-          <div className="flex items-center gap-2.5 pt-3">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <div className="flex flex-wrap items-center justify-center gap-2.5 pt-3">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               {targetType === 'job'
                 ? t('reports.backToJob')
                 : t('reports.backToCompany')}
             </Button>
             <Button
+              type="button"
               className="bg-primary text-primary-foreground hover:bg-primary-hover"
               onClick={() => {
                 onOpenChange(false);
@@ -271,13 +363,13 @@ export function ReportViolationDialog({
             <span className="font-semibold text-sm truncate text-(--ink)">
               {targetTitle}
             </span>
-            <span className="text-xs text-muted-foreground">
-              {targetSubtitle || defaultSubtitle}
+            <span className="text-xs text-muted-foreground truncate">
+              {formattedTargetSubtitle}
             </span>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           {/* Reason radio choices */}
           <div className="flex flex-col gap-2">
             <span className="text-xs font-semibold text-(--ink)">
@@ -292,7 +384,9 @@ export function ReportViolationDialog({
                     className={`flex items-center gap-2.5 h-[42px] px-3 rounded-lg border text-sm cursor-pointer transition-colors ${
                       isSelected
                         ? 'border-primary bg-primary/5 font-semibold text-(--ink)'
-                        : 'border-(--line) hover:bg-(--sand-hover) text-(--slate)'
+                        : reasonError
+                          ? 'border-(--status-error-fg)/40 hover:bg-(--sand-hover) text-(--slate)'
+                          : 'border-(--line) hover:bg-(--sand-hover) text-(--slate)'
                     }`}
                   >
                     <input
@@ -302,15 +396,16 @@ export function ReportViolationDialog({
                       checked={isSelected}
                       onChange={() => {
                         setSelectedReason(reason);
-                        setValidationError(null);
+                        setReasonError(null);
+                        setSubmitError(null);
                       }}
                       className="sr-only"
                     />
                     <span
-                      className={`size-4 rounded-full border flex items-center justify-center transition-colors ${
+                      className={`size-4 rounded-full border flex items-center justify-center transition-colors shrink-0 ${
                         isSelected
-                          ? 'border-primary bg-white ring-4 ring-primary'
-                          : 'border-(--slate-disabled) bg-white'
+                          ? 'border-primary bg-background ring-4 ring-primary'
+                          : 'border-(--slate-disabled) bg-background'
                       }`}
                     >
                       {isSelected && <span className="size-1.5 rounded-full bg-primary" />}
@@ -320,6 +415,15 @@ export function ReportViolationDialog({
                 );
               })}
             </div>
+            {reasonError && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 p-2.5 rounded-lg bg-(--status-error-bg) border border-(--status-error-fg)/20 text-xs text-(--status-error-fg)"
+              >
+                <AlertTriangle className="size-3.5 shrink-0 mt-0.5" aria-hidden="true" />
+                <span>{reasonError}</span>
+              </div>
+            )}
           </div>
 
           {/* Statement textarea */}
@@ -337,23 +441,36 @@ export function ReportViolationDialog({
               rows={4}
               maxLength={REPORT_LIMITS.STATEMENT_MAX}
               value={statement}
+              aria-invalid={Boolean(statementError)}
               onChange={(e) => {
                 setStatement(e.target.value);
-                setValidationError(null);
+                setStatementError(null);
+                setSubmitError(null);
               }}
               placeholder={t('reports.statementPlaceholder')}
-              className="w-full rounded-lg border border-(--input) bg-background px-3 py-2 text-sm text-(--ink) placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className={`w-full rounded-lg border bg-background px-3 py-2 text-sm text-(--ink) placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                statementError ? 'border-destructive' : 'border-(--input)'
+              }`}
             />
+            {statementError && (
+              <p
+                role="alert"
+                className="m-0 flex items-center gap-1.5 text-xs text-(--status-error-fg)"
+              >
+                <AlertTriangle className="size-3.5 shrink-0" aria-hidden="true" />
+                <span>{statementError}</span>
+              </p>
+            )}
           </div>
 
           {/* File attachments */}
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={files.length >= REPORT_LIMITS.MAX_FILES}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-(--fg-link) hover:underline disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-(--fg-link) hover:underline disabled:opacity-50 self-start"
               >
                 <Paperclip className="size-3.5" aria-hidden="true" />
                 <span>{t('reports.addFiles')}</span>
@@ -366,7 +483,7 @@ export function ReportViolationDialog({
               ref={fileInputRef}
               type="file"
               multiple
-              accept="image/png,image/jpeg,application/pdf"
+              accept={REPORT_EVIDENCE_ACCEPT}
               className="hidden"
               onChange={handleFileChange}
             />
@@ -391,6 +508,15 @@ export function ReportViolationDialog({
                 ))}
               </div>
             )}
+            {fileError && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 p-2.5 rounded-lg bg-(--status-error-bg) border border-(--status-error-fg)/20 text-xs text-(--status-error-fg)"
+              >
+                <AlertTriangle className="size-3.5 shrink-0 mt-0.5" aria-hidden="true" />
+                <span>{fileError}</span>
+              </div>
+            )}
           </div>
 
           {/* Privacy line */}
@@ -399,10 +525,13 @@ export function ReportViolationDialog({
             <span>{t('reports.privacyLine')}</span>
           </div>
 
-          {/* Validation error notice */}
-          {validationError && (
-            <div className="p-2.5 rounded-lg bg-(--status-error-bg) border border-(--status-error-fg)/20 text-xs text-(--status-error-fg)">
-              {validationError}
+          {/* Submit error notice */}
+          {submitError && (
+            <div
+              role="alert"
+              className="p-2.5 rounded-lg bg-(--status-error-bg) border border-(--status-error-fg)/20 text-xs text-(--status-error-fg)"
+            >
+              {submitError}
             </div>
           )}
 

@@ -2,6 +2,7 @@ import type {
   AdminResolveReportRequest,
   CreateReportRequest,
   CreateReportResponse,
+  GetApiV1ReportsData,
   PaginatedReportsResponse,
   ReportDetailResponse,
   ReportHideResponse,
@@ -12,10 +13,15 @@ import type {
   ReportReason,
   ReportStatus,
   ReportTargetType,
-} from './reports.constants';
+} from '@/config/reports';
 
 export type ReportItemResponse = PaginatedReportsResponse['items'][number];
 export type ReportsCounts = PaginatedReportsResponse['counts'];
+export type AdminBackendQuery = NonNullable<GetApiV1ReportsData['query']>;
+export type AdminBackendStatus = NonNullable<AdminBackendQuery['status']>;
+export type AdminBackendTargetType = NonNullable<AdminBackendQuery['target_type']>;
+
+export type AdminSubmittedFilter = 'all' | 'today' | '7d' | '30d';
 
 export type {
   AdminResolveReportRequest,
@@ -31,6 +37,11 @@ export type {
   ReportWithdrawResponse,
 };
 
+export interface ReportTargetRef {
+  id: string;
+  reference?: string;
+}
+
 export interface ReporterReportsQueryParams {
   page?: number;
   limit?: number;
@@ -44,7 +55,14 @@ export interface AdminReportsQueryParams {
   status?: string;
   target_type?: string;
   category?: string;
+  submitted?: string;
   search?: string;
+}
+
+export interface AdminReportTimelineEntry {
+  status: string;
+  timestamp: string;
+  note?: string | null;
 }
 
 export interface AdminReportItem {
@@ -60,12 +78,16 @@ export interface AdminReportItem {
   title?: string;
   description?: string;
   statement?: string;
-  evidence_files?: string[];
+  evidence_files: string[];
   status: ReportStatus;
   statusLabel?: string;
   submittedAt?: string;
   createdAt: string;
   updatedAt: string;
+  reviewed_at?: string | null;
+  resolved_at?: string | null;
+  withdrawn_at?: string | null;
+  withdrawal_reason?: string | null;
   reviewer?: string | null;
   assigned_admin?: {
     id: string;
@@ -76,6 +98,7 @@ export interface AdminReportItem {
   message_to_reporter?: string | null;
   resolution_decision?: string | null;
   action_taken?: string | null;
+  timeline: AdminReportTimelineEntry[];
 }
 
 export interface PaginatedAdminReportsResult {

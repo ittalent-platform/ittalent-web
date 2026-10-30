@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import {
   Briefcase,
   Building2,
@@ -8,6 +8,7 @@ import {
   FileText,
   Info,
   Lock,
+  Undo2,
   User,
   UserCheck,
   XCircle,
@@ -21,9 +22,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  REPORT_LIMITS,
   REPORT_STATUS_BADGE_CLASS,
   REPORT_TIMELINE_DOT_CLASS,
-  REPORT_LIMITS,
+  cleanEvidenceFileName,
 } from '@/features/reports/reports.constants';
 import {
   useAdminReportDetailQuery,
@@ -44,16 +46,11 @@ function TargetIcon({ type }: { type?: string }) {
 
 export function AdminReportDetailPage() {
   const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
   const { ref = '' } = useParams<{ ref: string }>();
 
   const [decision, setDecision] = useState<'resolved' | 'rejected'>('resolved');
-  const [messageToReporter, setMessageToReporter] = useState(
-    'We reviewed the report and completed our investigation. Thank you for notifying us.',
-  );
-  const [internalNotes, setInternalNotes] = useState(
-    'Review completed. Normal path verification with no target enforcement.',
-  );
+  const [messageToReporter, setMessageToReporter] = useState('');
+  const [internalNotes, setInternalNotes] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
 
@@ -61,7 +58,7 @@ export function AdminReportDetailPage() {
   const claimMutation = useClaimReportTicketMutation();
   const resolveMutation = useResolveReportTicketMutation();
 
-  const formatDate = (isoString?: string) => {
+  const formatDate = (isoString?: string | null) => {
     if (!isoString) return '';
     try {
       const d = new Date(isoString);
@@ -111,7 +108,8 @@ export function AdminReportDetailPage() {
   const status = report.status;
   const isPending = status === 'pending';
   const isReviewing = status === 'reviewing';
-  const isFinalized = status === 'resolved' || status === 'rejected' || status === 'withdrawn';
+  const isDecided = status === 'resolved' || status === 'rejected';
+  const isWithdrawn = status === 'withdrawn';
 
   const reasonLabel = t(`reports.reasons.${report.reason}`, { defaultValue: report.reason });
   const statusLabel = t(`reports.statuses.${status}`, { defaultValue: status });
@@ -177,6 +175,75 @@ export function AdminReportDetailPage() {
     }
   };
 
+  const adminTimelineEntries =
+    report.timeline && report.timeline.length > 0
+      ? report.timeline.map((entry) => {
+          if (entry.status === 'pending' || entry.status === 'submitted') {
+            return {
+              dotKey: 'submitted',
+              label: t('reports.timeline.submitted'),
+              timestamp: entry.timestamp,
+            };
+          }
+          if (entry.status === 'reviewing' || entry.status === 'review_started') {
+            return {
+              dotKey: 'reviewing',
+              label: report.reviewer
+                ? t('reports.timeline.claimedBy', { name: report.reviewer })
+                : t('reports.timeline.reviewStarted'),
+              timestamp: entry.timestamp,
+            };
+          }
+          if (entry.status === 'withdrawn') {
+            return {
+              dotKey: 'withdrawn',
+              label: t('reports.timeline.withdrawn'),
+              timestamp: entry.timestamp,
+            };
+          }
+          const entryStatusLabel = t(`reports.statuses.${entry.status}`, {
+            defaultValue: entry.status,
+          });
+          return {
+            dotKey: entry.status,
+            label: t('reports.timeline.finalizedAs', { status: entryStatusLabel }),
+            timestamp: entry.timestamp,
+          };
+        })
+      : [
+          {
+            dotKey: 'submitted',
+            label: t('reports.timeline.submitted'),
+            timestamp: report.submittedAt || report.createdAt,
+          },
+          ...(report.reviewer
+            ? [
+                {
+                  dotKey: 'reviewing',
+                  label: t('reports.timeline.claimedBy', { name: report.reviewer }),
+                  timestamp: report.reviewed_at || report.updatedAt,
+                },
+              ]
+            : []),
+          ...(isDecided
+            ? [
+                {
+                  dotKey: status,
+                  label: t('reports.timeline.finalizedAs', { status: statusLabel }),
+                  timestamp: report.resolved_at || report.updatedAt,
+                },
+              ]
+            : isWithdrawn
+              ? [
+                  {
+                    dotKey: 'withdrawn',
+                    label: t('reports.timeline.withdrawn'),
+                    timestamp: report.withdrawn_at || report.updatedAt,
+                  },
+                ]
+              : []),
+        ];
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-6xl pb-20">
       {/* Breadcrumb */}
@@ -233,7 +300,7 @@ export function AdminReportDetailPage() {
 
       {/* 2-Column Grid */}
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_380px] gap-6 items-start">
-        {/* Left Column: Report, Evidence, Reported Target */}
+        {/* Left Column: Report, Evidence, Reported Target, Reporter Privacy */}
         <div className="flex flex-col gap-5 min-w-0">
           {/* Report Summary Card */}
           <section className="p-5 sm:p-6 rounded-2xl bg-surface border border-line flex flex-col gap-4">
@@ -265,7 +332,7 @@ export function AdminReportDetailPage() {
                 {t('reports.detail.whatHappenedLabel')}
               </span>
               <p className="text-[14px] leading-relaxed text-foreground whitespace-pre-wrap">
-                {report.statement || report.description || 'No statement provided.'}
+                {report.statement || report.description}
               </p>
             </div>
           </section>
@@ -276,32 +343,34 @@ export function AdminReportDetailPage() {
               {t('reports.detail.evidenceCardTitle')}
             </h2>
             {report.evidence_files && report.evidence_files.length > 0 ? (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {report.evidence_files.map((fileUrl, idx) => {
-                  const fileName = fileUrl.split('/').pop() || `Evidence ${idx + 1}`;
-                  return (
-                    <a
-                      key={idx}
-                      href={fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface hover:bg-surface-subtle text-xs font-semibold text-foreground transition-colors"
-                    >
-                      <FileText className="size-3.5 text-muted-foreground" />
-                      <span className="max-w-[200px] truncate">{fileName}</span>
-                      <ExternalLink className="size-3 text-muted-foreground ml-0.5" />
-                    </a>
-                  );
-                })}
-              </div>
+              <>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {report.evidence_files.map((fileUrl, idx) => {
+                    const fileName = cleanEvidenceFileName(fileUrl, idx);
+                    return (
+                      <a
+                        key={`${fileUrl}-${idx}`}
+                        href={fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface hover:bg-surface-subtle text-xs font-semibold text-foreground transition-colors"
+                      >
+                        <FileText className="size-3.5 text-muted-foreground" />
+                        <span className="max-w-[200px] truncate">{fileName}</span>
+                        <ExternalLink className="size-3 text-muted-foreground ml-0.5" />
+                      </a>
+                    );
+                  })}
+                </div>
+                <span className="text-[12px] text-muted-foreground">
+                  {t('reports.detail.evidencePrivateLinkNotice')}
+                </span>
+              </>
             ) : (
               <span className="text-xs text-muted-foreground">
                 {t('reports.detail.noFiles')}
               </span>
             )}
-            <span className="text-[12px] text-muted-foreground">
-              {t('reports.detail.evidencePrivateLinkNotice')}
-            </span>
           </section>
 
           {/* Reported Item Snapshot Card */}
@@ -317,7 +386,7 @@ export function AdminReportDetailPage() {
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="font-semibold text-[14.5px] text-foreground truncate">
-                    {report.target_title || 'Untitled'}
+                    {report.target_title || t('common.untitled', { defaultValue: 'Untitled' })}
                   </span>
                   <span className="text-xs text-muted-foreground truncate">
                     ID: <span className="font-mono">{report.target_id}</span>
@@ -334,6 +403,17 @@ export function AdminReportDetailPage() {
                 </Button>
               )}
             </div>
+          </section>
+
+          {/* Reporter Privacy Card */}
+          <section className="p-5 sm:p-6 rounded-2xl bg-surface border border-line flex flex-col gap-2">
+            <h2 className="font-heading text-[16px] font-bold text-foreground">
+              {t('reports.detail.reporterCardTitle')}
+            </h2>
+            <p className="m-0 flex items-start gap-2 text-[13px] leading-relaxed text-muted-foreground">
+              <Lock className="size-3.5 mt-0.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <span>{t('reports.detail.reporterHiddenNotice')}</span>
+            </p>
           </section>
         </div>
 
@@ -418,7 +498,11 @@ export function AdminReportDetailPage() {
                 <Textarea
                   id="message-to-reporter"
                   value={messageToReporter}
-                  onChange={(e) => setMessageToReporter(e.target.value)}
+                  onChange={(e) => {
+                    setMessageToReporter(e.target.value);
+                    setValidationError(null);
+                  }}
+                  placeholder={t('reports.detail.messageToReporterPlaceholder')}
                   rows={3}
                   minLength={10}
                   maxLength={500}
@@ -437,7 +521,11 @@ export function AdminReportDetailPage() {
                 <Textarea
                   id="internal-notes"
                   value={internalNotes}
-                  onChange={(e) => setInternalNotes(e.target.value)}
+                  onChange={(e) => {
+                    setInternalNotes(e.target.value);
+                    setValidationError(null);
+                  }}
+                  placeholder={t('reports.detail.internalNotePlaceholder')}
                   rows={3}
                   minLength={5}
                   maxLength={1000}
@@ -450,7 +538,7 @@ export function AdminReportDetailPage() {
 
               {/* Validation Error Banner */}
               {validationError && (
-                <div className="text-xs font-semibold text-destructive">
+                <div role="alert" className="text-xs font-semibold text-destructive">
                   {validationError}
                 </div>
               )}
@@ -460,7 +548,8 @@ export function AdminReportDetailPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate(ADMIN_REPORTS_PATH)}
+                  disabled
+                  title={t('reports.detail.releaseUnavailableHint')}
                 >
                   {t('reports.detail.release')}
                 </Button>
@@ -472,7 +561,7 @@ export function AdminReportDetailPage() {
                 </Button>
               </div>
             </section>
-          ) : isFinalized ? (
+          ) : isDecided ? (
             /* Finalized Decision Card */
             <section className="p-5 sm:p-6 rounded-2xl bg-surface border border-line flex flex-col gap-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-subtle">
@@ -499,6 +588,20 @@ export function AdminReportDetailPage() {
                 </div>
               )}
             </section>
+          ) : isWithdrawn ? (
+            /* Withdrawn Status Card */
+            <section className="p-5 sm:p-6 rounded-2xl bg-surface border border-line flex flex-col gap-2.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-subtle">
+                {t('reports.detail.statusRailTitle')}
+              </span>
+              <div className="flex items-center gap-2 font-semibold text-[15px] text-foreground">
+                <Undo2 className="size-4 text-muted-foreground shrink-0" />
+                <span>{statusLabel}</span>
+              </div>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {t('reports.detail.withdrawnRecordDesc')}
+              </p>
+            </section>
           ) : (
             /* Unclaimed Status Notice Card */
             <section className="p-5 rounded-2xl bg-surface border border-line flex flex-col gap-2">
@@ -515,50 +618,24 @@ export function AdminReportDetailPage() {
           )}
 
           {/* History Card */}
-          <section className="p-5 rounded-2xl bg-surface border border-line flex flex-col gap-3">
+          <section aria-label={t('reports.detail.historyRailTitle')} className="p-5 rounded-2xl bg-surface border border-line flex flex-col gap-3">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-subtle">
               {t('reports.detail.historyRailTitle')}
             </span>
             <div className="flex flex-col gap-4 pt-1">
-              <div className="flex items-start gap-3">
-                <span className={`mt-1 size-2 rounded-full shrink-0 ${REPORT_TIMELINE_DOT_CLASS.submitted}`} />
-                <div className="flex flex-col text-xs">
-                  <span className="font-semibold text-foreground">{t('reports.timeline.submitted')}</span>
-                  <span className="text-muted-foreground">
-                    {formatDate(report.submittedAt || report.createdAt)}
-                  </span>
-                </div>
-              </div>
-
-              {report.reviewer && (
-                <div className="flex items-start gap-3">
-                  <span className={`mt-1 size-2 rounded-full shrink-0 ${REPORT_TIMELINE_DOT_CLASS.reviewing}`} />
-                  <div className="flex flex-col text-xs">
-                    <span className="font-semibold text-foreground">
-                      {t('reports.timeline.claimedBy', { name: report.reviewer })}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {formatDate(report.updatedAt)}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {isFinalized && (
-                <div className="flex items-start gap-3">
+              {adminTimelineEntries.map((entry, idx) => (
+                <div key={`${entry.dotKey}-${entry.timestamp}-${idx}`} className="flex items-start gap-3">
                   <span
-                    className={`mt-1 size-2 rounded-full shrink-0 ${REPORT_TIMELINE_DOT_CLASS[status] || 'bg-muted'}`}
+                    className={`mt-1 size-2 rounded-full shrink-0 ${
+                      REPORT_TIMELINE_DOT_CLASS[entry.dotKey] || 'bg-muted'
+                    }`}
                   />
                   <div className="flex flex-col text-xs">
-                    <span className="font-semibold text-foreground capitalize">
-                      {t('reports.timeline.finalizedAs', { status: statusLabel })}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {formatDate(report.updatedAt)}
-                    </span>
+                    <span className="font-semibold text-foreground">{entry.label}</span>
+                    <span className="text-muted-foreground">{formatDate(entry.timestamp)}</span>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
           </section>
         </aside>

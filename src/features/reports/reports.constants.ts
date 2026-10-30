@@ -1,42 +1,27 @@
-export const REPORT_REASONS = [
-  'scam_or_fraud',
-  'misleading_information',
-  'discrimination',
-  'inappropriate_content',
-  'something_else',
-] as const;
+import type { ReportStatus } from '@/config/reports';
 
-export type ReportReason = (typeof REPORT_REASONS)[number];
-
-export const REPORT_STATUSES = [
-  'pending',
-  'reviewing',
-  'resolved',
-  'rejected',
-  'withdrawn',
-] as const;
-
-export type ReportStatus = (typeof REPORT_STATUSES)[number];
-
-export const OPEN_REPORT_STATUSES: readonly ReportStatus[] = ['pending', 'reviewing'];
-export const CLOSED_REPORT_STATUSES: readonly ReportStatus[] = ['resolved', 'rejected', 'withdrawn'];
-
-export const REPORT_CANDIDATE_TABS = ['all', 'open', 'closed'] as const;
-export type ReportCandidateTab = (typeof REPORT_CANDIDATE_TABS)[number];
-
-export type ReportTargetType = 'job' | 'company' | 'enterprise' | 'user';
-
-export const REPORT_LIMITS = {
-  STATEMENT_MIN: 1,
-  STATEMENT_MAX: 2000,
-  INTERNAL_NOTES_MIN: 5,
-  INTERNAL_NOTES_MAX: 1000,
-  MESSAGE_TO_REPORTER_MIN: 10,
-  MESSAGE_TO_REPORTER_MAX: 500,
-  MAX_FILES: 5,
-  MAX_FILE_SIZE_BYTES: 5 * 1024 * 1024,
-  MAX_FILE_SIZE_MB: 5,
-} as const;
+export {
+  CANDIDATE_REPORT_ROLES,
+  CLOSED_REPORT_STATUSES,
+  OPEN_REPORT_STATUSES,
+  REPORT_CANDIDATE_TABS,
+  REPORT_EVIDENCE_ACCEPT,
+  REPORT_EVIDENCE_MIME_BY_EXT,
+  REPORT_LIMITS,
+  REPORT_REASONS,
+  REPORT_STATUSES,
+  UNAVAILABLE_TARGET_BACKEND_SUBTITLE,
+  cleanEvidenceFileName,
+  formatReportTargetSubtitle,
+  isCandidateReportRole,
+  normalizeEvidenceFileForUpload,
+  validateReportEvidenceFile,
+  type AllowedEvidenceExtension,
+  type ReportCandidateTab,
+  type ReportReason,
+  type ReportStatus,
+  type ReportTargetType,
+} from '@/config/reports';
 
 export const REPORT_STATUS_BADGE_CLASS: Record<ReportStatus, string> = {
   pending: 'bg-(--status-warning-bg) text-(--status-warning-fg) border border-(--status-warning-fg)/20',

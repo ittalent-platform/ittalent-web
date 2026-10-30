@@ -17,9 +17,12 @@ import { ErrorState } from '@/components/common/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import {
+  CLOSED_REPORT_STATUSES,
   REPORT_STATUS_BADGE_CLASS,
   REPORT_TIMELINE_DOT_CLASS,
-  CLOSED_REPORT_STATUSES,
+  UNAVAILABLE_TARGET_BACKEND_SUBTITLE,
+  cleanEvidenceFileName,
+  formatReportTargetSubtitle,
 } from '@/features/reports/reports.constants';
 import { useMyReportDetailQuery } from '@/features/reports/reports.queries';
 import { WithdrawReportDialog } from '@/features/reports/components/withdraw-report-dialog';
@@ -91,15 +94,89 @@ export function MyReportDetailPage() {
     );
   }
 
-  const reference = report.reference || report.ticket_id || report.id;
+  const reference = report.reference || report.id;
   const status = report.status;
-  const canWithdraw = status === 'pending';
-  const canHide = CLOSED_REPORT_STATUSES.includes(status);
+  const canWithdraw = report.canWithdraw ?? status === 'pending';
+  const canHide = report.canHide ?? CLOSED_REPORT_STATUSES.includes(status);
   const reasonLabel = t(`reports.reasons.${report.reason}`, { defaultValue: report.reason });
   const statusLabel = t(`reports.statuses.${status}`, { defaultValue: status });
   const badgeClass = REPORT_STATUS_BADGE_CLASS[status] || 'bg-muted text-foreground';
 
-  const responseText = report.responseFromPlatform || report.message_to_reporter;
+  const targetType = report.target?.type ?? 'job';
+  const targetTitle = report.target?.title || t('common.untitled', { defaultValue: 'Untitled' });
+  const rawSubtitle = report.target?.subtitle;
+  const isAvailable =
+    report.target?.isAvailable !== false &&
+    rawSubtitle !== UNAVAILABLE_TARGET_BACKEND_SUBTITLE;
+  const typeLabel = t(`reports.targetTypes.${targetType}`, { defaultValue: targetType });
+  const formattedSubtitle = formatReportTargetSubtitle({
+    subtitle: rawSubtitle,
+    typeLabel,
+    isAvailable,
+  });
+
+  const responseText = report.responseFromPlatform;
+  const files = report.files ?? [];
+
+  const getHistoryLabel = (event: string, fallbackLabel: string): string => {
+    switch (event) {
+      case 'submitted':
+      case 'pending':
+        return t('reports.timeline.submitted');
+      case 'review_started':
+      case 'reviewing':
+        return t('reports.timeline.reviewStarted');
+      case 'resolved':
+        return t('reports.timeline.resolved');
+      case 'rejected':
+        return t('reports.timeline.rejected');
+      case 'withdrawn':
+        return t('reports.timeline.withdrawnByYou');
+      default:
+        return fallbackLabel;
+    }
+  };
+
+  const historyEntries =
+    report.history && report.history.length > 0
+      ? report.history.map((entry) => ({
+          event: entry.event,
+          label: getHistoryLabel(entry.event, entry.label),
+          timestamp: entry.timestamp,
+        }))
+      : [
+          {
+            event: 'submitted',
+            label: t('reports.timeline.submitted'),
+            timestamp: report.submittedAt,
+          },
+          ...(status === 'reviewing' || status === 'resolved' || status === 'rejected'
+            ? [
+                {
+                  event: 'review_started',
+                  label: t('reports.timeline.reviewStarted'),
+                  timestamp: report.submittedAt,
+                },
+              ]
+            : []),
+          ...(status === 'withdrawn'
+            ? [
+                {
+                  event: 'withdrawn',
+                  label: t('reports.timeline.withdrawnByYou'),
+                  timestamp: report.submittedAt,
+                },
+              ]
+            : status === 'resolved' || status === 'rejected'
+              ? [
+                  {
+                    event: status,
+                    label: statusLabel,
+                    timestamp: report.submittedAt,
+                  },
+                ]
+              : []),
+        ];
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl pb-16">
@@ -117,7 +194,7 @@ export function MyReportDetailPage() {
         <div className="flex flex-col gap-1.5 min-w-0">
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="font-heading text-2xl font-bold text-foreground truncate">
-              {t('reports.detail.reportAbout', { target: report.target?.title || report.target_title || 'Item' })}
+              {t('reports.detail.reportAbout', { target: targetTitle })}
             </h1>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeClass}`}>
               {statusLabel}
@@ -126,7 +203,7 @@ export function MyReportDetailPage() {
           <span className="text-[13.5px] text-muted-foreground">
             {t('reports.detail.referenceSubmitted', {
               reference,
-              date: formatDate(report.submittedAt || report.createdAt),
+              date: formatDate(report.submittedAt),
             })}
           </span>
         </div>
@@ -137,7 +214,7 @@ export function MyReportDetailPage() {
             <Button
               type="button"
               variant="outline"
-              className="text-(--status-warning-fg) border-(--status-warning-border) hover:bg-(--status-warning-bg)"
+              className="text-(--status-warning-fg) border-(--status-warning-fg)/30 hover:bg-(--status-warning-bg)"
               onClick={() => setIsWithdrawOpen(true)}
             >
               <Undo2 className="size-4 mr-2" />
@@ -190,17 +267,21 @@ export function MyReportDetailPage() {
             {/* Target Item Row */}
             <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-subtle border border-line-muted">
               <div className="size-10 rounded-lg bg-surface border border-line flex items-center justify-center shrink-0">
-                <TargetIcon type={report.target?.type || report.target_type} />
+                <TargetIcon type={targetType} />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-semibold text-[14.5px] text-foreground truncate">
-                  {report.target?.title || report.target_title || 'Untitled'}
-                </span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="font-semibold text-[14.5px] text-foreground truncate">
+                    {targetTitle}
+                  </span>
+                  {!isAvailable && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-(--sand) text-(--slate-muted) border border-(--line) shrink-0">
+                      {t('reports.noLongerAvailable')}
+                    </span>
+                  )}
+                </div>
                 <span className="text-xs text-muted-foreground truncate">
-                  {t(`reports.targetTypes.${report.target?.type || report.target_type}`, {
-                    defaultValue: report.target?.type || report.target_type || 'Job',
-                  })}
-                  {report.target?.subtitle ? ` · ${report.target.subtitle}` : ''}
+                  {formattedSubtitle}
                 </span>
               </div>
             </div>
@@ -221,49 +302,44 @@ export function MyReportDetailPage() {
                 {t('reports.detail.whatHappenedLabel')}
               </span>
               <p className="text-[14px] leading-relaxed text-foreground whitespace-pre-wrap">
-                {report.statement || report.description || 'No statement provided.'}
+                {report.statement}
               </p>
             </div>
 
             {/* Evidence Files */}
-            {((report.files && report.files.length > 0) || (report.evidence_files && report.evidence_files.length > 0)) && (
-              <div className="flex flex-col gap-2 pt-2 border-t border-line-muted">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  {t('reports.detail.filesLabel')}
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {(report.files || []).map((fileObj) => (
-                    <a
-                      key={fileObj.id}
-                      href={fileObj.downloadUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface hover:bg-surface-subtle text-xs font-semibold text-foreground transition-colors"
-                    >
-                      <FileText className="size-3.5 text-muted-foreground" />
-                      <span className="max-w-[200px] truncate">{fileObj.fileName}</span>
-                      <ExternalLink className="size-3 text-muted-foreground ml-0.5" />
-                    </a>
-                  ))}
-                  {(report.evidence_files || []).map((fileUrl, idx) => {
-                    const fileName = fileUrl.split('/').pop() || `Attachment ${idx + 1}`;
-                    return (
+            <div className="flex flex-col gap-2 pt-2 border-t border-line-muted">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                {t('reports.detail.filesLabel')}
+              </span>
+              {files.length > 0 ? (
+                <>
+                  <div className="flex flex-wrap gap-2">
+                    {files.map((fileObj, idx) => (
                       <a
-                        key={`evidence-${idx}`}
-                        href={fileUrl}
+                        key={fileObj.id || `${fileObj.downloadUrl}-${idx}`}
+                        href={fileObj.downloadUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface hover:bg-surface-subtle text-xs font-semibold text-foreground transition-colors"
                       >
                         <FileText className="size-3.5 text-muted-foreground" />
-                        <span className="max-w-[200px] truncate">{fileName}</span>
+                        <span className="max-w-[200px] truncate">
+                          {cleanEvidenceFileName(fileObj.fileName, idx)}
+                        </span>
                         <ExternalLink className="size-3 text-muted-foreground ml-0.5" />
                       </a>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+                    ))}
+                  </div>
+                  <span className="text-[12px] text-muted-foreground">
+                    {t('reports.detail.evidencePrivateLinkNotice')}
+                  </span>
+                </>
+              ) : (
+                <span className="text-xs text-muted-foreground">
+                  {t('reports.detail.noFiles')}
+                </span>
+              )}
+            </div>
           </section>
         </div>
 
@@ -280,64 +356,37 @@ export function MyReportDetailPage() {
                 : status === 'reviewing'
                   ? t('reports.statuses.reviewing')
                   : status === 'withdrawn'
-                    ? t('reports.statuses.withdrawn')
+                    ? t('reports.detail.youWithdrewIt')
                     : t('reports.detail.reviewedAndClosed')}
             </span>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              {status === 'pending'
+              {status === 'pending' || status === 'reviewing'
                 ? t('reports.detail.waitingForReviewDesc')
-                : status === 'reviewing'
-                  ? t('reports.detail.waitingForReviewerDesc')
-                  : status === 'withdrawn'
-                    ? t('reports.detail.withdrawnDesc')
-                    : t('reports.detail.reportClosedDesc')}
+                : status === 'withdrawn'
+                  ? t('reports.detail.withdrawnDesc')
+                  : t('reports.detail.reportClosedDesc')}
             </p>
           </section>
 
           {/* History Card */}
-          <section className="p-5 rounded-2xl bg-surface border border-line flex flex-col gap-3">
+          <section aria-label={t('reports.detail.historyRailTitle')} className="p-5 rounded-2xl bg-surface border border-line flex flex-col gap-3">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-subtle">
               {t('reports.detail.historyRailTitle')}
             </span>
             <div className="flex flex-col gap-4 pt-1">
-              {/* Submitted Event */}
-              <div className="flex items-start gap-3">
-                <span className={`mt-1 size-2 rounded-full shrink-0 ${REPORT_TIMELINE_DOT_CLASS.submitted}`} />
-                <div className="flex flex-col text-xs">
-                  <span className="font-semibold text-foreground">{t('reports.timeline.submitted')}</span>
-                  <span className="text-muted-foreground">
-                    {formatDate(report.submittedAt || report.createdAt)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Review Started Event (if reviewing or closed) */}
-              {(status === 'reviewing' || CLOSED_REPORT_STATUSES.includes(status)) && (
-                <div className="flex items-start gap-3">
-                  <span className={`mt-1 size-2 rounded-full shrink-0 ${REPORT_TIMELINE_DOT_CLASS.reviewing}`} />
-                  <div className="flex flex-col text-xs">
-                    <span className="font-semibold text-foreground">{t('reports.timeline.underReview')}</span>
-                    <span className="text-muted-foreground">
-                      {formatDate(report.updatedAt)}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Closed Event */}
-              {CLOSED_REPORT_STATUSES.includes(status) && (
-                <div className="flex items-start gap-3">
+              {historyEntries.map((entry, idx) => (
+                <div key={`${entry.event}-${entry.timestamp}-${idx}`} className="flex items-start gap-3">
                   <span
-                    className={`mt-1 size-2 rounded-full shrink-0 ${REPORT_TIMELINE_DOT_CLASS[status] || 'bg-muted'}`}
+                    className={`mt-1 size-2 rounded-full shrink-0 ${
+                      REPORT_TIMELINE_DOT_CLASS[entry.event] || 'bg-muted'
+                    }`}
                   />
                   <div className="flex flex-col text-xs">
-                    <span className="font-semibold text-foreground capitalize">{statusLabel}</span>
-                    <span className="text-muted-foreground">
-                      {formatDate(report.updatedAt)}
-                    </span>
+                    <span className="font-semibold text-foreground">{entry.label}</span>
+                    <span className="text-muted-foreground">{formatDate(entry.timestamp)}</span>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
           </section>
         </aside>
@@ -347,7 +396,7 @@ export function MyReportDetailPage() {
       <WithdrawReportDialog
         open={isWithdrawOpen}
         onOpenChange={setIsWithdrawOpen}
-        report={report as unknown as import('@/features/reports/reports.types').ReportItemResponse}
+        report={report}
         onSuccess={() => void refetch()}
       />
 
@@ -355,7 +404,7 @@ export function MyReportDetailPage() {
       <HideReportDialog
         open={isHideOpen}
         onOpenChange={setIsHideOpen}
-        report={report as unknown as import('@/features/reports/reports.types').ReportItemResponse}
+        report={report}
         onSuccess={() => navigate(MY_REPORTS_PATH)}
       />
     </div>

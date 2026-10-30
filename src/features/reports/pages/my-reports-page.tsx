@@ -27,8 +27,10 @@ import {
   TableSkeletonRows,
 } from '@/components/ui/table';
 import {
-  REPORT_STATUS_BADGE_CLASS,
   CLOSED_REPORT_STATUSES,
+  REPORT_STATUS_BADGE_CLASS,
+  UNAVAILABLE_TARGET_BACKEND_SUBTITLE,
+  formatReportTargetSubtitle,
   type ReportCandidateTab,
 } from '@/features/reports/reports.constants';
 import { useMyReportsQuery } from '@/features/reports/reports.queries';
@@ -69,7 +71,8 @@ export function MyReportsPage() {
   const countsAll = data?.counts?.all ?? 0;
   const countsOpen = data?.counts?.open ?? 0;
   const countsClosed = data?.counts?.closed ?? 0;
-  const totalPages = data?.totalPages ?? 1;
+  const total = data?.pagination?.total ?? reports.length;
+  const totalPages = data?.pagination?.totalPages ?? 1;
 
   const formatDate = (isoString?: string) => {
     if (!isoString) return '';
@@ -114,7 +117,7 @@ export function MyReportsPage() {
           />
         </div>
 
-        <div role="tablist" aria-label="Status" className="flex items-center gap-2 self-start sm:self-auto">
+        <div role="tablist" aria-label="Status" className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           {tabsConfig.map((tab) => {
             const isActive = activeTab === tab.key;
             return (
@@ -207,9 +210,18 @@ export function MyReportsPage() {
                   const statusLabel = t(`reports.statuses.${item.status}`, { defaultValue: item.status });
                   const badgeClass = REPORT_STATUS_BADGE_CLASS[item.status] || 'bg-muted text-foreground';
 
-                  const targetType = item.target?.type ?? item.target_type ?? 'job';
-                  const targetTitle = item.target?.title ?? item.target_title ?? t('common.untitled', { defaultValue: 'Untitled' });
-                  const targetSubtitle = item.target?.subtitle;
+                  const targetType = item.target?.type ?? 'job';
+                  const targetTitle = item.target?.title || t('common.untitled', { defaultValue: 'Untitled' });
+                  const rawSubtitle = item.target?.subtitle;
+                  const isAvailable =
+                    item.target?.isAvailable !== false &&
+                    rawSubtitle !== UNAVAILABLE_TARGET_BACKEND_SUBTITLE;
+                  const typeLabel = t(`reports.targetTypes.${targetType}`, { defaultValue: targetType });
+                  const formattedSubtitle = formatReportTargetSubtitle({
+                    subtitle: rawSubtitle,
+                    typeLabel,
+                    isAvailable,
+                  });
 
                   return (
                     <TableRow
@@ -223,12 +235,18 @@ export function MyReportsPage() {
                             <TargetIcon type={targetType} />
                           </div>
                           <div className="flex flex-col min-w-0">
-                            <span className="font-semibold text-[14px] text-foreground truncate group-hover:text-primary transition-colors">
-                              {targetTitle}
-                            </span>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="font-semibold text-[14px] text-foreground truncate group-hover:text-primary transition-colors">
+                                {targetTitle}
+                              </span>
+                              {!isAvailable && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-(--sand) text-(--slate-muted) border border-(--line) shrink-0">
+                                  {t('reports.noLongerAvailable')}
+                                </span>
+                              )}
+                            </div>
                             <span className="text-xs text-muted-foreground truncate">
-                              {t(`reports.targetTypes.${targetType}`, { defaultValue: targetType })}
-                              {targetSubtitle ? ` · ${targetSubtitle}` : ''}
+                              {formattedSubtitle}
                             </span>
                           </div>
                         </div>
@@ -239,7 +257,7 @@ export function MyReportsPage() {
                       </TableCell>
 
                       <TableCell className="py-3.5 text-[13px] text-muted-foreground whitespace-nowrap">
-                        {formatDate(item.createdAt)}
+                        {formatDate(item.submittedAt)}
                       </TableCell>
 
                       <TableCell className="py-3.5">
@@ -305,8 +323,8 @@ export function MyReportsPage() {
             <span className="text-xs text-muted-foreground">
               {t('pagination.showing', {
                 start: (page - 1) * limit + 1,
-                end: Math.min(page * limit, data?.total ?? 0),
-                total: data?.total ?? 0,
+                end: Math.min(page * limit, total),
+                total,
                 defaultValue: `Showing ${page} of ${totalPages}`,
               })}
             </span>

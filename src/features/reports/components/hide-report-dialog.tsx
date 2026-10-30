@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 import { ActionConfirmDialog } from '@/components/common/action-confirm-dialog';
 import { useHideReportMutation } from '@/features/reports/reports.queries';
-import type { ReportItemResponse } from '@/features/reports/reports.types';
+import type { ReportTargetRef } from '@/features/reports/reports.types';
 
 export interface HideReportDialogProps {
-  report: ReportItemResponse | null;
+  report: ReportTargetRef | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;

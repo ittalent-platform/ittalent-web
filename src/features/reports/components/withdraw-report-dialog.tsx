@@ -6,10 +6,10 @@ import { ActionConfirmDialog } from '@/components/common/action-confirm-dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useWithdrawReportMutation } from '@/features/reports/reports.queries';
-import type { ReportItemResponse } from '@/features/reports/reports.types';
+import type { ReportTargetRef } from '@/features/reports/reports.types';
 
 export interface WithdrawReportDialogProps {
-  report: ReportItemResponse | null;
+  report: ReportTargetRef | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
@@ -31,6 +31,7 @@ export function WithdrawReportDialog({ report, open, onOpenChange, onSuccess }: 
         id: report.id,
         note: note.trim() || undefined,
       });
+      setNote('');
       onOpenChange(false);
       onSuccess?.();
     } catch (err) {

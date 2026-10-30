@@ -3316,6 +3316,103 @@
           "message"
         ]
       },
+      "PublicEnterpriseListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "logoUrl": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "industry": {
+                  "type": "string"
+                },
+                "companySize": {
+                  "type": "string"
+                },
+                "shortDescription": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "cities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "openRoleCount": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "logoUrl",
+                "industry",
+                "companySize",
+                "shortDescription",
+                "cities",
+                "openRoleCount"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "PublicIndustryList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "industry": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "industry",
+                "count"
+              ]
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "StartEnterpriseRegistrationRequest": {
         "type": "object",
         "properties": {
@@ -5258,6 +5355,33 @@
         ],
         "additionalProperties": false
       },
+      "UpdatePortfolioLinkRequest": {
+        "type": "object",
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
       "PortfolioLink": {
         "type": "object",
         "properties": {
@@ -5308,6 +5432,11 @@
             "minimum": 1,
             "maximum": 100,
             "default": 20
+          },
+          "keyword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
           }
         },
         "additionalProperties": false
@@ -9222,7 +9351,6 @@
             "enum": [
               "job",
               "company",
-              "enterprise",
               "user"
             ]
           },
@@ -9324,9 +9452,6 @@
                 "reference": {
                   "type": "string"
                 },
-                "ticket_id": {
-                  "type": "string"
-                },
                 "target": {
                   "type": "object",
                   "properties": {
@@ -9335,7 +9460,6 @@
                       "enum": [
                         "job",
                         "company",
-                        "enterprise",
                         "user"
                       ]
                     },
@@ -9360,78 +9484,20 @@
                     "isAvailable"
                   ]
                 },
-                "target_title": {
-                  "type": "string"
-                },
-                "target_type": {
+                "reason": {
                   "type": "string",
                   "enum": [
-                    "job",
-                    "company",
-                    "enterprise",
-                    "user"
+                    "scam_or_fraud",
+                    "misleading_information",
+                    "discrimination",
+                    "inappropriate_content",
+                    "something_else"
                   ]
-                },
-                "target_id": {
-                  "type": "string"
-                },
-                "target_link": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "reason": {
-                  "type": "string"
-                },
-                "reason_category": {
-                  "type": "string"
                 },
                 "reasonLabel": {
                   "type": "string"
                 },
-                "title": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                },
-                "statement": {
-                  "type": "string"
-                },
-                "evidence_files": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "timeline": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "status": {
-                        "type": "string"
-                      },
-                      "timestamp": {
-                        "type": "string"
-                      },
-                      "note": {
-                        "type": "string",
-                        "nullable": true
-                      }
-                    },
-                    "required": [
-                      "status",
-                      "timestamp"
-                    ]
-                  }
-                },
                 "submittedAt": {
-                  "type": "string"
-                },
-                "createdAt": {
-                  "type": "string"
-                },
-                "updatedAt": {
                   "type": "string"
                 },
                 "status": {
@@ -9482,61 +9548,6 @@
               "closed"
             ]
           },
-          "kpis": {
-            "type": "object",
-            "properties": {
-              "total": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "pending": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "reviewing": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "resolved": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "rejected": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "withdrawn": {
-                "type": "integer",
-                "minimum": 0
-              }
-            },
-            "required": [
-              "total",
-              "pending",
-              "reviewing",
-              "resolved",
-              "rejected",
-              "withdrawn"
-            ]
-          },
-          "page": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
-          },
-          "limit": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
-          },
-          "total": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "totalPages": {
-            "type": "integer",
-            "minimum": 0
-          },
           "pagination": {
             "type": "object",
             "properties": {
@@ -9582,71 +9593,6 @@
           "reference": {
             "type": "string"
           },
-          "ticket_id": {
-            "type": "string"
-          },
-          "target_title": {
-            "type": "string"
-          },
-          "target_type": {
-            "type": "string",
-            "enum": [
-              "job",
-              "company",
-              "enterprise",
-              "user"
-            ]
-          },
-          "target_id": {
-            "type": "string"
-          },
-          "target_link": {
-            "type": "string",
-            "nullable": true
-          },
-          "reason_category": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "evidence_files": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "timeline": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "status": {
-                  "type": "string"
-                },
-                "timestamp": {
-                  "type": "string"
-                },
-                "note": {
-                  "type": "string",
-                  "nullable": true
-                }
-              },
-              "required": [
-                "status",
-                "timestamp"
-              ]
-            }
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          },
           "status": {
             "type": "string",
             "enum": [
@@ -9674,7 +9620,6 @@
                 "enum": [
                   "job",
                   "company",
-                  "enterprise",
                   "user"
                 ]
               },
@@ -9700,7 +9645,14 @@
             ]
           },
           "reason": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "scam_or_fraud",
+              "misleading_information",
+              "discrimination",
+              "inappropriate_content",
+              "something_else"
+            ]
           },
           "reasonLabel": {
             "type": "string"
@@ -9741,10 +9693,6 @@
             }
           },
           "responseFromPlatform": {
-            "type": "string",
-            "nullable": true
-          },
-          "message_to_reporter": {
             "type": "string",
             "nullable": true
           },
@@ -12777,6 +12725,110 @@
         }
       }
     },
+    "/api/v1/enterprises/public": {
+      "get": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "Browse, search and filter companies (public)",
+        "description": "No sign-in needed. Only Active enterprises, each with card fields only (no contact or tax data) and the number of open roles. `keyword` matches the name, industry, city (head office or a branch), country or tech stack. `industry` and `company_size` take one value or a comma-separated list (\"Fintech,Gaming\"), and an enterprise matches any of them. `location` matches a city, district or province of the head office or a branch. Sorted by name; `total` is the live count for the chosen filters.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "keyword",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "industry",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "company_size",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "location",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated company cards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicEnterpriseListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or unsupported query parameters"
+          }
+        }
+      }
+    },
+    "/api/v1/enterprises/public/industries": {
+      "get": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "Industries of the companies on the platform (public)",
+        "description": "Active enterprises per industry, most companies first, for the Industry filter. At most 100 industries.",
+        "responses": {
+          "200": {
+            "description": "Industries with their company counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicIndustryList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/enterprises/{enterpriseId}": {
       "get": {
         "tags": [
@@ -14202,7 +14254,8 @@
         "tags": [
           "Portfolio Links"
         ],
-        "summary": "List the current Candidate’s private portfolio links",
+        "summary": "List or search the current Candidate’s private portfolio links",
+        "description": "With `keyword`, only links whose title, URL or description contain it (case-insensitive) are returned. Stored metadata only; external pages are never fetched.",
         "security": [
           {
             "bearerAuth": []
@@ -14229,6 +14282,16 @@
             "required": false,
             "name": "limit",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "keyword",
+            "in": "query"
           }
         ],
         "responses": {
@@ -14243,7 +14306,7 @@
             }
           },
           "400": {
-            "description": "Invalid pagination"
+            "description": "Invalid pagination or search query"
           },
           "401": {
             "description": "Authentication required or session revoked"
@@ -14258,6 +14321,69 @@
       }
     },
     "/api/v1/me/portfolio-links/{id}": {
+      "patch": {
+        "tags": [
+          "Portfolio Links"
+        ],
+        "summary": "Update the title, URL or description of an owned portfolio link",
+        "description": "A field that is left out keeps its value; `description: null` or an empty string removes it. Send the version that was loaded for editing. Earlier application snapshots are not changed. An update that changes nothing, or the retry of one that already committed, returns the stored link without a new version.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePortfolioLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated portfolio link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or empty update, or unsafe URL"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active verified Candidate account required"
+          },
+          "404": {
+            "description": "Portfolio link not found or owned by someone else"
+          },
+          "409": {
+            "description": "VERSION_CONFLICT or DUPLICATE_PORTFOLIO_URL"
+          },
+          "503": {
+            "description": "Portfolio link storage unavailable"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Portfolio Links"
@@ -17464,7 +17590,6 @@
                 "all",
                 "job",
                 "company",
-                "enterprise",
                 "user"
               ],
               "default": "all"
