@@ -65,6 +65,14 @@ export interface AdminReportTimelineEntry {
   note?: string | null;
 }
 
+export interface AdminReportFileEntry {
+  id: string;
+  fileName: string;
+  mimeType?: string;
+  size?: number;
+  downloadUrl: string;
+}
+
 export interface AdminReportItem {
   id: string;
   ticket_id: string;
@@ -79,6 +87,7 @@ export interface AdminReportItem {
   description?: string;
   statement?: string;
   evidence_files: string[];
+  files?: AdminReportFileEntry[];
   status: ReportStatus;
   statusLabel?: string;
   submittedAt?: string;

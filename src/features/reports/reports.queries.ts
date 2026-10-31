@@ -34,6 +34,7 @@ import {
 import type {
   AdminBackendStatus,
   AdminBackendTargetType,
+  AdminReportFileEntry,
   AdminReportItem,
   AdminReportTimelineEntry,
   AdminReportsQueryParams,
@@ -123,6 +124,34 @@ function parseAdminReportItem(raw: unknown): AdminReportItem {
   const rawReason = asString(doc.reason) || asString(doc.reason_category);
   const normalizedReason = normalizeReasonCode(rawReason);
 
+  const filesList: AdminReportFileEntry[] = [];
+  if (Array.isArray(doc.files)) {
+    for (const entry of doc.files) {
+      if (isRecord(entry) && typeof entry.downloadUrl === 'string' && entry.downloadUrl) {
+        filesList.push({
+          id: asString(entry.id) || entry.downloadUrl,
+          fileName: asString(entry.fileName) || entry.downloadUrl,
+          mimeType: asString(entry.mimeType),
+          size: asNumber(entry.size),
+          downloadUrl: entry.downloadUrl,
+        });
+      }
+    }
+  }
+  if (filesList.length === 0 && Array.isArray(doc.evidence_files)) {
+    for (const entry of doc.evidence_files) {
+      if (isRecord(entry) && typeof entry.file_url === 'string' && entry.file_url) {
+        filesList.push({
+          id: asString(entry.id) || asString(entry._id) || asString(entry.storage_key) || entry.file_url,
+          fileName: asString(entry.file_name) || asString(entry.fileName) || entry.file_url,
+          mimeType: asString(entry.mime_type) || asString(entry.mimeType),
+          size: asNumber(entry.size),
+          downloadUrl: entry.file_url,
+        });
+      }
+    }
+  }
+
   const evidenceList: string[] = [];
   if (Array.isArray(doc.evidence_files)) {
     for (const entry of doc.evidence_files) {
@@ -183,6 +212,7 @@ function parseAdminReportItem(raw: unknown): AdminReportItem {
     description: asString(doc.description) || asString(doc.statement) || '',
     statement: asString(doc.statement) || asString(doc.description) || '',
     evidence_files: evidenceList,
+    files: filesList.length > 0 ? filesList : undefined,
     status,
     statusLabel: asString(doc.statusLabel),
     submittedAt: asString(doc.submittedAt) || createdAt,
@@ -380,7 +410,8 @@ export function useSubmitReportMutation() {
           formData.append('idempotencyKey', payload.idempotencyKey);
         }
         for (const file of payload.files) {
-          formData.append('files', normalizeEvidenceFileForUpload(file));
+          const normalizedFile = normalizeEvidenceFileForUpload(file);
+          formData.append('files', normalizedFile, normalizedFile.name);
         }
 
         const res = await client.post<PostApiV1MeReportsResponses, PostApiV1MeReportsErrors>({
@@ -388,6 +419,9 @@ export function useSubmitReportMutation() {
           url: '/api/v1/me/reports',
           body: formData,
           bodySerializer: null,
+          headers: {
+            'Content-Type': null,
+          },
         });
         return unwrap(res, 'Unable to submit report');
       }

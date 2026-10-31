@@ -217,7 +217,7 @@ export function ReportViolationDialog({
         formData.append('statement', trimmedStatement);
         formData.append('idempotencyKey', effectiveKey);
         for (const file of files) {
-          formData.append('files', file);
+          formData.append('files', file, file.name);
         }
 
         const res = await client.post<PostApiV1MeReportsResponses, PostApiV1MeReportsErrors>({
@@ -225,6 +225,9 @@ export function ReportViolationDialog({
           url: '/api/v1/me/reports',
           body: formData,
           bodySerializer: null,
+          headers: {
+            'Content-Type': null,
+          },
         });
         const result = unwrap(res, t('reports.errors.statementRequired'));
         const returnedRef = extractSubmittedReference(result);

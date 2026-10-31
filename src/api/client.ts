@@ -151,6 +151,9 @@ client.interceptors.response.use(async (response, request, opts) => {
   const headers = new Headers(request.headers);
   headers.set("Authorization", `Bearer ${newAccessToken}`);
   headers.set("x-retry-attempt", "1");
+  if (opts.body instanceof FormData) {
+    headers.delete("Content-Type");
+  }
 
   const requestInit: RequestInit = {
     method: request.method,

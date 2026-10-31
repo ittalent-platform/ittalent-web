@@ -342,7 +342,31 @@ export function AdminReportDetailPage() {
             <h2 className="font-heading text-[16px] font-bold text-foreground">
               {t('reports.detail.evidenceCardTitle')}
             </h2>
-            {report.evidence_files && report.evidence_files.length > 0 ? (
+            {report.files && report.files.length > 0 ? (
+              <>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {report.files.map((file, idx) => {
+                    const fileName = cleanEvidenceFileName(file.fileName || file.downloadUrl, idx);
+                    return (
+                      <a
+                        key={`${file.id || file.downloadUrl}-${idx}`}
+                        href={file.downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface hover:bg-surface-subtle text-xs font-semibold text-foreground transition-colors"
+                      >
+                        <FileText className="size-3.5 text-muted-foreground" />
+                        <span className="max-w-[200px] truncate">{fileName}</span>
+                        <ExternalLink className="size-3 text-muted-foreground ml-0.5" />
+                      </a>
+                    );
+                  })}
+                </div>
+                <span className="text-[12px] text-muted-foreground">
+                  {t('reports.detail.evidencePrivateLinkNotice')}
+                </span>
+              </>
+            ) : report.evidence_files && report.evidence_files.length > 0 ? (
               <>
                 <div className="flex flex-wrap gap-2 pt-1">
                   {report.evidence_files.map((fileUrl, idx) => {
@@ -545,14 +569,6 @@ export function AdminReportDetailPage() {
 
               {/* Bottom Buttons */}
               <div className="flex items-center justify-end gap-2.5 pt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled
-                  title={t('reports.detail.releaseUnavailableHint')}
-                >
-                  {t('reports.detail.release')}
-                </Button>
                 <Button
                   type="button"
                   onClick={handleOpenFinalizeConfirm}

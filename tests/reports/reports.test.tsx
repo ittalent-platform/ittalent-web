@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -11,17 +11,14 @@ import { AdminReportDetailPage } from '@/features/reports/pages/admin-report-det
 import { AdminReportsPage } from '@/features/reports/pages/admin-reports-page';
 import { MyReportDetailPage } from '@/features/reports/pages/my-report-detail-page';
 import { MyReportsPage } from '@/features/reports/pages/my-reports-page';
+import { useSubmitReportMutation } from '@/features/reports/reports.queries';
 
 const mockUseSession = vi.fn();
 vi.mock('@/auth/use-session', () => ({
   useSession: () => mockUseSession(),
 }));
 
-vi.mock('@/api/client', () => ({
-  client: {
-    post: vi.fn(),
-  },
-}));
+const mockFetch = vi.fn<typeof fetch>();
 
 vi.mock('@/api/generated/sdk.gen', () => ({
   postApiV1MeReports: vi.fn(),
@@ -68,6 +65,11 @@ describe('Reports Feature Contract & E2E Alignment Tests', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockFetch.mockReset();
+    client.setConfig({
+      baseUrl: 'http://localhost:3000',
+      fetch: mockFetch,
+    });
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -153,16 +155,20 @@ describe('Reports Feature Contract & E2E Alignment Tests', () => {
       expect(sdk.postApiV1MeReports).not.toHaveBeenCalled();
     });
 
-    it('refuses unsupported .exe files immediately on selection while keeping valid files (Design E4 / Section 4.1)', async () => {
-      vi.mocked(client.post).mockResolvedValueOnce({
-        data: {
-          reference: 'RPT-2026-0099',
-          message: 'Report received. You can follow it in My reports.',
-        },
-        error: undefined,
-        request: new Request('http://localhost/api/v1/me/reports'),
-        response: new Response(null, { status: 201 }),
-      });
+    it('refuses unsupported .exe files immediately on selection while sending multipart FormData without Content-Type: application/json (Section 1 & Design E4)', async () => {
+      const postSpy = vi.spyOn(client, 'post');
+      mockFetch.mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            reference: 'RPT-2026-0099',
+            message: 'Report received. You can follow it in My reports.',
+          }),
+          {
+            status: 201,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        ),
+      );
 
       render(
         <ReportViolationDialog
@@ -202,19 +208,80 @@ describe('Reports Feature Contract & E2E Alignment Tests', () => {
       fireEvent.click(screen.getByRole('button', { name: /Send report/i }));
 
       await waitFor(() => {
-        expect(client.post).toHaveBeenCalledTimes(1);
+        expect(mockFetch).toHaveBeenCalledTimes(1);
       });
 
-      const postArg = vi.mocked(client.post).mock.calls[0]?.[0];
-      const submittedForm = postArg?.body as FormData;
+      const submittedForm = postSpy.mock.calls[0]?.[0]?.body as FormData;
       expect(submittedForm).toBeInstanceOf(FormData);
       const uploadedFiles = submittedForm.getAll('files') as File[];
       expect(uploadedFiles).toHaveLength(1);
       expect(uploadedFiles[0]?.name).toBe('call-notes.pdf');
 
+      const outgoingRequest = mockFetch.mock.calls[0]?.[0];
+      expect(outgoingRequest).toBeInstanceOf(Request);
+      const req = outgoingRequest as Request;
+      const contentTypeHeader = req.headers.get('content-type') ?? '';
+      expect(contentTypeHeader.toLowerCase()).not.toContain('application/json');
+      expect(contentTypeHeader.toLowerCase()).toMatch(/^multipart\/form-data;\s*boundary=/);
+
+      const rawMultipartBody = await req.text();
+      expect(rawMultipartBody).toContain('Content-Disposition: form-data; name="targetType"');
+      expect(rawMultipartBody).toContain('job_123');
+      expect(rawMultipartBody).toContain('scam_or_fraud');
+      expect(rawMultipartBody).toContain('Content-Type: application/pdf');
+
       await waitFor(() => {
         expect(screen.getByText(/RPT-2026-0099/i)).toBeInTheDocument();
       });
+    });
+
+    it('sends multipart request without Content-Type: application/json in useSubmitReportMutation when files are attached (Section 1)', async () => {
+      const postSpy = vi.spyOn(client, 'post');
+      mockFetch.mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            reference: 'RPT-2026-0100',
+            message: 'Report received. You can follow it in My reports.',
+          }),
+          {
+            status: 201,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        ),
+      );
+
+      const { result } = renderHook(() => useSubmitReportMutation(), {
+        wrapper: createWrapper(),
+      });
+
+      const pngFile = new File(['png-bytes'], 'evidence.png', { type: 'image/png' });
+      const res = await result.current.mutateAsync({
+        targetType: 'job',
+        targetId: 'job_123',
+        reason: 'scam_or_fraud',
+        statement: 'Fraudulent job fee demand.',
+        idempotencyKey: 'idem-multipart-1',
+        files: [pngFile],
+      });
+
+      expect(res.reference).toBe('RPT-2026-0100');
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      const submittedForm = postSpy.mock.calls[0]?.[0]?.body as FormData;
+      const uploadedFiles = submittedForm.getAll('files') as File[];
+      expect(uploadedFiles).toHaveLength(1);
+      expect(uploadedFiles[0]?.name).toBe('evidence.png');
+
+      const req = mockFetch.mock.calls[0]?.[0] as Request;
+      expect(req).toBeInstanceOf(Request);
+      const contentTypeHeader = req.headers.get('content-type') ?? '';
+      expect(contentTypeHeader.toLowerCase()).not.toContain('application/json');
+      expect(contentTypeHeader.toLowerCase()).toMatch(/^multipart\/form-data;\s*boundary=/);
+
+      const rawMultipartBody = await req.text();
+      expect(rawMultipartBody).toContain('Content-Disposition: form-data; name="files"');
+      expect(rawMultipartBody).toContain('Content-Type: image/png');
+      expect(rawMultipartBody).toContain('idem-multipart-1');
     });
 
     it('submits valid job report using POST /api/v1/me/reports without target_link or legacy fields (B1, B2)', async () => {
@@ -628,7 +695,7 @@ describe('Reports Feature Contract & E2E Alignment Tests', () => {
       expect(screen.getByText('1 open report · newest first')).toBeInTheDocument();
     });
 
-    it('leaves admin decision note/message empty by default, validates min-lengths, disables Release, cleans .png.png, and supports Resolve & Reject (Section 3.3, 4.2, 5)', async () => {
+    it('leaves admin decision note/message empty by default, validates min-lengths, hides unavailable Release button, cleans .png.png, and supports Resolve & Reject (Section 3.3, 4.2, 5)', async () => {
       vi.mocked(sdk.getApiV1ReportsById).mockResolvedValue({
         data: {
           data: {
@@ -680,9 +747,8 @@ describe('Reports Feature Contract & E2E Alignment Tests', () => {
       expect(screen.getByText('evidence-uuid.png')).toBeInTheDocument();
       expect(screen.queryByText('evidence-uuid.png.png')).toBeNull();
 
-      // Release button is explicitly disabled (no backend unclaim endpoint)
-      const releaseBtn = screen.getByRole('button', { name: /^Release$/i });
-      expect(releaseBtn).toBeDisabled();
+      // Unavailable Release button is hidden until backend unclaim endpoint exists
+      expect(screen.queryByRole('button', { name: /^Release$/i })).toBeNull();
 
       // Both note fields are EMPTY by default (Section 3.3)
       const msgInput = screen.getByLabelText(/Message to the reporter/i) as HTMLTextAreaElement;
@@ -745,6 +811,19 @@ describe('Reports Feature Contract & E2E Alignment Tests', () => {
             target_title: 'Senior Go Engineer',
             reason: 'misleading_information',
             statement: 'Job description salary is misleading.',
+            evidence_files: [
+              'https://res.cloudinary.com/demo/image/upload/v1/italent/reports/evidence/evidence-uuid.png',
+            ],
+            files: [
+              {
+                id: 'file_orig',
+                fileName: 'salary-screenshot.png',
+                mimeType: 'image/png',
+                size: 4096,
+                downloadUrl:
+                  'https://res.cloudinary.com/demo/image/upload/v1/italent/reports/evidence/evidence-uuid.png',
+              },
+            ],
             status: 'reviewing',
             reviewer: 'admin@ittalent.com',
             createdAt: '2026-10-27T10:00:00.000Z',
@@ -779,6 +858,10 @@ describe('Reports Feature Contract & E2E Alignment Tests', () => {
       await waitFor(() => {
         expect(screen.getByLabelText(/Message to the reporter/i)).toBeInTheDocument();
       });
+
+      // Displays original uploaded fileName when BE returns files metadata (Section 3.1)
+      expect(screen.getByText('salary-screenshot.png')).toBeInTheDocument();
+      expect(screen.queryByText('evidence-uuid.png')).toBeNull();
 
       fireEvent.change(screen.getByLabelText(/Message to the reporter/i), {
         target: { value: 'We reviewed the job and closed your report. Thank you.' },
