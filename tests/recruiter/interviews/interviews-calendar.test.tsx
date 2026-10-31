@@ -215,6 +215,7 @@ describe("Recruiter interviews calendar", () => {
   });
 
   it("moves to the next and the previous month through the address", async () => {
+    vi.useFakeTimers({ now: new Date("2026-10-08T03:00:00.000Z"), toFake: ["Date"] });
     const user = userEvent.setup();
     renderPage();
     await user.click(screen.getByRole("button", { name: "Next month" }));
