@@ -215,6 +215,8 @@ describe("Recruiter interviews calendar", () => {
   });
 
   it("moves to the next and the previous month through the address", async () => {
+    // The address leaves out the month that is "today", so the test pins today to October like its neighbours do.
+    vi.useFakeTimers({ now: new Date("2026-10-08T03:00:00.000Z"), toFake: ["Date"] });
     const user = userEvent.setup();
     renderPage();
     await user.click(screen.getByRole("button", { name: "Next month" }));
