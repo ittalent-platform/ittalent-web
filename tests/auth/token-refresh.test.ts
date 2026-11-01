@@ -19,7 +19,44 @@ describe("Token Auto-Refresh Interceptor", () => {
       expect(result).toBeNull();
     });
 
-    it("refreshes tokens and updates storage on success", async () => {
+    it("refreshes tokens and updates storage on success with real top-level backend response contract", async () => {
+      setStoredTokens({
+        accessToken: "old-access-token",
+        refreshToken: "valid-refresh-token",
+      });
+
+      const fetchMock = vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            accessToken: "new-access-token",
+            refreshToken: "new-refresh-token",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      );
+
+      client.setConfig({ fetch: fetchMock });
+
+      const newAccessToken = await refreshAuthTokens();
+
+      expect(newAccessToken).toBe("new-access-token");
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/auth/refresh"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ refreshToken: "valid-refresh-token" }),
+        }),
+      );
+
+      const stored = getStoredTokens();
+      expect(stored?.accessToken).toBe("new-access-token");
+      expect(stored?.refreshToken).toBe("new-refresh-token");
+    });
+
+    it("supports legacy wrapped data envelope for backward compatibility", async () => {
       setStoredTokens({
         accessToken: "old-access-token",
         refreshToken: "valid-refresh-token",
@@ -109,15 +146,12 @@ describe("Token Auto-Refresh Interceptor", () => {
             headers: { "Content-Type": "application/json" },
           }),
         )
-        // 2. Refresh request returns 200 with new tokens
+        // 2. Refresh request returns 200 with new tokens (top-level BE contract)
         .mockResolvedValueOnce(
           new Response(
             JSON.stringify({
-              success: true,
-              data: {
-                accessToken: "new-access-token",
-                refreshToken: "new-refresh-token",
-              },
+              accessToken: "new-access-token",
+              refreshToken: "new-refresh-token",
             }),
             {
               status: 200,

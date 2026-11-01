@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   Briefcase,
@@ -8,12 +8,14 @@ import {
   Lock,
   MapPin,
   RefreshCw,
+  Flag,
   TrendingUp,
   TriangleAlert,
   Users,
 } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 import { useSession } from "@/auth/use-session";
 import { HTTP_NOT_FOUND } from "@/api/http-status";
@@ -21,6 +23,7 @@ import { requestStatus } from "@/api/request-error";
 
 import { ApplyButton } from "./apply-button";
 import { SaveJobButton } from "@/features/applicant/saved-jobs/components/save-job-button";
+import { ReportViolationDialog } from "@/components/common/report-violation-dialog";
 import {
   loadEnterprise,
   loadEnterpriseOpenJobs,
@@ -115,10 +118,12 @@ function PageShell({ children }: { children: ReactNode }) {
 const MORE_JOBS_SHOWN = 3;
 
 export function CareerJobPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { slug } = useParams();
   const { data: session } = useSession();
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
 
   const { data, error, isError, isLoading, refetch } = useQuery({
     queryKey: publicKeys.job(slug),
@@ -377,7 +382,7 @@ export function CareerJobPage() {
               ) : null}
             </div>
           </div>
-          <div className="relative shrink-0">
+          <div className="relative flex shrink-0">
             <SaveJobButton
               jobId={job._id}
               jobTitle={job.title}
@@ -507,6 +512,14 @@ export function CareerJobPage() {
                   </p>
                 </>
               )}
+              <button
+                type="button"
+                onClick={() => setIsReportDialogOpen(true)}
+                className="self-center inline-flex items-center gap-1.5 text-[13px] font-semibold text-mkt-muted hover:text-mkt-ink transition-colors pt-2"
+              >
+                <Flag aria-hidden="true" className="size-3.5" />
+                <span>{t("reports.reportThisJob")}</span>
+              </button>
             </div>
           </section>
 
@@ -610,6 +623,15 @@ export function CareerJobPage() {
           </div>
         </section>
       ) : null}
+
+      <ReportViolationDialog
+        open={isReportDialogOpen}
+        onOpenChange={setIsReportDialogOpen}
+        targetType="job"
+        targetId={job._id}
+        targetTitle={job.title}
+        targetSubtitle={companyName || undefined}
+      />
     </PageShell>
   );
 }

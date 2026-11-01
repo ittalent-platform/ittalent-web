@@ -70,11 +70,18 @@ export async function refreshAuthTokens(): Promise<string | null> {
       return null;
     }
 
-    const json = (await res.json()) as {
-      data?: RefreshTokenResponse;
+    const json = (await res.json()) as Partial<RefreshTokenResponse> & {
+      data?: Partial<RefreshTokenResponse>;
     };
-    const newTokens = json?.data;
-    if (newTokens?.accessToken && newTokens?.refreshToken) {
+    const candidate =
+      typeof json?.accessToken === 'string' && typeof json?.refreshToken === 'string'
+        ? json
+        : json?.data;
+    if (candidate?.accessToken && candidate?.refreshToken) {
+      const newTokens: RefreshTokenResponse = {
+        accessToken: candidate.accessToken,
+        refreshToken: candidate.refreshToken,
+      };
       setStoredTokens(newTokens);
       return newTokens.accessToken;
     }
@@ -151,6 +158,9 @@ client.interceptors.response.use(async (response, request, opts) => {
   const headers = new Headers(request.headers);
   headers.set("Authorization", `Bearer ${newAccessToken}`);
   headers.set("x-retry-attempt", "1");
+  if (opts.body instanceof FormData) {
+    headers.delete("Content-Type");
+  }
 
   const requestInit: RequestInit = {
     method: request.method,
