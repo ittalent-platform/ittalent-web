@@ -11,6 +11,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/format";
+import { isWebLink } from "@/lib/web-link";
 
 import { CERTIFICATE_LIMITS } from "./certificates.constants";
 import { useCreateCertificate, useUpdateCertificate } from "./certificates.queries";
@@ -31,16 +32,6 @@ function initialValues(certificate?: CertificateLink): Values {
     suggested: certificate?.suggested ?? false,
     url: certificate?.url ?? "",
   };
-}
-
-/** A web address the server will accept: http(s), a host with a dot, no credentials. */
-export function isWebLink(value: string): boolean {
-  try {
-    const url = new URL(value.trim());
-    return (url.protocol === "https:" || url.protocol === "http:") && url.hostname.includes(".") && !url.username && !url.password;
-  } catch {
-    return false;
-  }
 }
 
 export function validateCertificate(values: Values): FieldErrors {

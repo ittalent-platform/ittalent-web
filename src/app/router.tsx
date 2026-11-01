@@ -16,6 +16,7 @@ const LoginPage = lazy(() =>
   import("@/features/auth/login-page").then((m) => ({ default: m.LoginPage })),
 );
 const ProfilePage = lazy(() => import("@/features/profile/profile-page").then((m) => ({ default: m.ProfilePage })));
+const PortfolioPage = lazy(() => import("@/features/portfolio/portfolio-page").then((m) => ({ default: m.PortfolioPage })));
 const RegisterPage = lazy(() =>
   import("@/features/auth/register-page").then((m) => ({
     default: m.RegisterPage,
@@ -274,6 +275,7 @@ export const appRoutes = [
               },
               { path: "saved-jobs", element: <SavedJobsPage /> },
               { path: "certificates", element: <CertificatesPage /> },
+              { path: "portfolio", element: <PortfolioPage /> },
               { path: "notifications", element: <NotificationCenterPage /> },
               { path: "account/notifications", element: <Navigate replace to="/notifications" /> },
             ],

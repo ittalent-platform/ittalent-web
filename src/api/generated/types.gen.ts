@@ -1180,6 +1180,13 @@ export type CreatePortfolioLinkRequest = {
     description?: string;
 };
 
+export type UpdatePortfolioLinkRequest = {
+    expectedVersion: number;
+    title?: string;
+    url?: string;
+    description?: string | null;
+};
+
 export type PortfolioLink = {
     id: string;
     title: string;
@@ -1193,6 +1200,7 @@ export type PortfolioLink = {
 export type PortfolioLinkListQuery = {
     page?: number;
     limit?: number;
+    keyword?: string;
 };
 
 export type PaginatedPortfolioLinks = {
@@ -4515,13 +4523,14 @@ export type GetApiV1MePortfolioLinksData = {
     query?: {
         page?: number;
         limit?: number;
+        keyword?: string;
     };
     url: '/api/v1/me/portfolio-links';
 };
 
 export type GetApiV1MePortfolioLinksErrors = {
     /**
-     * Invalid pagination
+     * Invalid pagination or search query
      */
     400: unknown;
     /**
@@ -4638,6 +4647,51 @@ export type DeleteApiV1MePortfolioLinksByIdResponses = {
 };
 
 export type DeleteApiV1MePortfolioLinksByIdResponse = DeleteApiV1MePortfolioLinksByIdResponses[keyof DeleteApiV1MePortfolioLinksByIdResponses];
+
+export type PatchApiV1MePortfolioLinksByIdData = {
+    body: UpdatePortfolioLinkRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/me/portfolio-links/{id}';
+};
+
+export type PatchApiV1MePortfolioLinksByIdErrors = {
+    /**
+     * Invalid or empty update, or unsafe URL
+     */
+    400: unknown;
+    /**
+     * Authentication required or session revoked
+     */
+    401: unknown;
+    /**
+     * Active verified Candidate account required
+     */
+    403: unknown;
+    /**
+     * Portfolio link not found or owned by someone else
+     */
+    404: unknown;
+    /**
+     * VERSION_CONFLICT or DUPLICATE_PORTFOLIO_URL
+     */
+    409: unknown;
+    /**
+     * Portfolio link storage unavailable
+     */
+    503: unknown;
+};
+
+export type PatchApiV1MePortfolioLinksByIdResponses = {
+    /**
+     * Updated portfolio link
+     */
+    200: PortfolioLink;
+};
+
+export type PatchApiV1MePortfolioLinksByIdResponse = PatchApiV1MePortfolioLinksByIdResponses[keyof PatchApiV1MePortfolioLinksByIdResponses];
 
 export type GetApiV1RecruiterApplicationsData = {
     body?: never;

@@ -5258,6 +5258,33 @@
         ],
         "additionalProperties": false
       },
+      "UpdatePortfolioLinkRequest": {
+        "type": "object",
+        "properties": {
+          "expectedVersion": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "expectedVersion"
+        ],
+        "additionalProperties": false
+      },
       "PortfolioLink": {
         "type": "object",
         "properties": {
@@ -5308,6 +5335,11 @@
             "minimum": 1,
             "maximum": 100,
             "default": 20
+          },
+          "keyword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
           }
         },
         "additionalProperties": false
@@ -13498,7 +13530,8 @@
         "tags": [
           "Portfolio Links"
         ],
-        "summary": "List the current Candidate’s private portfolio links",
+        "summary": "List or search the current Candidate’s private portfolio links",
+        "description": "With `keyword`, only links whose title, URL or description contain it (case-insensitive) are returned. Stored metadata only; external pages are never fetched.",
         "security": [
           {
             "bearerAuth": []
@@ -13525,6 +13558,16 @@
             "required": false,
             "name": "limit",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "keyword",
+            "in": "query"
           }
         ],
         "responses": {
@@ -13539,7 +13582,7 @@
             }
           },
           "400": {
-            "description": "Invalid pagination"
+            "description": "Invalid pagination or search query"
           },
           "401": {
             "description": "Authentication required or session revoked"
@@ -13554,6 +13597,69 @@
       }
     },
     "/api/v1/me/portfolio-links/{id}": {
+      "patch": {
+        "tags": [
+          "Portfolio Links"
+        ],
+        "summary": "Update the title, URL or description of an owned portfolio link",
+        "description": "A field that is left out keeps its value; `description: null` or an empty string removes it. Send the version that was loaded for editing. Earlier application snapshots are not changed. An update that changes nothing, or the retry of one that already committed, returns the stored link without a new version.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePortfolioLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated portfolio link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or empty update, or unsafe URL"
+          },
+          "401": {
+            "description": "Authentication required or session revoked"
+          },
+          "403": {
+            "description": "Active verified Candidate account required"
+          },
+          "404": {
+            "description": "Portfolio link not found or owned by someone else"
+          },
+          "409": {
+            "description": "VERSION_CONFLICT or DUPLICATE_PORTFOLIO_URL"
+          },
+          "503": {
+            "description": "Portfolio link storage unavailable"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Portfolio Links"
