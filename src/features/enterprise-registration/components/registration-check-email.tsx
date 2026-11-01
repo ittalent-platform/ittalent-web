@@ -3,7 +3,7 @@ import { Mail, RefreshCw } from "lucide-react";
 import { Trans, useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
-import { MS_PER_SECOND, RESEND_COOLDOWN_SECONDS } from "@/features/auth/auth-status.constants";
+import { MS_PER_SECOND, RESEND_COOLDOWN_SECONDS } from "@/config/resend-verification";
 
 const STRONG = { strong: <strong className="font-semibold text-foreground" /> };
 const STEP_KEYS = ["step1", "step2", "step3"] as const;

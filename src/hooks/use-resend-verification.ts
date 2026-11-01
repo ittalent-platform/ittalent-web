@@ -2,9 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { postApiV1AuthResendVerificationEmail } from "@/api/generated";
-
-import { MS_PER_SECOND, RESEND_COOLDOWN_SECONDS, RESEND_LIMIT, SECONDS_PER_MINUTE } from "./auth-status.constants";
 import { requestErrorMessage } from "@/api/request-error";
+import { MS_PER_SECOND, RESEND_COOLDOWN_SECONDS, RESEND_LIMIT, SECONDS_PER_MINUTE } from "@/config/resend-verification";
 
 type ResendStatus = "idle" | "loading" | "error";
 
@@ -56,9 +55,20 @@ export function useResendVerification() {
     [t],
   );
 
+  /** What the resend action reads: its idle label, then "Sending…", the countdown, or the limit reached. */
+  const label = (idleLabel: string) =>
+    limited
+      ? t("auth.verify.resendLimitReached")
+      : secondsLeft > 0
+        ? t("auth.verify.resendAgainIn", { time: formatCooldown(secondsLeft) })
+        : status === "loading"
+          ? t("auth.verify.sending")
+          : idleLabel;
+
   return {
     cooling: secondsLeft > 0 || limited,
     errorMessage,
+    label,
     limited,
     loading: status === "loading",
     resend,

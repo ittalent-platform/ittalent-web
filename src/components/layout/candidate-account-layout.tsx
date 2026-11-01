@@ -4,6 +4,7 @@ import {
   Bell,
   Briefcase,
   FileText,
+  Link2,
   ShieldAlert,
   UserRound,
   type LucideIcon,
@@ -11,7 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router";
 
-import { APPLICATIONS_PATH, MY_REPORTS_PATH, NOTIFICATIONS_PATH, PROFILE_PATH, SAVED_JOBS_PATH } from "@/config/routes";
+import { APPLICATIONS_PATH, MY_REPORTS_PATH, NOTIFICATIONS_PATH, PORTFOLIO_PATH, PROFILE_PATH, SAVED_JOBS_PATH } from "@/config/routes";
 import { cn } from "@/lib/utils";
 
 type AccountNavGroup = {
@@ -33,6 +34,7 @@ const ACCOUNT_NAV: AccountNavGroup[] = [
       { icon: UserRound, labelKey: "accountNav.myProfile", to: PROFILE_PATH },
       { icon: FileText, labelKey: "accountNav.documents", to: "/documents" },
       { icon: Award, labelKey: "accountNav.certificates", to: "/certificates" },
+      { icon: Link2, labelKey: "accountNav.portfolio", to: PORTFOLIO_PATH },
     ],
     labelKey: "accountNav.myProfile",
   },
