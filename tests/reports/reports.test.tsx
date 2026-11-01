@@ -34,6 +34,8 @@ vi.mock('@/api/generated/sdk.gen', () => ({
 
 const VALID_ADMIN_STATUSES = new Set([
   'all',
+  'open',
+  'closed',
   'pending',
   'reviewing',
   'resolved',
@@ -50,6 +52,11 @@ const VALID_ADMIN_CATEGORIES = new Set([
   'impersonation',
   'harassment',
   'other',
+  'scam_or_fraud',
+  'misleading_information',
+  'discrimination',
+  'inappropriate_content',
+  'something_else',
 ]);
 
 describe('Reports Feature Contract & E2E Alignment Tests', () => {
@@ -621,8 +628,24 @@ describe('Reports Feature Contract & E2E Alignment Tests', () => {
         }
 
         const filtered = sampleRecords.filter((rec) => {
-          if (status !== 'all' && rec.status !== status) return false;
+          if (status === 'open') {
+            if (rec.status !== 'pending' && rec.status !== 'reviewing') return false;
+          } else if (status === 'closed') {
+            if (rec.status !== 'resolved' && rec.status !== 'rejected' && rec.status !== 'withdrawn') return false;
+          } else if (status !== 'all' && rec.status !== status) {
+            return false;
+          }
           if (targetType !== 'all' && rec.target_type !== targetType) return false;
+          if (category !== 'all') {
+            const matchesCat =
+              rec.reason === category ||
+              rec.reason_category === category ||
+              (category === 'scam_or_fraud' && rec.reason_category === 'scam_fraud') ||
+              (category === 'misleading_information' && rec.reason_category === 'misleading_info') ||
+              (category === 'inappropriate_content' && rec.reason_category === 'offensive_content') ||
+              (category === 'something_else' && rec.reason_category === 'other');
+            if (!matchesCat) return false;
+          }
           return true;
         });
 
@@ -661,12 +684,11 @@ describe('Reports Feature Contract & E2E Alignment Tests', () => {
       expect(screen.queryByText(/Secret Candidate/i)).toBeNull();
       expect(screen.getByText(/Reporter names aren’t shown/i)).toBeInTheDocument();
 
-      // Verify BE received pending + reviewing, never status="open"
-      const queriedStatuses = vi
-        .mocked(sdk.getApiV1Reports)
-        .mock.calls.map((c) => c[0]?.query?.status);
-      expect(queriedStatuses).toEqual(expect.arrayContaining(['pending', 'reviewing']));
-      expect(queriedStatuses).not.toContain('open');
+      // Verify BE natively received status="open" directly in 1 single request
+      expect(sdk.getApiV1Reports).toHaveBeenCalledTimes(1);
+      const firstCall = vi.mocked(sdk.getApiV1Reports).mock.calls[0]?.[0];
+      expect(firstCall?.query?.status).toBe('open');
+      expect(firstCall?.query?.category).toBe('all');
     });
 
     it('loads Closed filter and 5 candidate reason filters against strict BE contract without 400 (Section 1)', async () => {

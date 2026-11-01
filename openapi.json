@@ -3413,6 +3413,192 @@
           "items"
         ]
       },
+      "PublicEnterpriseDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "industry": {
+            "type": "string"
+          },
+          "companySize": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "cities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "openRoleCount": {
+            "type": "integer"
+          },
+          "coverUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "cultureSummary": {
+            "type": "string",
+            "nullable": true
+          },
+          "subIndustries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "companyType": {
+            "type": "string",
+            "nullable": true
+          },
+          "foundedYear": {
+            "type": "integer",
+            "nullable": true
+          },
+          "headquarters": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "city",
+              "country"
+            ]
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "techStack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "benefits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "workingDays": {
+            "type": "string",
+            "nullable": true
+          },
+          "mediaGallery": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "socialLinks": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "linkedin": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "facebook": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "github": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "twitter": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      ""
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "logoUrl",
+          "industry",
+          "companySize",
+          "shortDescription",
+          "cities",
+          "openRoleCount",
+          "coverUrl",
+          "description",
+          "cultureSummary",
+          "subIndustries",
+          "companyType",
+          "foundedYear",
+          "headquarters",
+          "website",
+          "techStack",
+          "benefits",
+          "workingDays",
+          "mediaGallery",
+          "socialLinks"
+        ]
+      },
       "StartEnterpriseRegistrationRequest": {
         "type": "object",
         "properties": {
@@ -12829,6 +13015,44 @@
         }
       }
     },
+    "/api/v1/enterprises/{enterpriseId}/public": {
+      "get": {
+        "tags": [
+          "Enterprises"
+        ],
+        "summary": "View a company page (public)",
+        "description": "No sign-in needed. Profile content only (about, tech stack, benefits, offices, website, open role count); no contact, tax or registration data. A company that is not Active answers 404, like one that does not exist. Its open jobs are listed by `GET /api/v1/job-postings?enterprise_id=`.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{24}$"
+            },
+            "required": true,
+            "name": "enterpriseId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public company profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicEnterpriseDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid enterprise ID format"
+          },
+          "404": {
+            "description": "Company not found or not available"
+          }
+        }
+      }
+    },
     "/api/v1/enterprises/{enterpriseId}": {
       "get": {
         "tags": [
@@ -17571,6 +17795,8 @@
               "type": "string",
               "enum": [
                 "all",
+                "open",
+                "closed",
                 "pending",
                 "reviewing",
                 "resolved",
@@ -17609,7 +17835,12 @@
                 "offensive_content",
                 "impersonation",
                 "harassment",
-                "other"
+                "other",
+                "scam_or_fraud",
+                "misleading_information",
+                "discrimination",
+                "inappropriate_content",
+                "something_else"
               ],
               "default": "all"
             },

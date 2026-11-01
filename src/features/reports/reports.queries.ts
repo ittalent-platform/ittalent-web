@@ -8,30 +8,33 @@ import {
   getApiV1ReportsById,
   patchApiV1ReportsByIdClaim,
   patchApiV1ReportsByIdResolve,
-  postApiV1MeReports,
   postApiV1MeReportsByIdHide,
   postApiV1MeReportsByIdWithdraw,
 } from '@/api/generated/sdk.gen';
 import type {
   AdminResolveReportRequest,
-  CreateReportResponse,
   PaginatedReportsResponse,
   PostApiV1MeReportsByIdWithdrawErrors,
   PostApiV1MeReportsByIdWithdrawResponses,
-  PostApiV1MeReportsErrors,
-  PostApiV1MeReportsResponses,
   ReportDetailResponse,
   ReportHideResponse,
   ReportWithdrawResponse,
 } from '@/api/generated/types.gen';
 import { unwrap } from '@/api/request-error';
 import {
+  REPORT_QUERY_KEYS,
   REPORT_STATUSES,
-  normalizeEvidenceFileForUpload,
   type ReportStatus,
   type ReportTargetType,
 } from '@/config/reports';
+import {
+  useSubmitReportMutation,
+  type SubmitReportPayload,
+} from '@/hooks/use-submit-report-mutation';
+
+export { useSubmitReportMutation, type SubmitReportPayload };
 import type {
+  AdminBackendCategory,
   AdminBackendStatus,
   AdminBackendTargetType,
   AdminReportFileEntry,
@@ -43,14 +46,14 @@ import type {
 } from './reports.types';
 
 export const reportsKeys = {
-  all: ['reports'] as const,
-  myReports: () => [...reportsKeys.all, 'mine'] as const,
-  myReportsLists: () => [...reportsKeys.myReports(), 'list'] as const,
+  all: REPORT_QUERY_KEYS.all,
+  myReports: () => [...REPORT_QUERY_KEYS.myReports] as const,
+  myReportsLists: () => [...REPORT_QUERY_KEYS.myReports, 'list'] as const,
   myReportsList: (params: ReporterReportsQueryParams) => [...reportsKeys.myReportsLists(), params] as const,
-  myReportDetail: (ref: string) => [...reportsKeys.myReports(), 'detail', ref] as const,
-  adminReports: () => [...reportsKeys.all, 'admin'] as const,
-  adminReportsList: (params: AdminReportsQueryParams) => [...reportsKeys.adminReports(), 'list', params] as const,
-  adminReportDetail: (ref: string) => [...reportsKeys.adminReports(), 'detail', ref] as const,
+  myReportDetail: (ref: string) => [...REPORT_QUERY_KEYS.myReports, 'detail', ref] as const,
+  adminReports: () => [...REPORT_QUERY_KEYS.adminReports] as const,
+  adminReportsList: (params: AdminReportsQueryParams) => [...REPORT_QUERY_KEYS.adminReports, 'list', params] as const,
+  adminReportDetail: (ref: string) => [...REPORT_QUERY_KEYS.adminReports, 'detail', ref] as const,
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -98,24 +101,47 @@ function isReportStatus(value?: string): value is ReportStatus {
   return Boolean(value && (REPORT_STATUSES as readonly string[]).includes(value));
 }
 
-function resolveBackendStatuses(statusParam?: string): readonly AdminBackendStatus[] {
-  if (!statusParam || statusParam === 'open') {
-    return ['pending', 'reviewing'];
+const VALID_ADMIN_BACKEND_STATUSES: readonly AdminBackendStatus[] = [
+  'all',
+  'open',
+  'closed',
+  'pending',
+  'reviewing',
+  'resolved',
+  'rejected',
+  'withdrawn',
+];
+
+function normalizeAdminBackendStatus(statusParam?: string): AdminBackendStatus {
+  if (!statusParam) return 'open';
+  if ((VALID_ADMIN_BACKEND_STATUSES as readonly string[]).includes(statusParam)) {
+    return statusParam as AdminBackendStatus;
   }
-  if (statusParam === 'closed') {
-    return ['resolved', 'rejected', 'withdrawn'];
+  return 'open';
+}
+
+const VALID_ADMIN_BACKEND_CATEGORIES: readonly AdminBackendCategory[] = [
+  'all',
+  'scam_fraud',
+  'fee_extortion',
+  'misleading_info',
+  'offensive_content',
+  'impersonation',
+  'harassment',
+  'other',
+  'scam_or_fraud',
+  'misleading_information',
+  'discrimination',
+  'inappropriate_content',
+  'something_else',
+];
+
+function normalizeAdminBackendCategory(categoryParam?: string): AdminBackendCategory {
+  if (!categoryParam || categoryParam === 'all') return 'all';
+  if ((VALID_ADMIN_BACKEND_CATEGORIES as readonly string[]).includes(categoryParam)) {
+    return categoryParam as AdminBackendCategory;
   }
-  if (
-    statusParam === 'all' ||
-    statusParam === 'pending' ||
-    statusParam === 'reviewing' ||
-    statusParam === 'resolved' ||
-    statusParam === 'rejected' ||
-    statusParam === 'withdrawn'
-  ) {
-    return [statusParam];
-  }
-  return ['pending', 'reviewing'];
+  return 'all';
 }
 
 function parseAdminReportItem(raw: unknown): AdminReportItem {
@@ -267,15 +293,6 @@ function parsePaginatedAdminReports(
   };
 }
 
-function matchesCategoryFilter(item: AdminReportItem, categoryFilter: string): boolean {
-  if (!categoryFilter || categoryFilter === 'all') return true;
-  const normalizedTarget = normalizeReasonCode(categoryFilter);
-  return (
-    normalizeReasonCode(item.reason) === normalizedTarget ||
-    normalizeReasonCode(item.reason_category) === normalizedTarget
-  );
-}
-
 function matchesSubmittedFilter(item: AdminReportItem, submittedFilter: string): boolean {
   if (!submittedFilter || submittedFilter === 'all') return true;
   const iso = item.submittedAt || item.createdAt;
@@ -299,20 +316,18 @@ function matchesSubmittedFilter(item: AdminReportItem, submittedFilter: string):
 const MAX_ADMIN_BATCH_LIMIT = 100;
 const MAX_ADMIN_BATCH_PAGES = 5;
 
-async function fetchAdminStatusItems(options: {
+async function fetchAdminQueryPages(options: {
   status: AdminBackendStatus;
   targetType: AdminBackendTargetType;
+  category: AdminBackendCategory;
   search?: string;
   batchLimit: number;
-  fetchAllPages: boolean;
-  requiredCount: number;
 }): Promise<{
   items: AdminReportItem[];
   total: number;
   kpis?: PaginatedAdminReportsResult['kpis'];
-  complete: boolean;
 }> {
-  const { status, targetType, search, batchLimit, fetchAllPages, requiredCount } = options;
+  const { status, targetType, category, search, batchLimit } = options;
 
   const firstRes = await getApiV1Reports({
     query: {
@@ -320,7 +335,7 @@ async function fetchAdminStatusItems(options: {
       limit: batchLimit,
       status,
       target_type: targetType,
-      category: 'all',
+      category,
       search,
     },
   });
@@ -330,20 +345,12 @@ async function fetchAdminStatusItems(options: {
     batchLimit,
   );
 
-  const targetPages = fetchAllPages
-    ? Math.min(firstData.totalPages, MAX_ADMIN_BATCH_PAGES)
-    : Math.min(
-        firstData.totalPages,
-        MAX_ADMIN_BATCH_PAGES,
-        Math.max(1, Math.ceil(requiredCount / batchLimit)),
-      );
-
+  const targetPages = Math.min(firstData.totalPages, MAX_ADMIN_BATCH_PAGES);
   if (targetPages <= 1) {
     return {
       items: firstData.items,
       total: firstData.total,
       kpis: firstData.kpis,
-      complete: firstData.totalPages <= 1,
     };
   }
 
@@ -360,7 +367,7 @@ async function fetchAdminStatusItems(options: {
           limit: batchLimit,
           status,
           target_type: targetType,
-          category: 'all',
+          category,
           search,
         },
       });
@@ -381,67 +388,7 @@ async function fetchAdminStatusItems(options: {
     items: combined,
     total: firstData.total,
     kpis: firstData.kpis,
-    complete: targetPages >= firstData.totalPages,
   };
-}
-
-// UC-30: Submit a violation report (Candidate)
-export interface SubmitReportPayload {
-  targetType: 'job' | 'company' | 'user';
-  targetId: string;
-  reason: 'scam_or_fraud' | 'misleading_information' | 'discrimination' | 'inappropriate_content' | 'something_else';
-  statement: string;
-  idempotencyKey?: string;
-  files?: File[];
-}
-
-export function useSubmitReportMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (payload: SubmitReportPayload): Promise<CreateReportResponse> => {
-      if (payload.files && payload.files.length > 0) {
-        const formData = new FormData();
-        formData.append('targetType', payload.targetType);
-        formData.append('targetId', payload.targetId);
-        formData.append('reason', payload.reason);
-        formData.append('statement', payload.statement.trim());
-        if (payload.idempotencyKey) {
-          formData.append('idempotencyKey', payload.idempotencyKey);
-        }
-        for (const file of payload.files) {
-          const normalizedFile = normalizeEvidenceFileForUpload(file);
-          formData.append('files', normalizedFile, normalizedFile.name);
-        }
-
-        const res = await client.post<PostApiV1MeReportsResponses, PostApiV1MeReportsErrors>({
-          security: [{ scheme: 'bearer', type: 'http' }],
-          url: '/api/v1/me/reports',
-          body: formData,
-          bodySerializer: null,
-          headers: {
-            'Content-Type': null,
-          },
-        });
-        return unwrap(res, 'Unable to submit report');
-      }
-
-      const res = await postApiV1MeReports({
-        body: {
-          targetType: payload.targetType,
-          targetId: payload.targetId,
-          reason: payload.reason,
-          statement: payload.statement.trim(),
-          idempotencyKey: payload.idempotencyKey,
-        },
-      });
-      return unwrap(res, 'Unable to submit report');
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: reportsKeys.myReports() });
-      void queryClient.invalidateQueries({ queryKey: reportsKeys.adminReports() });
-    },
-  });
 }
 
 // UC-31: Candidate My Reports List
@@ -552,22 +499,21 @@ export function useAdminReportsQuery(params: AdminReportsQueryParams = {}) {
       search,
     }),
     queryFn: async () => {
-      const backendStatuses = resolveBackendStatuses(status);
+      const normalizedStatus = normalizeAdminBackendStatus(status);
       const normalizedTargetType = normalizeAdminBackendTargetType(target_type);
+      const normalizedCategory = normalizeAdminBackendCategory(category);
       const trimmedSearch = search?.trim() || undefined;
-      const hasClientFilter =
-        (Boolean(category) && category !== 'all') ||
-        (Boolean(submitted) && submitted !== 'all');
+      const hasDateWindowFilter = Boolean(submitted) && submitted !== 'all';
 
-      // Direct single-endpoint pagination when BE supports the exact filter natively
-      if (backendStatuses.length === 1 && !hasClientFilter) {
+      // 1. Single direct request whenever no client-side date window filter is active (default 99% path)
+      if (!hasDateWindowFilter) {
         const res = await getApiV1Reports({
           query: {
             page,
             limit,
-            status: backendStatuses[0],
+            status: normalizedStatus,
             target_type: normalizedTargetType,
-            category: 'all',
+            category: normalizedCategory,
             search: trimmedSearch,
           },
         });
@@ -575,75 +521,28 @@ export function useAdminReportsQuery(params: AdminReportsQueryParams = {}) {
         return parsePaginatedAdminReports(data, page, limit);
       }
 
-      // Composite status ('open' -> pending + reviewing, 'closed' -> resolved + rejected + withdrawn)
-      // or client-refined filters (5 candidate reason codes / submitted date window).
-      const requiredCount = page * limit;
-      const batchLimit = hasClientFilter
-        ? MAX_ADMIN_BATCH_LIMIT
-        : Math.min(MAX_ADMIN_BATCH_LIMIT, Math.max(50, requiredCount));
-
-      const statusResults = await Promise.all(
-        backendStatuses.map((beStatus) =>
-          fetchAdminStatusItems({
-            status: beStatus,
-            targetType: normalizedTargetType,
-            search: trimmedSearch,
-            batchLimit,
-            fetchAllPages: hasClientFilter,
-            requiredCount,
-          }),
-        ),
-      );
-
-      const seenIds = new Set<string>();
-      const mergedItems: AdminReportItem[] = [];
-      let sumBackendTotals = 0;
-      let allComplete = true;
-      let kpis: PaginatedAdminReportsResult['kpis'];
-
-      for (const result of statusResults) {
-        sumBackendTotals += result.total;
-        if (!result.complete) {
-          allComplete = false;
-        }
-        if (!kpis && result.kpis) {
-          kpis = result.kpis;
-        }
-        for (const item of result.items) {
-          const dedupeKey = item.id || item.reference || item.ticket_id;
-          if (dedupeKey && seenIds.has(dedupeKey)) continue;
-          if (dedupeKey) seenIds.add(dedupeKey);
-          mergedItems.push(item);
-        }
-      }
-
-      mergedItems.sort((a, b) => {
-        const tsB = Date.parse(b.submittedAt || b.createdAt) || 0;
-        const tsA = Date.parse(a.submittedAt || a.createdAt) || 0;
-        return tsB - tsA;
+      // 2. Date window filter ('today' | '7d' | '30d') not yet supported natively as a query param on BE.
+      // Query up to MAX_ADMIN_BATCH_PAGES of this single status/category stream and filter client-side.
+      const queryResult = await fetchAdminQueryPages({
+        status: normalizedStatus,
+        targetType: normalizedTargetType,
+        category: normalizedCategory,
+        search: trimmedSearch,
+        batchLimit: MAX_ADMIN_BATCH_LIMIT,
       });
 
-      const filteredItems = hasClientFilter
-        ? mergedItems.filter(
-            (item) =>
-              matchesCategoryFilter(item, category) &&
-              matchesSubmittedFilter(item, submitted),
-          )
-        : mergedItems;
+      const filteredItems = queryResult.items.filter((item) =>
+        matchesSubmittedFilter(item, submitted),
+      );
 
-      const total = hasClientFilter
-        ? filteredItems.length
-        : allComplete
-          ? filteredItems.length
-          : sumBackendTotals;
-
+      const total = filteredItems.length;
       const totalPages = Math.max(1, Math.ceil(total / Math.max(1, limit)));
       const startIndex = (page - 1) * limit;
       const pagedItems = filteredItems.slice(startIndex, startIndex + limit);
 
       return {
         items: pagedItems,
-        kpis,
+        kpis: queryResult.kpis,
         page,
         limit,
         total,

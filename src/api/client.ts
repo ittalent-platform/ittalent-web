@@ -70,11 +70,18 @@ export async function refreshAuthTokens(): Promise<string | null> {
       return null;
     }
 
-    const json = (await res.json()) as {
-      data?: RefreshTokenResponse;
+    const json = (await res.json()) as Partial<RefreshTokenResponse> & {
+      data?: Partial<RefreshTokenResponse>;
     };
-    const newTokens = json?.data;
-    if (newTokens?.accessToken && newTokens?.refreshToken) {
+    const candidate =
+      typeof json?.accessToken === 'string' && typeof json?.refreshToken === 'string'
+        ? json
+        : json?.data;
+    if (candidate?.accessToken && candidate?.refreshToken) {
+      const newTokens: RefreshTokenResponse = {
+        accessToken: candidate.accessToken,
+        refreshToken: candidate.refreshToken,
+      };
       setStoredTokens(newTokens);
       return newTokens.accessToken;
     }

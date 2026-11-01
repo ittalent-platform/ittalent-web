@@ -768,6 +768,38 @@ export type PublicIndustryList = {
     }>;
 };
 
+export type PublicEnterpriseDetail = {
+    id: string;
+    name: string;
+    logoUrl: string | null;
+    industry: string;
+    companySize: string;
+    shortDescription: string | null;
+    cities: Array<string>;
+    openRoleCount: number;
+    coverUrl: string | null;
+    description: string | null;
+    cultureSummary: string | null;
+    subIndustries: Array<string>;
+    companyType: string | null;
+    foundedYear: number | null;
+    headquarters: {
+        city: string;
+        country: string;
+    };
+    website: string | null;
+    techStack: Array<string>;
+    benefits: Array<string>;
+    workingDays: string | null;
+    mediaGallery: Array<string>;
+    socialLinks: {
+        linkedin?: string | '';
+        facebook?: string | '';
+        github?: string | '';
+        twitter?: string | '';
+    } | null;
+};
+
 export type StartEnterpriseRegistrationRequest = {
     corporate_email: string;
     representative_name: string;
@@ -3857,6 +3889,35 @@ export type GetApiV1EnterprisesPublicIndustriesResponses = {
 
 export type GetApiV1EnterprisesPublicIndustriesResponse = GetApiV1EnterprisesPublicIndustriesResponses[keyof GetApiV1EnterprisesPublicIndustriesResponses];
 
+export type GetApiV1EnterprisesByEnterpriseIdPublicData = {
+    body?: never;
+    path: {
+        enterpriseId: string;
+    };
+    query?: never;
+    url: '/api/v1/enterprises/{enterpriseId}/public';
+};
+
+export type GetApiV1EnterprisesByEnterpriseIdPublicErrors = {
+    /**
+     * Invalid enterprise ID format
+     */
+    400: unknown;
+    /**
+     * Company not found or not available
+     */
+    404: unknown;
+};
+
+export type GetApiV1EnterprisesByEnterpriseIdPublicResponses = {
+    /**
+     * Public company profile
+     */
+    200: PublicEnterpriseDetail;
+};
+
+export type GetApiV1EnterprisesByEnterpriseIdPublicResponse = GetApiV1EnterprisesByEnterpriseIdPublicResponses[keyof GetApiV1EnterprisesByEnterpriseIdPublicResponses];
+
 export type DeleteApiV1EnterprisesByEnterpriseIdData = {
     body?: never;
     path: {
@@ -6708,9 +6769,9 @@ export type GetApiV1ReportsData = {
     query?: {
         page?: number;
         limit?: number;
-        status?: 'all' | 'pending' | 'reviewing' | 'resolved' | 'rejected' | 'withdrawn';
+        status?: 'all' | 'open' | 'closed' | 'pending' | 'reviewing' | 'resolved' | 'rejected' | 'withdrawn';
         target_type?: 'all' | 'job' | 'company' | 'user';
-        category?: 'all' | 'scam_fraud' | 'fee_extortion' | 'misleading_info' | 'offensive_content' | 'impersonation' | 'harassment' | 'other';
+        category?: 'all' | 'scam_fraud' | 'fee_extortion' | 'misleading_info' | 'offensive_content' | 'impersonation' | 'harassment' | 'other' | 'scam_or_fraud' | 'misleading_information' | 'discrimination' | 'inappropriate_content' | 'something_else';
         search?: string;
     };
     url: '/api/v1/reports';

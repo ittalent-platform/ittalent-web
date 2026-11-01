@@ -20,6 +20,7 @@ export type ReportsCounts = PaginatedReportsResponse['counts'];
 export type AdminBackendQuery = NonNullable<GetApiV1ReportsData['query']>;
 export type AdminBackendStatus = NonNullable<AdminBackendQuery['status']>;
 export type AdminBackendTargetType = NonNullable<AdminBackendQuery['target_type']>;
+export type AdminBackendCategory = NonNullable<AdminBackendQuery['category']>;
 
 export type AdminSubmittedFilter = 'all' | 'today' | '7d' | '30d';
 

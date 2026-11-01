@@ -11,13 +11,7 @@ import {
   X,
 } from 'lucide-react';
 
-import { client } from '@/api/client';
-import { postApiV1MeReports } from '@/api/generated/sdk.gen';
-import type {
-  PostApiV1MeReportsErrors,
-  PostApiV1MeReportsResponses,
-} from '@/api/generated/types.gen';
-import { unwrap } from '@/api/request-error';
+import { useSubmitReportMutation } from '@/hooks/use-submit-report-mutation';
 import { useSession } from '@/auth/use-session';
 import {
   REPORT_EVIDENCE_ACCEPT,
@@ -87,8 +81,9 @@ export function ReportViolationDialog({
   const [statementError, setStatementError] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedReference, setSubmittedReference] = useState<string | null>(null);
+  const submitMutation = useSubmitReportMutation();
+  const isSubmitting = submitMutation.isPending;
   const [idempotencyKey, setIdempotencyKey] = useState<string>(() => crypto.randomUUID());
 
   const statementId = useId();
@@ -101,7 +96,6 @@ export function ReportViolationDialog({
     setStatementError(null);
     setFileError(null);
     setSubmitError(null);
-    setIsSubmitting(false);
     setSubmittedReference(null);
     setIdempotencyKey(crypto.randomUUID());
   };
@@ -204,53 +198,21 @@ export function ReportViolationDialog({
       return;
     }
 
-    setIsSubmitting(true);
     try {
-      const normalizedTargetType = targetType === 'enterprise' ? 'company' : targetType;
       const effectiveKey = idempotencyKey || crypto.randomUUID();
-
-      if (files.length > 0) {
-        const formData = new FormData();
-        formData.append('targetType', normalizedTargetType);
-        formData.append('targetId', targetId);
-        formData.append('reason', selectedReason);
-        formData.append('statement', trimmedStatement);
-        formData.append('idempotencyKey', effectiveKey);
-        for (const file of files) {
-          formData.append('files', file, file.name);
-        }
-
-        const res = await client.post<PostApiV1MeReportsResponses, PostApiV1MeReportsErrors>({
-          security: [{ scheme: 'bearer', type: 'http' }],
-          url: '/api/v1/me/reports',
-          body: formData,
-          bodySerializer: null,
-          headers: {
-            'Content-Type': null,
-          },
-        });
-        const result = unwrap(res, t('reports.errors.statementRequired'));
-        const returnedRef = extractSubmittedReference(result);
-        if (returnedRef) setSubmittedReference(returnedRef);
-      } else {
-        const res = await postApiV1MeReports({
-          body: {
-            targetType: normalizedTargetType,
-            targetId,
-            reason: selectedReason,
-            statement: trimmedStatement,
-            idempotencyKey: effectiveKey,
-          },
-        });
-        const result = unwrap(res, t('reports.errors.statementRequired'));
-        const returnedRef = extractSubmittedReference(result);
-        if (returnedRef) setSubmittedReference(returnedRef);
-      }
+      const result = await submitMutation.mutateAsync({
+        targetType,
+        targetId,
+        reason: selectedReason,
+        statement: trimmedStatement,
+        idempotencyKey: effectiveKey,
+        files: files.length > 0 ? files : undefined,
+      });
+      const returnedRef = extractSubmittedReference(result);
+      if (returnedRef) setSubmittedReference(returnedRef);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t('reports.errors.statementRequired');
       setSubmitError(msg);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

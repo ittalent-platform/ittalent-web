@@ -196,3 +196,9 @@ export function formatReportTargetSubtitle(options: {
 
   return `${typeLabel} · ${trimmed}`;
 }
+
+export const REPORT_QUERY_KEYS = {
+  all: ['reports'] as const,
+  myReports: ['reports', 'mine'] as const,
+  adminReports: ['reports', 'admin'] as const,
+} as const;
