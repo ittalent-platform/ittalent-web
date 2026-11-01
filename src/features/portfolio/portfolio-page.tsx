@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import { HTTP_FORBIDDEN, HTTP_NOT_FOUND, HTTP_UNAUTHORIZED } from "@/api/http-status";
 import type { RequestError } from "@/api/request-error";
 import type { PortfolioLink } from "@/api/generated/types.gen";
+import { useSession } from "@/auth/use-session";
 import { ActionConfirmDialog } from "@/components/common/action-confirm-dialog";
 import { PageHeader } from "@/components/common/admin-page-header";
 import { Callout } from "@/components/common/callout";
@@ -21,6 +22,7 @@ import { useUrlSearchInput } from "@/hooks/use-url-search-input";
 
 import { PortfolioFormDialog } from "./portfolio-form-dialog";
 import { PortfolioRow } from "./portfolio-row";
+import { PortfolioUnverified } from "./portfolio-unverified";
 import { NEW_PORTFOLIO_HIGHLIGHT_MS, PORTFOLIO_LIMITS, PORTFOLIO_PAGE_SIZE } from "./portfolio.constants";
 import { useDeletePortfolioItem, usePortfolioQuery } from "./portfolio.queries";
 
@@ -35,6 +37,21 @@ type Dialog =
   | null;
 
 export function PortfolioPage() {
+  const { t } = useTranslation();
+  const { data: session } = useSession();
+  // Managing links needs a verified account: say so instead of offering a form the server would refuse.
+  if (session && !session.user.emailVerified) {
+    return (
+      <Shell>
+        <PageHeader title={t("portfolio.title")} />
+        <PortfolioUnverified email={session.user.email} />
+      </Shell>
+    );
+  }
+  return <PortfolioList />;
+}
+
+function PortfolioList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -59,8 +76,12 @@ export function PortfolioPage() {
   }, [highlightId]);
 
   // A page number past the end (an old link) falls back to the first page, and says so until the user pages or searches.
+  // A page the user just emptied by deleting its last item is not that: they step back one page, with nothing to explain.
   const data = query.data;
-  const pageGone = Boolean(data && page > 1 && data.items.length === 0 && data.total > 0);
+  const [emptiedPage, setEmptiedPage] = useState<number | null>(null);
+  if (emptiedPage !== null && emptiedPage !== page) setEmptiedPage(null);
+  const pageEmpty = Boolean(data && page > 1 && data.items.length === 0 && data.total > 0);
+  const pageGone = pageEmpty && emptiedPage !== page;
   const [goneFrom, setGoneFrom] = useState<number | null>(null);
   if (pageGone && goneFrom !== page) setGoneFrom(page);
   else if (goneFrom !== null && !pageGone && (page > 1 || keyword)) setGoneFrom(null);
@@ -84,14 +105,17 @@ export function PortfolioPage() {
 
   async function confirmDelete(item: PortfolioLink) {
     setActionError(null);
+    // Deleting the last item of a later page leaves that page empty: step back instead of showing "page doesn't exist".
+    const emptiesPage = items.length === 1 && page > 1;
+    if (emptiesPage) setEmptiedPage(page);
     try {
       await remove.mutateAsync({ expectedVersion: item.version, id: item.id });
       close();
-      // Deleting the last item of a later page leaves that page empty: step back instead of showing "page doesn't exist".
-      if (items.length === 1 && page > 1) set("page", String(page - 1));
+      if (emptiesPage) set("page", String(page - 1));
       toast(t("portfolio.toast.deleted"));
     } catch (error) {
       const { code, status } = error as RequestError;
+      setEmptiedPage(null);
       close();
       if (code === "VERSION_CONFLICT") setDialog({ action: "delete", kind: "conflict" });
       else if (status === HTTP_NOT_FOUND) showMissing();
@@ -153,7 +177,7 @@ export function PortfolioPage() {
         <Panel>
           <EmptyState action={{ label: t("portfolio.search.clear"), onClick: () => setSearchText(""), variant: "outline" }} description={t("portfolio.search.noMatchDescription")} title={t("portfolio.search.noMatch", { term: appliedKeyword })} />
         </Panel>
-      ) : items.length === 0 && !pageGone ? (
+      ) : items.length === 0 && !pageEmpty ? (
         <Panel>
           <EmptyState action={{ label: t("portfolio.add"), onClick: () => setDialog({ kind: "add" }) }} description={t("portfolio.empty.description")} icon={LayoutGrid} title={t("portfolio.empty.title")} />
         </Panel>

@@ -3,13 +3,14 @@ import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { InlineBanner } from "@/components/common/inline-banner";
+import { ResendBanners } from "@/components/common/resend-banners";
 import { StatusPanel } from "@/components/common/status-panel";
 import { Button } from "@/components/ui/button";
+import { useResendVerification } from "@/hooks/use-resend-verification";
 
 import { AuthCardPage, AuthStatusCard } from "./auth-status-card";
 import { AUTH_ACTION_CLASS } from "./auth-status.constants";
-import { ResendBanners, ResendButton } from "./resend-button";
-import { useResendVerification } from "./use-resend-verification";
+import { ResendButton } from "./resend-button";
 
 const STRONG = { strong: <strong className="font-semibold text-foreground" /> };
 const STEP_KEYS = ["step1", "step2", "step3"] as const;

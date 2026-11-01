@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as api from "@/api/generated";
 import type { PortfolioLink } from "@/api/generated/types.gen";
+import { useSession } from "@/auth/use-session";
 import { ToastProvider } from "@/components/toast/toast-provider";
 import { validatePortfolioItem } from "@/features/portfolio/portfolio-form-dialog";
 import { PortfolioPage } from "@/features/portfolio/portfolio-page";
@@ -13,8 +14,12 @@ vi.mock("@/api/generated", () => ({
   deleteApiV1MePortfolioLinksById: vi.fn(),
   getApiV1MePortfolioLinks: vi.fn(),
   patchApiV1MePortfolioLinksById: vi.fn(),
+  postApiV1AuthResendVerificationEmail: vi.fn(),
   postApiV1MePortfolioLinks: vi.fn(),
 }));
+vi.mock("@/auth/use-session", () => ({ useSession: vi.fn() }));
+
+const sessionOf = (emailVerified: boolean) => ({ data: { user: { email: "an.nguyen@gmail.com", emailVerified } } }) as never;
 
 const item = (over: Partial<PortfolioLink>): PortfolioLink => ({
   createdAt: "2026-10-01T00:00:00.000Z", description: "Led a 6-person team to ship a loan dashboard.", id: "p1", title: "Fintech loan dashboard", updatedAt: "2026-10-03T00:00:00.000Z",
@@ -41,6 +46,7 @@ const fill = (label: string, value: string) => fireEvent.change(screen.getByLabe
 describe("Portfolio page (UC-S4-PORT-01..04, 06)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useSession).mockReturnValue(sessionOf(true));
     vi.mocked(api.getApiV1MePortfolioLinks).mockResolvedValue(list([
       item({}),
       item({ description: null, id: "p2", title: "Talk: Running Scrum", url: "http://youtube.com/watch?v=1", version: 1 }),
@@ -78,6 +84,27 @@ describe("Portfolio page (UC-S4-PORT-01..04, 06)", () => {
     vi.mocked(api.getApiV1MePortfolioLinks).mockResolvedValue(fail(401));
     renderPage();
     expect(await screen.findByText("Sign in again to see your portfolio")).toBeInTheDocument();
+  });
+
+  describe("account not verified", () => {
+    beforeEach(() => vi.mocked(useSession).mockReturnValue(sessionOf(false)));
+
+    it("asks to verify the email instead of offering the list, and loads nothing", () => {
+      renderPage();
+      expect(screen.getByText("Verify your email to manage your portfolio")).toBeInTheDocument();
+      expect(screen.getByText("We sent a link to an.nguyen@gmail.com.")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Add portfolio item" })).not.toBeInTheDocument();
+      expect(api.getApiV1MePortfolioLinks).not.toHaveBeenCalled();
+    });
+
+    it("sends the link again to the account's address, then waits before the next one", async () => {
+      vi.mocked(api.postApiV1AuthResendVerificationEmail).mockResolvedValue(ok(undefined, 202));
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: "Resend link" }));
+      await waitFor(() => expect(api.postApiV1AuthResendVerificationEmail).toHaveBeenCalledWith({ body: { email: "an.nguyen@gmail.com" } }));
+      expect(await screen.findByText("New link sent. Links from earlier emails no longer work.")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /^Resend again in/ })).toBeDisabled();
+    });
   });
 
   it("falls back to the first page when the page in the link doesn't exist", async () => {
@@ -294,6 +321,22 @@ describe("Portfolio page (UC-S4-PORT-01..04, 06)", () => {
       fireEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
       await waitFor(() => expect(api.deleteApiV1MePortfolioLinksById).toHaveBeenCalledWith({ path: { id: "p1" }, query: { expectedVersion: 3 } }));
       expect(await screen.findByText("Portfolio item deleted. Sent applications keep their copy.")).toBeInTheDocument();
+    });
+
+    it("steps back a page without saying the page doesn't exist when the last item of the last page is deleted", async () => {
+      let deleted = false;
+      vi.mocked(api.getApiV1MePortfolioLinks).mockImplementation((async ({ query }: { query: { page: number } }) => {
+        if (!deleted) return query.page === 2 ? list([item({ id: "p21", title: "Twenty-first project", version: 1 })], { page: 2, total: 21, totalPages: 2 }) : list([item({})], { total: 21, totalPages: 2 });
+        return query.page === 2 ? list([], { page: 2, total: 20, totalPages: 1 }) : list([item({})], { total: 20, totalPages: 1 });
+      }) as never);
+      vi.mocked(api.deleteApiV1MePortfolioLinksById).mockImplementation((async () => { deleted = true; return ok(undefined, 204); }) as never);
+      renderPage("/portfolio?page=2");
+      await menu("Twenty-first project", /Delete/);
+      fireEvent.click(within(await screen.findByRole("alertdialog", { name: "Delete this portfolio item?" })).getByRole("button", { name: "Delete" }));
+      expect(await screen.findByText("Fintech loan dashboard")).toBeInTheDocument();
+      expect(screen.getByText("Portfolio item deleted. Sent applications keep their copy.")).toBeInTheDocument();
+      expect(screen.queryByText("That page doesn't exist")).not.toBeInTheDocument();
+      expect(screen.queryByText("No portfolio items yet")).not.toBeInTheDocument();
     });
 
     it("keeps the item when the user keeps it", async () => {

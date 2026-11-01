@@ -371,6 +371,11 @@
       "title": "Trang đó không tồn tại",
       "description": "Đang hiển thị trang đầu tiên của portfolio."
     },
+    "unverified": {
+      "title": "Xác minh email để quản lý portfolio",
+      "description": "Chúng tôi đã gửi liên kết tới {{email}}.",
+      "resend": "Gửi lại liên kết"
+    },
     "search": {
       "placeholder": "Tìm theo tiêu đề, mô tả hoặc liên kết",
       "tooLong": "Tối đa {{max}} ký tự.",

@@ -5,9 +5,11 @@ import { AlertTriangle, Check, CircleX, Clock3, Info, Loader2, Mail } from "luci
 
 import { getApiV1AuthVerifyEmail } from "@/api/generated";
 import { FormField } from "@/components/common/form-field";
+import { ResendBanners } from "@/components/common/resend-banners";
 import { StatusPanel } from "@/components/common/status-panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useResendVerification } from "@/hooks/use-resend-verification";
 import { AuthCardPage, AuthStatusCard } from "./auth-status-card";
 import { AUTH_ACTION_CLASS, AUTH_FULL_ACTION_CLASS, VERIFY_NEW_LINK_PATH } from "./auth-status.constants";
 import { CheckEmailScreen } from "./check-email-screen";
@@ -16,8 +18,7 @@ import {
   getEmailVerificationCallbackURL,
 } from "./email-verification";
 import { forgotPasswordPath } from "./password-reset";
-import { ResendBanners, ResendButton } from "./resend-button";
-import { useResendVerification } from "./use-resend-verification";
+import { ResendButton } from "./resend-button";
 
 type VerificationMode =
   | "registration"

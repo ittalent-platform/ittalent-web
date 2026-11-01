@@ -372,6 +372,11 @@
       "title": "That page doesn't exist",
       "description": "Showing the first page of your portfolio."
     },
+    "unverified": {
+      "title": "Verify your email to manage your portfolio",
+      "description": "We sent a link to {{email}}.",
+      "resend": "Resend link"
+    },
     "search": {
       "placeholder": "Search title, description or link",
       "tooLong": "Use up to {{max}} characters.",
