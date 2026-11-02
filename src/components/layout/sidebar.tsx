@@ -7,7 +7,7 @@ import {
   Inbox,
   LayoutDashboard,
   PanelLeftClose,
-  ShieldAlert,
+  Flag,
   Users,
   X,
 } from "lucide-react";
@@ -45,7 +45,7 @@ const adminNavItems = [
   { end: false, icon: ClipboardCheck, labelKey: "sidebar.registrations", to: "/admin/registrations" },
   { end: false, icon: Building2, labelKey: "sidebar.enterprises", to: "/admin/enterprises" },
   { end: false, icon: Bell, labelKey: "sidebar.broadcasts", to: ADMIN_BROADCASTS_PATH },
-  { end: false, icon: ShieldAlert, labelKey: "sidebar.reports", to: ADMIN_REPORTS_PATH },
+  { end: false, icon: Flag, labelKey: "sidebar.reports", to: ADMIN_REPORTS_PATH },
 ] as const;
 
 const recruiterNavItems = [

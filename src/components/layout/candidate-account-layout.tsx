@@ -5,7 +5,7 @@ import {
   Briefcase,
   FileText,
   Link2,
-  ShieldAlert,
+  Flag,
   UserRound,
   type LucideIcon,
 } from "lucide-react";
@@ -26,6 +26,7 @@ const ACCOUNT_NAV: AccountNavGroup[] = [
     items: [
       { icon: Briefcase, labelKey: "accountNav.myApplications", to: APPLICATIONS_PATH },
       { icon: Bookmark, labelKey: "accountNav.savedJobs", to: SAVED_JOBS_PATH },
+      { icon: Flag, labelKey: "accountNav.myReports", to: MY_REPORTS_PATH },
     ],
     labelKey: "accountNav.jobSearch",
   },
@@ -41,7 +42,7 @@ const ACCOUNT_NAV: AccountNavGroup[] = [
   {
     items: [
       { icon: Bell, labelKey: "accountNav.notifications", to: NOTIFICATIONS_PATH },
-      { icon: ShieldAlert, labelKey: "accountNav.myReports", to: MY_REPORTS_PATH },
+
     ],
     labelKey: "accountNav.account",
   },

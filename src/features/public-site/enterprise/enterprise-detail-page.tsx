@@ -350,26 +350,15 @@ export function EnterpriseDetailPage() {
               </div>
             ) : null}
           </div>
-          <div className="mb-1 flex items-center gap-2">
-            {jobCount > 0 ? (
-              <button
-                className="flex h-11 items-center gap-2 rounded-full bg-mkt-accent px-[22px] text-sm font-semibold text-white hover:bg-mkt-accent-hover"
-                onClick={() => jumpTo("open-jobs")}
-                type="button"
-              >
-                See {jobCount} open {jobCount === 1 ? "job" : "jobs"}
-              </button>
-            ) : null}
+          {jobCount > 0 ? (
             <button
+              className="mb-1 flex h-11 items-center gap-2 rounded-full bg-mkt-accent px-[22px] text-sm font-semibold text-white hover:bg-mkt-accent-hover"
+              onClick={() => jumpTo("open-jobs")}
               type="button"
-              onClick={() => setIsReportDialogOpen(true)}
-              className="inline-flex h-11 items-center gap-1.5 rounded-full border border-mkt-line bg-white px-4 text-xs font-semibold text-mkt-ink transition-colors hover:bg-mkt-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              title={t("reports.reportThisCompany")}
             >
-              <Flag className="size-3.5 text-mkt-muted" aria-hidden="true" />
-              <span>{t("reports.reportThisCompany")}</span>
+              See {jobCount} open {jobCount === 1 ? "job" : "jobs"}
             </button>
-          </div>
+          ) : null}
         </div>
 
         <CompanyTabs
@@ -585,6 +574,14 @@ export function EnterpriseDetailPage() {
               </Link>
             </section>
           ) : null}
+          <button
+            type="button"
+            onClick={() => setIsReportDialogOpen(true)}
+            className="self-center inline-flex items-center gap-1.5 text-[13px] font-semibold text-mkt-muted hover:text-mkt-ink transition-colors pt-2"
+          >
+            <Flag aria-hidden="true" className="size-3.5" />
+            <span>{t("reports.reportThisCompany")}</span>
+          </button>
         </aside>
       </div>
 

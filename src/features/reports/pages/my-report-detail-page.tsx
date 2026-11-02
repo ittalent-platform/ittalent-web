@@ -211,26 +211,25 @@ export function MyReportDetailPage() {
         {/* Action Button */}
         <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
           {canWithdraw && (
-            <Button
+            <button
               type="button"
-              variant="outline"
-              className="text-(--status-warning-fg) border-(--status-warning-fg)/30 hover:bg-(--status-warning-bg)"
+              className="h-10 px-4 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 font-semibold text-sm inline-flex items-center gap-2 transition-colors cursor-pointer"
               onClick={() => setIsWithdrawOpen(true)}
             >
-              <Undo2 className="size-4 mr-2" />
+              <Undo2 className="size-4" />
               <span>{t('reports.actions.withdraw')}</span>
-            </Button>
+            </button>
           )}
 
           {canHide && (
-            <Button
+            <button
               type="button"
-              variant="outline"
+              className="h-10 px-4 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm inline-flex items-center gap-2 transition-colors cursor-pointer"
               onClick={() => setIsHideOpen(true)}
             >
-              <EyeOff className="size-4 mr-2" />
+              <EyeOff className="size-4" />
               <span>{t('reports.actions.hide')}</span>
-            </Button>
+            </button>
           )}
         </div>
       </div>

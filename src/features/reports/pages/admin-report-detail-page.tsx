@@ -10,7 +10,7 @@ import {
   Lock,
   Undo2,
   User,
-  UserCheck,
+
   XCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -278,15 +278,14 @@ export function AdminReportDetailPage() {
 
         {/* Claim Button (if unclaimed / pending) */}
         {isPending && (
-          <Button
+          <button
             type="button"
             onClick={handleClaim}
             disabled={claimMutation.isPending}
-            className="self-start sm:self-auto shrink-0"
+            className="h-10 px-5 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-[13.5px] inline-flex items-center justify-center self-start sm:self-auto shrink-0 transition-colors disabled:opacity-60 cursor-pointer"
           >
-            <UserCheck className="size-4 mr-2" />
             <span>{claimMutation.isPending ? t('reports.sending') : t('reports.actions.claimToReview')}</span>
-          </Button>
+          </button>
         )}
       </div>
 
@@ -569,12 +568,13 @@ export function AdminReportDetailPage() {
 
               {/* Bottom Buttons */}
               <div className="flex items-center justify-end gap-2.5 pt-2">
-                <Button
+                <button
                   type="button"
                   onClick={handleOpenFinalizeConfirm}
+                  className="h-10 px-5 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-[13.5px] inline-flex items-center justify-center transition-colors cursor-pointer"
                 >
                   {t('reports.detail.finalizeDecision')}
-                </Button>
+                </button>
               </div>
             </section>
           ) : isDecided ? (
