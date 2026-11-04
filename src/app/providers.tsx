@@ -3,6 +3,7 @@ import { useState, type PropsWithChildren } from "react";
 
 import { SessionExpiryListener } from "@/auth/session-expiry-listener";
 import { ToastProvider } from "@/components/toast/toast-provider";
+import { NotificationStreamListener } from "@/features/notifications";
 
 export function AppProviders({ children }: PropsWithChildren) {
   const [queryClient] = useState(
@@ -20,7 +21,10 @@ export function AppProviders({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionExpiryListener />
-      <ToastProvider>{children}</ToastProvider>
+      <ToastProvider>
+        <NotificationStreamListener />
+        {children}
+      </ToastProvider>
     </QueryClientProvider>
   );
 }
