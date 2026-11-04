@@ -6,7 +6,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as authClient from "@/api/client";
 import type { UserDto } from "@/api/generated/types.gen";
 import * as useSessionModule from "@/auth/use-session";
-import * as toastProviderModule from "@/components/toast/toast-provider";
 import { NotificationStreamListener, useNotificationStream } from "@/features/notifications";
 
 class MockEventSource {
@@ -45,7 +44,6 @@ class MockEventSource {
 
 describe("Notification Stream (SSE) Integration Suite", () => {
   let queryClient: QueryClient;
-  const mockShowToast = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -56,11 +54,6 @@ describe("Notification Stream (SSE) Integration Suite", () => {
       defaultOptions: {
         queries: { retry: false },
       },
-    });
-
-    vi.spyOn(toastProviderModule, "useToast").mockReturnValue({
-      showToast: mockShowToast,
-      dismissToast: vi.fn(),
     });
   });
 
@@ -117,9 +110,10 @@ describe("Notification Stream (SSE) Integration Suite", () => {
     });
 
     const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+    const onNotificationSpy = vi.fn();
 
     function TestComponent() {
-      useNotificationStream();
+      useNotificationStream({ onNotification: onNotificationSpy });
       return null;
     }
 
@@ -148,18 +142,7 @@ describe("Notification Stream (SSE) Integration Suite", () => {
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["notifications", "unread-count"] });
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["notifications", "list"] });
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ["notifications", "infinite-list"] });
-
-      // Check toast notification
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Interview Rescheduled",
-          message: "New time: Tomorrow 14:00",
-          tone: "warning",
-          action: expect.objectContaining({
-            label: "View",
-          }),
-        }),
-      );
+      expect(onNotificationSpy).toHaveBeenCalledWith(mockNotification);
     });
   });
 

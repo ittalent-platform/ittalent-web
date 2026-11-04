@@ -4,7 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { client, getStoredTokens } from "@/api/client";
 import type { NotificationItemDto } from "@/api/generated/types.gen";
 import { useSession } from "@/auth/use-session";
-import { useToast, type ToastTone } from "@/components/toast/toast-provider";
 import { getPublicEnv } from "@/config/env";
 import { notificationKeys } from "@/features/notifications/api/notifications.queries";
 
@@ -17,7 +16,6 @@ export function useNotificationStream(options: UseNotificationStreamOptions = {}
   const { enabled = true, onNotification } = options;
   const { data: session } = useSession();
   const queryClient = useQueryClient();
-  const { showToast } = useToast();
 
   useEffect(() => {
     if (!enabled || !session?.user) {
@@ -50,26 +48,6 @@ export function useNotificationStream(options: UseNotificationStreamOptions = {}
         void queryClient.invalidateQueries({ queryKey: notificationKeys.lists() });
         void queryClient.invalidateQueries({ queryKey: notificationKeys.infiniteLists() });
 
-        // Map category to toast tone
-        let tone: ToastTone = "success";
-        if (item.category === "warning" || item.category === "action_required") {
-          tone = "warning";
-        }
-
-        showToast({
-          title: item.title,
-          message: item.message,
-          tone,
-          action: item.actionUrl
-            ? {
-                label: "View",
-                onClick: () => {
-                  window.location.assign(item.actionUrl!);
-                },
-              }
-            : undefined,
-        });
-
         onNotification?.(item);
       } catch (parseError) {
         console.error("Failed to parse SSE notification payload", parseError);
@@ -84,7 +62,7 @@ export function useNotificationStream(options: UseNotificationStreamOptions = {}
         eventSource.close();
       }
     };
-  }, [enabled, session?.user, queryClient, showToast, onNotification]);
+  }, [enabled, session?.user, queryClient, onNotification]);
 }
 
 /**
