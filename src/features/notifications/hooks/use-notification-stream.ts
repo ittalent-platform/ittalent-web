@@ -57,8 +57,8 @@ export function useNotificationStream(options: UseNotificationStreamOptions = {}
         }
 
         showToast({
-          title: item.title,
-          message: item.message,
+          title: "New Notification",
+          message: item.title ? `${item.title}: ${item.message}` : item.message,
           tone,
           action: item.actionUrl
             ? {

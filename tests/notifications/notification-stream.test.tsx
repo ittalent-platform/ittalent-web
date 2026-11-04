@@ -152,8 +152,8 @@ describe("Notification Stream (SSE) Integration Suite", () => {
       // Check toast notification
       expect(mockShowToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: "Interview Rescheduled",
-          message: "New time: Tomorrow 14:00",
+          title: "New Notification",
+          message: "Interview Rescheduled: New time: Tomorrow 14:00",
           tone: "warning",
           action: expect.objectContaining({
             label: "View",
