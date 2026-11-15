@@ -86,6 +86,34 @@ describe("ApplicationsBoard", () => {
     expect(screen.getByText("3")).toBeInTheDocument();
   });
 
+  it("renders ratio format cards / count when board is filtered and count differs from cards", () => {
+    const statusCounts = {
+      submitted: 10,
+      under_review: 4,
+      interviewing: 3,
+      offered: 2,
+      hired: 1,
+      rejected: 5,
+      withdrawn: 1,
+      position_filled: 0,
+    };
+
+    render(
+      <MemoryRouter>
+        <ApplicationsBoard
+          isFiltered={true}
+          items={[mockItem1]}
+          locale="en"
+          statusCounts={statusCounts}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("1 / 4")).toBeInTheDocument();
+    expect(screen.getByText("0 / 10")).toBeInTheDocument();
+    expect(screen.getByText("0 / 3")).toBeInTheDocument();
+  });
+
   it("renders candidate card content including avatar, job title, email, and document badges", () => {
     render(
       <MemoryRouter>

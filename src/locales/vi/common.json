@@ -515,6 +515,16 @@
     "viewMessage": "Xem tin nhắn",
     "viewMessageFor": "Xem tin nhắn của {{label}}"
   },
+  "application_status": {
+    "submitted": "Đã nộp",
+    "under_review": "Đang xem xét",
+    "interviewing": "Phỏng vấn",
+    "offered": "Đã nhận offer",
+    "hired": "Đã trúng tuyển",
+    "rejected": "Bị từ chối",
+    "withdrawn": "Đã rút đơn",
+    "position_filled": "Vị trí đã tuyển đủ"
+  },
   "applications": {
     "certificates": {
       "title": "Chứng chỉ",
@@ -581,7 +591,8 @@
       "offered": "Đã nhận offer",
       "hired": "Đã trúng tuyển",
       "rejected": "Bị từ chối",
-      "withdrawn": "Đã rút đơn"
+      "withdrawn": "Đã rút đơn",
+      "position_filled": "Vị trí đã tuyển đủ"
     },
     "attachment": {
       "cv": "CV",
@@ -663,7 +674,8 @@
       "offered": "Bạn đã nhận offer. Công ty sẽ liên hệ qua email với thông tin chi tiết.",
       "hired": "Bạn đã trúng tuyển. Chúc mừng!",
       "rejected": "Lần này bạn chưa được chọn. Bạn có thể tiếp tục ứng tuyển các vị trí khác.",
-      "withdrawn": "Bạn đã rút đơn ứng tuyển này."
+      "withdrawn": "Bạn đã rút đơn ứng tuyển này.",
+      "position_filled": "Vị trí đã tuyển đủ. Vị trí này đã được tuyển đủ bởi ứng viên khác."
     },
     "history": {
       "title": "Lịch sử trạng thái",
@@ -675,6 +687,7 @@
       "hired": "Chuyển sang Đã trúng tuyển",
       "rejected": "Chuyển sang Bị từ chối",
       "withdrawn": "Đã rút đơn",
+      "position_filled": "Vị trí đã tuyển đủ",
       "submittedAgain": "Đã nộp · ứng tuyển lại"
     },
     "historyError": "Không tải được lịch sử trạng thái.",

@@ -518,6 +518,16 @@
     "viewMessage": "View message",
     "viewMessageFor": "View message for {{label}}"
   },
+  "application_status": {
+    "submitted": "Submitted",
+    "under_review": "Under Review",
+    "interviewing": "Interviewing",
+    "offered": "Offered",
+    "hired": "Hired",
+    "rejected": "Rejected",
+    "withdrawn": "Withdrawn",
+    "position_filled": "Position Filled"
+  },
   "applications": {
     "certificates": {
       "title": "Certificates",
@@ -588,7 +598,8 @@
       "offered": "Offered",
       "hired": "Hired",
       "rejected": "Rejected",
-      "withdrawn": "Withdrawn"
+      "withdrawn": "Withdrawn",
+      "position_filled": "Position Filled"
     },
     "attachment": {
       "cv": "CV",
@@ -672,7 +683,8 @@
       "offered": "Offer received. The company will contact you by email with the details.",
       "hired": "You are hired. Congratulations!",
       "rejected": "Not selected this time. You can keep applying to other jobs.",
-      "withdrawn": "You withdrew this application."
+      "withdrawn": "You withdrew this application.",
+      "position_filled": "Position filled. The vacancy was filled by another applicant."
     },
     "history": {
       "title": "Status history",
@@ -684,6 +696,7 @@
       "hired": "Moved to Hired",
       "rejected": "Moved to Rejected",
       "withdrawn": "Withdrawn",
+      "position_filled": "Position filled",
       "submittedAgain": "Submitted · applied again"
     },
     "historyError": "Could not load the status history.",
