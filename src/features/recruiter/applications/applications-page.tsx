@@ -210,6 +210,7 @@ export function ApplicationsPage() {
     if (state.view === "board") {
       return (
         <ApplicationsBoard
+          isFiltered={state.hasFilters}
           items={data.items}
           locale={i18n.language}
           onOpenCoverLetter={handleOpenCv}

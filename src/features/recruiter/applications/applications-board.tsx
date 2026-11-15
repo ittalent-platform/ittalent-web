@@ -18,6 +18,7 @@ export interface ApplicationsBoardProps {
   items: ApplicationItem[];
   statusCounts?: Record<ApplicationStatus, number>;
   locale: string;
+  isFiltered?: boolean;
   onStatusChange?: (item: ApplicationItem, nextStatus: ApplicationStatus) => void;
   onOpenCv?: (item: ApplicationItem) => void;
   onOpenCoverLetter?: (item: ApplicationItem) => void;
@@ -27,6 +28,7 @@ export function ApplicationsBoard({
   items,
   statusCounts,
   locale,
+  isFiltered = false,
   onStatusChange,
   onOpenCv,
   onOpenCoverLetter,
@@ -110,6 +112,7 @@ export function ApplicationsBoard({
         const tone = STATUS_TONES[status];
         const cards = cardsByStatus[status] || [];
         const count = statusCounts ? statusCounts[status] ?? cards.length : cards.length;
+        const countDisplay = isFiltered && count !== cards.length ? `${cards.length} / ${count}` : `${count}`;
 
         const isCurrentColumn = draggingItem?.status === status;
         const isDropTarget = isDragging && !isCurrentColumn && isTransitionPermitted(draggingItem.status, status);
@@ -136,7 +139,7 @@ export function ApplicationsBoard({
                 {t(`applications.status.${status}`)}
               </h2>
               <span className="grid h-5 min-w-5 place-items-center rounded-full bg-muted px-1.5 text-[11px] font-bold text-muted-foreground">
-                {count}
+                {countDisplay}
               </span>
               {isIneligible ? (
                 <span
